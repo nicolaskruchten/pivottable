@@ -1,0 +1,32 @@
+
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <link rel="stylesheet" type="text/css" href="pivot.css">
+        <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="pivot.js"></script>
+    </head>
+    <style>
+        * {font-family: Verdana;}
+    </style>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+                        $("#output").pivotUI(
+        [ 
+            {color: "blue", shape: "circle"}, 
+            {color: "red", shape: "triangle"}
+        ], 
+        { 
+            rows: ["color"], 
+            cols: ["shape"] 
+        }
+    );
+             });
+        </script>
+
+        <div id="output" style="margin: 10px;"></div>
+
+    </body>
+</html>
