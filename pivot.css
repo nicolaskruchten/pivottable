@@ -37,6 +37,7 @@ table.pvtTable tr td {
     margin: 5px;
     padding: 5px;
     list-style-type: none;
+    cursor: move;
 }
 
 .pvtHorizList li { display: inline; }
