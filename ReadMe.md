@@ -1,10 +1,10 @@
 #PivotTable.js
 
-PivotTable.js is a Javascript pivot table library built on top of jQuery/jQueryUI and written in CoffeeScript by Nicolas Kruchten at Datacratic.
+PivotTable.js is a Javascript Pivot Table library built on top of jQuery/jQueryUI and written in CoffeeScript by Nicolas Kruchten at Datacratic.
 
 ##What does it do?
 
-PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table.
+PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel.
 
 
 ##Features
@@ -51,6 +51,10 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 ### Now you do it: Age distribution bar chart by Gender
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/gender_age_bins.png)
+
+### You can also exclude some rows
+
+![image](http://nicolaskruchten.github.io/pivottable/images/filters.png)
 
 
 ##How does the code work?
