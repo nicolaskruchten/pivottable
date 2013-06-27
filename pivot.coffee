@@ -1,4 +1,3 @@
-
 $ = jQuery
 
 ###
@@ -110,13 +109,13 @@ functions for accessing input
 
 deriveAttributes = (row, derivedAttributes, f) -> 
     row[k] = v(row) ? row[k] for k, v of derivedAttributes
-    row[k] ?= "null" for k of row
+    row[k] ?= "null" for own k of row
     f(row)
 
 #can handle arrays or jQuery selections of tables
 forEachRow = (input, derivedAttributes, f) ->
     if Array.isArray(input)
-        deriveAttributes(row, derivedAttributes, f) for row in input
+        deriveAttributes(row, derivedAttributes, f) for own row in input
     else
         tblCols = []
         $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
@@ -154,9 +153,9 @@ $.fn.pivot = (input, opts) ->
     totals = {rows:{}, cols:{}, all: opts.aggregator()}
     forEachRow input, opts.derivedAttributes, (row) ->
         if opts.filter(row)
-            cA = (row[x] for x in opts.cols)
+            cA = (row[x] for own x in opts.cols)
             c = cA.join("-")
-            rA = (row[x] for x in opts.rows)
+            rA = (row[x] for own x in opts.rows)
             r = rA.join("-")
             totals.all.push row
             if r != ""
@@ -192,7 +191,7 @@ $.fn.pivot = (input, opts) ->
     spanSize = (arr, i, j) ->
         if i != 0
             noDraw = true
-            for x in [0..j]
+            for own x in [0..j]
                 if arr[i-1][x] != arr[i][x]
                     noDraw = false
             if noDraw
@@ -200,24 +199,24 @@ $.fn.pivot = (input, opts) ->
         len = 0
         while i+len < arr.length
             stop = false
-            for x in [0..j]
+            for own x in [0..j]
                 stop = true if arr[i][x] != arr[i+len][x]
             break if stop
             len++
         return len
     
     #now actually build the output
-    result = $("<table class='pvtTable'>")
+    result = $("<table class='table table-bordered pvtTable'>")
 
     #the first few rows are for col headers
-    for j, c of opts.cols
+    for own j, c of opts.cols
         tr = $("<tr>")
         if parseInt(j) == 0 and opts.rows.length != 0
             tr.append $("<th>")
                 .attr("colspan", opts.rows.length)
                 .attr("rowspan", opts.cols.length)
         tr.append $("<th class='pvtAxisLabel'>").text(c)
-        for i, cA of colAs
+        for own i, cA of colAs
             x = spanSize(colAs, parseInt(i), parseInt(j))
             if x != -1
                 th = $("<th class='pvtColLabel'>").text(cA[j]).attr("colspan", x)
@@ -232,7 +231,7 @@ $.fn.pivot = (input, opts) ->
     #then a row for row header headers
     if opts.rows.length !=0
         tr = $("<tr>")
-        for i, r of opts.rows
+        for own i, r of opts.rows
             tr.append $("<th class='pvtAxisLabel'>").text(r)
         th = $("<th>")
         if opts.cols.length ==0
@@ -245,16 +244,16 @@ $.fn.pivot = (input, opts) ->
         format: -> ""
 
     #now the actual data rows, with their row headers and totals
-    for i, rA of rowAs
+    for own i, rA of rowAs
         tr = $("<tr>")
-        for j, txt of rA
+        for own j, txt of rA
             x = spanSize(rowAs, parseInt(i), parseInt(j))
             if x != -1
                 th = $("<th class='pvtRowLabel'>").text(txt).attr("rowspan", x)
                 if parseInt(j) == opts.rows.length-1 and opts.cols.length !=0
                     th.attr("colspan",2)
                 tr.append th
-        for j, cA of colAs
+        for own j, cA of colAs
             aggregator = (tree[rA.join("-")][cA.join("-")] ? nullAggregator)
             val = aggregator.value()
             tr.append $("<td class='pvtVal row#{i} col#{j}'>")
@@ -274,7 +273,7 @@ $.fn.pivot = (input, opts) ->
     th = $("<th class='pvtTotalLabel'>").text("Totals")
     th.attr("colspan", opts.rows.length + (if opts.cols.length == 0 then 0 else 1))
     tr.append th
-    for j, ca of colAs
+    for own j, ca of colAs
         totalAggregator = (totals.cols[ca.join("-")] ? nullAggregator)
         val = totalAggregator.value()
         tr.append $("<td class='pvtTotal colTotal'>")
@@ -310,34 +309,37 @@ $.fn.pivotUI = (input, opts) ->
     
     #cache the input in some useful form
     input = convertToArray(input)
-    tblCols = (k for k of input[0])
-    tblCols.push c for c of opts.derivedAttributes when (c not in tblCols)
+    tblCols = (k for own k of input[0])
+    tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
     
     #figure out the cardinality and some stats
     axisValues = {}
-    axisValues[x] = {} for x in tblCols
+    axisValues[x] = {} for own x in tblCols
 
     forEachRow input, opts.derivedAttributes, (row) ->
-        for k, v of row
+        for own k, v of row
             v ?= "null"
             axisValues[k][v] ?= 0
             axisValues[k][v]++
 
     #start building the output
-    uiTable = $("<table cellpadding='5'>")
+    uiTable = $("<table class='table table-bordered' cellpadding='5'>")
     
     #effects controls, if desired
 
-    effectNames = (x for x, y of opts.effects)
+    effectNames = (x for own x, y of opts.effects)
     if effectNames.length != 0
         effectNames.unshift "None"
         controls = $("<td colspan='2' align='center'>")
-        controls.append $("<strong>").text("Effects:")
-        for x in effectNames
+        form = $("<form>").addClass("form-inline")
+        controls.append form
+
+        form.append $("<strong>").text("Effects:")
+        for own x in effectNames
             radio = $("<input type='radio' name='effects' id='effects_#{x.replace(/\s/g, "")}'>")
               .css("margin-left":"15px", "margin-right": "5px").val(x)
             radio.attr("checked", "checked") if x=="None"
-            controls.append(radio).append $("<label for='effects_#{x.replace(/\s/g, "")}'>").text(x)
+            form.append(radio).append $("<label class='checkbox inline' for='effects_#{x.replace(/\s/g, "")}'>").text(x)
         
         uiTable.append $("<tr>").append controls
     
@@ -345,7 +347,7 @@ $.fn.pivotUI = (input, opts) ->
 
     colList = $("<td colspan='2' id='unused' class='pvtAxisContainer pvtHorizList'>")
     
-    for c in tblCols when c not in opts.hiddenAxes
+    for own c in tblCols when c not in opts.hiddenAxes
         do (c) ->
             numKeys = Object.keys(axisValues[c]).length
             colLabel = $("<nobr>").text(c)
@@ -370,7 +372,7 @@ $.fn.pivotUI = (input, opts) ->
                 btns.append $("<button>").text("Select None").bind "click", ->
                     valueList.find("input").attr "checked", false
                 valueList.append btns
-                for k in Object.keys(axisValues[c]).sort()
+                for own k in Object.keys(axisValues[c]).sort()
                      v = axisValues[c][k]
                      filterItem = $("<label>")
                      filterItem.append $("<input type='checkbox' class='pvtFilter'>")
@@ -383,7 +385,7 @@ $.fn.pivotUI = (input, opts) ->
                 $(document).one "click", ->
                     refresh()
                     valueList.toggle()
-            colList.append $("<li id='axis_#{c.replace(/\s/g, "")}'>").append(colLabel).append(valueList)
+            colList.append $("<li class='label label-info' id='axis_#{c.replace(/\s/g, "")}'>").append(colLabel).append(valueList)
 
         
     uiTable.append $("<tr>").append colList
@@ -395,7 +397,7 @@ $.fn.pivotUI = (input, opts) ->
     aggregator = $("<select id='aggregator'>")
         .css("margin-bottom", "5px")
         .bind "change", -> refresh() #capture reference
-    for x of opts.aggregators
+    for own x of opts.aggregators
         aggregator.append $("<option>").val(x).text(x)
     
     tr1.append $("<td id='vals' class='pvtAxisContainer pvtHorizList'>")
@@ -423,11 +425,11 @@ $.fn.pivotUI = (input, opts) ->
 
     #set up the UI initial state as requested by moving elements around
 
-    for x in opts.cols
+    for own x in opts.cols
         $("#cols").append $("#axis_#{x.replace(/\s/g, "")}")
-    for x in opts.rows
+    for own x in opts.rows
         $("#rows").append $("#axis_#{x.replace(/\s/g, "")}")
-    for x in opts.vals
+    for own x in opts.vals
         $("#vals").append $("#axis_#{x.replace(/\s/g, "")}")
     if opts.aggregatorName?
         $("#aggregator").val opts.aggregatorName
@@ -452,7 +454,7 @@ $.fn.pivotUI = (input, opts) ->
             exclusions.push $(this).data("filter")
         
         subopts.filter = (row) ->
-            for [k,v] in exclusions
+            for own k,v in exclusions
                 return false if row[k] == v
             return true
 
@@ -462,7 +464,7 @@ $.fn.pivotUI = (input, opts) ->
                 subopts.postProcessor = opts.effects[effect]
 
         pivotTable.pivot(input,subopts)
-            
+
     #the very first refresh will actually display the table
     refresh()
 
@@ -481,7 +483,7 @@ Heatmap post-processing
 
 $.fn.heatmap = (scope = "heatmap") ->
     [numRows, numCols] = @data "dimensions"
-    
+
     colorGen = (color, min, max) ->
         hexGen = switch color
             when "red"   then (hex) -> "ff#{hex}#{hex}"
@@ -503,15 +505,15 @@ $.fn.heatmap = (scope = "heatmap") ->
         values = []
         forEachCell (x) -> values.push x
         colorFor = colorGen color, Math.min(values...), Math.max(values...)
-        forEachCell (x, elem) -> elem.css "background-color", colorFor(x)
+        forEachCell (x, elem) -> elem.css "background-color", "#" + colorFor(x)
         
     switch scope
         when "heatmap"
             heatmapper ".pvtVal", "red"
         when "rowheatmap"
-            heatmapper ".pvtVal.row#{i}", "red" for i in [0...numRows]
+            heatmapper ".pvtVal.row#{i}", "red" for own i in [0...numRows]
         when "colheatmap"
-            heatmapper ".pvtVal.col#{j}", "red" for j in [0...numCols]
+            heatmapper ".pvtVal.col#{j}", "red" for own j in [0...numCols]
     
     heatmapper ".pvtTotal.rowTotal", "red"
     heatmapper ".pvtTotal.colTotal", "red"
@@ -553,8 +555,8 @@ $.fn.barchart =  ->
                 "padding-right":"5px"
                 
             elem.css("padding": 0,"padding-top": "5px", "text-align": "center").html wrapper
-    
-    barcharter ".pvtVal.row#{i}" for i in [0...numRows]
+
+    barcharter ".pvtVal.row#{i}" for own i in [0...numRows]
     barcharter ".pvtTotal.colTotal"
     
     return this
