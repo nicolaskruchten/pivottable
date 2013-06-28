@@ -1,6 +1,6 @@
 #PivotTable.js
 
-PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and written in CoffeeScript by Nicolas Kruchten at Datacratic.
+PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com).
 
 ##What does it do?
 
