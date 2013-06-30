@@ -115,7 +115,7 @@ deriveAttributes = (row, derivedAttributes, f) ->
 #can handle arrays or jQuery selections of tables
 forEachRow = (input, derivedAttributes, f) ->
     if Array.isArray(input)
-        deriveAttributes(row, derivedAttributes, f) for own row in input
+        deriveAttributes(row, derivedAttributes, f) for row in input
     else
         tblCols = []
         $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
@@ -153,9 +153,9 @@ $.fn.pivot = (input, opts) ->
     totals = {rows:{}, cols:{}, all: opts.aggregator()}
     forEachRow input, opts.derivedAttributes, (row) ->
         if opts.filter(row)
-            cA = (row[x] for own x in opts.cols)
+            cA = (row[x] for x in opts.cols)
             c = cA.join("-")
-            rA = (row[x] for own x in opts.rows)
+            rA = (row[x] for x in opts.rows)
             r = rA.join("-")
             totals.all.push row
             if r != ""
@@ -191,7 +191,7 @@ $.fn.pivot = (input, opts) ->
     spanSize = (arr, i, j) ->
         if i != 0
             noDraw = true
-            for own x in [0..j]
+            for x in [0..j]
                 if arr[i-1][x] != arr[i][x]
                     noDraw = false
             if noDraw
@@ -199,7 +199,7 @@ $.fn.pivot = (input, opts) ->
         len = 0
         while i+len < arr.length
             stop = false
-            for own x in [0..j]
+            for x in [0..j]
                 stop = true if arr[i][x] != arr[i+len][x]
             break if stop
             len++
@@ -314,7 +314,7 @@ $.fn.pivotUI = (input, opts) ->
     
     #figure out the cardinality and some stats
     axisValues = {}
-    axisValues[x] = {} for own x in tblCols
+    axisValues[x] = {} for x in tblCols
 
     forEachRow input, opts.derivedAttributes, (row) ->
         for own k, v of row
@@ -335,7 +335,7 @@ $.fn.pivotUI = (input, opts) ->
         controls.append form
 
         form.append $("<strong>").text("Effects:")
-        for own x in effectNames
+        for x in effectNames
             radio = $("<input type='radio' name='effects' id='effects_#{x.replace(/\s/g, "")}'>")
               .css("margin-left":"15px", "margin-right": "5px").val(x)
             radio.attr("checked", "checked") if x=="None"
@@ -347,7 +347,7 @@ $.fn.pivotUI = (input, opts) ->
 
     colList = $("<td colspan='2' id='unused' class='pvtAxisContainer pvtHorizList'>")
     
-    for own c in tblCols when c not in opts.hiddenAxes
+    for c in tblCols when c not in opts.hiddenAxes
         do (c) ->
             numKeys = Object.keys(axisValues[c]).length
             colLabel = $("<nobr>").text(c)
@@ -372,7 +372,7 @@ $.fn.pivotUI = (input, opts) ->
                 btns.append $("<button>").text("Select None").bind "click", ->
                     valueList.find("input").attr "checked", false
                 valueList.append btns
-                for own k in Object.keys(axisValues[c]).sort()
+                for k in Object.keys(axisValues[c]).sort()
                      v = axisValues[c][k]
                      filterItem = $("<label>")
                      filterItem.append $("<input type='checkbox' class='pvtFilter'>")
@@ -425,11 +425,11 @@ $.fn.pivotUI = (input, opts) ->
 
     #set up the UI initial state as requested by moving elements around
 
-    for own x in opts.cols
+    for x in opts.cols
         $("#cols").append $("#axis_#{x.replace(/\s/g, "")}")
-    for own x in opts.rows
+    for x in opts.rows
         $("#rows").append $("#axis_#{x.replace(/\s/g, "")}")
-    for own x in opts.vals
+    for x in opts.vals
         $("#vals").append $("#axis_#{x.replace(/\s/g, "")}")
     if opts.aggregatorName?
         $("#aggregator").val opts.aggregatorName
@@ -454,7 +454,7 @@ $.fn.pivotUI = (input, opts) ->
             exclusions.push $(this).data("filter")
         
         subopts.filter = (row) ->
-            for own k,v in exclusions
+            for [k,v] in exclusions
                 return false if row[k] == v
             return true
 
@@ -472,7 +472,6 @@ $.fn.pivotUI = (input, opts) ->
     $('input[name=effects]').bind "change", refresh
     $(".pvtAxisContainer")
          .sortable({connectWith:".pvtAxisContainer", items: 'li'})
-         .disableSelection()
          .bind "sortstop", refresh
 
     return this
@@ -511,9 +510,9 @@ $.fn.heatmap = (scope = "heatmap") ->
         when "heatmap"
             heatmapper ".pvtVal", "red"
         when "rowheatmap"
-            heatmapper ".pvtVal.row#{i}", "red" for own i in [0...numRows]
+            heatmapper ".pvtVal.row#{i}", "red" for i in [0...numRows]
         when "colheatmap"
-            heatmapper ".pvtVal.col#{j}", "red" for own j in [0...numCols]
+            heatmapper ".pvtVal.col#{j}", "red" for j in [0...numCols]
     
     heatmapper ".pvtTotal.rowTotal", "red"
     heatmapper ".pvtTotal.colTotal", "red"
@@ -556,7 +555,7 @@ $.fn.barchart =  ->
                 
             elem.css("padding": 0,"padding-top": "5px", "text-align": "center").html wrapper
 
-    barcharter ".pvtVal.row#{i}" for own i in [0...numRows]
+    barcharter ".pvtVal.row#{i}" for i in [0...numRows]
     barcharter ".pvtTotal.colTotal"
     
     return this
