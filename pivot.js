@@ -732,9 +732,9 @@
         return exclusions.push($(this).data("filter"));
       });
       subopts.filter = function(row) {
-        var k, v, _len7;
-        for (v = 0, _len7 = exclusions.length; v < _len7; v++) {
-          k = exclusions[v];
+        var v, _len7, _o, _ref6;
+        for (_o = 0, _len7 = exclusions.length; _o < _len7; _o++) {
+          _ref6 = exclusions[_o], k = _ref6[0], v = _ref6[1];
           if (row[k] === v) {
             return false;
           }
@@ -754,7 +754,7 @@
     $(".pvtAxisContainer").sortable({
       connectWith: ".pvtAxisContainer",
       items: 'li'
-    }).disableSelection().bind("sortstop", refresh);
+    }).bind("sortstop", refresh);
     return this;
   };
   /*
