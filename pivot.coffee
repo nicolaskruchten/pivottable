@@ -35,7 +35,7 @@ aggregatorTemplates =
                 @len++
         value: -> @sum/@len
         format: numberFormat(sigfig, scaler)
-        
+
     sumOverSum: (sigfig=3, scaler=1) -> ([num, denom]) -> ->
         sumNum: 0
         sumDenom: 0
@@ -51,13 +51,13 @@ aggregatorTemplates =
         push: (row) ->
             @sumNum   += parseFloat(row[num])   if not isNaN parseFloat(row[num])
             @sumDenom += parseFloat(row[denom]) if not isNaN parseFloat(row[denom])
-        value: -> 
+        value: ->
             sign = if upper then 1 else -1
             (0.821187207574908/@sumDenom + @sumNum/@sumDenom + 1.2815515655446004*sign*
                 Math.sqrt(0.410593603787454/ (@sumDenom*@sumDenom) + (@sumNum*(1 - @sumNum/ @sumDenom))/ (@sumDenom*@sumDenom)))/
                 (1 + 1.642374415149816/@sumDenom)
         format: numberFormat(sigfig, scaler)
-        
+
 #technically these are aggregator constructor generators (!)
 aggregators =
     count: -> ->
@@ -65,7 +65,7 @@ aggregators =
         push:  -> @count++
         value: -> @count
         format: numberFormat(0)
-    
+
     countUnique: ([field]) -> ->
         uniq: []
         push: (row) -> @uniq.push(row[field]) if row[field] not in @uniq
@@ -84,16 +84,16 @@ aggregators =
     sumOverSum: aggregatorTemplates.sumOverSum(3)
     ub80: aggregatorTemplates.sumOverSumBound80(3, 1, true)
     lb80: aggregatorTemplates.sumOverSumBound80(3, 1, false)
-    
 
-effects = 
+
+effects =
     "Row Barchart": (x) -> x.barchart()
     "Heatmap": (x) -> x.heatmap()
     "Row Heatmap": (x) -> x.heatmap("rowheatmap")
     "Col Heatmap": (x) -> x.heatmap("colheatmap")
 
-derivers = 
-    bin: (selector, binWidth) -> 
+derivers =
+    bin: (selector, binWidth) ->
         if "string" == typeof selector
             select = (x) -> x[selector]
         else
@@ -107,7 +107,7 @@ $.pivotUtilities = {aggregatorTemplates, aggregators, effects, derivers}
 functions for accessing input
 ###
 
-deriveAttributes = (row, derivedAttributes, f) -> 
+deriveAttributes = (row, derivedAttributes, f) ->
     row[k] = v(row) ? row[k] for k, v of derivedAttributes
     row[k] ?= "null" for own k of row
     f(row)
@@ -122,7 +122,7 @@ forEachRow = (input, derivedAttributes, f) ->
         $("tbody > tr", input).each (i) ->
             row = {}
             $("td", this).each (j) -> row[tblCols[j]] = $(this).text()
-            deriveAttributes(row, derivedAttributes, f) 
+            deriveAttributes(row, derivedAttributes, f)
 
 #converts to [{field:val, field:val},{field:val, field:val}] using method above
 convertToArray = (input) ->
@@ -141,7 +141,7 @@ $.fn.pivot = (input, opts) ->
         aggregator: aggregators.count()
         derivedAttributes: {},
         postProcessor: ->
-    
+
     opts = $.extend defaults, opts
 
     # iterate through input, accumulating data for cells
@@ -174,9 +174,9 @@ $.fn.pivot = (input, opts) ->
                 tree[r] = {} if r not of tree
                 tree[r][c] = opts.aggregator() if c not of tree[r]
                 tree[r][c].push row
-    
+
     #sort row/col axes for proper row/col-spanning
-    
+
     strSort = (a,b) ->
         return  1 if a > b
         return -1 if a < b
@@ -204,7 +204,7 @@ $.fn.pivot = (input, opts) ->
             break if stop
             len++
         return len
-    
+
     #now actually build the output
     result = $("<table class='table table-bordered pvtTable'>")
 
@@ -227,7 +227,7 @@ $.fn.pivot = (input, opts) ->
             tr.append $("<th class='pvtTotalLabel'>").text("Totals")
                 .attr("rowspan", opts.cols.length + (if opts.rows.length ==0 then 0 else 1))
         result.append tr
-    
+
     #then a row for row header headers
     if opts.rows.length !=0
         tr = $("<tr>")
@@ -291,7 +291,7 @@ $.fn.pivot = (input, opts) ->
     @html(result)
 
     opts.postProcessor result
-    
+
     return this
 
 ###
@@ -306,12 +306,12 @@ $.fn.pivotUI = (input, opts) ->
         hiddenAxes: []
         cols: [], rows: [], vals: []
     opts = $.extend defaults, opts
-    
+
     #cache the input in some useful form
     input = convertToArray(input)
     tblCols = (k for own k of input[0])
     tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
-    
+
     #figure out the cardinality and some stats
     axisValues = {}
     axisValues[x] = {} for x in tblCols
@@ -324,7 +324,7 @@ $.fn.pivotUI = (input, opts) ->
 
     #start building the output
     uiTable = $("<table class='table table-bordered' cellpadding='5'>")
-    
+
     #effects controls, if desired
 
     effectNames = (x for own x, y of opts.effects)
@@ -340,13 +340,13 @@ $.fn.pivotUI = (input, opts) ->
               .css("margin-left":"15px", "margin-right": "5px").val(x)
             radio.attr("checked", "checked") if x=="None"
             form.append(radio).append $("<label class='checkbox inline' for='effects_#{x.replace(/\s/g, "")}'>").text(x)
-        
+
         uiTable.append $("<tr>").append controls
-    
+
     #axis list, including the double-click menu
 
     colList = $("<td colspan='2' id='unused' class='pvtAxisContainer pvtHorizList'>")
-    
+
     for c in tblCols when c not in opts.hiddenAxes
         do (c) ->
             numKeys = Object.keys(axisValues[c]).length
@@ -387,11 +387,11 @@ $.fn.pivotUI = (input, opts) ->
                     valueList.toggle()
             colList.append $("<li class='label label-info' id='axis_#{c.replace(/\s/g, "")}'>").append(colLabel).append(valueList)
 
-        
+
     uiTable.append $("<tr>").append colList
-    
+
     tr1 = $("<tr>")
-    
+
     #aggregator menu and value area
 
     aggregator = $("<select id='aggregator'>")
@@ -399,25 +399,25 @@ $.fn.pivotUI = (input, opts) ->
         .bind "change", -> refresh() #capture reference
     for own x of opts.aggregators
         aggregator.append $("<option>").val(x).text(x)
-    
+
     tr1.append $("<td id='vals' class='pvtAxisContainer pvtHorizList'>")
       .css("text-align", "center")
       .append(aggregator).append($("<br>"))
 
     #column axes
     tr1.append $("<td id='cols' class='pvtAxisContainer pvtHorizList'>")
-    
+
     uiTable.append tr1
 
     tr2 = $("<tr>")
-    
+
     #row axes
     tr2.append $("<td valign='top' id='rows' class='pvtAxisContainer'>")
-    
+
     #the actual pivot table container
     pivotTable = $("<td valign='top'>")
     tr2.append pivotTable
-    
+
     uiTable.append tr2
 
     #render the UI in its default state
@@ -435,7 +435,7 @@ $.fn.pivotUI = (input, opts) ->
         $("#aggregator").val opts.aggregatorName
     if opts.effectsName?
         $("#effects_#{opts.effectsName.replace(/\s/g, "")}").attr('checked',true)
-    
+
     #set up for refreshing
     refresh = ->
         subopts = {derivedAttributes: opts.derivedAttributes}
@@ -445,14 +445,14 @@ $.fn.pivotUI = (input, opts) ->
         $("#rows li nobr").each -> subopts.rows.push $(this).text()
         $("#cols li nobr").each -> subopts.cols.push $(this).text()
         $("#vals li nobr").each -> vals.push $(this).text()
-        
+
         subopts.aggregator = opts.aggregators[aggregator.val()](vals)
-        
+
         #construct filter here
         exclusions = []
         $('input.pvtFilter').not(':checked').each ->
             exclusions.push $(this).data("filter")
-        
+
         subopts.filter = (row) ->
             for [k,v] in exclusions
                 return false if row[k] == v
@@ -488,24 +488,24 @@ $.fn.heatmap = (scope = "heatmap") ->
             when "red"   then (hex) -> "ff#{hex}#{hex}"
             when "green" then (hex) -> "#{hex}ff#{hex}"
             when "blue"  then (hex) -> "#{hex}#{hex}ff"
-            
-        return (x) -> 
+
+        return (x) ->
             intensity = 255 - Math.round 255*(x-min)/(max-min)
             hex = intensity.toString(16).split(".")[0]
             hex = 0+hex if hex.length == 1
             return hexGen(hex)
-        
+
     heatmapper = (scope, color) =>
-        forEachCell = (f) => 
-            @find(scope).each -> 
+        forEachCell = (f) =>
+            @find(scope).each ->
                 x = $(this).data("value")
                 f(x, $(this)) if x? and isFinite(x)
-                
+
         values = []
         forEachCell (x) -> values.push x
         colorFor = colorGen color, Math.min(values...), Math.max(values...)
         forEachCell (x, elem) -> elem.css "background-color", "#" + colorFor(x)
-        
+
     switch scope
         when "heatmap"
             heatmapper ".pvtVal", "red"
@@ -513,10 +513,10 @@ $.fn.heatmap = (scope = "heatmap") ->
             heatmapper ".pvtVal.row#{i}", "red" for i in [0...numRows]
         when "colheatmap"
             heatmapper ".pvtVal.col#{j}", "red" for j in [0...numCols]
-    
+
     heatmapper ".pvtTotal.rowTotal", "red"
     heatmapper ".pvtTotal.colTotal", "red"
-    
+
     return this
 
 ###
@@ -525,13 +525,13 @@ Barchart post-processing
 
 $.fn.barchart =  ->
     [numRows, numCols] = @data "dimensions"
-        
+
     barcharter = (scope) =>
         forEachCell = (f) =>
             @find(scope).each ->
                 x = $(this).data("value")
                 f(x, $(this)) if x? and isFinite(x)
-                
+
         values = []
         forEachCell (x) -> values.push x
         max = Math.max(values...)
@@ -552,10 +552,10 @@ $.fn.barchart =  ->
                 "position":"relative"
                 "padding-left":"5px"
                 "padding-right":"5px"
-                
+
             elem.css("padding": 0,"padding-top": "5px", "text-align": "center").html wrapper
 
     barcharter ".pvtVal.row#{i}" for i in [0...numRows]
     barcharter ".pvtTotal.colTotal"
-    
+
     return this
