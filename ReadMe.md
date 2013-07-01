@@ -59,20 +59,20 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 
 ##How does the code work?
 
-There are two main functions defined in `pivot.coffee`: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates. 
+There are two main functions defined in `pivot.coffee`: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
 Despite the fact that this is described as a Javascript library, it's actually written in [CoffeeScript](http://coffeescript.org). You can compile `pivot.coffee` into `pivot.js` with `coffee -c pivot.coffee` or you can use the precompiled JS file from the `examples` directory.
 
 Once you've loaded jQuery and pivot.js, this code ([demo](http://nicolaskruchten.github.io/pivottable/simple.html)):
 
 	$("#output").pivot(
-	    [ 
-	        {color: "blue", shape: "circle"}, 
+	    [
+	        {color: "blue", shape: "circle"},
 	        {color: "red", shape: "triangle"}
-	    ], 
-	    { 
-	        rows: ["color"], 
-	        cols: ["shape"] 
+	    ],
+	    {
+	        rows: ["color"],
+	        cols: ["shape"]
 	    }
 	);
 
@@ -83,13 +83,13 @@ appends this table to `$("#output")` (the default, *overridable* behaviour is to
 A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/simple_ui.html)):
 
 	$("#output").pivotUI(
-	    [ 
-	        {color: "blue", shape: "circle"}, 
+	    [
+	        {color: "blue", shape: "circle"},
 	        {color: "red", shape: "triangle"}
-	    ], 
-	    { 
-	        rows: ["color"], 
-	        cols: ["shape"] 
+	    ],
+	    {
+	        rows: ["color"],
+	        cols: ["shape"]
 	    }
 	);
 
@@ -115,7 +115,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 ####`pivotUI(input [,options])`
 
-`pivotUI` will essentiall draw a UI and then call `pivot`. It will call `pivot` every time the UI is changed via a drag'n'drop or an aggregator selection. The `options` object lets you set up the UI itself in terms of what visualization aggregators and effects are offered, and it lets you prepopulate the various options as well.  
+`pivotUI` will essentiall draw a UI and then call `pivot`. It will call `pivot` every time the UI is changed via a drag'n'drop or an aggregator selection. The `options` object lets you set up the UI itself in terms of what visualization aggregators and effects are offered, and it lets you prepopulate the various options as well.
 
 `input` is an array of objects, or a jQuery object referencing a table (see next section).
 
@@ -142,13 +142,13 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 	<script>
 		var input = [
 			{
-				attribute1: value1, 
-				attribute2: value2, 
+				attribute1: value1,
+				attribute2: value2,
 				//...
 			},
 			{
-				attribute1: value1, 
-				attribute2: value2, 
+				attribute1: value1,
+				attribute2: value2,
 				//...
 			},
 			//...
@@ -160,7 +160,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 	<script>
 		var input = $("#input");
 	</script>
-	
+
 	<table id="input">
 		<thead>
 			<tr>
@@ -185,7 +185,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 ##Copyright & Licence
 
-PivotTable.js is © 2012-2013 Nicolas Kruchten, Datacratic 
+PivotTable.js is © 2012-2013 Nicolas Kruchten, Datacratic
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
