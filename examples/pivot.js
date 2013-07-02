@@ -274,7 +274,11 @@
   };
   forEachRow = function(input, derivedAttributes, f) {
     var row, tblCols, _i, _len, _results;
-    if (Array.isArray(input)) {
+    if (Object.prototype.toString.call(input) === '[object Function]') {
+      return input(function(row) {
+        return deriveAttributes(row, derivedAttributes, f);
+      });
+    } else if (Array.isArray(input)) {
       _results = [];
       for (_i = 0, _len = input.length; _i < _len; _i++) {
         row = input[_i];

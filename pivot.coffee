@@ -114,7 +114,9 @@ deriveAttributes = (row, derivedAttributes, f) ->
 
 #can handle arrays or jQuery selections of tables
 forEachRow = (input, derivedAttributes, f) ->
-    if Array.isArray(input)
+    if Object.prototype.toString.call(input) == '[object Function]'
+        input (row) -> deriveAttributes(row, derivedAttributes, f)
+    else if Array.isArray(input)
         deriveAttributes(row, derivedAttributes, f) for row in input
     else
         tblCols = []

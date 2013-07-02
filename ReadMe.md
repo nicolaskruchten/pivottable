@@ -155,6 +155,24 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 		];
 	</script>
 
+###Functions that call back
+
+	<script>
+		var input = function(callback) {
+			callback({
+				attribute1: value1,
+				attribute2: value2,
+				//...
+			});
+			callback({
+				attribute1: value1,
+				attribute2: value2,
+				//...
+			};
+			//...
+		};
+	</script>
+
 ###Simple Tables
 
 	<script>
