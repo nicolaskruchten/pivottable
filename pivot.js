@@ -273,14 +273,38 @@
     return f(row);
   };
   forEachRow = function(input, derivedAttributes, f) {
-    var row, tblCols, _i, _len, _results;
-    if (Array.isArray(input)) {
-      _results = [];
-      for (_i = 0, _len = input.length; _i < _len; _i++) {
-        row = input[_i];
-        _results.push(deriveAttributes(row, derivedAttributes, f));
+    var addRow, compactRow, i, j, k, row, tblCols, _i, _len, _ref, _results, _results2;
+    addRow = function(row) {
+      return deriveAttributes(row, derivedAttributes, f);
+    };
+    if (Object.prototype.toString.call(input) === '[object Function]') {
+      return input(addRow);
+    } else if (Array.isArray(input)) {
+      if (Array.isArray(input[0])) {
+        _results = [];
+        for (i in input) {
+          if (!__hasProp.call(input, i)) continue;
+          compactRow = input[i];
+          if (i > 0) {
+            row = {};
+            _ref = input[0];
+            for (j in _ref) {
+              if (!__hasProp.call(_ref, j)) continue;
+              k = _ref[j];
+              row[k] = compactRow[j];
+            }
+            _results.push(addRow(row));
+          }
+        }
+        return _results;
+      } else {
+        _results2 = [];
+        for (_i = 0, _len = input.length; _i < _len; _i++) {
+          row = input[_i];
+          _results2.push(addRow(row));
+        }
+        return _results2;
       }
-      return _results;
     } else {
       tblCols = [];
       $("thead > tr > th", input).each(function(i) {
@@ -291,7 +315,7 @@
         $("td", this).each(function(j) {
           return row[tblCols[j]] = $(this).text();
         });
-        return deriveAttributes(row, derivedAttributes, f);
+        return addRow(row);
       });
     }
   };
