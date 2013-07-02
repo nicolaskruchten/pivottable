@@ -142,15 +142,26 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 	<script>
 		var input = [
 			{
-				attribute1: value1,
-				attribute2: value2,
+				"key1": "value1_key1",
+				"key2": "value1_key2",
 				//...
 			},
 			{
-				attribute1: value1,
-				attribute2: value2,
+				"key1": "value2_key1",
+				"key2": "value2_key2",
 				//...
 			},
+			//...
+		];
+	</script>
+
+###Arrays of arrays
+
+	<script>
+		var input = [
+			["key1", "key2"],
+			["value1_key1", "value1_key2"],
+			["value2_key1", "value2_key2"],
 			//...
 		];
 	</script>
@@ -160,20 +171,20 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 	<script>
 		var input = function(callback) {
 			callback({
-				attribute1: value1,
-				attribute2: value2,
+				"key1": "value1_key1",
+				"key2": "value1_key2",
 				//...
 			});
 			callback({
-				attribute1: value1,
-				attribute2: value2,
+				"key1": "value2_key1",
+				"key2": "value2_key2",
 				//...
 			};
 			//...
 		};
 	</script>
 
-###Simple Tables
+###jQuery References to Simple Tables
 
 	<script>
 		var input = $("#input");
@@ -182,19 +193,19 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 	<table id="input">
 		<thead>
 			<tr>
-				<th>attribute1</th>
-				<th>attribute2</th>
+				<th>key1</th>
+				<th>key2</th>
 				<!-- etc... -->
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
-				<td>value1</td>
-				<td>value2</td>
+				<td>value1_key1</td>
+				<td>value1_key2</td>
 			</tr>
 			<tr>
-				<td>value1</td>
-				<td>value2</td>
+				<td>value2_key1</td>
+				<td>value2_key2</td>
 			</tr>
 				<!-- etc... -->
 		</tbody>

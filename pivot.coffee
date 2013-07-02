@@ -114,17 +114,25 @@ deriveAttributes = (row, derivedAttributes, f) ->
 
 #can handle arrays or jQuery selections of tables
 forEachRow = (input, derivedAttributes, f) ->
+    addRow = (row) -> deriveAttributes(row, derivedAttributes, f)
+    #if it's a function, have it call us back
     if Object.prototype.toString.call(input) == '[object Function]'
-        input (row) -> deriveAttributes(row, derivedAttributes, f)
+        input(addRow)
     else if Array.isArray(input)
-        deriveAttributes(row, derivedAttributes, f) for row in input
-    else
+        if Array.isArray(input[0]) #array of arrays
+            for own i, compactRow of input when i > 0
+                row = {}
+                row[k] = compactRow[j] for own j, k of input[0]
+                addRow(row)
+        else #array of objects
+            addRow(row) for row in input
+    else #assume a jQuery reference to a table
         tblCols = []
         $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
         $("tbody > tr", input).each (i) ->
             row = {}
             $("td", this).each (j) -> row[tblCols[j]] = $(this).text()
-            deriveAttributes(row, derivedAttributes, f)
+            addRow(row)
 
 #converts to [{field:val, field:val},{field:val, field:val}] using method above
 convertToArray = (input) ->
