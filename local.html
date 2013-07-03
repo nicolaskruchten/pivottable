@@ -19,8 +19,8 @@
                     reader.onload = function(theFile) { 
                         var fileContents = theFile.target.result;
                         var lines = fileContents.split(/[\n]+/);
-                        for(i=0;i<lines.length;i++) {
-                            data.push(lines[i].split("|"));
+                        for(var i=0;i<lines.length;i++) {
+                            if(lines[i].length !=0) data.push(lines[i].split("|"));
                         }
                         $("#output").pivotUI(data)
                     };
