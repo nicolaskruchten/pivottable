@@ -321,9 +321,6 @@
   };
   convertToArray = function(input) {
     var result;
-    if (Array.isArray(input)) {
-      return input;
-    }
     result = [];
     forEachRow(input, {}, function(row) {
       return result.push(row);

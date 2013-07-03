@@ -136,7 +136,6 @@ forEachRow = (input, derivedAttributes, f) ->
 
 #converts to [{field:val, field:val},{field:val, field:val}] using method above
 convertToArray = (input) ->
-    return input if Array.isArray input
     result = []
     forEachRow input, {}, (row) -> result.push row
     return result

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo From Local CSV</title>
+        <link rel="stylesheet" type="text/css" href="pivot.css">
+        <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="pivot.js"></script>
+    </head>
+    <style>
+        * {font-family: Verdana;}
+    </style>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+                $("#csv").bind("change", function(event){
+                    var reader = new FileReader();
+                    var data = [];
+                    reader.onload = function(theFile) { 
+                        var fileContents = theFile.target.result;
+                        var lines = fileContents.split(/[\n]+/);
+                        for(i=0;i<lines.length;i++) {
+                            data.push(lines[i].split("|"));
+                        }
+                        $("#output").pivotUI(data)
+                    };
+                    reader.readAsText(event.target.files[0]);
+                });  
+             });
+        </script>
+        <p>Select a |-delimited file with no quotes: <input id="csv" type="file" /></p>
+        <div id="output" style="margin: 10px;"></div>
+
+    </body>
+</html>
