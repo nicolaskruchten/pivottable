@@ -167,19 +167,19 @@ $.fn.pivot = (input, opts) ->
             rA = (row[x] for x in opts.rows)
             r = rA.join("-")
             totals.all.push row
-            if r != ""
+            if rA.length != 0
                 if r not in rows
                     rowAs.push rA
                     rows.push r
                 totals.rows[r] = opts.aggregator() if not totals.rows[r]
                 totals.rows[r].push row
-            if c != ""
+            if cA.length != 0
                 if c not in cols
                     colAs.push cA
                     cols.push c
                 totals.cols[c] = opts.aggregator() if not totals.cols[c]
                 totals.cols[c].push row
-            if c != "" and r != ""
+            if cA.length != 0 and rA.length != 0
                 tree[r] = {} if r not of tree
                 tree[r][c] = opts.aggregator() if c not of tree[r]
                 tree[r][c].push row

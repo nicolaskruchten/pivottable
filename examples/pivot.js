@@ -377,7 +377,7 @@
         })();
         r = rA.join("-");
         totals.all.push(row);
-        if (r !== "") {
+        if (rA.length !== 0) {
           if (__indexOf.call(rows, r) < 0) {
             rowAs.push(rA);
             rows.push(r);
@@ -387,7 +387,7 @@
           }
           totals.rows[r].push(row);
         }
-        if (c !== "") {
+        if (cA.length !== 0) {
           if (__indexOf.call(cols, c) < 0) {
             colAs.push(cA);
             cols.push(c);
@@ -397,7 +397,7 @@
           }
           totals.cols[c].push(row);
         }
-        if (c !== "" && r !== "") {
+        if (cA.length !== 0 && rA.length !== 0) {
           if (!(r in tree)) {
             tree[r] = {};
           }
