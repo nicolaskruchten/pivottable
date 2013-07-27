@@ -331,7 +331,7 @@
   Pivot Table
   */
   $.fn.pivot = function(input, opts) {
-    var aggregator, arrSort, c, cA, ca, colAs, cols, defaults, i, j, nullAggregator, r, rA, result, rowAs, rows, spanSize, strSort, th, totalAggregator, totals, tr, tree, txt, val, x, _ref, _ref2, _ref3, _ref4, _ref5;
+    var aggregator, arrSort, c, cA, ca, colAs, cols, defaults, i, j, natSort, nullAggregator, r, rA, result, rowAs, rows, spanSize, th, totalAggregator, totals, tr, tree, txt, val, x, _ref, _ref2, _ref3, _ref4, _ref5;
     defaults = {
       filter: function() {
         return true;
@@ -364,7 +364,7 @@
           }
           return _results;
         })();
-        c = cA.join("-");
+        c = cA.join(String.fromCharCode(0));
         rA = (function() {
           var _i, _len, _ref, _results;
           _ref = opts.rows;
@@ -375,7 +375,7 @@
           }
           return _results;
         })();
-        r = rA.join("-");
+        r = rA.join(String.fromCharCode(0));
         totals.all.push(row);
         if (rA.length !== 0) {
           if (__indexOf.call(rows, r) < 0) {
@@ -408,17 +408,53 @@
         }
       }
     });
-    strSort = function(a, b) {
-      if (a > b) {
-        return 1;
+    natSort = function(as, bs) {
+      var a, a1, b, b1, rd, rx, rz;
+      rx = /(\d+)|(\D+)/g;
+      rd = /\d/;
+      rz = /^0/;
+      if (typeof as === "number" || typeof bs === "number") {
+        if (isNaN(as)) {
+          return 1;
+        }
+        if (isNaN(bs)) {
+          return -1;
+        }
+        return as - bs;
       }
-      if (a < b) {
-        return -1;
+      a = String(as).toLowerCase();
+      b = String(bs).toLowerCase();
+      if (a === b) {
+        return 0;
       }
-      return 0;
+      if (!(rd.test(a) && rd.test(b))) {
+        if (a > b) {
+          return 1;
+        } else {
+          return -1;
+        }
+      }
+      a = a.match(rx);
+      b = b.match(rx);
+      while (a.length && b.length) {
+        a1 = a.shift();
+        b1 = b.shift();
+        if (a1 !== b1) {
+          if (rd.test(a1) && rd.test(b1)) {
+            return a1.replace(rz, ".0") - b1.replace(rz, ".0");
+          } else {
+            if (a1 > b1) {
+              return 1;
+            } else {
+              return -1;
+            }
+          }
+        }
+      }
+      return a.length - b.length;
     };
     arrSort = function(a, b) {
-      return strSort(a.join(), b.join());
+      return natSort(a.join(), b.join());
     };
     rowAs = rowAs.sort(arrSort);
     colAs = colAs.sort(arrSort);
@@ -519,11 +555,11 @@
       for (j in colAs) {
         if (!__hasProp.call(colAs, j)) continue;
         cA = colAs[j];
-        aggregator = (_ref3 = tree[rA.join("-")][cA.join("-")]) != null ? _ref3 : nullAggregator;
+        aggregator = (_ref3 = tree[rA.join(String.fromCharCode(0))][cA.join(String.fromCharCode(0))]) != null ? _ref3 : nullAggregator;
         val = aggregator.value();
         tr.append($("<td class='pvtVal row" + i + " col" + j + "'>").text(aggregator.format(val)).data("value", val));
       }
-      totalAggregator = (_ref4 = totals.rows[rA.join("-")]) != null ? _ref4 : nullAggregator;
+      totalAggregator = (_ref4 = totals.rows[rA.join(String.fromCharCode(0))]) != null ? _ref4 : nullAggregator;
       val = totalAggregator.value();
       tr.append($("<td class='pvtTotal rowTotal'>").text(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
       result.append(tr);
@@ -535,7 +571,7 @@
     for (j in colAs) {
       if (!__hasProp.call(colAs, j)) continue;
       ca = colAs[j];
-      totalAggregator = (_ref5 = totals.cols[ca.join("-")]) != null ? _ref5 : nullAggregator;
+      totalAggregator = (_ref5 = totals.cols[ca.join(String.fromCharCode(0))]) != null ? _ref5 : nullAggregator;
       val = totalAggregator.value();
       tr.append($("<td class='pvtTotal colTotal'>").text(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
     }
