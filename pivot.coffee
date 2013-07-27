@@ -163,9 +163,9 @@ $.fn.pivot = (input, opts) ->
     forEachRow input, opts.derivedAttributes, (row) ->
         if opts.filter(row)
             cA = (row[x] for x in opts.cols)
-            c = cA.join("-")
+            c = cA.join(String.fromCharCode(0))
             rA = (row[x] for x in opts.rows)
-            r = rA.join("-")
+            r = rA.join(String.fromCharCode(0))
             totals.all.push row
             if rA.length != 0
                 if r not in rows
@@ -186,12 +186,32 @@ $.fn.pivot = (input, opts) ->
 
     #sort row/col axes for proper row/col-spanning
 
-    strSort = (a,b) ->
-        return  1 if a > b
-        return -1 if a < b
-        return  0
+    #from http://stackoverflow.com/a/4373421/112871
+    natSort = (as, bs) ->
+      rx = /(\d+)|(\D+)/g
+      rd = /\d/
+      rz = /^0/
+      if typeof as is "number" or typeof bs is "number"
+        return 1  if isNaN(as)
+        return -1  if isNaN(bs)
+        return as - bs
+      a = String(as).toLowerCase()
+      b = String(bs).toLowerCase()
+      return 0  if a is b
+      return (if a > b then 1 else -1)  unless rd.test(a) and rd.test(b)
+      a = a.match(rx)
+      b = b.match(rx)
+      while a.length and b.length
+        a1 = a.shift()
+        b1 = b.shift()
+        if a1 isnt b1
+          if rd.test(a1) and rd.test(b1)
+            return a1.replace(rz, ".0") - b1.replace(rz, ".0")
+          else
+            return (if a1 > b1 then 1 else -1)
+      a.length - b.length
 
-    arrSort = (a,b) -> strSort a.join(), b.join()
+    arrSort = (a,b) -> natSort a.join(), b.join()
 
     rowAs = rowAs.sort arrSort
     colAs = colAs.sort arrSort
@@ -263,13 +283,13 @@ $.fn.pivot = (input, opts) ->
                     th.attr("colspan",2)
                 tr.append th
         for own j, cA of colAs
-            aggregator = (tree[rA.join("-")][cA.join("-")] ? nullAggregator)
+            aggregator = (tree[rA.join(String.fromCharCode(0))][cA.join(String.fromCharCode(0))] ? nullAggregator)
             val = aggregator.value()
             tr.append $("<td class='pvtVal row#{i} col#{j}'>")
                 .text(aggregator.format val)
                 .data("value", val)
 
-        totalAggregator = (totals.rows[rA.join("-")] ? nullAggregator)
+        totalAggregator = (totals.rows[rA.join(String.fromCharCode(0))] ? nullAggregator)
         val = totalAggregator.value()
         tr.append $("<td class='pvtTotal rowTotal'>")
             .text(totalAggregator.format val)
@@ -283,7 +303,7 @@ $.fn.pivot = (input, opts) ->
     th.attr("colspan", opts.rows.length + (if opts.cols.length == 0 then 0 else 1))
     tr.append th
     for own j, ca of colAs
-        totalAggregator = (totals.cols[ca.join("-")] ? nullAggregator)
+        totalAggregator = (totals.cols[ca.join(String.fromCharCode(0))] ? nullAggregator)
         val = totalAggregator.value()
         tr.append $("<td class='pvtTotal colTotal'>")
             .text(totalAggregator.format val)
