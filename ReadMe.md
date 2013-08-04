@@ -16,6 +16,7 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 * built-in support for basic heatmap and bar chart visualization
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
 * works acceptably fast in Chrome on commodity hardware up to hundreds of thousands of rows with a dozen attributes
+* works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
 
 ##Where's the demo?
 
