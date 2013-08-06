@@ -101,7 +101,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 `pivot` will inject an HTML table into the object onto which it is called, which will summarize `input` according to `options`.
 
-`input` is an array of objects, or a jQuery object referencing a table (see next section).
+`input` is an array of objects, an array of arrays, a function or a jQuery object referencing a table (see next section).
 
 `options` is an object with the following keys:
 
@@ -110,24 +110,24 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 * `aggregator`: constructor for an object which will aggregate results per cell (see source)
 * `derivedAttributes`: object to define derived attributes (see [demo](http://nicolaskruchten.github.io/pivottable/mps_prepop.html))
 * `filter`: function called on each row, returns `false` if the row is to be excluded from the output
-* `postProcessor`: function called on the output before function returns (used by `pivotUI` to do visualization effects like `heatmap` and `barchart`)
+* `renderer`: function to generate output from pivot data structure (defaults to simple table)
 
 
 ####`pivotUI(input [,options])`
 
 `pivotUI` will essentiall draw a UI and then call `pivot`. It will call `pivot` every time the UI is changed via a drag'n'drop or an aggregator selection. The `options` object lets you set up the UI itself in terms of what visualization aggregators and effects are offered, and it lets you prepopulate the various options as well.
 
-`input` is an array of objects, or a jQuery object referencing a table (see next section).
+`input` is an array of objects, an array of arrays, a function or a jQuery object referencing a table (see next section).
 
 `options` is an object with the following keys:
 
-* `effects`: dictionary of post-processing visualization functions
+* `renderers`: dictionary of rendering functions
 * `aggregators`: dictionary of constructors for aggregation functions in dropdown
 * `rows`: array of variable names to prepopulate in row area
 * `cols`: array of variable names to prepopulate in cols area
 * `vals`: array of variable names to prepopulate in vals area
 * `aggregatorName`: aggregator to prepopulate in dropdown
-* `effectsName`: effects to prepopulate in radio button
+* `rendererName`: renderer to prepopulate in radio button
 * `derivedAttributes`: object to define derived attributes (passed through to `pivot()`)
 
 (You can also view-source on the [demo](http://nicolaskruchten.github.io/pivottable/mps_prepop.html) or log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if this isn't clear enough)

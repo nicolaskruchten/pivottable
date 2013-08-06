@@ -86,11 +86,11 @@ aggregators =
     lb80: aggregatorTemplates.sumOverSumBound80(3, 1, false)
 
 
-effects =
-    "Row Barchart": (x) -> x.barchart()
-    "Heatmap": (x) -> x.heatmap()
-    "Row Heatmap": (x) -> x.heatmap("rowheatmap")
-    "Col Heatmap": (x) -> x.heatmap("colheatmap")
+renderers =
+    "Row Barchart": (pvtData) -> buildPivotTable(pvtData).barchart()
+    "Heatmap":      (pvtData) -> buildPivotTable(pvtData).heatmap()
+    "Row Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("rowheatmap")
+    "Col Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("colheatmap")
 
 derivers =
     bin: (selector, binWidth) ->
@@ -101,7 +101,7 @@ derivers =
         (row) -> "#{select(row) - select(row) % binWidth}"
 
 
-$.pivotUtilities = {aggregatorTemplates, aggregators, effects, derivers}
+$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers}
 
 ###
 functions for accessing input
@@ -140,54 +140,19 @@ convertToArray = (input) ->
     forEachRow input, {}, (row) -> result.push row
     return result
 
-###
-Pivot Table
-###
-
-$.fn.pivot = (input, opts) ->
-    defaults =
-        filter: -> true
-        aggregator: aggregators.count()
-        derivedAttributes: {},
-        postProcessor: ->
-
-    opts = $.extend defaults, opts
-
-    # iterate through input, accumulating data for cells
-    rows = []
-    rowAs = []
-    cols = []
-    colAs = []
-    tree = {}
-    totals = {rows:{}, cols:{}, all: opts.aggregator()}
-    forEachRow input, opts.derivedAttributes, (row) ->
-        if opts.filter(row)
-            cA = (row[x] for x in opts.cols)
-            c = cA.join(String.fromCharCode(0))
-            rA = (row[x] for x in opts.rows)
-            r = rA.join(String.fromCharCode(0))
-            totals.all.push row
-            if rA.length != 0
-                if r not in rows
-                    rowAs.push rA
-                    rows.push r
-                totals.rows[r] = opts.aggregator() if not totals.rows[r]
-                totals.rows[r].push row
-            if cA.length != 0
-                if c not in cols
-                    colAs.push cA
-                    cols.push c
-                totals.cols[c] = opts.aggregator() if not totals.cols[c]
-                totals.cols[c].push row
-            if cA.length != 0 and rA.length != 0
-                tree[r] = {} if r not of tree
-                tree[r][c] = opts.aggregator() if c not of tree[r]
-                tree[r][c].push row
-
-    #sort row/col axes for proper row/col-spanning
-
-    #from http://stackoverflow.com/a/4373421/112871
-    natSort = (as, bs) ->
+class PivotData
+    constructor: (@aggregator, @colVars, @rowVars) ->
+        @tree = {}
+        @rowKeys = []
+        @colKeys = []
+        @flatRowKeys = []
+        @flatColKeys = []
+        @rowTotals = {}
+        @colTotals = {}
+        @allTotal = @aggregator()
+        @sorted = false
+    
+    natSort: (as, bs) => #from http://stackoverflow.com/a/4373421/112871
       rx = /(\d+)|(\D+)/g
       rd = /\d/
       rz = /^0/
@@ -211,85 +176,152 @@ $.fn.pivot = (input, opts) ->
             return (if a1 > b1 then 1 else -1)
       a.length - b.length
 
-    arrSort = (a,b) -> natSort a.join(), b.join()
+    arrSort: (a,b) => @natSort a.join(), b.join()
 
-    rowAs = rowAs.sort arrSort
-    colAs = colAs.sort arrSort
+    sortKeys: () =>
+        if not @sorted
+            @rowKeys.sort @arrSort
+            @colKeys.sort @arrSort
+        @sorted = true
 
-    #helper function for setting row/col-span
-    spanSize = (arr, i, j) ->
-        if i != 0
-            noDraw = true
-            for x in [0..j]
-                if arr[i-1][x] != arr[i][x]
-                    noDraw = false
-            if noDraw
-              return -1 #do not draw cell
-        len = 0
-        while i+len < arr.length
-            stop = false
-            for x in [0..j]
-                stop = true if arr[i][x] != arr[i+len][x]
-            break if stop
-            len++
-        return len
+    getColKeys: () =>
+        @sortKeys()
+        return @colKeys
+
+    getRowKeys: () =>
+        @sortKeys()
+        return @rowKeys
+
+    flattenKey: (x) => x.join(String.fromCharCode(0))
+
+    processRow: (row) ->
+        colKey = (row[x] for x in @colVars)
+        rowKey = (row[x] for x in @rowVars)
+
+        flatRowKey = @flattenKey rowKey
+        flatColKey = @flattenKey colKey
+
+        @allTotal.push row
+
+        if rowKey.length != 0
+            if flatRowKey not in @flatRowKeys
+                @rowKeys.push rowKey
+                @flatRowKeys.push flatRowKey
+            if not @rowTotals[flatRowKey]
+                @rowTotals[flatRowKey] = @aggregator() 
+            @rowTotals[flatRowKey].push row
+
+        if colKey.length != 0
+            if flatColKey not in @flatColKeys
+                @colKeys.push colKey
+                @flatColKeys.push flatColKey
+            if not @colTotals[flatColKey]
+                @colTotals[flatColKey] = @aggregator()
+            @colTotals[flatColKey].push row
+
+        if colKey.length != 0 and rowKey.length != 0
+            if flatRowKey not of @tree
+                @tree[flatRowKey] = {}
+            if flatColKey not of @tree[flatRowKey]
+                @tree[flatRowKey][flatColKey] = @aggregator() 
+            @tree[flatRowKey][flatColKey].push row
+
+    getAggregator: (rowKey, colKey) =>
+        flatRowKey = @flattenKey rowKey
+        flatColKey = @flattenKey colKey
+        if rowKey.length == 0 and colKey.length == 0
+            agg = @allTotal
+        else if rowKey.length == 0
+            agg = @colTotals[flatColKey]
+        else if colKey.length == 0 
+            agg = @rowTotals[flatRowKey]
+        else
+            agg = @tree[flatRowKey][flatColKey]
+        return agg ? {value: (-> null), format: -> ""}
+
+buildPivotData = (input, cols, rows, aggregator, filter, derivedAttributes) ->
+    # iterate through input, accumulating data for cells
+    pivotData = new PivotData(aggregator, cols, rows)
+    forEachRow input, derivedAttributes, (row) ->
+        pivotData.processRow(row) if filter(row)
+    return pivotData
+
+#helper function for setting row/col-span
+spanSize = (arr, i, j) ->
+    if i != 0
+        noDraw = true
+        for x in [0..j]
+            if arr[i-1][x] != arr[i][x]
+                noDraw = false
+        if noDraw
+          return -1 #do not draw cell
+    len = 0
+    while i+len < arr.length
+        stop = false
+        for x in [0..j]
+            stop = true if arr[i][x] != arr[i+len][x]
+        break if stop
+        len++
+    return len
+
+buildPivotTable = (pivotData) ->
+    cols = pivotData.colVars
+    rows = pivotData.rowVars
+    rowKeys = pivotData.getRowKeys()
+    colKeys = pivotData.getColKeys()
 
     #now actually build the output
     result = $("<table class='table table-bordered pvtTable'>")
 
     #the first few rows are for col headers
-    for own j, c of opts.cols
+    for own j, c of cols
         tr = $("<tr>")
-        if parseInt(j) == 0 and opts.rows.length != 0
+        if parseInt(j) == 0 and rows.length != 0
             tr.append $("<th>")
-                .attr("colspan", opts.rows.length)
-                .attr("rowspan", opts.cols.length)
+                .attr("colspan", rows.length)
+                .attr("rowspan", cols.length)
         tr.append $("<th class='pvtAxisLabel'>").text(c)
-        for own i, cA of colAs
-            x = spanSize(colAs, parseInt(i), parseInt(j))
+        for own i, colKey of colKeys
+            x = spanSize(colKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = $("<th class='pvtColLabel'>").text(cA[j]).attr("colspan", x)
-                if parseInt(j) == opts.cols.length-1 and opts.rows.length != 0
+                th = $("<th class='pvtColLabel'>").text(colKey[j]).attr("colspan", x)
+                if parseInt(j) == cols.length-1 and rows.length != 0
                     th.attr("rowspan", 2)
                 tr.append th
         if parseInt(j) == 0
             tr.append $("<th class='pvtTotalLabel'>").text("Totals")
-                .attr("rowspan", opts.cols.length + (if opts.rows.length ==0 then 0 else 1))
+                .attr("rowspan", cols.length + (if rows.length ==0 then 0 else 1))
         result.append tr
 
     #then a row for row header headers
-    if opts.rows.length !=0
+    if rows.length !=0
         tr = $("<tr>")
-        for own i, r of opts.rows
+        for own i, r of rows
             tr.append $("<th class='pvtAxisLabel'>").text(r)
         th = $("<th>")
-        if opts.cols.length ==0
+        if cols.length ==0
             th.addClass("pvtTotalLabel").text("Totals")
         tr.append th
         result.append tr
 
-    nullAggregator =
-        value: -> null
-        format: -> ""
-
     #now the actual data rows, with their row headers and totals
-    for own i, rA of rowAs
+    for own i, rowKey of rowKeys
         tr = $("<tr>")
-        for own j, txt of rA
-            x = spanSize(rowAs, parseInt(i), parseInt(j))
+        for own j, txt of rowKey
+            x = spanSize(rowKeys, parseInt(i), parseInt(j))
             if x != -1
                 th = $("<th class='pvtRowLabel'>").text(txt).attr("rowspan", x)
-                if parseInt(j) == opts.rows.length-1 and opts.cols.length !=0
+                if parseInt(j) == rows.length-1 and cols.length !=0
                     th.attr("colspan",2)
                 tr.append th
-        for own j, cA of colAs
-            aggregator = (tree[rA.join(String.fromCharCode(0))][cA.join(String.fromCharCode(0))] ? nullAggregator)
+        for own j, colKey of colKeys
+            aggregator = pivotData.getAggregator(rowKey, colKey)
             val = aggregator.value()
             tr.append $("<td class='pvtVal row#{i} col#{j}'>")
                 .text(aggregator.format val)
                 .data("value", val)
 
-        totalAggregator = (totals.rows[rA.join(String.fromCharCode(0))] ? nullAggregator)
+        totalAggregator = pivotData.getAggregator(rowKey, [])
         val = totalAggregator.value()
         tr.append $("<td class='pvtTotal rowTotal'>")
             .text(totalAggregator.format val)
@@ -300,26 +332,48 @@ $.fn.pivot = (input, opts) ->
     #finally, the row for col totals, and a grand total
     tr = $("<tr>")
     th = $("<th class='pvtTotalLabel'>").text("Totals")
-    th.attr("colspan", opts.rows.length + (if opts.cols.length == 0 then 0 else 1))
+    th.attr("colspan", rows.length + (if cols.length == 0 then 0 else 1))
     tr.append th
-    for own j, ca of colAs
-        totalAggregator = (totals.cols[ca.join(String.fromCharCode(0))] ? nullAggregator)
+    for own j, colKey of colKeys
+        totalAggregator = pivotData.getAggregator([], colKey)
         val = totalAggregator.value()
         tr.append $("<td class='pvtTotal colTotal'>")
             .text(totalAggregator.format val)
             .data("value", val)
             .data("for", "col"+j)
-    val = totals.all.value()
+    totalAggregator = pivotData.getAggregator([], [])
+    val = totalAggregator.value()
     tr.append $("<td class='pvtGrandTotal'>")
-        .text(totals.all.format val)
+        .text(totalAggregator.format val)
         .data("value", val)
     result.append tr
 
     #squirrel this away for later
-    result.data "dimensions", [rowAs.length, colAs.length]
-    @html(result)
+    result.data "dimensions", [rowKeys.length, colKeys.length]
 
-    opts.postProcessor result
+    return result
+
+###
+Pivot Table
+###
+
+$.fn.pivot = (input, opts) ->
+    defaults =
+        cols : []
+        rows: []
+        filter: -> true
+        aggregator: aggregators.count()
+        derivedAttributes: {},
+        renderer: (pivotData) -> buildPivotTable(pivotData)
+
+    opts = $.extend defaults, opts
+
+    # iterate through input, accumulating data for cells
+    pivotData = buildPivotData(input, opts.cols, opts.rows, 
+                                opts.aggregator, opts.filter, 
+                                opts.derivedAttributes)
+
+    @html opts.renderer pivotData
 
     return this
 
@@ -331,7 +385,7 @@ $.fn.pivotUI = (input, opts) ->
     defaults =
         derivedAttributes: {}
         aggregators: aggregators
-        effects: effects
+        renderers: renderers
         hiddenAxes: []
         cols: [], rows: [], vals: []
     opts = $.extend defaults, opts
@@ -354,21 +408,21 @@ $.fn.pivotUI = (input, opts) ->
     #start building the output
     uiTable = $("<table class='table table-bordered' cellpadding='5'>")
 
-    #effects controls, if desired
+    #renderers controls, if desired
 
-    effectNames = (x for own x, y of opts.effects)
-    if effectNames.length != 0
-        effectNames.unshift "None"
+    rendererNames = (x for own x, y of opts.renderers)
+    if rendererNames.length != 0
+        rendererNames.unshift "None"
         controls = $("<td colspan='2' align='center'>")
         form = $("<form>").addClass("form-inline")
         controls.append form
 
         form.append $("<strong>").text("Effects:")
-        for x in effectNames
-            radio = $("<input type='radio' name='effects' id='effects_#{x.replace(/\s/g, "")}'>")
+        for x in rendererNames
+            radio = $("<input type='radio' name='renderers' id='renderers_#{x.replace(/\s/g, "")}'>")
               .css("margin-left":"15px", "margin-right": "5px").val(x)
             radio.attr("checked", "checked") if x=="None"
-            form.append(radio).append $("<label class='checkbox inline' for='effects_#{x.replace(/\s/g, "")}'>").text(x)
+            form.append(radio).append $("<label class='checkbox inline' for='renderers_#{x.replace(/\s/g, "")}'>").text(x)
 
         uiTable.append $("<tr>").append controls
 
@@ -462,8 +516,8 @@ $.fn.pivotUI = (input, opts) ->
         $("#vals").append $("#axis_#{x.replace(/\s/g, "")}")
     if opts.aggregatorName?
         $("#aggregator").val opts.aggregatorName
-    if opts.effectsName?
-        $("#effects_#{opts.effectsName.replace(/\s/g, "")}").attr('checked',true)
+    if opts.rendererName?
+        $("#renderers_#{opts.rendererName.replace(/\s/g, "")}").attr('checked',true)
 
     #set up for refreshing
     refresh = ->
@@ -487,10 +541,10 @@ $.fn.pivotUI = (input, opts) ->
                 return false if row[k] == v
             return true
 
-        if effectNames.length != 0
-            effect = $('input[name=effects]:checked').val()
-            if effect != "None"
-                subopts.postProcessor = opts.effects[effect]
+        if rendererNames.length != 0
+            renderer = $('input[name=renderers]:checked').val()
+            if renderer != "None"
+                subopts.renderer = opts.renderers[renderer]
 
         pivotTable.pivot(input,subopts)
 
@@ -498,7 +552,7 @@ $.fn.pivotUI = (input, opts) ->
     refresh()
 
     #finally we attach the event handlers
-    $('input[name=effects]').bind "change", refresh
+    $('input[name=renderers]').bind "change", refresh
     $(".pvtAxisContainer")
          .sortable({connectWith:".pvtAxisContainer", items: 'li'})
          .bind "sortstop", refresh
