@@ -235,17 +235,9 @@
     }
   };
   derivers = {
-    bin: function(selector, binWidth) {
-      var select;
-      if ("string" === typeof selector) {
-        select = function(x) {
-          return x[selector];
-        };
-      } else {
-        select = selector;
-      }
+    bin: function(col, binWidth) {
       return function(row) {
-        return "" + (select(row) - select(row) % binWidth);
+        return row[col] - row[col] % binWidth;
       };
     }
   };
