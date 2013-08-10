@@ -1,5 +1,5 @@
 (function() {
-  var $, PivotData, addCommas, aggregatorTemplates, aggregators, buildPivotData, buildPivotTable, convertToArray, deriveAttributes, derivers, forEachRow, numberFormat, renderers, spanSize;
+  var $, PivotData, addCommas, aggregatorTemplates, aggregators, buildPivotData, buildPivotTable, convertToArray, dayNames, deriveAttributes, derivers, forEachRow, mthNames, numberFormat, renderers, spanSize, zeroPad;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -234,10 +234,53 @@
       return buildPivotTable(pvtData).heatmap("colheatmap");
     }
   };
+  mthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  zeroPad = function(number) {
+    return ("0" + number).substr(-2, 2);
+  };
   derivers = {
     bin: function(col, binWidth) {
       return function(row) {
         return row[col] - row[col] % binWidth;
+      };
+    },
+    dateFormat: function(col, formatString) {
+      return function(row) {
+        var date, dispatch;
+        date = new Date(Date.parse(row[col]));
+        dispatch = {
+          y: function() {
+            return date.getFullYear();
+          },
+          m: function() {
+            return zeroPad(date.getMonth() + 1);
+          },
+          n: function() {
+            return mthNames[date.getMonth()];
+          },
+          d: function() {
+            return zeroPad(date.getDate());
+          },
+          w: function() {
+            return dayNames[date.getDay()];
+          },
+          x: function() {
+            return date.getDay();
+          },
+          H: function() {
+            return zeroPad(date.getHours());
+          },
+          M: function() {
+            return zeroPad(date.getMinutes());
+          },
+          S: function() {
+            return zeroPad(date.getSeconds());
+          }
+        };
+        return formatString.replace(/%(.)/g, function(m, p) {
+          return dispatch[p]();
+        });
       };
     }
   };
