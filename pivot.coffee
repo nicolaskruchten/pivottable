@@ -93,12 +93,7 @@ renderers =
     "Col Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("colheatmap")
 
 derivers =
-    bin: (selector, binWidth) ->
-        if "string" == typeof selector
-            select = (x) -> x[selector]
-        else
-            select = selector
-        (row) -> "#{select(row) - select(row) % binWidth}"
+    bin: (col, binWidth) -> (row) -> row[col] - row[col] % binWidth
 
 
 $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers}
