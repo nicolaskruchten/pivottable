@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <link rel="stylesheet" type="text/css" href="pivot.css">
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="pivot.js"></script>
+        <script type="text/javascript" src="gchart_renderers.js"></script>
+    </head>
+    <style>
+        * {font-family: Verdana;}
+    </style>
+    <body>
+        <script type="text/javascript">
+            google.load("visualization", "1", {packages:["corechart"]});
+            $(function(){
+                var derivers = $.pivotUtilities.derivers;
+                var renderers = $.pivotUtilities.gchart_renderers;
+
+                $.getJSON("mps.json", function(mps) {
+                    $("#output").pivotUI(mps, {
+                        renderers: renderers,
+                        derivedAttributes: { "Age Bin": derivers.bin("Age", 10) },
+                        cols: ["Age Bin"], rows: ["Gender"],
+                        rendererName: "Area Chart"
+                    });
+                });
+             });
+        </script>
+
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>
