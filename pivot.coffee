@@ -92,9 +92,27 @@ renderers =
     "Row Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("rowheatmap")
     "Col Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("colheatmap")
 
+mthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+zeroPad = (number) -> ("0"+number).substr(-2,2)
+
 derivers =
     bin: (col, binWidth) -> (row) -> row[col] - row[col] % binWidth
-
+    dateFormat: (col, formatString) ->
+        #thanks http://stackoverflow.com/a/12213072/112871
+        (row) ->
+            date = new Date(Date.parse(row[col]))
+            dispatch =
+                y: -> date.getFullYear()
+                m: -> zeroPad(date.getMonth()+1)
+                n: -> mthNames[date.getMonth()]
+                d: -> zeroPad(date.getDate())
+                w: -> dayNames[date.getDay()]
+                x: -> date.getDay()
+                H: -> zeroPad(date.getHours())
+                M: -> zeroPad(date.getMinutes())
+                S: -> zeroPad(date.getSeconds())
+            formatString.replace /%(.)/g, (m, p) -> dispatch[p]()
 
 $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers}
 
