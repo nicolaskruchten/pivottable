@@ -20,7 +20,7 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 
 ##Where's the demo?
 
-A demo of PivotTable.js loaded up with a sample dataset of Canadian Members of Parliament as of 2012 can be found here: [PivotTable.js demo](http://nicolaskruchten.github.io/pivottable/mps_prepop.html).
+A demo of PivotTable.js loaded up with a sample dataset of Canadian Members of Parliament as of 2012 can be found here: [PivotTable.js demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html).
 
 ##How do you use the UI?
 
@@ -64,7 +64,7 @@ There are two main functions defined in `pivot.coffee`: `pivot()` and `pivotUI()
 
 Despite the fact that this is described as a Javascript library, it's actually written in [CoffeeScript](http://coffeescript.org). You can compile `pivot.coffee` into `pivot.js` with `coffee -c pivot.coffee` or you can use the precompiled JS file from the `examples` directory.
 
-Once you've loaded jQuery and pivot.js, this code ([demo](http://nicolaskruchten.github.io/pivottable/simple.html)):
+Once you've loaded jQuery and pivot.js, this code ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple.html)):
 
 	$("#output").pivot(
 	    [
@@ -81,7 +81,7 @@ appends this table to `$("#output")` (the default, *overridable* behaviour is to
 
 <table class="pvtTable"><tbody><tr><th colspan="1" rowspan="1"></th><th class="pvtAxisLabel">shape</th><th class="pvtColLabel" colspan="1" rowspan="2">circle</th><th class="pvtColLabel" colspan="1" rowspan="2">triangle</th><th class="pvtTotalLabel" rowspan="2">Totals</th></tr><tr><th class="pvtAxisLabel">color</th><th></th></tr><tr><th class="pvtRowLabel" rowspan="1" colspan="2">blue</th><td class="pvtVal row0 col0">1</td><td class="pvtVal row0 col1"></td><td class="pvtTotal rowTotal">1</td></tr><tr><th class="pvtRowLabel" rowspan="1" colspan="2">red</th><td class="pvtVal row1 col0"></td><td class="pvtVal row1 col1">1</td><td class="pvtTotal rowTotal">1</td></tr><tr><th class="pvtTotalLabel" colspan="2">Totals</th><td class="pvtTotal colTotal">1</td><td class="pvtTotal colTotal">1</td><td class="pvtGrandTotal">2</td></tr></tbody></table>
 
-A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/simple_ui.html)):
+A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
 
 	$("#output").pivotUI(
 	    [
@@ -109,7 +109,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 * `rows`: array of variable names to use as rows
 * `cols`: array of variable names for use as columns
 * `aggregator`: constructor for an object which will aggregate results per cell (see source)
-* `derivedAttributes`: object to define derived attributes (see [demo](http://nicolaskruchten.github.io/pivottable/mps_prepop.html))
+* `derivedAttributes`: object to define derived attributes (see [demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html))
 * `filter`: function called on each row, returns `false` if the row is to be excluded from the output
 * `renderer`: function to generate output from pivot data structure (defaults to simple table)
 
@@ -131,7 +131,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 * `rendererName`: renderer to prepopulate in radio button
 * `derivedAttributes`: object to define derived attributes (passed through to `pivot()`)
 
-(You can also view-source on the [demo](http://nicolaskruchten.github.io/pivottable/mps_prepop.html) or log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if this isn't clear enough)
+(You can also view-source on the [demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html) or log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if this isn't clear enough)
 
 
 
