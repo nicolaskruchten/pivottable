@@ -14,10 +14,11 @@
     </style>
     <body>
         <script type="text/javascript">
-            google.load("visualization", "1", {packages:["corechart"]});
+            google.load("visualization", "1", {packages:["corechart", "charteditor"]});
             $(function(){
                 var derivers = $.pivotUtilities.derivers;
                 var renderers = $.pivotUtilities.gchart_renderers;
+                renderers.Table = $.pivotUtilities.renderers.Table;
 
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {

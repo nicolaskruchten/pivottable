@@ -59,7 +59,8 @@
             value: function() {
               return this.sum;
             },
-            format: numberFormat(sigfig, scaler)
+            format: numberFormat(sigfig, scaler),
+            label: "Sum of " + field
           };
         };
       };
@@ -87,7 +88,8 @@
             value: function() {
               return this.sum / this.len;
             },
-            format: numberFormat(sigfig, scaler)
+            format: numberFormat(sigfig, scaler),
+            label: "Average of " + field
           };
         };
       };
@@ -117,7 +119,8 @@
             value: function() {
               return this.sumNum / this.sumDenom;
             },
-            format: numberFormat(sigfig, scaler)
+            format: numberFormat(sigfig, scaler),
+            label: "" + num + "/" + denom
           };
         };
       };
@@ -152,7 +155,8 @@
               sign = upper ? 1 : -1;
               return (0.821187207574908 / this.sumDenom + this.sumNum / this.sumDenom + 1.2815515655446004 * sign * Math.sqrt(0.410593603787454 / (this.sumDenom * this.sumDenom) + (this.sumNum * (1 - this.sumNum / this.sumDenom)) / (this.sumDenom * this.sumDenom))) / (1 + 1.642374415149816 / this.sumDenom);
             },
-            format: numberFormat(sigfig, scaler)
+            format: numberFormat(sigfig, scaler),
+            label: "" + (upper ? "Upper" : "Lower") + " Bound of " + num + "/" + denom
           };
         };
       };
@@ -169,7 +173,8 @@
           value: function() {
             return this.count;
           },
-          format: numberFormat(0)
+          format: numberFormat(0),
+          label: "Count"
         };
       };
     },
@@ -188,7 +193,8 @@
           value: function() {
             return this.uniq.length;
           },
-          format: numberFormat(0)
+          format: numberFormat(0),
+          label: "Count Unique " + field
         };
       };
     },
@@ -209,7 +215,8 @@
           },
           format: function(x) {
             return x;
-          }
+          },
+          label: "List Unique " + field
         };
       };
     },
