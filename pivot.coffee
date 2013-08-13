@@ -25,6 +25,7 @@ aggregatorTemplates =
         push: (row) -> @sum += parseFloat(row[field]) if not isNaN parseFloat(row[field])
         value: -> @sum
         format: numberFormat(sigfig, scaler)
+        label: "Sum of #{field}"
 
     average:  (sigfig=3, scaler=1) -> ([field]) -> ->
         sum: 0
@@ -35,6 +36,7 @@ aggregatorTemplates =
                 @len++
         value: -> @sum/@len
         format: numberFormat(sigfig, scaler)
+        label: "Average of #{field}"
 
     sumOverSum: (sigfig=3, scaler=1) -> ([num, denom]) -> ->
         sumNum: 0
@@ -44,6 +46,7 @@ aggregatorTemplates =
             @sumDenom += parseFloat(row[denom]) if not isNaN parseFloat(row[denom])
         value: -> @sumNum/@sumDenom
         format: numberFormat(sigfig, scaler)
+        label: "#{num}/#{denom}"
 
     sumOverSumBound80: (sigfig=3, scaler=1, upper=true) -> ([num, denom]) -> ->
         sumNum: 0
@@ -57,6 +60,7 @@ aggregatorTemplates =
                 Math.sqrt(0.410593603787454/ (@sumDenom*@sumDenom) + (@sumNum*(1 - @sumNum/ @sumDenom))/ (@sumDenom*@sumDenom)))/
                 (1 + 1.642374415149816/@sumDenom)
         format: numberFormat(sigfig, scaler)
+        label: "#{if upper then "Upper" else "Lower"} Bound of #{num}/#{denom}"
 
 #technically these are aggregator constructor generators (!)
 aggregators =
@@ -65,18 +69,21 @@ aggregators =
         push:  -> @count++
         value: -> @count
         format: numberFormat(0)
+        label: "Count"
 
     countUnique: ([field]) -> ->
         uniq: []
         push: (row) -> @uniq.push(row[field]) if row[field] not in @uniq
         value: -> @uniq.length
         format: numberFormat(0)
+        label: "Count Unique #{field}"
 
     listUnique: ([field]) -> ->
         uniq: []
         push: (row) -> @uniq.push(row[field]) if row[field] not in @uniq
         value: -> @uniq.join ", "
         format: (x) -> x
+        label: "List Unique #{field}"
 
     intSum: aggregatorTemplates.sum(0)
     sum: aggregatorTemplates.sum(3)

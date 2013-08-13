@@ -9,31 +9,51 @@ makeGoogleChart = (chartType, extraOptions) -> (pivotData) ->
 	headers = (h.join("-") for h in rowKeys)
 	headers.unshift ""
 
+	numCharsInHAxis = 0
 	dataArray = [headers]
 	for colKey in colKeys
 		row = [colKey.join("-")]
+		numCharsInHAxis += row[0].length
 		for rowKey in rowKeys
-			row.push pivotData.getAggregator(rowKey, colKey).value()
+			agg = pivotData.getAggregator(rowKey, colKey)
+			if agg.value()?
+				row.push parseFloat agg.format agg.value()
+			else row.push null
 		dataArray.push row
 
+	title = vAxisTitle = pivotData.aggregator().label
+	hAxisTitle = pivotData.colVars.join("-")
+	title += " vs #{hAxisTitle}" if hAxisTitle != ""
+	groupByTitle = pivotData.rowVars.join("-")
+	title += " by #{groupByTitle}" if groupByTitle != ""
+
 	options = 
-		width: $(window).width() / 1.5
-		height: $(window).height() / 1.5
-		hAxis: slantedText: true
+		width: $(window).width() / 1.4
+		height: $(window).height() / 1.4
+		title: title
+		hAxis: {title: hAxisTitle, slantedText: numCharsInHAxis > 50}
+		vAxis: {title: vAxisTitle}
+
 	if dataArray[0].length == 2 and dataArray[0][1] ==  ""
 		options.legend = position: "none"
 
 	options[k] = v for k, v of extraOptions
 
-	data = google.visualization.arrayToDataTable(dataArray)
+	dataTable = google.visualization.arrayToDataTable(dataArray)
 
 	result = $("<div style='width: 100%; height: 100%;'>")
-	chart = new google.visualization[chartType](result[0])
-	chart.draw(data, options)
+	wrapper = new google.visualization.ChartWrapper {dataTable, chartType, options}
+	wrapper.draw(result[0])	
+	result.bind "dblclick", -> 
+		editor = new google.visualization.ChartEditor()
+		google.visualization.events.addListener editor, 'ok', -> 
+			editor.getChartWrapper().draw(result[0])
+		editor.openDialog(wrapper)
 	return result
 
 $.pivotUtilities.gchart_renderers = 
 	"Line Chart": makeGoogleChart("LineChart")
-	"Column Chart": makeGoogleChart("ColumnChart")
-	"Bar Chart": makeGoogleChart("BarChart")
+	"Bar Chart": makeGoogleChart("ColumnChart")
 	"Area Chart": makeGoogleChart("AreaChart", isStacked: true)
+
+

@@ -3,7 +3,7 @@
   $ = jQuery;
   makeGoogleChart = function(chartType, extraOptions) {
     return function(pivotData) {
-      var chart, colKey, colKeys, data, dataArray, h, headers, k, options, result, row, rowKey, rowKeys, v, _i, _j, _len, _len2;
+      var agg, colKey, colKeys, dataArray, dataTable, groupByTitle, h, hAxisTitle, headers, k, numCharsInHAxis, options, result, row, rowKey, rowKeys, title, v, vAxisTitle, wrapper, _i, _j, _len, _len2;
       rowKeys = pivotData.getRowKeys();
       if (rowKeys.length === 0) {
         rowKeys.push([]);
@@ -22,21 +22,42 @@
         return _results;
       })();
       headers.unshift("");
+      numCharsInHAxis = 0;
       dataArray = [headers];
       for (_i = 0, _len = colKeys.length; _i < _len; _i++) {
         colKey = colKeys[_i];
         row = [colKey.join("-")];
+        numCharsInHAxis += row[0].length;
         for (_j = 0, _len2 = rowKeys.length; _j < _len2; _j++) {
           rowKey = rowKeys[_j];
-          row.push(pivotData.getAggregator(rowKey, colKey).value());
+          agg = pivotData.getAggregator(rowKey, colKey);
+          if (agg.value() != null) {
+            row.push(parseFloat(agg.format(agg.value())));
+          } else {
+            row.push(null);
+          }
         }
         dataArray.push(row);
       }
+      title = vAxisTitle = pivotData.aggregator().label;
+      hAxisTitle = pivotData.colVars.join("-");
+      if (hAxisTitle !== "") {
+        title += " vs " + hAxisTitle;
+      }
+      groupByTitle = pivotData.rowVars.join("-");
+      if (groupByTitle !== "") {
+        title += " by " + groupByTitle;
+      }
       options = {
-        width: $(window).width() / 1.5,
-        height: $(window).height() / 1.5,
+        width: $(window).width() / 1.4,
+        height: $(window).height() / 1.4,
+        title: title,
         hAxis: {
-          slantedText: true
+          title: hAxisTitle,
+          slantedText: numCharsInHAxis > 50
+        },
+        vAxis: {
+          title: vAxisTitle
         }
       };
       if (dataArray[0].length === 2 && dataArray[0][1] === "") {
@@ -48,17 +69,28 @@
         v = extraOptions[k];
         options[k] = v;
       }
-      data = google.visualization.arrayToDataTable(dataArray);
+      dataTable = google.visualization.arrayToDataTable(dataArray);
       result = $("<div style='width: 100%; height: 100%;'>");
-      chart = new google.visualization[chartType](result[0]);
-      chart.draw(data, options);
+      wrapper = new google.visualization.ChartWrapper({
+        dataTable: dataTable,
+        chartType: chartType,
+        options: options
+      });
+      wrapper.draw(result[0]);
+      result.bind("dblclick", function() {
+        var editor;
+        editor = new google.visualization.ChartEditor();
+        google.visualization.events.addListener(editor, 'ok', function() {
+          return editor.getChartWrapper().draw(result[0]);
+        });
+        return editor.openDialog(wrapper);
+      });
       return result;
     };
   };
   $.pivotUtilities.gchart_renderers = {
     "Line Chart": makeGoogleChart("LineChart"),
-    "Column Chart": makeGoogleChart("ColumnChart"),
-    "Bar Chart": makeGoogleChart("BarChart"),
+    "Bar Chart": makeGoogleChart("ColumnChart"),
     "Area Chart": makeGoogleChart("AreaChart", {
       isStacked: true
     })
