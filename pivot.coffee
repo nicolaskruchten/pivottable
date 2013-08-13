@@ -87,7 +87,8 @@ aggregators =
 
 
 renderers =
-    "Row Barchart": (pvtData) -> buildPivotTable(pvtData).barchart()
+    "Table": buildPivotData
+    "Table Barchart": (pvtData) -> buildPivotTable(pvtData).barchart()
     "Heatmap":      (pvtData) -> buildPivotTable(pvtData).heatmap()
     "Row Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("rowheatmap")
     "Col Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("colheatmap")
@@ -425,16 +426,17 @@ $.fn.pivotUI = (input, opts) ->
 
     rendererNames = (x for own x, y of opts.renderers)
     if rendererNames.length != 0
-        rendererNames.unshift "None"
         controls = $("<td colspan='2' align='center'>")
         form = $("<form>").addClass("form-inline")
         controls.append form
 
-        form.append $("<strong>").text("Effects:")
+        first = true
         for x in rendererNames
             radio = $("<input type='radio' name='renderers' id='renderers_#{x.replace(/\s/g, "")}'>")
               .css("margin-left":"15px", "margin-right": "5px").val(x)
-            radio.attr("checked", "checked") if x=="None"
+            if first
+                radio.attr("checked", "checked") 
+                first = false
             form.append(radio).append $("<label class='checkbox inline' for='renderers_#{x.replace(/\s/g, "")}'>").text(x)
 
         uiTable.append $("<tr>").append controls
@@ -459,7 +461,7 @@ $.fn.pivotUI = (input, opts) ->
                     "position": "absolute"
                     "padding": "20px"
             valueList.append $("<strong>").text "#{numKeys} values for #{c}"
-            if numKeys > 20
+            if numKeys > 50
                 valueList.append $("<p>").text "(too many to list)"
             else
                 btns = $("<p>")
@@ -556,8 +558,7 @@ $.fn.pivotUI = (input, opts) ->
 
         if rendererNames.length != 0
             renderer = $('input[name=renderers]:checked').val()
-            if renderer != "None"
-                subopts.renderer = opts.renderers[renderer]
+            subopts.renderer = opts.renderers[renderer]
 
         pivotTable.pivot(input,subopts)
 
