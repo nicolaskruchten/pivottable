@@ -221,7 +221,8 @@
     lb80: aggregatorTemplates.sumOverSumBound80(3, 1, false)
   };
   renderers = {
-    "Row Barchart": function(pvtData) {
+    "Table": buildPivotData,
+    "Table Barchart": function(pvtData) {
       return buildPivotTable(pvtData).barchart();
     },
     "Heatmap": function(pvtData) {
@@ -685,7 +686,7 @@
   UI code, calls pivot table above
   */
   $.fn.pivotUI = function(input, opts) {
-    var aggregator, axisValues, c, colList, controls, defaults, form, k, pivotTable, radio, refresh, rendererNames, tblCols, tr1, tr2, uiTable, x, y, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _len6, _m, _n, _ref, _ref2, _ref3, _ref4, _ref5;
+    var aggregator, axisValues, c, colList, controls, defaults, first, form, k, pivotTable, radio, refresh, rendererNames, tblCols, tr1, tr2, uiTable, x, y, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _len6, _m, _n, _ref, _ref2, _ref3, _ref4, _ref5;
     defaults = {
       derivedAttributes: {},
       aggregators: aggregators,
@@ -748,19 +749,19 @@
       return _results;
     })();
     if (rendererNames.length !== 0) {
-      rendererNames.unshift("None");
       controls = $("<td colspan='2' align='center'>");
       form = $("<form>").addClass("form-inline");
       controls.append(form);
-      form.append($("<strong>").text("Effects:"));
+      first = true;
       for (_j = 0, _len2 = rendererNames.length; _j < _len2; _j++) {
         x = rendererNames[_j];
         radio = $("<input type='radio' name='renderers' id='renderers_" + (x.replace(/\s/g, "")) + "'>").css({
           "margin-left": "15px",
           "margin-right": "5px"
         }).val(x);
-        if (x === "None") {
+        if (first) {
           radio.attr("checked", "checked");
+          first = false;
         }
         form.append(radio).append($("<label class='checkbox inline' for='renderers_" + (x.replace(/\s/g, "")) + "'>").text(x));
       }
@@ -786,7 +787,7 @@
             "padding": "20px"
           });
           valueList.append($("<strong>").text("" + numKeys + " values for " + c));
-          if (numKeys > 20) {
+          if (numKeys > 50) {
             valueList.append($("<p>").text("(too many to list)"));
           } else {
             btns = $("<p>");
@@ -898,9 +899,7 @@
       };
       if (rendererNames.length !== 0) {
         renderer = $('input[name=renderers]:checked').val();
-        if (renderer !== "None") {
-          subopts.renderer = opts.renderers[renderer];
-        }
+        subopts.renderer = opts.renderers[renderer];
       }
       return pivotTable.pivot(input, subopts);
     };
