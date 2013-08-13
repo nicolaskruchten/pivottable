@@ -5,6 +5,7 @@
         <link rel="stylesheet" type="text/css" href="pivot.css">
         <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="jquery.csv-0.71.min.js"></script>
         <script type="text/javascript" src="pivot.js"></script>
     </head>
     <style>
@@ -15,20 +16,14 @@
             $(function(){
                 $("#csv").bind("change", function(event){
                     var reader = new FileReader();
-                    var data = [];
                     reader.onload = function(theFile) { 
-                        var fileContents = theFile.target.result;
-                        var lines = fileContents.split(/[\n]+/);
-                        for(var i=0;i<lines.length;i++) {
-                            if(lines[i].length !=0) data.push(lines[i].split("|"));
-                        }
-                        $("#output").pivotUI(data)
+                        $("#output").pivotUI( $.csv.toArrays(theFile.target.result) );
                     };
                     reader.readAsText(event.target.files[0]);
                 });  
              });
         </script>
-        <p>Select a |-delimited file with no quotes: <input id="csv" type="file" /></p>
+        <p>Select a CSV file: <input id="csv" type="file" /></p>
         <div id="output" style="margin: 10px;"></div>
 
     </body>
