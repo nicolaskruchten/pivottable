@@ -34,7 +34,10 @@
       }
       options = {
         width: $(window).width() / 1.5,
-        height: $(window).height() / 1.5
+        height: $(window).height() / 1.5,
+        hAxis: {
+          slantedText: true
+        }
       };
       if (dataArray[0].length === 2 && dataArray[0][1] === "") {
         options.legend = {

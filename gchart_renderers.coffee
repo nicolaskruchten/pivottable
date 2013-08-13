@@ -19,6 +19,7 @@ makeGoogleChart = (chartType, extraOptions) -> (pivotData) ->
 	options = 
 		width: $(window).width() / 1.5
 		height: $(window).height() / 1.5
+		hAxis: slantedText: true
 	if dataArray[0].length == 2 and dataArray[0][1] ==  ""
 		options.legend = position: "none"
 
