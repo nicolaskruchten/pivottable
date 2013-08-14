@@ -102,28 +102,28 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 `pivot` will inject an HTML table into the object onto which it is called, which will summarize `input` according to `options`.
 
-`input` is an array of objects, an array of arrays, a function or a jQuery object referencing a table (see next section).
+`input` is an array of objects, an array of arrays, a function or a jQuery object referencing a table (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)).
 
 `options` is an object with the following keys:
 
 * `rows`: array of variable names to use as rows
 * `cols`: array of variable names for use as columns
-* `aggregator`: constructor for an object which will aggregate results per cell (see source)
+* `aggregator`: constructor for an object which will aggregate results per cell (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
+* `renderer`: function to generate output from pivot data structure (defaults to simple table, see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
 * `derivedAttributes`: object to define derived attributes (see [demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html))
 * `filter`: function called on each row, returns `false` if the row is to be excluded from the output
-* `renderer`: function to generate output from pivot data structure (defaults to simple table)
 
 
 ####`pivotUI(input [,options])`
 
 `pivotUI` will essentiall draw a UI and then call `pivot`. It will call `pivot` every time the UI is changed via a drag'n'drop or an aggregator selection. The `options` object lets you set up the UI itself in terms of what visualization aggregators and effects are offered, and it lets you prepopulate the various options as well.
 
-`input` is an array of objects, an array of arrays, a function or a jQuery object referencing a table (see next section).
+`input` is an array of objects, an array of arrays, a function or a jQuery object referencing a table (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)).
 
 `options` is an object with the following keys:
 
-* `renderers`: dictionary of rendering functions
-* `aggregators`: dictionary of constructors for aggregation functions in dropdown
+* `renderers`: dictionary of rendering functions (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
+* `aggregators`: dictionary of constructors for aggregation functions in dropdown (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
 * `rows`: array of variable names to prepopulate in row area
 * `cols`: array of variable names to prepopulate in cols area
 * `vals`: array of variable names to prepopulate in vals area
@@ -131,86 +131,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 * `rendererName`: renderer to prepopulate in radio button
 * `derivedAttributes`: object to define derived attributes (passed through to `pivot()`)
 
-(You can also view-source on the [demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html) or log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if this isn't clear enough)
-
-
-
-##Input Formats
-
-
-###Arrays of objects
-
-	<script>
-		var input = [
-			{
-				"key1": "value1_key1",
-				"key2": "value1_key2",
-				//...
-			},
-			{
-				"key1": "value2_key1",
-				"key2": "value2_key2",
-				//...
-			},
-			//...
-		];
-	</script>
-
-###Arrays of arrays
-
-	<script>
-		var input = [
-			["key1", "key2"],
-			["value1_key1", "value1_key2"],
-			["value2_key1", "value2_key2"],
-			//...
-		];
-	</script>
-
-###Functions that call back
-
-	<script>
-		var input = function(callback) {
-			callback({
-				"key1": "value1_key1",
-				"key2": "value1_key2",
-				//...
-			});
-			callback({
-				"key1": "value2_key1",
-				"key2": "value2_key2",
-				//...
-			};
-			//...
-		};
-	</script>
-
-###jQuery References to Simple Tables
-
-	<script>
-		var input = $("#input");
-	</script>
-
-	<table id="input">
-		<thead>
-			<tr>
-				<th>key1</th>
-				<th>key2</th>
-				<!-- etc... -->
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>value1_key1</td>
-				<td>value1_key2</td>
-			</tr>
-			<tr>
-				<td>value2_key1</td>
-				<td>value2_key2</td>
-			</tr>
-				<!-- etc... -->
-		</tbody>
-	</table>
+Please log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if the documentation here or on the [wiki](https://github.com/nicolaskruchten/pivottable/wiki) doesn't answer your question!
 
 
 ##Copyright & Licence
