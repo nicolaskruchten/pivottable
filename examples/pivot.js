@@ -255,39 +255,31 @@
     },
     dateFormat: function(col, formatString) {
       return function(row) {
-        var date, dispatch;
+        var date;
         date = new Date(Date.parse(row[col]));
-        dispatch = {
-          y: function() {
-            return date.getFullYear();
-          },
-          m: function() {
-            return zeroPad(date.getMonth() + 1);
-          },
-          n: function() {
-            return mthNames[date.getMonth()];
-          },
-          d: function() {
-            return zeroPad(date.getDate());
-          },
-          w: function() {
-            return dayNames[date.getDay()];
-          },
-          x: function() {
-            return date.getDay();
-          },
-          H: function() {
-            return zeroPad(date.getHours());
-          },
-          M: function() {
-            return zeroPad(date.getMinutes());
-          },
-          S: function() {
-            return zeroPad(date.getSeconds());
-          }
-        };
         return formatString.replace(/%(.)/g, function(m, p) {
-          return dispatch[p]();
+          switch (p) {
+            case "y":
+              return date.getFullYear();
+            case "m":
+              return zeroPad(date.getMonth() + 1);
+            case "n":
+              return mthNames[date.getMonth()];
+            case "d":
+              return zeroPad(date.getDate());
+            case "w":
+              return dayNames[date.getDay()];
+            case "x":
+              return date.getDay();
+            case "H":
+              return zeroPad(date.getHours());
+            case "M":
+              return zeroPad(date.getMinutes());
+            case "S":
+              return zeroPad(date.getSeconds());
+            default:
+              return "%" + p;
+          }
         });
       };
     }

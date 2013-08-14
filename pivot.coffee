@@ -110,17 +110,18 @@ derivers =
         #thanks http://stackoverflow.com/a/12213072/112871
         (row) ->
             date = new Date(Date.parse(row[col]))
-            dispatch =
-                y: -> date.getFullYear()
-                m: -> zeroPad(date.getMonth()+1)
-                n: -> mthNames[date.getMonth()]
-                d: -> zeroPad(date.getDate())
-                w: -> dayNames[date.getDay()]
-                x: -> date.getDay()
-                H: -> zeroPad(date.getHours())
-                M: -> zeroPad(date.getMinutes())
-                S: -> zeroPad(date.getSeconds())
-            formatString.replace /%(.)/g, (m, p) -> dispatch[p]()
+            formatString.replace /%(.)/g, (m, p) -> 
+                switch p
+                    when "y" then date.getFullYear()
+                    when "m" then zeroPad(date.getMonth()+1)
+                    when "n" then mthNames[date.getMonth()]
+                    when "d" then zeroPad(date.getDate())
+                    when "w" then dayNames[date.getDay()]
+                    when "x" then date.getDay()
+                    when "H" then zeroPad(date.getHours())
+                    when "M" then zeroPad(date.getMinutes())
+                    when "S" then zeroPad(date.getSeconds())
+                    else "%" + p
 
 $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers}
 
