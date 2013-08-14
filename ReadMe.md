@@ -58,7 +58,7 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 ![image](http://nicolaskruchten.github.io/pivottable/images/filters.png)
 
 
-##How does the code work?
+##How do you use the code?
 
 There are two main functions defined in `pivot.coffee`: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
@@ -110,7 +110,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 * `cols`: array of variable names for use as columns
 * `aggregator`: constructor for an object which will aggregate results per cell (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
 * `renderer`: function to generate output from pivot data structure (defaults to simple table, see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
-* `derivedAttributes`: object to define derived attributes (see [demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html))
+* `derivedAttributes`: object to define derived attributes (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
 * `filter`: function called on each row, returns `false` if the row is to be excluded from the output
 
 
@@ -127,9 +127,11 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 * `rows`: array of variable names to prepopulate in row area
 * `cols`: array of variable names to prepopulate in cols area
 * `vals`: array of variable names to prepopulate in vals area
-* `aggregatorName`: aggregator to prepopulate in dropdown
-* `rendererName`: renderer to prepopulate in radio button
-* `derivedAttributes`: object to define derived attributes (passed through to `pivot()`)
+* `aggregatorName`: aggregator to prepopulate in dropdown (key to `aggregators` object)
+* `rendererName`: renderer to prepopulate in radio button (key to `renderers` object)
+* `derivedAttributes`: object to define derived attributes (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
+
+## Getting in touch
 
 Please log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if the documentation here or on the [wiki](https://github.com/nicolaskruchten/pivottable/wiki) doesn't answer your question!
 
