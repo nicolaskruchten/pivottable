@@ -11,11 +11,11 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 
 * works with common input formats
 * layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
-* derived columns can be created on the fly based on the whole input row by passing in a function
-* complex aggregation functions can compute values based on the whole input row (i.e. weighted averages)
+* derived columns can be created on the fly based on the whole input record by passing in a function
+* complex aggregation functions can compute values based on the whole input record (i.e. weighted averages)
 * built-in support for basic heatmap and bar chart visualization
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
-* works acceptably fast in Chrome on commodity hardware up to hundreds of thousands of rows with a dozen attributes
+* works acceptably fast in Chrome on commodity hardware up to hundreds of thousands of records with a dozen attributes
 * works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
 
 ##Where's the demo?
@@ -24,7 +24,7 @@ A demo of PivotTable.js loaded up with a sample dataset of Canadian Members of P
 
 ##How do you use the UI?
 
-PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag variables into/out of the row/column areas, and choose a summary function. If you choose a summary function that takes an argument, like 'average', you'll have to drag a variable onto the dropdown.
+PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. If you choose a summary function that takes an argument, like 'average', you'll have to drag a attribute onto the dropdown.
 
 ###Initial state of UI with Canadian MP's dataset
 
@@ -53,7 +53,7 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/gender_age_bins.png)
 
-### You can also exclude some rows
+### You can also exclude some records
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/filters.png)
 
@@ -106,12 +106,12 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 `options` is an object with the following keys:
 
-* `rows`: array of variable names to use as rows
-* `cols`: array of variable names for use as columns
+* `rows`: array of attribute names to use as rows
+* `cols`: array of attribute names for use as columns
 * `aggregator`: constructor for an object which will aggregate results per cell (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
 * `renderer`: function to generate output from pivot data structure (defaults to simple table, see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
 * `derivedAttributes`: object to define derived attributes (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
-* `filter`: function called on each row, returns `false` if the row is to be excluded from the output
+* `filter`: function called on each record, returns `false` if the record is to be excluded from the output
 
 
 ####`pivotUI(input [,options])`
@@ -124,9 +124,9 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 * `renderers`: dictionary of rendering functions (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
 * `aggregators`: dictionary of generators for aggregation functions in dropdown (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
-* `rows`: array of variable names to prepopulate in row area
-* `cols`: array of variable names to prepopulate in cols area
-* `vals`: array of variable names to prepopulate in vals area (gets passed to aggregator generating function)
+* `rows`: array of attribute names to prepopulate in row area
+* `cols`: array of attribute names to prepopulate in cols area
+* `vals`: array of attribute names to prepopulate in vals area (gets passed to aggregator generating function)
 * `aggregatorName`: aggregator to prepopulate in dropdown (key to `aggregators` object)
 * `rendererName`: renderer to prepopulate in radio button (key to `renderers` object)
 * `derivedAttributes`: object to define derived attributes (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
