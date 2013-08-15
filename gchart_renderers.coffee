@@ -17,14 +17,14 @@ makeGoogleChart = (chartType, extraOptions) -> (pivotData) ->
 		for rowKey in rowKeys
 			agg = pivotData.getAggregator(rowKey, colKey)
 			if agg.value()?
-				row.push parseFloat agg.format agg.value()
+				row.push agg.value()
 			else row.push null
 		dataArray.push row
-
+	console.log dataArray
 	title = vAxisTitle = pivotData.aggregator().label
-	hAxisTitle = pivotData.colVars.join("-")
+	hAxisTitle = pivotData.colAttrs.join("-")
 	title += " vs #{hAxisTitle}" if hAxisTitle != ""
-	groupByTitle = pivotData.rowVars.join("-")
+	groupByTitle = pivotData.rowAttrs.join("-")
 	title += " by #{groupByTitle}" if groupByTitle != ""
 
 	options = 

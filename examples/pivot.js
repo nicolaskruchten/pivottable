@@ -1,5 +1,5 @@
 (function() {
-  var $, PivotData, addCommas, aggregatorTemplates, aggregators, buildPivotData, buildPivotTable, convertToArray, dayNames, deriveAttributes, derivers, forEachRow, mthNames, numberFormat, renderers, spanSize, zeroPad;
+  var $, PivotData, addCommas, aggregatorTemplates, aggregators, buildPivotData, buildPivotTable, convertToArray, dayNames, deriveAttributes, derivers, forEachRecord, mthNames, numberFormat, renderers, spanSize, zeroPad;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -46,21 +46,21 @@
         scaler = 1;
       }
       return function(_arg) {
-        var field;
-        field = _arg[0];
+        var attr;
+        attr = _arg[0];
         return function() {
           return {
             sum: 0,
-            push: function(row) {
-              if (!isNaN(parseFloat(row[field]))) {
-                return this.sum += parseFloat(row[field]);
+            push: function(record) {
+              if (!isNaN(parseFloat(record[attr]))) {
+                return this.sum += parseFloat(record[attr]);
               }
             },
             value: function() {
               return this.sum;
             },
             format: numberFormat(sigfig, scaler),
-            label: "Sum of " + field
+            label: "Sum of " + attr
           };
         };
       };
@@ -73,15 +73,15 @@
         scaler = 1;
       }
       return function(_arg) {
-        var field;
-        field = _arg[0];
+        var attr;
+        attr = _arg[0];
         return function() {
           return {
             sum: 0,
             len: 0,
-            push: function(row) {
-              if (!isNaN(parseFloat(row[field]))) {
-                this.sum += parseFloat(row[field]);
+            push: function(record) {
+              if (!isNaN(parseFloat(record[attr]))) {
+                this.sum += parseFloat(record[attr]);
                 return this.len++;
               }
             },
@@ -89,7 +89,7 @@
               return this.sum / this.len;
             },
             format: numberFormat(sigfig, scaler),
-            label: "Average of " + field
+            label: "Average of " + attr
           };
         };
       };
@@ -108,12 +108,12 @@
           return {
             sumNum: 0,
             sumDenom: 0,
-            push: function(row) {
-              if (!isNaN(parseFloat(row[num]))) {
-                this.sumNum += parseFloat(row[num]);
+            push: function(record) {
+              if (!isNaN(parseFloat(record[num]))) {
+                this.sumNum += parseFloat(record[num]);
               }
-              if (!isNaN(parseFloat(row[denom]))) {
-                return this.sumDenom += parseFloat(row[denom]);
+              if (!isNaN(parseFloat(record[denom]))) {
+                return this.sumDenom += parseFloat(record[denom]);
               }
             },
             value: function() {
@@ -142,12 +142,12 @@
           return {
             sumNum: 0,
             sumDenom: 0,
-            push: function(row) {
-              if (!isNaN(parseFloat(row[num]))) {
-                this.sumNum += parseFloat(row[num]);
+            push: function(record) {
+              if (!isNaN(parseFloat(record[num]))) {
+                this.sumNum += parseFloat(record[num]);
               }
-              if (!isNaN(parseFloat(row[denom]))) {
-                return this.sumDenom += parseFloat(row[denom]);
+              if (!isNaN(parseFloat(record[denom]))) {
+                return this.sumDenom += parseFloat(record[denom]);
               }
             },
             value: function() {
@@ -179,35 +179,35 @@
       };
     },
     countUnique: function(_arg) {
-      var field;
-      field = _arg[0];
+      var attr;
+      attr = _arg[0];
       return function() {
         return {
           uniq: [],
-          push: function(row) {
+          push: function(record) {
             var _ref;
-            if (_ref = row[field], __indexOf.call(this.uniq, _ref) < 0) {
-              return this.uniq.push(row[field]);
+            if (_ref = record[attr], __indexOf.call(this.uniq, _ref) < 0) {
+              return this.uniq.push(record[attr]);
             }
           },
           value: function() {
             return this.uniq.length;
           },
           format: numberFormat(0),
-          label: "Count Unique " + field
+          label: "Count Unique " + attr
         };
       };
     },
     listUnique: function(_arg) {
-      var field;
-      field = _arg[0];
+      var attr;
+      attr = _arg[0];
       return function() {
         return {
           uniq: [],
-          push: function(row) {
+          push: function(record) {
             var _ref;
-            if (_ref = row[field], __indexOf.call(this.uniq, _ref) < 0) {
-              return this.uniq.push(row[field]);
+            if (_ref = record[attr], __indexOf.call(this.uniq, _ref) < 0) {
+              return this.uniq.push(record[attr]);
             }
           },
           value: function() {
@@ -216,7 +216,7 @@
           format: function(x) {
             return x;
           },
-          label: "List Unique " + field
+          label: "List Unique " + attr
         };
       };
     },
@@ -249,14 +249,14 @@
   };
   derivers = {
     bin: function(col, binWidth) {
-      return function(row) {
-        return row[col] - row[col] % binWidth;
+      return function(record) {
+        return record[col] - record[col] % binWidth;
       };
     },
     dateFormat: function(col, formatString) {
-      return function(row) {
+      return function(record) {
         var date;
-        date = new Date(Date.parse(row[col]));
+        date = new Date(Date.parse(record[col]));
         return formatString.replace(/%(.)/g, function(m, p) {
           switch (p) {
             case "y":
@@ -293,50 +293,50 @@
   /*
   functions for accessing input
   */
-  deriveAttributes = function(row, derivedAttributes, f) {
+  deriveAttributes = function(record, derivedAttributes, f) {
     var k, v, _ref, _ref2;
     for (k in derivedAttributes) {
       v = derivedAttributes[k];
-      row[k] = (_ref = v(row)) != null ? _ref : row[k];
+      record[k] = (_ref = v(record)) != null ? _ref : record[k];
     }
-    for (k in row) {
-      if (!__hasProp.call(row, k)) continue;
-      if ((_ref2 = row[k]) == null) {
-        row[k] = "null";
+    for (k in record) {
+      if (!__hasProp.call(record, k)) continue;
+      if ((_ref2 = record[k]) == null) {
+        record[k] = "null";
       }
     }
-    return f(row);
+    return f(record);
   };
-  forEachRow = function(input, derivedAttributes, f) {
-    var addRow, compactRow, i, j, k, row, tblCols, _i, _len, _ref, _results, _results2;
-    addRow = function(row) {
-      return deriveAttributes(row, derivedAttributes, f);
+  forEachRecord = function(input, derivedAttributes, f) {
+    var addRecord, compactRecord, i, j, k, record, tblCols, _i, _len, _ref, _results, _results2;
+    addRecord = function(record) {
+      return deriveAttributes(record, derivedAttributes, f);
     };
     if (Object.prototype.toString.call(input) === '[object Function]') {
-      return input(addRow);
+      return input(addRecord);
     } else if (Array.isArray(input)) {
       if (Array.isArray(input[0])) {
         _results = [];
         for (i in input) {
           if (!__hasProp.call(input, i)) continue;
-          compactRow = input[i];
+          compactRecord = input[i];
           if (i > 0) {
-            row = {};
+            record = {};
             _ref = input[0];
             for (j in _ref) {
               if (!__hasProp.call(_ref, j)) continue;
               k = _ref[j];
-              row[k] = compactRow[j];
+              record[k] = compactRecord[j];
             }
-            _results.push(addRow(row));
+            _results.push(addRecord(record));
           }
         }
         return _results;
       } else {
         _results2 = [];
         for (_i = 0, _len = input.length; _i < _len; _i++) {
-          row = input[_i];
-          _results2.push(addRow(row));
+          record = input[_i];
+          _results2.push(addRecord(record));
         }
         return _results2;
       }
@@ -346,27 +346,27 @@
         return tblCols.push($(this).text());
       });
       return $("tbody > tr", input).each(function(i) {
-        row = {};
+        record = {};
         $("td", this).each(function(j) {
-          return row[tblCols[j]] = $(this).text();
+          return record[tblCols[j]] = $(this).text();
         });
-        return addRow(row);
+        return addRecord(record);
       });
     }
   };
   convertToArray = function(input) {
     var result;
     result = [];
-    forEachRow(input, {}, function(row) {
-      return result.push(row);
+    forEachRecord(input, {}, function(record) {
+      return result.push(record);
     });
     return result;
   };
   PivotData = (function() {
-    function PivotData(aggregator, colVars, rowVars) {
+    function PivotData(aggregator, colAttrs, rowAttrs) {
       this.aggregator = aggregator;
-      this.colVars = colVars;
-      this.rowVars = rowVars;
+      this.colAttrs = colAttrs;
+      this.rowAttrs = rowAttrs;
       this.getAggregator = __bind(this.getAggregator, this);
       this.flattenKey = __bind(this.flattenKey, this);
       this.getRowKeys = __bind(this.getRowKeys, this);
@@ -450,31 +450,31 @@
     PivotData.prototype.flattenKey = function(x) {
       return x.join(String.fromCharCode(0));
     };
-    PivotData.prototype.processRow = function(row) {
+    PivotData.prototype.processRecord = function(record) {
       var colKey, flatColKey, flatRowKey, rowKey, x;
       colKey = (function() {
         var _i, _len, _ref, _results;
-        _ref = this.colVars;
+        _ref = this.colAttrs;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           x = _ref[_i];
-          _results.push(row[x]);
+          _results.push(record[x]);
         }
         return _results;
       }).call(this);
       rowKey = (function() {
         var _i, _len, _ref, _results;
-        _ref = this.rowVars;
+        _ref = this.rowAttrs;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           x = _ref[_i];
-          _results.push(row[x]);
+          _results.push(record[x]);
         }
         return _results;
       }).call(this);
       flatRowKey = this.flattenKey(rowKey);
       flatColKey = this.flattenKey(colKey);
-      this.allTotal.push(row);
+      this.allTotal.push(record);
       if (rowKey.length !== 0) {
         if (__indexOf.call(this.flatRowKeys, flatRowKey) < 0) {
           this.rowKeys.push(rowKey);
@@ -483,7 +483,7 @@
         if (!this.rowTotals[flatRowKey]) {
           this.rowTotals[flatRowKey] = this.aggregator();
         }
-        this.rowTotals[flatRowKey].push(row);
+        this.rowTotals[flatRowKey].push(record);
       }
       if (colKey.length !== 0) {
         if (__indexOf.call(this.flatColKeys, flatColKey) < 0) {
@@ -493,7 +493,7 @@
         if (!this.colTotals[flatColKey]) {
           this.colTotals[flatColKey] = this.aggregator();
         }
-        this.colTotals[flatColKey].push(row);
+        this.colTotals[flatColKey].push(record);
       }
       if (colKey.length !== 0 && rowKey.length !== 0) {
         if (!(flatRowKey in this.tree)) {
@@ -502,7 +502,7 @@
         if (!(flatColKey in this.tree[flatRowKey])) {
           this.tree[flatRowKey][flatColKey] = this.aggregator();
         }
-        return this.tree[flatRowKey][flatColKey].push(row);
+        return this.tree[flatRowKey][flatColKey].push(record);
       }
     };
     PivotData.prototype.getAggregator = function(rowKey, colKey) {
@@ -532,9 +532,9 @@
   buildPivotData = function(input, cols, rows, aggregator, filter, derivedAttributes) {
     var pivotData;
     pivotData = new PivotData(aggregator, cols, rows);
-    forEachRow(input, derivedAttributes, function(row) {
-      if (filter(row)) {
-        return pivotData.processRow(row);
+    forEachRecord(input, derivedAttributes, function(record) {
+      if (filter(record)) {
+        return pivotData.processRecord(record);
       }
     });
     return pivotData;
@@ -569,8 +569,8 @@
   };
   buildPivotTable = function(pivotData) {
     var aggregator, c, colKey, colKeys, cols, i, j, r, result, rowKey, rowKeys, rows, th, totalAggregator, tr, txt, val, x;
-    cols = pivotData.colVars;
-    rows = pivotData.rowVars;
+    cols = pivotData.colAttrs;
+    rows = pivotData.rowAttrs;
     rowKeys = pivotData.getRowKeys();
     colKeys = pivotData.getColKeys();
     result = $("<table class='table table-bordered pvtTable'>");
@@ -719,12 +719,12 @@
       x = tblCols[_i];
       axisValues[x] = {};
     }
-    forEachRow(input, opts.derivedAttributes, function(row) {
+    forEachRecord(input, opts.derivedAttributes, function(record) {
       var k, v, _base, _ref2, _results;
       _results = [];
-      for (k in row) {
-        if (!__hasProp.call(row, k)) continue;
-        v = row[k];
+      for (k in record) {
+        if (!__hasProp.call(record, k)) continue;
+        v = record[k];
         if (v == null) {
           v = "null";
         }
@@ -886,11 +886,11 @@
       $('input.pvtFilter').not(':checked').each(function() {
         return exclusions.push($(this).data("filter"));
       });
-      subopts.filter = function(row) {
+      subopts.filter = function(record) {
         var v, _len7, _o, _ref6;
         for (_o = 0, _len7 = exclusions.length; _o < _len7; _o++) {
           _ref6 = exclusions[_o], k = _ref6[0], v = _ref6[1];
-          if (row[k] === v) {
+          if (record[k] === v) {
             return false;
           }
         }
