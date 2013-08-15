@@ -11,7 +11,7 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 
 * works with common input formats
 * layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
-* derived columns can be created on the fly based on the whole input record by passing in a function
+* derived attributes can be created on the fly based on the whole input record by passing in a function
 * complex aggregation functions can compute values based on the whole input record (i.e. weighted averages)
 * built-in support for basic heatmap and bar chart visualization
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
