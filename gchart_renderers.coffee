@@ -20,7 +20,7 @@ makeGoogleChart = (chartType, extraOptions) -> (pivotData) ->
 				row.push agg.value()
 			else row.push null
 		dataArray.push row
-	console.log dataArray
+
 	title = vAxisTitle = pivotData.aggregator().label
 	hAxisTitle = pivotData.colAttrs.join("-")
 	title += " vs #{hAxisTitle}" if hAxisTitle != ""

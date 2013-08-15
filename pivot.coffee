@@ -386,7 +386,7 @@ $.fn.pivot = (input, opts) ->
         filter: -> true
         aggregator: aggregators.count()
         derivedAttributes: {},
-        renderer: (pivotData) -> buildPivotTable(pivotData)
+        renderer: buildPivotTable
 
     opts = $.extend defaults, opts
 
@@ -430,28 +430,19 @@ $.fn.pivotUI = (input, opts) ->
     #start building the output
     uiTable = $("<table class='table table-bordered' cellpadding='5'>")
 
-    #renderers controls, if desired
+    #renderer control
+    rendererControl = $("<td>")
 
-    rendererNames = (x for own x, y of opts.renderers)
-    if rendererNames.length != 0
-        controls = $("<td colspan='2' align='center'>")
-        form = $("<form>").addClass("form-inline")
-        controls.append form
+    renderer = $("<select id='renderer'>")
+        .bind "change", -> refresh() #capture reference
+    for own x of opts.renderers
+        renderer.append $("<option>").val(x).text(x)
+    rendererControl.append renderer
 
-        first = true
-        for x in rendererNames
-            radio = $("<input type='radio' name='renderers' id='renderers_#{x.replace(/\s/g, "")}'>")
-              .css("margin-left":"15px", "margin-right": "5px").val(x)
-            if first
-                radio.attr("checked", "checked") 
-                first = false
-            form.append(radio).append $("<label class='checkbox inline' for='renderers_#{x.replace(/\s/g, "")}'>").text(x)
-
-        uiTable.append $("<tr>").append controls
 
     #axis list, including the double-click menu
 
-    colList = $("<td colspan='2' id='unused' class='pvtAxisContainer pvtHorizList'>")
+    colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>")
 
     for c in tblCols when c not in opts.hiddenAxes
         do (c) ->
@@ -494,7 +485,7 @@ $.fn.pivotUI = (input, opts) ->
             colList.append $("<li class='label label-info' id='axis_#{c.replace(/\s/g, "")}'>").append(colLabel).append(valueList)
 
 
-    uiTable.append $("<tr>").append colList
+    uiTable.append $("<tr>").append(rendererControl).append(colList)
 
     tr1 = $("<tr>")
 
@@ -540,7 +531,7 @@ $.fn.pivotUI = (input, opts) ->
     if opts.aggregatorName?
         $("#aggregator").val opts.aggregatorName
     if opts.rendererName?
-        $("#renderers_#{opts.rendererName.replace(/\s/g, "")}").attr('checked',true)
+        $("#renderer").val opts.rendererName
 
     #set up for refreshing
     refresh = ->
@@ -553,6 +544,7 @@ $.fn.pivotUI = (input, opts) ->
         $("#vals li nobr").each -> vals.push $(this).text()
 
         subopts.aggregator = opts.aggregators[aggregator.val()](vals)
+        subopts.renderer = opts.renderers[renderer.val()]
 
         #construct filter here
         exclusions = []
@@ -564,17 +556,11 @@ $.fn.pivotUI = (input, opts) ->
                 return false if record[k] == v
             return true
 
-        if rendererNames.length != 0
-            renderer = $('input[name=renderers]:checked').val()
-            subopts.renderer = opts.renderers[renderer]
-
         pivotTable.pivot(input,subopts)
 
     #the very first refresh will actually display the table
     refresh()
 
-    #finally we attach the event handlers
-    $('input[name=renderers]').bind "change", refresh
     $(".pvtAxisContainer")
          .sortable({connectWith:".pvtAxisContainer", items: 'li'})
          .bind "sortstop", refresh
