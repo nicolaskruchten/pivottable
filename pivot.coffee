@@ -20,30 +20,30 @@ numberFormat = (sigfig=3, scaler=1) ->
 
 #technically these are aggregator constructor generator generators (!)
 aggregatorTemplates =
-    sum: (sigfig=3, scaler=1) -> ([field]) -> ->
+    sum: (sigfig=3, scaler=1) -> ([attr]) -> ->
         sum: 0
-        push: (row) -> @sum += parseFloat(row[field]) if not isNaN parseFloat(row[field])
+        push: (record) -> @sum += parseFloat(record[attr]) if not isNaN parseFloat(record[attr])
         value: -> @sum
         format: numberFormat(sigfig, scaler)
-        label: "Sum of #{field}"
+        label: "Sum of #{attr}"
 
-    average:  (sigfig=3, scaler=1) -> ([field]) -> ->
+    average:  (sigfig=3, scaler=1) -> ([attr]) -> ->
         sum: 0
         len: 0
-        push: (row) ->
-            if not isNaN parseFloat(row[field])
-                @sum += parseFloat(row[field])
+        push: (record) ->
+            if not isNaN parseFloat(record[attr])
+                @sum += parseFloat(record[attr])
                 @len++
         value: -> @sum/@len
         format: numberFormat(sigfig, scaler)
-        label: "Average of #{field}"
+        label: "Average of #{attr}"
 
     sumOverSum: (sigfig=3, scaler=1) -> ([num, denom]) -> ->
         sumNum: 0
         sumDenom: 0
-        push: (row) ->
-            @sumNum   += parseFloat(row[num])   if not isNaN parseFloat(row[num])
-            @sumDenom += parseFloat(row[denom]) if not isNaN parseFloat(row[denom])
+        push: (record) ->
+            @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
+            @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
         value: -> @sumNum/@sumDenom
         format: numberFormat(sigfig, scaler)
         label: "#{num}/#{denom}"
@@ -51,9 +51,9 @@ aggregatorTemplates =
     sumOverSumBound80: (sigfig=3, scaler=1, upper=true) -> ([num, denom]) -> ->
         sumNum: 0
         sumDenom: 0
-        push: (row) ->
-            @sumNum   += parseFloat(row[num])   if not isNaN parseFloat(row[num])
-            @sumDenom += parseFloat(row[denom]) if not isNaN parseFloat(row[denom])
+        push: (record) ->
+            @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
+            @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
         value: ->
             sign = if upper then 1 else -1
             (0.821187207574908/@sumDenom + @sumNum/@sumDenom + 1.2815515655446004*sign*
@@ -71,19 +71,19 @@ aggregators =
         format: numberFormat(0)
         label: "Count"
 
-    countUnique: ([field]) -> ->
+    countUnique: ([attr]) -> ->
         uniq: []
-        push: (row) -> @uniq.push(row[field]) if row[field] not in @uniq
+        push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
         value: -> @uniq.length
         format: numberFormat(0)
-        label: "Count Unique #{field}"
+        label: "Count Unique #{attr}"
 
-    listUnique: ([field]) -> ->
+    listUnique: ([attr]) -> ->
         uniq: []
-        push: (row) -> @uniq.push(row[field]) if row[field] not in @uniq
+        push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
         value: -> @uniq.join ", "
         format: (x) -> x
-        label: "List Unique #{field}"
+        label: "List Unique #{attr}"
 
     intSum: aggregatorTemplates.sum(0)
     sum: aggregatorTemplates.sum(3)
@@ -105,22 +105,23 @@ dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
 zeroPad = (number) -> ("0"+number).substr(-2,2)
 
 derivers =
-    bin: (col, binWidth) -> (row) -> row[col] - row[col] % binWidth
+    bin: (col, binWidth) -> (record) -> record[col] - record[col] % binWidth
     dateFormat: (col, formatString) ->
         #thanks http://stackoverflow.com/a/12213072/112871
-        (row) ->
-            date = new Date(Date.parse(row[col]))
-            dispatch =
-                y: -> date.getFullYear()
-                m: -> zeroPad(date.getMonth()+1)
-                n: -> mthNames[date.getMonth()]
-                d: -> zeroPad(date.getDate())
-                w: -> dayNames[date.getDay()]
-                x: -> date.getDay()
-                H: -> zeroPad(date.getHours())
-                M: -> zeroPad(date.getMinutes())
-                S: -> zeroPad(date.getSeconds())
-            formatString.replace /%(.)/g, (m, p) -> dispatch[p]()
+        (record) ->
+            date = new Date(Date.parse(record[col]))
+            formatString.replace /%(.)/g, (m, p) -> 
+                switch p
+                    when "y" then date.getFullYear()
+                    when "m" then zeroPad(date.getMonth()+1)
+                    when "n" then mthNames[date.getMonth()]
+                    when "d" then zeroPad(date.getDate())
+                    when "w" then dayNames[date.getDay()]
+                    when "x" then date.getDay()
+                    when "H" then zeroPad(date.getHours())
+                    when "M" then zeroPad(date.getMinutes())
+                    when "S" then zeroPad(date.getSeconds())
+                    else "%" + p
 
 $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers}
 
@@ -128,41 +129,41 @@ $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers}
 functions for accessing input
 ###
 
-deriveAttributes = (row, derivedAttributes, f) ->
-    row[k] = v(row) ? row[k] for k, v of derivedAttributes
-    row[k] ?= "null" for own k of row
-    f(row)
+deriveAttributes = (record, derivedAttributes, f) ->
+    record[k] = v(record) ? record[k] for k, v of derivedAttributes
+    record[k] ?= "null" for own k of record
+    f(record)
 
 #can handle arrays or jQuery selections of tables
-forEachRow = (input, derivedAttributes, f) ->
-    addRow = (row) -> deriveAttributes(row, derivedAttributes, f)
+forEachRecord = (input, derivedAttributes, f) ->
+    addRecord = (record) -> deriveAttributes(record, derivedAttributes, f)
     #if it's a function, have it call us back
     if Object.prototype.toString.call(input) == '[object Function]'
-        input(addRow)
+        input(addRecord)
     else if Array.isArray(input)
         if Array.isArray(input[0]) #array of arrays
-            for own i, compactRow of input when i > 0
-                row = {}
-                row[k] = compactRow[j] for own j, k of input[0]
-                addRow(row)
+            for own i, compactRecord of input when i > 0
+                record = {}
+                record[k] = compactRecord[j] for own j, k of input[0]
+                addRecord(record)
         else #array of objects
-            addRow(row) for row in input
+            addRecord(record) for record in input
     else #assume a jQuery reference to a table
         tblCols = []
         $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
         $("tbody > tr", input).each (i) ->
-            row = {}
-            $("td", this).each (j) -> row[tblCols[j]] = $(this).text()
-            addRow(row)
+            record = {}
+            $("td", this).each (j) -> record[tblCols[j]] = $(this).text()
+            addRecord(record)
 
-#converts to [{field:val, field:val},{field:val, field:val}] using method above
+#converts to [{attr:val, attr:val},{attr:val, attr:val}] using method above
 convertToArray = (input) ->
     result = []
-    forEachRow input, {}, (row) -> result.push row
+    forEachRecord input, {}, (record) -> result.push record
     return result
 
 class PivotData
-    constructor: (@aggregator, @colVars, @rowVars) ->
+    constructor: (@aggregator, @colAttrs, @rowAttrs) ->
         @tree = {}
         @rowKeys = []
         @colKeys = []
@@ -215,14 +216,14 @@ class PivotData
 
     flattenKey: (x) => x.join(String.fromCharCode(0))
 
-    processRow: (row) ->
-        colKey = (row[x] for x in @colVars)
-        rowKey = (row[x] for x in @rowVars)
+    processRecord: (record) ->
+        colKey = (record[x] for x in @colAttrs)
+        rowKey = (record[x] for x in @rowAttrs)
 
         flatRowKey = @flattenKey rowKey
         flatColKey = @flattenKey colKey
 
-        @allTotal.push row
+        @allTotal.push record
 
         if rowKey.length != 0
             if flatRowKey not in @flatRowKeys
@@ -230,7 +231,7 @@ class PivotData
                 @flatRowKeys.push flatRowKey
             if not @rowTotals[flatRowKey]
                 @rowTotals[flatRowKey] = @aggregator() 
-            @rowTotals[flatRowKey].push row
+            @rowTotals[flatRowKey].push record
 
         if colKey.length != 0
             if flatColKey not in @flatColKeys
@@ -238,14 +239,14 @@ class PivotData
                 @flatColKeys.push flatColKey
             if not @colTotals[flatColKey]
                 @colTotals[flatColKey] = @aggregator()
-            @colTotals[flatColKey].push row
+            @colTotals[flatColKey].push record
 
         if colKey.length != 0 and rowKey.length != 0
             if flatRowKey not of @tree
                 @tree[flatRowKey] = {}
             if flatColKey not of @tree[flatRowKey]
                 @tree[flatRowKey][flatColKey] = @aggregator() 
-            @tree[flatRowKey][flatColKey].push row
+            @tree[flatRowKey][flatColKey].push record
 
     getAggregator: (rowKey, colKey) =>
         flatRowKey = @flattenKey rowKey
@@ -263,8 +264,8 @@ class PivotData
 buildPivotData = (input, cols, rows, aggregator, filter, derivedAttributes) ->
     # iterate through input, accumulating data for cells
     pivotData = new PivotData(aggregator, cols, rows)
-    forEachRow input, derivedAttributes, (row) ->
-        pivotData.processRow(row) if filter(row)
+    forEachRecord input, derivedAttributes, (record) ->
+        pivotData.processRecord(record) if filter(record)
     return pivotData
 
 #helper function for setting row/col-span
@@ -286,8 +287,8 @@ spanSize = (arr, i, j) ->
     return len
 
 buildPivotTable = (pivotData) ->
-    cols = pivotData.colVars
-    rows = pivotData.rowVars
+    cols = pivotData.colAttrs
+    rows = pivotData.rowAttrs
     rowKeys = pivotData.getRowKeys()
     colKeys = pivotData.getColKeys()
 
@@ -420,8 +421,8 @@ $.fn.pivotUI = (input, opts) ->
     axisValues = {}
     axisValues[x] = {} for x in tblCols
 
-    forEachRow input, opts.derivedAttributes, (row) ->
-        for own k, v of row
+    forEachRecord input, opts.derivedAttributes, (record) ->
+        for own k, v of record
             v ?= "null"
             axisValues[k][v] ?= 0
             axisValues[k][v]++
@@ -558,9 +559,9 @@ $.fn.pivotUI = (input, opts) ->
         $('input.pvtFilter').not(':checked').each ->
             exclusions.push $(this).data("filter")
 
-        subopts.filter = (row) ->
+        subopts.filter = (record) ->
             for [k,v] in exclusions
-                return false if row[k] == v
+                return false if record[k] == v
             return true
 
         if rendererNames.length != 0

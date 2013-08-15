@@ -32,19 +32,20 @@
           rowKey = rowKeys[_j];
           agg = pivotData.getAggregator(rowKey, colKey);
           if (agg.value() != null) {
-            row.push(parseFloat(agg.format(agg.value())));
+            row.push(agg.value());
           } else {
             row.push(null);
           }
         }
         dataArray.push(row);
       }
+      console.log(dataArray);
       title = vAxisTitle = pivotData.aggregator().label;
-      hAxisTitle = pivotData.colVars.join("-");
+      hAxisTitle = pivotData.colAttrs.join("-");
       if (hAxisTitle !== "") {
         title += " vs " + hAxisTitle;
       }
-      groupByTitle = pivotData.rowVars.join("-");
+      groupByTitle = pivotData.rowAttrs.join("-");
       if (groupByTitle !== "") {
         title += " by " + groupByTitle;
       }
