@@ -672,9 +672,7 @@
       },
       aggregator: aggregators.count(),
       derivedAttributes: {},
-      renderer: function(pivotData) {
-        return buildPivotTable(pivotData);
-      }
+      renderer: buildPivotTable
     };
     opts = $.extend(defaults, opts);
     pivotData = buildPivotData(input, opts.cols, opts.rows, opts.aggregator, opts.filter, opts.derivedAttributes);
@@ -685,7 +683,7 @@
   UI code, calls pivot table above
   */
   $.fn.pivotUI = function(input, opts) {
-    var aggregator, axisValues, c, colList, controls, defaults, first, form, k, pivotTable, radio, refresh, rendererNames, tblCols, tr1, tr2, uiTable, x, y, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _len6, _m, _n, _ref, _ref2, _ref3, _ref4, _ref5;
+    var aggregator, axisValues, c, colList, defaults, k, pivotTable, refresh, renderer, rendererControl, tblCols, tr1, tr2, uiTable, x, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
     defaults = {
       derivedAttributes: {},
       aggregators: aggregators,
@@ -736,42 +734,22 @@
       return _results;
     });
     uiTable = $("<table class='table table-bordered' cellpadding='5'>");
-    rendererNames = (function() {
-      var _ref2, _results;
-      _ref2 = opts.renderers;
-      _results = [];
-      for (x in _ref2) {
-        if (!__hasProp.call(_ref2, x)) continue;
-        y = _ref2[x];
-        _results.push(x);
-      }
-      return _results;
-    })();
-    if (rendererNames.length !== 0) {
-      controls = $("<td colspan='2' align='center'>");
-      form = $("<form>").addClass("form-inline");
-      controls.append(form);
-      first = true;
-      for (_j = 0, _len2 = rendererNames.length; _j < _len2; _j++) {
-        x = rendererNames[_j];
-        radio = $("<input type='radio' name='renderers' id='renderers_" + (x.replace(/\s/g, "")) + "'>").css({
-          "margin-left": "15px",
-          "margin-right": "5px"
-        }).val(x);
-        if (first) {
-          radio.attr("checked", "checked");
-          first = false;
-        }
-        form.append(radio).append($("<label class='checkbox inline' for='renderers_" + (x.replace(/\s/g, "")) + "'>").text(x));
-      }
-      uiTable.append($("<tr>").append(controls));
+    rendererControl = $("<td>");
+    renderer = $("<select id='renderer'>").bind("change", function() {
+      return refresh();
+    });
+    _ref2 = opts.renderers;
+    for (x in _ref2) {
+      if (!__hasProp.call(_ref2, x)) continue;
+      renderer.append($("<option>").val(x).text(x));
     }
-    colList = $("<td colspan='2' id='unused' class='pvtAxisContainer pvtHorizList'>");
-    for (_k = 0, _len3 = tblCols.length; _k < _len3; _k++) {
-      c = tblCols[_k];
+    rendererControl.append(renderer);
+    colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>");
+    for (_j = 0, _len2 = tblCols.length; _j < _len2; _j++) {
+      c = tblCols[_j];
       if (__indexOf.call(opts.hiddenAxes, c) < 0) {
         (function(c) {
-          var btns, colLabel, filterItem, k, numKeys, v, valueList, _l, _len4, _ref2;
+          var btns, colLabel, filterItem, k, numKeys, v, valueList, _k, _len3, _ref3;
           numKeys = Object.keys(axisValues[c]).length;
           colLabel = $("<nobr>").text(c);
           valueList = $("<div>").css({
@@ -797,9 +775,9 @@
               return valueList.find("input").attr("checked", false);
             }));
             valueList.append(btns);
-            _ref2 = Object.keys(axisValues[c]).sort();
-            for (_l = 0, _len4 = _ref2.length; _l < _len4; _l++) {
-              k = _ref2[_l];
+            _ref3 = Object.keys(axisValues[c]).sort();
+            for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
+              k = _ref3[_k];
               v = axisValues[c][k];
               filterItem = $("<label>");
               filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", true).data("filter", [c, k]));
@@ -824,14 +802,14 @@
         })(c);
       }
     }
-    uiTable.append($("<tr>").append(colList));
+    uiTable.append($("<tr>").append(rendererControl).append(colList));
     tr1 = $("<tr>");
     aggregator = $("<select id='aggregator'>").css("margin-bottom", "5px").bind("change", function() {
       return refresh();
     });
-    _ref2 = opts.aggregators;
-    for (x in _ref2) {
-      if (!__hasProp.call(_ref2, x)) continue;
+    _ref3 = opts.aggregators;
+    for (x in _ref3) {
+      if (!__hasProp.call(_ref3, x)) continue;
       aggregator.append($("<option>").val(x).text(x));
     }
     tr1.append($("<td id='vals' class='pvtAxisContainer pvtHorizList'>").css("text-align", "center").append(aggregator).append($("<br>")));
@@ -843,29 +821,29 @@
     tr2.append(pivotTable);
     uiTable.append(tr2);
     this.html(uiTable);
-    _ref3 = opts.cols;
-    for (_l = 0, _len4 = _ref3.length; _l < _len4; _l++) {
-      x = _ref3[_l];
+    _ref4 = opts.cols;
+    for (_k = 0, _len3 = _ref4.length; _k < _len3; _k++) {
+      x = _ref4[_k];
       $("#cols").append($("#axis_" + (x.replace(/\s/g, ""))));
     }
-    _ref4 = opts.rows;
-    for (_m = 0, _len5 = _ref4.length; _m < _len5; _m++) {
-      x = _ref4[_m];
+    _ref5 = opts.rows;
+    for (_l = 0, _len4 = _ref5.length; _l < _len4; _l++) {
+      x = _ref5[_l];
       $("#rows").append($("#axis_" + (x.replace(/\s/g, ""))));
     }
-    _ref5 = opts.vals;
-    for (_n = 0, _len6 = _ref5.length; _n < _len6; _n++) {
-      x = _ref5[_n];
+    _ref6 = opts.vals;
+    for (_m = 0, _len5 = _ref6.length; _m < _len5; _m++) {
+      x = _ref6[_m];
       $("#vals").append($("#axis_" + (x.replace(/\s/g, ""))));
     }
     if (opts.aggregatorName != null) {
       $("#aggregator").val(opts.aggregatorName);
     }
     if (opts.rendererName != null) {
-      $("#renderers_" + (opts.rendererName.replace(/\s/g, ""))).attr('checked', true);
+      $("#renderer").val(opts.rendererName);
     }
     refresh = function() {
-      var exclusions, renderer, subopts, vals;
+      var exclusions, subopts, vals;
       subopts = {
         derivedAttributes: opts.derivedAttributes
       };
@@ -882,28 +860,24 @@
         return vals.push($(this).text());
       });
       subopts.aggregator = opts.aggregators[aggregator.val()](vals);
+      subopts.renderer = opts.renderers[renderer.val()];
       exclusions = [];
       $('input.pvtFilter').not(':checked').each(function() {
         return exclusions.push($(this).data("filter"));
       });
       subopts.filter = function(record) {
-        var v, _len7, _o, _ref6;
-        for (_o = 0, _len7 = exclusions.length; _o < _len7; _o++) {
-          _ref6 = exclusions[_o], k = _ref6[0], v = _ref6[1];
+        var v, _len6, _n, _ref7;
+        for (_n = 0, _len6 = exclusions.length; _n < _len6; _n++) {
+          _ref7 = exclusions[_n], k = _ref7[0], v = _ref7[1];
           if (record[k] === v) {
             return false;
           }
         }
         return true;
       };
-      if (rendererNames.length !== 0) {
-        renderer = $('input[name=renderers]:checked').val();
-        subopts.renderer = opts.renderers[renderer];
-      }
       return pivotTable.pivot(input, subopts);
     };
     refresh();
-    $('input[name=renderers]').bind("change", refresh);
     $(".pvtAxisContainer").sortable({
       connectWith: ".pvtAxisContainer",
       items: 'li'

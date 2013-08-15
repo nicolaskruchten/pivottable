@@ -17,8 +17,8 @@
             google.load("visualization", "1", {packages:["corechart", "charteditor"]});
             $(function(){
                 var derivers = $.pivotUtilities.derivers;
-                var renderers = $.pivotUtilities.gchart_renderers;
-                renderers.Table = $.pivotUtilities.renderers.Table;
+                var renderers = $.extend($.pivotUtilities.renderers, 
+                    $.pivotUtilities.gchart_renderers);
 
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {
