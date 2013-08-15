@@ -123,10 +123,10 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 `options` is an object with the following keys:
 
 * `renderers`: dictionary of rendering functions (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
-* `aggregators`: dictionary of constructors for aggregation functions in dropdown (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
+* `aggregators`: dictionary of generators for aggregation functions in dropdown (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
 * `rows`: array of variable names to prepopulate in row area
 * `cols`: array of variable names to prepopulate in cols area
-* `vals`: array of variable names to prepopulate in vals area
+* `vals`: array of variable names to prepopulate in vals area (gets passed to aggregator generating function)
 * `aggregatorName`: aggregator to prepopulate in dropdown (key to `aggregators` object)
 * `rendererName`: renderer to prepopulate in radio button (key to `renderers` object)
 * `derivedAttributes`: object to define derived attributes (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
