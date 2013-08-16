@@ -106,15 +106,15 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 `options` is an object with the following keys:
 
-* `rows`: array of attribute names to use as rows
-* `cols`: array of attribute names for use as columns
-* `aggregator`: constructor for an object which will aggregate results per cell (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
+* `rows`: array of attribute names to use as rows, defaults to `[]`
+* `cols`: array of attribute names for use as columns, defaults to `[]`
+* `aggregator`: constructor for an object which will aggregate results per cell, defaults to `count()` (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
 * `renderer`: function to generate output from pivot data structure (defaults to simple table, see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
-* `derivedAttributes`: object to define derived attributes (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
-* `filter`: function called on each record, returns `false` if the record is to be excluded from the output
+* `derivedAttributes`: object to define derived attributes, defaults to `{}` (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
+* `filter`: function called on each record, returns `false` if the record is to be excluded from the output, defaults to returning true
 
 
-####`pivotUI(input [,options])`
+####`pivotUI(input [,options [,overwrite]])`
 
 `pivotUI` will essentiall draw a UI and then call `pivot`. It will call `pivot` every time the UI is changed via a drag'n'drop or an aggregator selection. The `options` object lets you set up the UI itself in terms of what visualization aggregators and effects are offered, and it lets you prepopulate the various options as well.
 
@@ -122,14 +122,17 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 `options` is an object with the following keys:
 
-* `renderers`: dictionary of rendering functions (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
-* `aggregators`: dictionary of generators for aggregation functions in dropdown (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
-* `rows`: array of attribute names to prepopulate in row area
-* `cols`: array of attribute names to prepopulate in cols area
-* `vals`: array of attribute names to prepopulate in vals area (gets passed to aggregator generating function)
-* `aggregatorName`: aggregator to prepopulate in dropdown (key to `aggregators` object)
-* `rendererName`: renderer to prepopulate in radio button (key to `renderers` object)
-* `derivedAttributes`: object to define derived attributes (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
+* `renderers`: dictionary of rendering functions, defaulting with various table renderers (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
+* `aggregators`: dictionary of generators for aggregation functions in dropdown, defaulting to common aggregators (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
+* `rows`: array of attribute names to prepopulate in row area, default is `[]`
+* `cols`: array of attribute names to prepopulate in cols area, default is `[]`
+* `vals`: array of attribute names to prepopulate in vals area, default is `[]` (gets passed to aggregator generating function)
+* `aggregatorName`: aggregator to prepopulate in dropdown (key to `aggregators` object), default is first key in `aggregators`
+* `rendererName`: renderer to prepopulate in radio button (key to `renderers` object), default is first key in `renderers`
+* `derivedAttributes`: object to define derived attributes, default is `{}` (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
+
+`overwrite` is a boolean defaulting to false which controls what happens if this function is called repeatedly on the same element. If set to true, the options object overwrites the current state of the UI. If set to false, only the input data set changes, and the state of the UI remains the same, unless this is the first call, at which point the UI will be set to the options.
+
 
 ## Getting in touch
 

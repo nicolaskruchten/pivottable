@@ -94,11 +94,11 @@ aggregators =
 
 
 renderers =
-    "Table": buildPivotData
-    "Table Barchart": (pvtData) -> buildPivotTable(pvtData).barchart()
-    "Heatmap":      (pvtData) -> buildPivotTable(pvtData).heatmap()
-    "Row Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("rowheatmap")
-    "Col Heatmap":  (pvtData) -> buildPivotTable(pvtData).heatmap("colheatmap")
+    "Table": (pvtData) -> pivotTableRenderer(pvtData)
+    "Table Barchart": (pvtData) -> pivotTableRenderer(pvtData).barchart()
+    "Heatmap":      (pvtData) -> pivotTableRenderer(pvtData).heatmap()
+    "Row Heatmap":  (pvtData) -> pivotTableRenderer(pvtData).heatmap("rowheatmap")
+    "Col Heatmap":  (pvtData) -> pivotTableRenderer(pvtData).heatmap("colheatmap")
 
 mthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -261,7 +261,7 @@ class PivotData
             agg = @tree[flatRowKey][flatColKey]
         return agg ? {value: (-> null), format: -> ""}
 
-buildPivotData = (input, cols, rows, aggregator, filter, derivedAttributes) ->
+getPivotData = (input, cols, rows, aggregator, filter, derivedAttributes) ->
     # iterate through input, accumulating data for cells
     pivotData = new PivotData(aggregator, cols, rows)
     forEachRecord input, derivedAttributes, (record) ->
@@ -286,7 +286,7 @@ spanSize = (arr, i, j) ->
         len++
     return len
 
-buildPivotTable = (pivotData) ->
+pivotTableRenderer = (pivotData) ->
     cols = pivotData.colAttrs
     rows = pivotData.rowAttrs
     rowKeys = pivotData.getRowKeys()
@@ -386,16 +386,14 @@ $.fn.pivot = (input, opts) ->
         filter: -> true
         aggregator: aggregators.count()
         derivedAttributes: {},
-        renderer: buildPivotTable
+        renderer: pivotTableRenderer
 
     opts = $.extend defaults, opts
 
     # iterate through input, accumulating data for cells
-    pivotData = buildPivotData(input, opts.cols, opts.rows, 
+    @html opts.renderer getPivotData(input, opts.cols, opts.rows, 
                                 opts.aggregator, opts.filter, 
                                 opts.derivedAttributes)
-
-    @html opts.renderer pivotData
 
     return this
 
@@ -403,14 +401,19 @@ $.fn.pivot = (input, opts) ->
 UI code, calls pivot table above
 ###
 
-$.fn.pivotUI = (input, opts) ->
+$.fn.pivotUI = (input, inputOpts, overwrite = false) ->
     defaults =
         derivedAttributes: {}
         aggregators: aggregators
         renderers: renderers
         hiddenAxes: []
         cols: [], rows: [], vals: []
-    opts = $.extend defaults, opts
+
+    existingOpts = @data "pivotUIOptions"
+    if not existingOpts? or overwrite
+        opts = $.extend defaults, inputOpts
+    else
+        opts = existingOpts 
 
     #cache the input in some useful form
     input = convertToArray(input)
@@ -534,7 +537,7 @@ $.fn.pivotUI = (input, opts) ->
         $("#renderer").val opts.rendererName
 
     #set up for refreshing
-    refresh = ->
+    refresh = =>
         subopts = {derivedAttributes: opts.derivedAttributes}
         subopts.cols = []
         subopts.rows = []
@@ -557,6 +560,16 @@ $.fn.pivotUI = (input, opts) ->
             return true
 
         pivotTable.pivot(input,subopts)
+        @data "pivotUIOptions",
+            cols: subopts.cols
+            rows: subopts.rows
+            vals: vals
+            hiddenAxes: opts.hiddenAxes
+            renderers: opts.renderers
+            aggregators: opts.aggregators
+            derivedAttributes: opts.derivedAttributes
+            aggregatorName: aggregator.val()
+            rendererName: renderer.val()
 
     #the very first refresh will actually display the table
     refresh()

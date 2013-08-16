@@ -1,5 +1,5 @@
 (function() {
-  var $, PivotData, addCommas, aggregatorTemplates, aggregators, buildPivotData, buildPivotTable, convertToArray, dayNames, deriveAttributes, derivers, forEachRecord, mthNames, numberFormat, renderers, spanSize, zeroPad;
+  var $, PivotData, addCommas, aggregatorTemplates, aggregators, convertToArray, dayNames, deriveAttributes, derivers, forEachRecord, getPivotData, mthNames, numberFormat, pivotTableRenderer, renderers, spanSize, zeroPad;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -228,18 +228,20 @@
     lb80: aggregatorTemplates.sumOverSumBound80(3, 1, false)
   };
   renderers = {
-    "Table": buildPivotData,
+    "Table": function(pvtData) {
+      return pivotTableRenderer(pvtData);
+    },
     "Table Barchart": function(pvtData) {
-      return buildPivotTable(pvtData).barchart();
+      return pivotTableRenderer(pvtData).barchart();
     },
     "Heatmap": function(pvtData) {
-      return buildPivotTable(pvtData).heatmap();
+      return pivotTableRenderer(pvtData).heatmap();
     },
     "Row Heatmap": function(pvtData) {
-      return buildPivotTable(pvtData).heatmap("rowheatmap");
+      return pivotTableRenderer(pvtData).heatmap("rowheatmap");
     },
     "Col Heatmap": function(pvtData) {
-      return buildPivotTable(pvtData).heatmap("colheatmap");
+      return pivotTableRenderer(pvtData).heatmap("colheatmap");
     }
   };
   mthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -529,7 +531,7 @@
     };
     return PivotData;
   })();
-  buildPivotData = function(input, cols, rows, aggregator, filter, derivedAttributes) {
+  getPivotData = function(input, cols, rows, aggregator, filter, derivedAttributes) {
     var pivotData;
     pivotData = new PivotData(aggregator, cols, rows);
     forEachRecord(input, derivedAttributes, function(record) {
@@ -567,7 +569,7 @@
     }
     return len;
   };
-  buildPivotTable = function(pivotData) {
+  pivotTableRenderer = function(pivotData) {
     var aggregator, c, colKey, colKeys, cols, i, j, r, result, rowKey, rowKeys, rows, th, totalAggregator, tr, txt, val, x;
     cols = pivotData.colAttrs;
     rows = pivotData.rowAttrs;
@@ -663,7 +665,7 @@
   Pivot Table
   */
   $.fn.pivot = function(input, opts) {
-    var defaults, pivotData;
+    var defaults;
     defaults = {
       cols: [],
       rows: [],
@@ -672,18 +674,20 @@
       },
       aggregator: aggregators.count(),
       derivedAttributes: {},
-      renderer: buildPivotTable
+      renderer: pivotTableRenderer
     };
     opts = $.extend(defaults, opts);
-    pivotData = buildPivotData(input, opts.cols, opts.rows, opts.aggregator, opts.filter, opts.derivedAttributes);
-    this.html(opts.renderer(pivotData));
+    this.html(opts.renderer(getPivotData(input, opts.cols, opts.rows, opts.aggregator, opts.filter, opts.derivedAttributes)));
     return this;
   };
   /*
   UI code, calls pivot table above
   */
-  $.fn.pivotUI = function(input, opts) {
-    var aggregator, axisValues, c, colList, defaults, k, pivotTable, refresh, renderer, rendererControl, tblCols, tr1, tr2, uiTable, x, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
+  $.fn.pivotUI = function(input, inputOpts, overwrite) {
+    var aggregator, axisValues, c, colList, defaults, existingOpts, k, opts, pivotTable, refresh, renderer, rendererControl, tblCols, tr1, tr2, uiTable, x, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
+    if (overwrite == null) {
+      overwrite = false;
+    }
     defaults = {
       derivedAttributes: {},
       aggregators: aggregators,
@@ -693,7 +697,12 @@
       rows: [],
       vals: []
     };
-    opts = $.extend(defaults, opts);
+    existingOpts = this.data("pivotUIOptions");
+    if (!(existingOpts != null) || overwrite) {
+      opts = $.extend(defaults, inputOpts);
+    } else {
+      opts = existingOpts;
+    }
     input = convertToArray(input);
     tblCols = (function() {
       var _ref, _results;
@@ -842,7 +851,7 @@
     if (opts.rendererName != null) {
       $("#renderer").val(opts.rendererName);
     }
-    refresh = function() {
+    refresh = __bind(function() {
       var exclusions, subopts, vals;
       subopts = {
         derivedAttributes: opts.derivedAttributes
@@ -875,8 +884,19 @@
         }
         return true;
       };
-      return pivotTable.pivot(input, subopts);
-    };
+      pivotTable.pivot(input, subopts);
+      return this.data("pivotUIOptions", {
+        cols: subopts.cols,
+        rows: subopts.rows,
+        vals: vals,
+        hiddenAxes: opts.hiddenAxes,
+        renderers: opts.renderers,
+        aggregators: opts.aggregators,
+        derivedAttributes: opts.derivedAttributes,
+        aggregatorName: aggregator.val(),
+        rendererName: renderer.val()
+      });
+    }, this);
     refresh();
     $(".pvtAxisContainer").sortable({
       connectWith: ".pvtAxisContainer",
