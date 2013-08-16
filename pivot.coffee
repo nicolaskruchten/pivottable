@@ -401,14 +401,19 @@ $.fn.pivot = (input, opts) ->
 UI code, calls pivot table above
 ###
 
-$.fn.pivotUI = (input, opts) ->
+$.fn.pivotUI = (input, inputOpts, overwrite = false) ->
     defaults =
         derivedAttributes: {}
         aggregators: aggregators
         renderers: renderers
         hiddenAxes: []
         cols: [], rows: [], vals: []
-    opts = $.extend defaults, opts
+
+    existingOpts = @data "pivotUIOptions"
+    if not existingOpts? or overwrite
+        opts = $.extend defaults, inputOpts
+    else
+        opts = existingOpts 
 
     #cache the input in some useful form
     input = convertToArray(input)
@@ -532,7 +537,7 @@ $.fn.pivotUI = (input, opts) ->
         $("#renderer").val opts.rendererName
 
     #set up for refreshing
-    refresh = ->
+    refresh = =>
         subopts = {derivedAttributes: opts.derivedAttributes}
         subopts.cols = []
         subopts.rows = []
@@ -555,6 +560,16 @@ $.fn.pivotUI = (input, opts) ->
             return true
 
         pivotTable.pivot(input,subopts)
+        @data "pivotUIOptions",
+            cols: subopts.cols
+            rows: subopts.rows
+            vals: vals
+            hiddenAxes: opts.hiddenAxes
+            renderers: opts.renderers
+            aggregators: opts.aggregators
+            derivedAttributes: opts.derivedAttributes
+            aggregatorName: aggregator.val()
+            rendererName: renderer.val()
 
     #the very first refresh will actually display the table
     refresh()
