@@ -9,11 +9,11 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 
 ##Features
 
-* works with common input formats
+* works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
 * layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
-* derived attributes can be created on the fly based on the whole input record by passing in a function
-* complex aggregation functions can compute values based on the whole input record (i.e. weighted averages)
-* built-in support for basic heatmap and bar chart visualization
+* [derived attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes) can be created on the fly based on the whole input record by passing in a function
+* complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (i.e. weighted averages)
+* built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional support for Google Charts
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
 * works acceptably fast in Chrome on commodity hardware up to hundreds of thousands of records with a dozen attributes
 * works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
@@ -26,36 +26,9 @@ A demo of PivotTable.js loaded up with a sample dataset of Canadian Members of P
 
 PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. If you choose a summary function that takes an argument, like 'average', you'll have to drag a attribute onto the dropdown.
 
-###Initial state of UI with Canadian MP's dataset
+![image](http://nicolaskruchten.github.io/pivottable/images/animation.gif)
 
-![image](http://nicolaskruchten.github.io/pivottable/images/whats_what.png)
-
-###Drag'n'Drop...
-
-
-![image](http://nicolaskruchten.github.io/pivottable/images/province_x_party_heatmap_instructions.png)
-
-###...for MP counts by Province and Party
-
-![image](http://nicolaskruchten.github.io/pivottable/images/province_x_party_heatmap.png)
-
-###A little more...
-
-![image](http://nicolaskruchten.github.io/pivottable/images/gender_imbalance_instructions.png)
-
-
-###...for Gender Imbalance by Provice and Party
-
-![image](http://nicolaskruchten.github.io/pivottable/images/gender_imbalance.png)
-
-
-### Now you do it: Age distribution bar chart by Gender
-
-![image](http://nicolaskruchten.github.io/pivottable/images/gender_age_bins.png)
-
-### You can also exclude some records
-
-![image](http://nicolaskruchten.github.io/pivottable/images/filters.png)
+There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki as well.
 
 
 ##How do you use the code?
@@ -79,7 +52,7 @@ Once you've loaded jQuery and pivot.js, this code ([demo](http://nicolaskruchten
 
 appends this table to `$("#output")` (the default, *overridable* behaviour is to populate the table cells with counts):
 
-<table class="pvtTable"><tbody><tr><th colspan="1" rowspan="1"></th><th class="pvtAxisLabel">shape</th><th class="pvtColLabel" colspan="1" rowspan="2">circle</th><th class="pvtColLabel" colspan="1" rowspan="2">triangle</th><th class="pvtTotalLabel" rowspan="2">Totals</th></tr><tr><th class="pvtAxisLabel">color</th><th></th></tr><tr><th class="pvtRowLabel" rowspan="1" colspan="2">blue</th><td class="pvtVal row0 col0">1</td><td class="pvtVal row0 col1"></td><td class="pvtTotal rowTotal">1</td></tr><tr><th class="pvtRowLabel" rowspan="1" colspan="2">red</th><td class="pvtVal row1 col0"></td><td class="pvtVal row1 col1">1</td><td class="pvtTotal rowTotal">1</td></tr><tr><th class="pvtTotalLabel" colspan="2">Totals</th><td class="pvtTotal colTotal">1</td><td class="pvtTotal colTotal">1</td><td class="pvtGrandTotal">2</td></tr></tbody></table>
+![image](http://nicolaskruchten.github.io/pivottable/images/simple.png)
 
 A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
 
@@ -96,42 +69,18 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple_ui.png)
 
-###Parameters
+See the wiki for [full parameter documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters).
 
-####`pivot(input [,options])`
+## Documentation
 
-`pivot` will inject an HTML table into the object onto which it is called, which will summarize `input` according to `options`.
+More extensive documentation can be found in the [wiki](https://github.com/nicolaskruchten/pivottable/wiki):
 
-`input` is an array of objects, an array of arrays, a function or a jQuery object referencing a table (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)).
-
-`options` is an object with the following keys:
-
-* `rows`: array of attribute names to use as rows, defaults to `[]`
-* `cols`: array of attribute names for use as columns, defaults to `[]`
-* `aggregator`: constructor for an object which will aggregate results per cell, defaults to `count()` (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
-* `renderer`: function to generate output from pivot data structure (defaults to simple table, see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
-* `derivedAttributes`: object to define derived attributes, defaults to `{}` (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
-* `filter`: function called on each record, returns `false` if the record is to be excluded from the output, defaults to returning true
-
-
-####`pivotUI(input [,options [,overwrite]])`
-
-`pivotUI` will essentiall draw a UI and then call `pivot`. It will call `pivot` every time the UI is changed via a drag'n'drop or an aggregator selection. The `options` object lets you set up the UI itself in terms of what visualization aggregators and effects are offered, and it lets you prepopulate the various options as well.
-
-`input` is an array of objects, an array of arrays, a function or a jQuery object referencing a table (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)).
-
-`options` is an object with the following keys:
-
-* `renderers`: dictionary of rendering functions, defaulting with various table renderers (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Renderers))
-* `aggregators`: dictionary of generators for aggregation functions in dropdown, defaulting to common aggregators (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators))
-* `rows`: array of attribute names to prepopulate in row area, default is `[]`
-* `cols`: array of attribute names to prepopulate in cols area, default is `[]`
-* `vals`: array of attribute names to prepopulate in vals area, default is `[]` (gets passed to aggregator generating function)
-* `aggregatorName`: aggregator to prepopulate in dropdown (key to `aggregators` object), default is first key in `aggregators`
-* `rendererName`: renderer to prepopulate in radio button (key to `renderers` object), default is first key in `renderers`
-* `derivedAttributes`: object to define derived attributes, default is `{}` (see [documentation](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes))
-
-`overwrite` is a boolean defaulting to false which controls what happens if this function is called repeatedly on the same element. If set to true, the options object overwrites the current state of the UI. If set to false, only the input data set changes, and the state of the UI remains the same, unless this is the first call, at which point the UI will be set to the options.
+* [Step by step UI Tutorial](https://github.com/nicolaskruchten/pivottable/wiki/Parameters)
+* [Full Parameter Documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters)
+* [Input Formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
+* [Aggregators](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators)
+* [Renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers)
+* [Derived Attributes](https://github.com/nicolaskruchten/pivottable/wiki/https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes)
 
 
 ## Getting in touch
