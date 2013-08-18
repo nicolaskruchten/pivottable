@@ -4,34 +4,39 @@ PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality
 
 ##What does it do?
 
-PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects.
+PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. 
+
+With an optional add-on, the summary table can be rendered as a Google Chart, turning the pivot table into a pivot chart.
 
 
-##Features
+##Why is it good?
 
 * works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
 * layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
 * [derived attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes) can be created on the fly based on the whole input record by passing in a function
 * complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (i.e. weighted averages)
-* built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional support for Google Charts
+* built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional support for [Google Charts](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
 * works acceptably fast in Chrome on commodity hardware up to hundreds of thousands of records with a dozen attributes
 * works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
 
 ##Where's the demo?
 
-A demo of PivotTable.js loaded up with a sample dataset of Canadian Members of Parliament as of 2012 can be found here: [PivotTable.js demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html).
+A demo of PivotTable.js loaded up with a sample dataset of Canadian Members of Parliament as of 2012 can be found here: [PivotTable.js demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html). 
 
-##How do you use the UI?
+A version of this demo which include Google Chart renderers can be found here: [Google Charts demo](http://nicolaskruchten.github.io/pivottable/examples/gchart.html).
 
-PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. If you choose a summary function that takes an argument, like 'average', you'll have to drag a attribute onto the dropdown.
+Finally, here is a demo where you can view your own data from a local CSV file, all in-browser with no server support: [Local CSV demo](http://nicolaskruchten.github.io/pivottable/examples/local.html).
+
+##How do I use the UI?
+
+PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. If you choose a summary function that takes an argument, like 'average', you'll have to drag a attribute onto the dropdown. 
+There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction.
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/animation.gif)
 
-There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki as well.
 
-
-##How do you use the code?
+##How do I use the code?
 
 There are two main functions defined in `pivot.coffee`: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
@@ -71,7 +76,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 See the wiki for [full parameter documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters).
 
-## Documentation
+## Where is the documentation?
 
 More extensive documentation can be found in the [wiki](https://github.com/nicolaskruchten/pivottable/wiki):
 
@@ -81,9 +86,10 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 * [Aggregators](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators)
 * [Renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers)
 * [Derived Attributes](https://github.com/nicolaskruchten/pivottable/wiki/https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes)
+* [Google Charts Support](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
 
 
-## Getting in touch
+## I have a question, how can I get in touch?
 
 Please log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if the documentation here or on the [wiki](https://github.com/nicolaskruchten/pivottable/wiki) doesn't answer your question!
 
