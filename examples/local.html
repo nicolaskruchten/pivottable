@@ -3,21 +3,27 @@
     <head>
         <title>Pivot Demo From Local CSV</title>
         <link rel="stylesheet" type="text/css" href="pivot.css">
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="jquery-ui-1.9.2.custom.min.js"></script>
         <script type="text/javascript" src="jquery.csv-0.71.min.js"></script>
         <script type="text/javascript" src="pivot.js"></script>
+        <script type="text/javascript" src="gchart_renderers.js"></script>
     </head>
     <style>
         * {font-family: Verdana;}
     </style>
     <body>
         <script type="text/javascript">
+            google.load("visualization", "1", {packages:["corechart", "charteditor"]});
             $(function(){
+                var renderers = $.extend($.pivotUtilities.renderers, 
+                    $.pivotUtilities.gchart_renderers);
                 $("#csv").bind("change", function(event){
                     var reader = new FileReader();
                     reader.onload = function(theFile) { 
-                        $("#output").pivotUI( $.csv.toArrays(theFile.target.result) );
+                        $("#output").pivotUI( $.csv.toArrays(theFile.target.result),
+                           {renderers: renderers} );
                     };
                     reader.readAsText(event.target.files[0]);
                 });  
