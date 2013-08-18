@@ -52,7 +52,7 @@ Once you've loaded jQuery and pivot.js, this code ([demo](http://nicolaskruchten
 
 appends this table to `$("#output")` (the default, *overridable* behaviour is to populate the table cells with counts):
 
-<table class="pvtTable"><tbody><tr><th colspan="1" rowspan="1"></th><th class="pvtAxisLabel">shape</th><th class="pvtColLabel" colspan="1" rowspan="2">circle</th><th class="pvtColLabel" colspan="1" rowspan="2">triangle</th><th class="pvtTotalLabel" rowspan="2">Totals</th></tr><tr><th class="pvtAxisLabel">color</th><th></th></tr><tr><th class="pvtRowLabel" rowspan="1" colspan="2">blue</th><td class="pvtVal row0 col0">1</td><td class="pvtVal row0 col1"></td><td class="pvtTotal rowTotal">1</td></tr><tr><th class="pvtRowLabel" rowspan="1" colspan="2">red</th><td class="pvtVal row1 col0"></td><td class="pvtVal row1 col1">1</td><td class="pvtTotal rowTotal">1</td></tr><tr><th class="pvtTotalLabel" colspan="2">Totals</th><td class="pvtTotal colTotal">1</td><td class="pvtTotal colTotal">1</td><td class="pvtGrandTotal">2</td></tr></tbody></table>
+![image](http://nicolaskruchten.github.io/pivottable/images/simple.png)
 
 A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
 
