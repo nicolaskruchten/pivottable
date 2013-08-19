@@ -570,18 +570,18 @@
     return len;
   };
   pivotTableRenderer = function(pivotData) {
-    var aggregator, c, colKey, colKeys, cols, i, j, r, result, rowKey, rowKeys, rows, th, totalAggregator, tr, txt, val, x;
-    cols = pivotData.colAttrs;
-    rows = pivotData.rowAttrs;
+    var aggregator, c, colAttrs, colKey, colKeys, i, j, r, result, rowAttrs, rowKey, rowKeys, th, totalAggregator, tr, txt, val, x;
+    colAttrs = pivotData.colAttrs;
+    rowAttrs = pivotData.rowAttrs;
     rowKeys = pivotData.getRowKeys();
     colKeys = pivotData.getColKeys();
     result = $("<table class='table table-bordered pvtTable'>");
-    for (j in cols) {
-      if (!__hasProp.call(cols, j)) continue;
-      c = cols[j];
+    for (j in colAttrs) {
+      if (!__hasProp.call(colAttrs, j)) continue;
+      c = colAttrs[j];
       tr = $("<tr>");
-      if (parseInt(j) === 0 && rows.length !== 0) {
-        tr.append($("<th>").attr("colspan", rows.length).attr("rowspan", cols.length));
+      if (parseInt(j) === 0 && rowAttrs.length !== 0) {
+        tr.append($("<th>").attr("colspan", rowAttrs.length).attr("rowspan", colAttrs.length));
       }
       tr.append($("<th class='pvtAxisLabel'>").text(c));
       for (i in colKeys) {
@@ -590,26 +590,26 @@
         x = spanSize(colKeys, parseInt(i), parseInt(j));
         if (x !== -1) {
           th = $("<th class='pvtColLabel'>").text(colKey[j]).attr("colspan", x);
-          if (parseInt(j) === cols.length - 1 && rows.length !== 0) {
+          if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
             th.attr("rowspan", 2);
           }
           tr.append(th);
         }
       }
       if (parseInt(j) === 0) {
-        tr.append($("<th class='pvtTotalLabel'>").text("Totals").attr("rowspan", cols.length + (rows.length === 0 ? 0 : 1)));
+        tr.append($("<th class='pvtTotalLabel'>").text("Totals").attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
       }
       result.append(tr);
     }
-    if (rows.length !== 0) {
+    if (rowAttrs.length !== 0) {
       tr = $("<tr>");
-      for (i in rows) {
-        if (!__hasProp.call(rows, i)) continue;
-        r = rows[i];
+      for (i in rowAttrs) {
+        if (!__hasProp.call(rowAttrs, i)) continue;
+        r = rowAttrs[i];
         tr.append($("<th class='pvtAxisLabel'>").text(r));
       }
       th = $("<th>");
-      if (cols.length === 0) {
+      if (colAttrs.length === 0) {
         th.addClass("pvtTotalLabel").text("Totals");
       }
       tr.append(th);
@@ -625,7 +625,7 @@
         x = spanSize(rowKeys, parseInt(i), parseInt(j));
         if (x !== -1) {
           th = $("<th class='pvtRowLabel'>").text(txt).attr("rowspan", x);
-          if (parseInt(j) === rows.length - 1 && cols.length !== 0) {
+          if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
             th.attr("colspan", 2);
           }
           tr.append(th);
@@ -645,7 +645,7 @@
     }
     tr = $("<tr>");
     th = $("<th class='pvtTotalLabel'>").text("Totals");
-    th.attr("colspan", rows.length + (cols.length === 0 ? 0 : 1));
+    th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
     tr.append(th);
     for (j in colKeys) {
       if (!__hasProp.call(colKeys, j)) continue;
@@ -692,7 +692,7 @@
       derivedAttributes: {},
       aggregators: aggregators,
       renderers: renderers,
-      hiddenAxes: [],
+      hiddenAttributes: [],
       cols: [],
       rows: [],
       vals: []
@@ -756,7 +756,7 @@
     colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>");
     for (_j = 0, _len2 = tblCols.length; _j < _len2; _j++) {
       c = tblCols[_j];
-      if (__indexOf.call(opts.hiddenAxes, c) < 0) {
+      if (__indexOf.call(opts.hiddenAttributes, c) < 0) {
         (function(c) {
           var btns, colLabel, filterItem, k, numKeys, v, valueList, _k, _len3, _ref3;
           numKeys = Object.keys(axisValues[c]).length;
@@ -889,7 +889,7 @@
         cols: subopts.cols,
         rows: subopts.rows,
         vals: vals,
-        hiddenAxes: opts.hiddenAxes,
+        hiddenAttributes: opts.hiddenAttributes,
         renderers: opts.renderers,
         aggregators: opts.aggregators,
         derivedAttributes: opts.derivedAttributes,
