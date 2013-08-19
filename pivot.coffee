@@ -287,8 +287,8 @@ spanSize = (arr, i, j) ->
     return len
 
 pivotTableRenderer = (pivotData) ->
-    cols = pivotData.colAttrs
-    rows = pivotData.rowAttrs
+    colAttrs = pivotData.colAttrs
+    rowAttrs = pivotData.rowAttrs
     rowKeys = pivotData.getRowKeys()
     colKeys = pivotData.getColKeys()
 
@@ -296,32 +296,32 @@ pivotTableRenderer = (pivotData) ->
     result = $("<table class='table table-bordered pvtTable'>")
 
     #the first few rows are for col headers
-    for own j, c of cols
+    for own j, c of colAttrs
         tr = $("<tr>")
-        if parseInt(j) == 0 and rows.length != 0
+        if parseInt(j) == 0 and rowAttrs.length != 0
             tr.append $("<th>")
-                .attr("colspan", rows.length)
-                .attr("rowspan", cols.length)
+                .attr("colspan", rowAttrs.length)
+                .attr("rowspan", colAttrs.length)
         tr.append $("<th class='pvtAxisLabel'>").text(c)
         for own i, colKey of colKeys
             x = spanSize(colKeys, parseInt(i), parseInt(j))
             if x != -1
                 th = $("<th class='pvtColLabel'>").text(colKey[j]).attr("colspan", x)
-                if parseInt(j) == cols.length-1 and rows.length != 0
+                if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                     th.attr("rowspan", 2)
                 tr.append th
         if parseInt(j) == 0
             tr.append $("<th class='pvtTotalLabel'>").text("Totals")
-                .attr("rowspan", cols.length + (if rows.length ==0 then 0 else 1))
+                .attr("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
         result.append tr
 
     #then a row for row header headers
-    if rows.length !=0
+    if rowAttrs.length !=0
         tr = $("<tr>")
-        for own i, r of rows
+        for own i, r of rowAttrs
             tr.append $("<th class='pvtAxisLabel'>").text(r)
         th = $("<th>")
-        if cols.length ==0
+        if colAttrs.length ==0
             th.addClass("pvtTotalLabel").text("Totals")
         tr.append th
         result.append tr
@@ -333,7 +333,7 @@ pivotTableRenderer = (pivotData) ->
             x = spanSize(rowKeys, parseInt(i), parseInt(j))
             if x != -1
                 th = $("<th class='pvtRowLabel'>").text(txt).attr("rowspan", x)
-                if parseInt(j) == rows.length-1 and cols.length !=0
+                if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                     th.attr("colspan",2)
                 tr.append th
         for own j, colKey of colKeys
@@ -354,7 +354,7 @@ pivotTableRenderer = (pivotData) ->
     #finally, the row for col totals, and a grand total
     tr = $("<tr>")
     th = $("<th class='pvtTotalLabel'>").text("Totals")
-    th.attr("colspan", rows.length + (if cols.length == 0 then 0 else 1))
+    th.attr("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
     tr.append th
     for own j, colKey of colKeys
         totalAggregator = pivotData.getAggregator([], colKey)
