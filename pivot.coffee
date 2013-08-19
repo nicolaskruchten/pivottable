@@ -406,7 +406,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         derivedAttributes: {}
         aggregators: aggregators
         renderers: renderers
-        hiddenAxes: []
+        hiddenAttributes: []
         cols: [], rows: [], vals: []
 
     existingOpts = @data "pivotUIOptions"
@@ -447,7 +447,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
     colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>")
 
-    for c in tblCols when c not in opts.hiddenAxes
+    for c in tblCols when c not in opts.hiddenAttributes
         do (c) ->
             numKeys = Object.keys(axisValues[c]).length
             colLabel = $("<nobr>").text(c)
@@ -564,7 +564,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             cols: subopts.cols
             rows: subopts.rows
             vals: vals
-            hiddenAxes: opts.hiddenAxes
+            hiddenAttributes: opts.hiddenAttributes
             renderers: opts.renderers
             aggregators: opts.aggregators
             derivedAttributes: opts.derivedAttributes

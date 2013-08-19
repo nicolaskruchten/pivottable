@@ -692,7 +692,7 @@
       derivedAttributes: {},
       aggregators: aggregators,
       renderers: renderers,
-      hiddenAxes: [],
+      hiddenAttributes: [],
       cols: [],
       rows: [],
       vals: []
@@ -756,7 +756,7 @@
     colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>");
     for (_j = 0, _len2 = tblCols.length; _j < _len2; _j++) {
       c = tblCols[_j];
-      if (__indexOf.call(opts.hiddenAxes, c) < 0) {
+      if (__indexOf.call(opts.hiddenAttributes, c) < 0) {
         (function(c) {
           var btns, colLabel, filterItem, k, numKeys, v, valueList, _k, _len3, _ref3;
           numKeys = Object.keys(axisValues[c]).length;
@@ -889,7 +889,7 @@
         cols: subopts.cols,
         rows: subopts.rows,
         vals: vals,
-        hiddenAxes: opts.hiddenAxes,
+        hiddenAttributes: opts.hiddenAttributes,
         renderers: opts.renderers,
         aggregators: opts.aggregators,
         derivedAttributes: opts.derivedAttributes,
