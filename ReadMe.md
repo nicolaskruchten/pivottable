@@ -11,14 +11,16 @@ With an optional add-on, the summary table can be rendered as a Google Chart, tu
 
 ##Why is it good?
 
-* works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
+* lightweight: less than 1000 LOC of CoffeeScript, 6.1kb minified and gzipped, depends only on jQuery and jQueryUI's 'sortable' (and optionally on Google Charts)
+* works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
+* works acceptably fast in Chrome on commodity hardware up to megabytes of input: hundreds of thousands of records with a dozen attributes
 * layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
+* works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
 * [derived attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes) can be created on the fly based on the whole input record by passing in a function
 * complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (i.e. weighted averages)
 * built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional support for [Google Charts](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
-* works acceptably fast in Chrome on commodity hardware up to hundreds of thousands of records with a dozen attributes
-* works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
+
 
 ##Where's the demo?
 
