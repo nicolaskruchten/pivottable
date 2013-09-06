@@ -526,15 +526,15 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
     #set up the UI initial state as requested by moving elements around
 
     for x in opts.cols
-        $("#cols").append $("#axis_#{x.replace(/\s/g, "")}")
+        @find("#cols").append @find("#axis_#{x.replace(/\s/g, "")}")
     for x in opts.rows
-        $("#rows").append $("#axis_#{x.replace(/\s/g, "")}")
+        @find("#rows").append @find("#axis_#{x.replace(/\s/g, "")}")
     for x in opts.vals
-        $("#vals").append $("#axis_#{x.replace(/\s/g, "")}")
+        @find("#vals").append @find("#axis_#{x.replace(/\s/g, "")}")
     if opts.aggregatorName?
-        $("#aggregator").val opts.aggregatorName
+        @find("#aggregator").val opts.aggregatorName
     if opts.rendererName?
-        $("#renderer").val opts.rendererName
+        @find("#renderer").val opts.rendererName
 
     #set up for refreshing
     refresh = =>
@@ -542,16 +542,16 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         subopts.cols = []
         subopts.rows = []
         vals = []
-        $("#rows li nobr").each -> subopts.rows.push $(this).text()
-        $("#cols li nobr").each -> subopts.cols.push $(this).text()
-        $("#vals li nobr").each -> vals.push $(this).text()
+        @find("#rows li nobr").each -> subopts.rows.push $(this).text()
+        @find("#cols li nobr").each -> subopts.cols.push $(this).text()
+        @find("#vals li nobr").each -> vals.push $(this).text()
 
         subopts.aggregator = opts.aggregators[aggregator.val()](vals)
         subopts.renderer = opts.renderers[renderer.val()]
 
         #construct filter here
         exclusions = []
-        $('input.pvtFilter').not(':checked').each ->
+        @find('input.pvtFilter').not(':checked').each ->
             exclusions.push $(this).data("filter")
 
         subopts.filter = (record) ->
@@ -574,7 +574,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
     #the very first refresh will actually display the table
     refresh()
 
-    $(".pvtAxisContainer")
+    @find(".pvtAxisContainer")
          .sortable({connectWith:".pvtAxisContainer", items: 'li'})
          .bind "sortstop", refresh
 
