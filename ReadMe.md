@@ -33,7 +33,7 @@ Finally, here is a demo where you can view your own data from a local CSV file, 
 ##How do I use the UI?
 
 PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. If you choose a summary function that takes an argument, like 'average', you'll have to drag a attribute onto the dropdown. 
-There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction.
+There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the Canadian Parliament 2012 dataset.
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/animation.gif)
 
@@ -82,12 +82,12 @@ See the wiki for [full parameter documentation](https://github.com/nicolaskrucht
 
 More extensive documentation can be found in the [wiki](https://github.com/nicolaskruchten/pivottable/wiki):
 
-* [Step by step UI Tutorial](https://github.com/nicolaskruchten/pivottable/wiki/Parameters)
+* [Step by step UI Tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial)
 * [Full Parameter Documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters)
 * [Input Formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
 * [Aggregators](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators)
 * [Renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers)
-* [Derived Attributes](https://github.com/nicolaskruchten/pivottable/wiki/https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes)
+* [Derived Attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes)
 * [Google Charts Support](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
 
 
