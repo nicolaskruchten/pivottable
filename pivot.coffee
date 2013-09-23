@@ -140,8 +140,8 @@ forEachRecord = (input, derivedAttributes, f) ->
     #if it's a function, have it call us back
     if Object.prototype.toString.call(input) == '[object Function]'
         input(addRecord)
-    else if Array.isArray(input)
-        if Array.isArray(input[0]) #array of arrays
+    else if $.isArray(input)
+        if $.isArray(input[0]) #array of arrays
             for own i, compactRecord of input when i > 0
                 record = {}
                 record[k] = compactRecord[j] for own j, k of input[0]

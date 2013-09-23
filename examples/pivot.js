@@ -316,8 +316,8 @@
     };
     if (Object.prototype.toString.call(input) === '[object Function]') {
       return input(addRecord);
-    } else if (Array.isArray(input)) {
-      if (Array.isArray(input[0])) {
+    } else if ($.isArray(input)) {
+      if ($.isArray(input[0])) {
         _results = [];
         for (i in input) {
           if (!__hasProp.call(input, i)) continue;
