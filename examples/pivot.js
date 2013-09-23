@@ -314,7 +314,7 @@
     addRecord = function(record) {
       return deriveAttributes(record, derivedAttributes, f);
     };
-    if (Object.prototype.toString.call(input) === '[object Function]') {
+    if ($.isFunction(input)) {
       return input(addRecord);
     } else if ($.isArray(input)) {
       if ($.isArray(input[0])) {
