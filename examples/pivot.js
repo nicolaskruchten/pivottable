@@ -758,8 +758,15 @@
       c = tblCols[_j];
       if (__indexOf.call(opts.hiddenAttributes, c) < 0) {
         (function(c) {
-          var btns, colLabel, filterItem, k, numKeys, v, valueList, _k, _len3, _ref3;
-          numKeys = Object.keys(axisValues[c]).length;
+          var btns, colLabel, filterItem, k, keys, v, valueList, _k, _len3, _ref3;
+          keys = (function() {
+            var _results;
+            _results = [];
+            for (k in axisValues[c]) {
+              _results.push(k);
+            }
+            return _results;
+          })();
           colLabel = $("<nobr>").text(c);
           valueList = $("<div>").css({
             "z-index": 100,
@@ -772,8 +779,8 @@
             "position": "absolute",
             "padding": "20px"
           });
-          valueList.append($("<strong>").text("" + numKeys + " values for " + c));
-          if (numKeys > 50) {
+          valueList.append($("<strong>").text("" + keys.length + " values for " + c));
+          if (keys.length > 50) {
             valueList.append($("<p>").text("(too many to list)"));
           } else {
             btns = $("<p>");
@@ -784,7 +791,7 @@
               return valueList.find("input").attr("checked", false);
             }));
             valueList.append(btns);
-            _ref3 = Object.keys(axisValues[c]).sort();
+            _ref3 = keys.sort();
             for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
               k = _ref3[_k];
               v = axisValues[c][k];

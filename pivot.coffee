@@ -449,7 +449,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
     for c in tblCols when c not in opts.hiddenAttributes
         do (c) ->
-            numKeys = Object.keys(axisValues[c]).length
+            keys = (k for k of axisValues[c])
             colLabel = $("<nobr>").text(c)
             valueList = $("<div>")
                 .css
@@ -462,8 +462,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     "display": "none"
                     "position": "absolute"
                     "padding": "20px"
-            valueList.append $("<strong>").text "#{numKeys} values for #{c}"
-            if numKeys > 50
+            valueList.append $("<strong>").text "#{keys.length} values for #{c}"
+            if keys.length > 50
                 valueList.append $("<p>").text "(too many to list)"
             else
                 btns = $("<p>")
@@ -472,7 +472,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 btns.append $("<button>").text("Select None").bind "click", ->
                     valueList.find("input").attr "checked", false
                 valueList.append btns
-                for k in Object.keys(axisValues[c]).sort()
+                for k in keys.sort()
                      v = axisValues[c][k]
                      filterItem = $("<label>")
                      filterItem.append $("<input type='checkbox' class='pvtFilter'>")
