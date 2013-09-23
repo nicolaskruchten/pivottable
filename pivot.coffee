@@ -138,7 +138,7 @@ deriveAttributes = (record, derivedAttributes, f) ->
 forEachRecord = (input, derivedAttributes, f) ->
     addRecord = (record) -> deriveAttributes(record, derivedAttributes, f)
     #if it's a function, have it call us back
-    if Object.prototype.toString.call(input) == '[object Function]'
+    if $.isFunction(input)
         input(addRecord)
     else if $.isArray(input)
         if $.isArray(input[0]) #array of arrays
