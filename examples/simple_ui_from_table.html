@@ -1,0 +1,45 @@
+
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <link rel="stylesheet" type="text/css" href="pivot.css">
+        <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="pivot.js"></script>
+    </head>
+    <style>
+        * {font-family: Verdana;}
+    </style>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+                    var input = $("#input")
+                    $("#output").pivotUI(input);
+             });
+        </script>
+
+        <div id="output" style="margin: 10px;"></div>
+        <br /><br /><br />
+        <table id="input" border="1">
+            <thead>
+                <tr>
+                    <th>attr1</th>
+                    <th>attr2</th>
+                    <!-- etc... -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>value1_attr1</td>
+                    <td>value1_attr2</td>
+                </tr>
+                <tr>
+                    <td>value2_attr1</td>
+                    <td>value2_attr2</td>
+                </tr>
+                    <!-- etc... -->
+            </tbody>
+        </table>
+
+    </body>
+</html>
