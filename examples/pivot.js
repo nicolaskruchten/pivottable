@@ -885,7 +885,7 @@
         var v, _len6, _n, _ref7;
         for (_n = 0, _len6 = exclusions.length; _n < _len6; _n++) {
           _ref7 = exclusions[_n], k = _ref7[0], v = _ref7[1];
-          if (record[k] === v) {
+          if (("" + record[k]) === v) {
             return false;
           }
         }

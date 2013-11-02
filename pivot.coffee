@@ -556,7 +556,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
         subopts.filter = (record) ->
             for [k,v] in exclusions
-                return false if record[k] == v
+                return false if "#{record[k]}" == v
             return true
 
         pivotTable.pivot(input,subopts)
