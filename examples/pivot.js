@@ -1,6 +1,6 @@
 (function() {
   var $, PivotData, addCommas, aggregatorTemplates, aggregators, convertToArray, dayNames, deriveAttributes, derivers, forEachRecord, getPivotData, mthNames, numberFormat, pivotTableRenderer, renderers, spanSize, zeroPad;
-  var __indexOf = Array.prototype.indexOf || function(item) {
+  var __slice = Array.prototype.slice, __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
     }
@@ -160,6 +160,35 @@
           };
         };
       };
+    },
+    fractionOf: function(wrapped, type) {
+      if (type == null) {
+        type = "total";
+      }
+      return function() {
+        var x;
+        x = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return function(data, rowKey, colKey) {
+          return {
+            selector: {
+              total: [[], []],
+              row: [rowKey, []],
+              col: [[], colKey]
+            }[type],
+            inner: wrapped.apply(null, x)(data, rowKey, colKey),
+            push: function(record) {
+              return this.inner.push(record);
+            },
+            format: function(v) {
+              return numberFormat(2)(100 * v) + "%";
+            },
+            label: "blah",
+            value: function() {
+              return this.inner.value() / data.getAggregator.apply(data, this.selector).inner.value();
+            }
+          };
+        };
+      };
     }
   };
   aggregators = {
@@ -227,6 +256,12 @@
     ub80: aggregatorTemplates.sumOverSumBound80(3, 1, true),
     lb80: aggregatorTemplates.sumOverSumBound80(3, 1, false)
   };
+  aggregators.sumAsFractionOfTotal = aggregatorTemplates.fractionOf(aggregators.sum);
+  aggregators.sumAsFractionOfRow = aggregatorTemplates.fractionOf(aggregators.sum, "row");
+  aggregators.sumAsFractionOfCol = aggregatorTemplates.fractionOf(aggregators.sum, "col");
+  aggregators.countAsFractionOfTotal = aggregatorTemplates.fractionOf(aggregators.count);
+  aggregators.countAsFractionOfRow = aggregatorTemplates.fractionOf(aggregators.count, "row");
+  aggregators.countAsFractionOfCol = aggregatorTemplates.fractionOf(aggregators.count, "col");
   renderers = {
     "Table": function(pvtData) {
       return pivotTableRenderer(pvtData);
@@ -383,7 +418,7 @@
       this.flatColKeys = [];
       this.rowTotals = {};
       this.colTotals = {};
-      this.allTotal = this.aggregator();
+      this.allTotal = this.aggregator(this, [], []);
       this.sorted = false;
     }
     PivotData.prototype.natSort = function(as, bs) {
@@ -483,7 +518,7 @@
           this.flatRowKeys.push(flatRowKey);
         }
         if (!this.rowTotals[flatRowKey]) {
-          this.rowTotals[flatRowKey] = this.aggregator();
+          this.rowTotals[flatRowKey] = this.aggregator(this, rowKey, []);
         }
         this.rowTotals[flatRowKey].push(record);
       }
@@ -493,7 +528,7 @@
           this.flatColKeys.push(flatColKey);
         }
         if (!this.colTotals[flatColKey]) {
-          this.colTotals[flatColKey] = this.aggregator();
+          this.colTotals[flatColKey] = this.aggregator(this, [], colKey);
         }
         this.colTotals[flatColKey].push(record);
       }
@@ -502,7 +537,7 @@
           this.tree[flatRowKey] = {};
         }
         if (!(flatColKey in this.tree[flatRowKey])) {
-          this.tree[flatRowKey][flatColKey] = this.aggregator();
+          this.tree[flatRowKey][flatColKey] = this.aggregator(this, rowKey, colKey);
         }
         return this.tree[flatRowKey][flatColKey].push(record);
       }

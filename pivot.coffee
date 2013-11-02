@@ -62,6 +62,16 @@ aggregatorTemplates =
         format: numberFormat(sigfig, scaler)
         label: "#{if upper then "Upper" else "Lower"} Bound of #{num}/#{denom}"
 
+    fractionOf: (wrapped, type="total") -> (x...) -> (data, rowKey, colKey) ->
+        selector: {total:[[],[]],row:[rowKey,[]],col:[[],colKey]}[type]
+        inner: wrapped(x...)(data, rowKey, colKey)
+        push: (record) -> @inner.push record
+        format: (v) -> numberFormat(2)(100*v)+"%"
+        label: "blah"
+        value: -> @inner.value() / data.getAggregator(@selector...).inner.value()
+
+
+
 #technically these are aggregator constructor generators (!)
 aggregators =
     count: -> ->
@@ -78,7 +88,7 @@ aggregators =
         format: numberFormat(0)
         label: "Count Unique #{attr}"
 
-    listUnique: ([attr]) -> ->
+    listUnique: ([attr]) ->  ->
         uniq: []
         push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
         value: -> @uniq.join ", "
@@ -91,6 +101,13 @@ aggregators =
     sumOverSum: aggregatorTemplates.sumOverSum(3)
     ub80: aggregatorTemplates.sumOverSumBound80(3, 1, true)
     lb80: aggregatorTemplates.sumOverSumBound80(3, 1, false)
+
+aggregators.sumAsFractionOfTotal= aggregatorTemplates.fractionOf(aggregators.sum)
+aggregators.sumAsFractionOfRow= aggregatorTemplates.fractionOf(aggregators.sum, "row")
+aggregators.sumAsFractionOfCol= aggregatorTemplates.fractionOf(aggregators.sum, "col")
+aggregators.countAsFractionOfTotal= aggregatorTemplates.fractionOf(aggregators.count)
+aggregators.countAsFractionOfRow= aggregatorTemplates.fractionOf(aggregators.count, "row")
+aggregators.countAsFractionOfCol= aggregatorTemplates.fractionOf(aggregators.count, "col")
 
 
 renderers =
@@ -171,7 +188,7 @@ class PivotData
         @flatColKeys = []
         @rowTotals = {}
         @colTotals = {}
-        @allTotal = @aggregator()
+        @allTotal = @aggregator(this, [], [])
         @sorted = false
     
     natSort: (as, bs) => #from http://stackoverflow.com/a/4373421/112871
@@ -230,7 +247,7 @@ class PivotData
                 @rowKeys.push rowKey
                 @flatRowKeys.push flatRowKey
             if not @rowTotals[flatRowKey]
-                @rowTotals[flatRowKey] = @aggregator() 
+                @rowTotals[flatRowKey] = @aggregator(this, rowKey, []) 
             @rowTotals[flatRowKey].push record
 
         if colKey.length != 0
@@ -238,14 +255,14 @@ class PivotData
                 @colKeys.push colKey
                 @flatColKeys.push flatColKey
             if not @colTotals[flatColKey]
-                @colTotals[flatColKey] = @aggregator()
+                @colTotals[flatColKey] = @aggregator(this, [], colKey)
             @colTotals[flatColKey].push record
 
         if colKey.length != 0 and rowKey.length != 0
             if flatRowKey not of @tree
                 @tree[flatRowKey] = {}
             if flatColKey not of @tree[flatRowKey]
-                @tree[flatRowKey][flatColKey] = @aggregator() 
+                @tree[flatRowKey][flatColKey] = @aggregator(this, rowKey, colKey) 
             @tree[flatRowKey][flatColKey].push record
 
     getAggregator: (rowKey, colKey) =>
