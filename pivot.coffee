@@ -407,6 +407,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         aggregators: aggregators
         renderers: renderers
         hiddenAttributes: []
+        menuLimit: 50
         cols: [], rows: [], vals: []
 
     existingOpts = @data "pivotUIOptions"
@@ -463,7 +464,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     "position": "absolute"
                     "padding": "20px"
             valueList.append $("<strong>").text "#{keys.length} values for #{c}"
-            if keys.length > 50
+            if keys.length > opts.menuLimit
                 valueList.append $("<p>").text "(too many to list)"
             else
                 btns = $("<p>")
@@ -556,7 +557,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
         subopts.filter = (record) ->
             for [k,v] in exclusions
-                return false if record[k] == v
+                return false if "#{record[k]}" == v
             return true
 
         pivotTable.pivot(input,subopts)

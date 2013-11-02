@@ -693,6 +693,7 @@
       aggregators: aggregators,
       renderers: renderers,
       hiddenAttributes: [],
+      menuLimit: 50,
       cols: [],
       rows: [],
       vals: []
@@ -780,7 +781,7 @@
             "padding": "20px"
           });
           valueList.append($("<strong>").text("" + keys.length + " values for " + c));
-          if (keys.length > 50) {
+          if (keys.length > opts.menuLimit) {
             valueList.append($("<p>").text("(too many to list)"));
           } else {
             btns = $("<p>");
@@ -885,7 +886,7 @@
         var v, _len6, _n, _ref7;
         for (_n = 0, _len6 = exclusions.length; _n < _len6; _n++) {
           _ref7 = exclusions[_n], k = _ref7[0], v = _ref7[1];
-          if (record[k] === v) {
+          if (("" + record[k]) === v) {
             return false;
           }
         }
