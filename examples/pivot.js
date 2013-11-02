@@ -693,6 +693,7 @@
       aggregators: aggregators,
       renderers: renderers,
       hiddenAttributes: [],
+      menuLimit: 50,
       cols: [],
       rows: [],
       vals: []
@@ -780,7 +781,7 @@
             "padding": "20px"
           });
           valueList.append($("<strong>").text("" + keys.length + " values for " + c));
-          if (keys.length > 50) {
+          if (keys.length > opts.menuLimit) {
             valueList.append($("<p>").text("(too many to list)"));
           } else {
             btns = $("<p>");
