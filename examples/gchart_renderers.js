@@ -91,6 +91,9 @@
   $.pivotUtilities.gchart_renderers = {
     "Line Chart": makeGoogleChart("LineChart"),
     "Bar Chart": makeGoogleChart("ColumnChart"),
+    "Stacked Bar Chart": makeGoogleChart("ColumnChart", {
+      isStacked: true
+    }),
     "Area Chart": makeGoogleChart("AreaChart", {
       isStacked: true
     })
