@@ -67,7 +67,7 @@ aggregatorTemplates =
         inner: wrapped(x...)(data, rowKey, colKey)
         push: (record) -> @inner.push record
         format: (v) -> numberFormat(2)(100*v)+"%"
-        label: "blah"
+        label: wrapped(x...)(data, rowKey, colKey).label+" % of "+type
         value: -> @inner.value() / data.getAggregator(@selector...).inner.value()
 
 

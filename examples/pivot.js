@@ -182,7 +182,7 @@
             format: function(v) {
               return numberFormat(2)(100 * v) + "%";
             },
-            label: "blah",
+            label: wrapped.apply(null, x)(data, rowKey, colKey).label + " % of " + type,
             value: function() {
               return this.inner.value() / data.getAggregator.apply(data, this.selector).inner.value();
             }
