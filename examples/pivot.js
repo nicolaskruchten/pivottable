@@ -703,34 +703,30 @@
 		var attrs=new Object();
 		attrs.filter = new Array();
 		attrs.result = "" + $(this).html();
-		var myClasses;
 		if (!myClass){
 			var myClass = $(this).attr("class");
 		}
     	var myClasses = myClass.split(" ");
+		function addAttribute(className, attrNameArry, attrValueArry){
+			for (j = 0; j < attrNameArry.length; j++) {
+				var attr=new Object();
+				attr.name = attrNameArry[j];
+				attr.value = attrValueArry[className.substr(3)][j];
+				attrs.filter.push(attr);
+			}
+		}
 		for (i = 0; i < myClasses.length; i++) {
 		  var className = myClasses[i];
-		  if (className.substr(0,3)=="row"){
-			for (j = 0; j < rowAttrs.length; j++) {
-				var attr=new Object();
-				attr.name = rowAttrs[j];
-				attr.value = rowKeys[className.substr(3,10)][j];
-				attrs.filter.push(attr);
-			}
-		  }else if (className.substr(0,3)=="col"){
-			for (j = 0; j < colAttrs.length; j++) {
-				var attr=new Object();
-				attr.name = colAttrs[j];
-				attr.value = colKeys[className.substr(3,10)][j];
-				attrs.filter.push(attr);
-			}
+		  if (className[0]=="r"){
+			addAttribute(className, rowAttrs, rowKeys);
+		  }else if (className[0]=="c"){
+			addAttribute(className, colAttrs, colKeys);
 		  }
 		}
 		pivotData.onFieldClick(attrs);
 	};
 	if (pivotData.onFieldClick)	{
-    	result.find(".pvtVal").bind("click", valueClick);
-    	result.find(".pvtTotal").bind("click", valueClick);		
+    	result.find(".pvtVal,.pvtTotal").bind("click", valueClick);		
 	}
 	
     return result;
