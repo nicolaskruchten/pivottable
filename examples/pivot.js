@@ -719,7 +719,7 @@
   UI code, calls pivot table above
   */
   $.fn.pivotUI = function(input, inputOpts, overwrite) {
-    var aggregator, axisValues, c, colList, defaults, existingOpts, k, opts, pivotTable, refresh, renderer, rendererControl, tblCols, tr1, tr2, uiTable, x, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
+    var aggregator, axisValues, c, colList, defaults, existingOpts, i, k, opts, pivotTable, refresh, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, x, _fn, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
     if (overwrite == null) {
       overwrite = false;
     }
@@ -790,69 +790,79 @@
     }
     rendererControl.append(renderer);
     colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>");
-    for (_j = 0, _len2 = tblCols.length; _j < _len2; _j++) {
-      c = tblCols[_j];
-      if (__indexOf.call(opts.hiddenAttributes, c) < 0) {
-        (function(c) {
-          var btns, colLabel, filterItem, k, keys, v, valueList, _k, _len3, _ref3;
-          keys = (function() {
-            var _results;
-            _results = [];
-            for (k in axisValues[c]) {
-              _results.push(k);
-            }
-            return _results;
-          })();
-          colLabel = $("<nobr>").text(c);
-          valueList = $("<div>").css({
-            "z-index": 100,
-            "width": "280px",
-            "height": "350px",
-            "overflow": "scroll",
-            "border": "1px solid gray",
-            "background": "white",
-            "display": "none",
-            "position": "absolute",
-            "padding": "20px"
-          });
-          valueList.append($("<strong>").text("" + keys.length + " values for " + c));
-          if (keys.length > opts.menuLimit) {
-            valueList.append($("<p>").text("(too many to list)"));
-          } else {
-            btns = $("<p>");
-            btns.append($("<button>").text("Select All").bind("click", function() {
-              return valueList.find("input").attr("checked", true);
-            }));
-            btns.append($("<button>").text("Select None").bind("click", function() {
-              return valueList.find("input").attr("checked", false);
-            }));
-            valueList.append(btns);
-            _ref3 = keys.sort();
-            for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
-              k = _ref3[_k];
-              v = axisValues[c][k];
-              filterItem = $("<label>");
-              filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", true).data("filter", [c, k]));
-              filterItem.append($("<span>").text("" + k + " (" + v + ")"));
-              valueList.append($("<p>").append(filterItem));
-            }
-          }
-          colLabel.bind("dblclick", function(e) {
-            valueList.css({
-              left: e.pageX,
-              top: e.pageY
-            }).toggle();
-            valueList.bind("click", function(e) {
-              return e.stopPropagation();
-            });
-            return $(document).one("click", function() {
-              refresh();
-              return valueList.toggle();
-            });
-          });
-          return colList.append($("<li class='label label-info' id='axis_" + (c.replace(/\s/g, "")) + "'>").append(colLabel).append(valueList));
-        })(c);
+    shownAttributes = (function() {
+      var _j, _len2, _results;
+      _results = [];
+      for (_j = 0, _len2 = tblCols.length; _j < _len2; _j++) {
+        c = tblCols[_j];
+        if (__indexOf.call(opts.hiddenAttributes, c) < 0) {
+          _results.push(c);
+        }
       }
+      return _results;
+    })();
+    _fn = function(c) {
+      var btns, colLabel, filterItem, k, keys, v, valueList, _j, _len2, _ref3;
+      keys = (function() {
+        var _results;
+        _results = [];
+        for (k in axisValues[c]) {
+          _results.push(k);
+        }
+        return _results;
+      })();
+      colLabel = $("<nobr>").text(c);
+      valueList = $("<div>").css({
+        "z-index": 100,
+        "width": "280px",
+        "height": "350px",
+        "overflow": "scroll",
+        "border": "1px solid gray",
+        "background": "white",
+        "display": "none",
+        "position": "absolute",
+        "padding": "20px"
+      });
+      valueList.append($("<strong>").text("" + keys.length + " values for " + c));
+      if (keys.length > opts.menuLimit) {
+        valueList.append($("<p>").text("(too many to list)"));
+      } else {
+        btns = $("<p>");
+        btns.append($("<button>").text("Select All").bind("click", function() {
+          return valueList.find("input").attr("checked", true);
+        }));
+        btns.append($("<button>").text("Select None").bind("click", function() {
+          return valueList.find("input").attr("checked", false);
+        }));
+        valueList.append(btns);
+        _ref3 = keys.sort();
+        for (_j = 0, _len2 = _ref3.length; _j < _len2; _j++) {
+          k = _ref3[_j];
+          v = axisValues[c][k];
+          filterItem = $("<label>");
+          filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", true).data("filter", [c, k]));
+          filterItem.append($("<span>").text("" + k + " (" + v + ")"));
+          valueList.append($("<p>").append(filterItem));
+        }
+      }
+      colLabel.bind("dblclick", function(e) {
+        valueList.css({
+          left: e.pageX,
+          top: e.pageY
+        }).toggle();
+        valueList.bind("click", function(e) {
+          return e.stopPropagation();
+        });
+        return $(document).one("click", function() {
+          refresh();
+          return valueList.toggle();
+        });
+      });
+      return colList.append($("<li class='label label-info' id='axis_" + i + "'>").append(colLabel).append(valueList));
+    };
+    for (i in shownAttributes) {
+      c = shownAttributes[i];
+      _fn(c);
     }
     uiTable.append($("<tr>").append(rendererControl).append(colList));
     tr1 = $("<tr>");
@@ -874,19 +884,19 @@
     uiTable.append(tr2);
     this.html(uiTable);
     _ref4 = opts.cols;
-    for (_k = 0, _len3 = _ref4.length; _k < _len3; _k++) {
-      x = _ref4[_k];
-      this.find("#cols").append(this.find("#axis_" + (x.replace(/\s/g, ""))));
+    for (_j = 0, _len2 = _ref4.length; _j < _len2; _j++) {
+      x = _ref4[_j];
+      this.find("#cols").append(this.find("#axis_" + (shownAttributes.indexOf(x))));
     }
     _ref5 = opts.rows;
-    for (_l = 0, _len4 = _ref5.length; _l < _len4; _l++) {
-      x = _ref5[_l];
-      this.find("#rows").append(this.find("#axis_" + (x.replace(/\s/g, ""))));
+    for (_k = 0, _len3 = _ref5.length; _k < _len3; _k++) {
+      x = _ref5[_k];
+      this.find("#rows").append(this.find("#axis_" + (shownAttributes.indexOf(x))));
     }
     _ref6 = opts.vals;
-    for (_m = 0, _len5 = _ref6.length; _m < _len5; _m++) {
-      x = _ref6[_m];
-      this.find("#vals").append(this.find("#axis_" + (x.replace(/\s/g, ""))));
+    for (_l = 0, _len4 = _ref6.length; _l < _len4; _l++) {
+      x = _ref6[_l];
+      this.find("#vals").append(this.find("#axis_" + (shownAttributes.indexOf(x))));
     }
     if (opts.aggregatorName != null) {
       this.find("#aggregator").val(opts.aggregatorName);
@@ -918,9 +928,9 @@
         return exclusions.push($(this).data("filter"));
       });
       subopts.filter = function(record) {
-        var v, _len6, _n, _ref7;
-        for (_n = 0, _len6 = exclusions.length; _n < _len6; _n++) {
-          _ref7 = exclusions[_n], k = _ref7[0], v = _ref7[1];
+        var v, _len5, _m, _ref7;
+        for (_m = 0, _len5 = exclusions.length; _m < _len5; _m++) {
+          _ref7 = exclusions[_m], k = _ref7[0], v = _ref7[1];
           if (("" + record[k]) === v) {
             return false;
           }

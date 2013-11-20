@@ -464,8 +464,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
     #axis list, including the double-click menu
 
     colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>")
-
-    for c in tblCols when c not in opts.hiddenAttributes
+    shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
+    for i, c of shownAttributes
         do (c) ->
             keys = (k for k of axisValues[c])
             colLabel = $("<nobr>").text(c)
@@ -503,7 +503,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 $(document).one "click", ->
                     refresh()
                     valueList.toggle()
-            colList.append $("<li class='label label-info' id='axis_#{c.replace(/\s/g, "")}'>").append(colLabel).append(valueList)
+            colList.append $("<li class='label label-info' id='axis_#{i}'>").append(colLabel).append(valueList)
 
 
     uiTable.append $("<tr>").append(rendererControl).append(colList)
@@ -544,11 +544,11 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
     #set up the UI initial state as requested by moving elements around
 
     for x in opts.cols
-        @find("#cols").append @find("#axis_#{x.replace(/\s/g, "")}")
+        @find("#cols").append @find("#axis_#{shownAttributes.indexOf(x)}")
     for x in opts.rows
-        @find("#rows").append @find("#axis_#{x.replace(/\s/g, "")}")
+        @find("#rows").append @find("#axis_#{shownAttributes.indexOf(x)}")
     for x in opts.vals
-        @find("#vals").append @find("#axis_#{x.replace(/\s/g, "")}")
+        @find("#vals").append @find("#axis_#{shownAttributes.indexOf(x)}")
     if opts.aggregatorName?
         @find("#aggregator").val opts.aggregatorName
     if opts.rendererName?
