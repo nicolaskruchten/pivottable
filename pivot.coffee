@@ -156,6 +156,7 @@ derivers =
         #thanks http://stackoverflow.com/a/12213072/112871
         (record) ->
             date = new Date(Date.parse(record[col]))
+            return "" if isNaN(date.valueOf())            
             formatString.replace /%(.)/g, (m, p) -> 
                 switch p
                     when "y" then date.getFullYear()
