@@ -18,6 +18,35 @@ numberFormat = (sigfig=3, scaler=1) ->
         if x==0 or isNaN(x) or not isFinite(x) then ""
         else addCommas (scaler*x).toFixed(sigfig)
 
+###
+Returns the week number for this date. dowOffset is the day of week the week
+"starts" on for your locale - it can be from 0 to 6. If dowOffset is 1 (Monday),
+the week returned is the ISO 8601 week number.
+
+getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.epoch-calendar.com
+a modified version is used so as not to pollute the Date class
+###
+getWeek = (date, dowOffset=0) ->
+  newYear = new Date(date.getFullYear(), 0, 1)
+  day = newYear.getDay() - dowOffset # the day of week the year begins on
+  day = ((if day >= 0 then day else day + 7))
+  daynum = Math.floor((date.getTime() - newYear.getTime() - (date.getTimezoneOffset() - newYear.getTimezoneOffset()) * 60000) / 86400000) + 1
+  weeknum = undefined
+
+  # if the year starts before the middle of a week
+  if day < 4
+    weeknum = Math.floor((daynum + day - 1) / 7) + 1
+    if weeknum > 52
+      nYear = new Date(date.getFullYear() + 1, 0, 1)
+      nday = nYear.getDay() - dowOffset
+      nday = (if nday >= 0 then nday else nday + 7)
+
+      # if the next year starts before the middle of the week, it is week #1 of that year
+      weeknum = (if nday < 4 then 1 else 53)
+  else
+    weeknum = Math.floor((daynum + day - 1) / 7)
+  weeknum
+  
 #technically these are aggregator constructor generator generators (!)
 aggregatorTemplates =
     sum: (sigfig=3, scaler=1) -> ([attr]) -> ->
@@ -138,6 +167,7 @@ derivers =
                     when "H" then zeroPad(date.getHours())
                     when "M" then zeroPad(date.getMinutes())
                     when "S" then zeroPad(date.getSeconds())
+                    when "W" then zeroPad(getWeek(date,1))
                     else "%" + p
 
 $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers}
