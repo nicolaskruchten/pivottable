@@ -165,13 +165,15 @@ forEachRecord = (input, derivedAttributes, f) ->
                 addRecord(record)
         else #array of objects
             addRecord(record) for record in input
-    else #assume a jQuery reference to a table
+    else if input instanceof jQuery
         tblCols = []
         $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
         $("tbody > tr", input).each (i) ->
             record = {}
             $("td", this).each (j) -> record[tblCols[j]] = $(this).text()
             addRecord(record)
+    else
+        throw new Error("unknown input format")
 
 #converts to [{attr:val, attr:val},{attr:val, attr:val}] using method above
 convertToArray = (input) ->
@@ -407,195 +409,209 @@ $.fn.pivot = (input, opts) ->
 
     opts = $.extend defaults, opts
 
-    # iterate through input, accumulating data for cells
-    @html opts.renderer getPivotData(input, opts.cols, opts.rows, 
-                                opts.aggregator, opts.filter, 
-                                opts.derivedAttributes)
-
+    result = null
+    try
+        pivotData = getPivotData(input, opts.cols, opts.rows,
+                                    opts.aggregator, opts.filter,
+                                    opts.derivedAttributes)
+        try
+            result = opts.renderer(pivotData)
+        catch e
+            console.error(e.stack)
+            result = "An error occurred rendering the PivotTable results."
+    catch e
+        console.error(e.stack)
+        result = "An error occurred computing the PivotTable results."
+    
+    @html result
     return this
+
 
 ###
 UI code, calls pivot table above
 ###
 
 $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
-    defaults =
-        derivedAttributes: {}
-        aggregators: aggregators
-        renderers: renderers
-        hiddenAttributes: []
-        menuLimit: 50
-        cols: [], rows: [], vals: []
+    try
+        defaults =
+            derivedAttributes: {}
+            aggregators: aggregators
+            renderers: renderers
+            hiddenAttributes: []
+            menuLimit: 50
+            cols: [], rows: [], vals: []
 
-    existingOpts = @data "pivotUIOptions"
-    if not existingOpts? or overwrite
-        opts = $.extend defaults, inputOpts
-    else
-        opts = existingOpts 
+        existingOpts = @data "pivotUIOptions"
+        if not existingOpts? or overwrite
+            opts = $.extend defaults, inputOpts
+        else
+            opts = existingOpts 
 
-    #cache the input in some useful form
-    input = convertToArray(input)
-    tblCols = (k for own k of input[0])
-    tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
+        #cache the input in some useful form
+        input = convertToArray(input)
+        tblCols = (k for own k of input[0])
+        tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
 
-    #figure out the cardinality and some stats
-    axisValues = {}
-    axisValues[x] = {} for x in tblCols
+        #figure out the cardinality and some stats
+        axisValues = {}
+        axisValues[x] = {} for x in tblCols
 
-    forEachRecord input, opts.derivedAttributes, (record) ->
-        for own k, v of record
-            v ?= "null"
-            axisValues[k][v] ?= 0
-            axisValues[k][v]++
+        forEachRecord input, opts.derivedAttributes, (record) ->
+            for own k, v of record
+                v ?= "null"
+                axisValues[k][v] ?= 0
+                axisValues[k][v]++
 
-    #start building the output
-    uiTable = $("<table class='table table-bordered' cellpadding='5'>")
+        #start building the output
+        uiTable = $("<table class='table table-bordered' cellpadding='5'>")
 
-    #renderer control
-    rendererControl = $("<td>")
+        #renderer control
+        rendererControl = $("<td>")
 
-    renderer = $("<select id='renderer'>")
-        .bind "change", -> refresh() #capture reference
-    for own x of opts.renderers
-        renderer.append $("<option>").val(x).text(x)
-    rendererControl.append renderer
-
-
-    #axis list, including the double-click menu
-
-    colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>")
-    shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
-    for i, c of shownAttributes
-        do (c) ->
-            keys = (k for k of axisValues[c])
-            colLabel = $("<nobr>").text(c)
-            valueList = $("<div>")
-                .css
-                    "z-index": 100
-                    "width": "280px"
-                    "height": "350px"
-                    "overflow": "scroll"
-                    "border": "1px solid gray"
-                    "background": "white"
-                    "display": "none"
-                    "position": "absolute"
-                    "padding": "20px"
-            valueList.append $("<strong>").text "#{keys.length} values for #{c}"
-            if keys.length > opts.menuLimit
-                valueList.append $("<p>").text "(too many to list)"
-            else
-                btns = $("<p>")
-                btns.append $("<button>").text("Select All").bind "click", ->
-                    valueList.find("input").attr "checked", true
-                btns.append $("<button>").text("Select None").bind "click", ->
-                    valueList.find("input").attr "checked", false
-                valueList.append btns
-                for k in keys.sort()
-                     v = axisValues[c][k]
-                     filterItem = $("<label>")
-                     filterItem.append $("<input type='checkbox' class='pvtFilter'>")
-                        .attr("checked", true).data("filter", [c,k])
-                     filterItem.append $("<span>").text "#{k} (#{v})"
-                     valueList.append $("<p>").append(filterItem)
-            colLabel.bind "dblclick", (e) ->
-                valueList.css(left: e.pageX, top: e.pageY).toggle()
-                valueList.bind "click", (e) -> e.stopPropagation()
-                $(document).one "click", ->
-                    refresh()
-                    valueList.toggle()
-            colList.append $("<li class='label label-info' id='axis_#{i}'>").append(colLabel).append(valueList)
+        renderer = $("<select id='renderer'>")
+            .bind "change", -> refresh() #capture reference
+        for own x of opts.renderers
+            renderer.append $("<option>").val(x).text(x)
+        rendererControl.append renderer
 
 
-    uiTable.append $("<tr>").append(rendererControl).append(colList)
+        #axis list, including the double-click menu
 
-    tr1 = $("<tr>")
+        colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>")
+        shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
+        for i, c of shownAttributes
+            do (c) ->
+                keys = (k for k of axisValues[c])
+                colLabel = $("<nobr>").text(c)
+                valueList = $("<div>")
+                    .css
+                        "z-index": 100
+                        "width": "280px"
+                        "height": "350px"
+                        "overflow": "scroll"
+                        "border": "1px solid gray"
+                        "background": "white"
+                        "display": "none"
+                        "position": "absolute"
+                        "padding": "20px"
+                valueList.append $("<strong>").text "#{keys.length} values for #{c}"
+                if keys.length > opts.menuLimit
+                    valueList.append $("<p>").text "(too many to list)"
+                else
+                    btns = $("<p>")
+                    btns.append $("<button>").text("Select All").bind "click", ->
+                        valueList.find("input").attr "checked", true
+                    btns.append $("<button>").text("Select None").bind "click", ->
+                        valueList.find("input").attr "checked", false
+                    valueList.append btns
+                    for k in keys.sort()
+                         v = axisValues[c][k]
+                         filterItem = $("<label>")
+                         filterItem.append $("<input type='checkbox' class='pvtFilter'>")
+                            .attr("checked", true).data("filter", [c,k])
+                         filterItem.append $("<span>").text "#{k} (#{v})"
+                         valueList.append $("<p>").append(filterItem)
+                colLabel.bind "dblclick", (e) ->
+                    valueList.css(left: e.pageX, top: e.pageY).toggle()
+                    valueList.bind "click", (e) -> e.stopPropagation()
+                    $(document).one "click", ->
+                        refresh()
+                        valueList.toggle()
+                colList.append $("<li class='label label-info' id='axis_#{i}'>").append(colLabel).append(valueList)
 
-    #aggregator menu and value area
 
-    aggregator = $("<select id='aggregator'>")
-        .css("margin-bottom", "5px")
-        .bind "change", -> refresh() #capture reference
-    for own x of opts.aggregators
-        aggregator.append $("<option>").val(x).text(x)
+        uiTable.append $("<tr>").append(rendererControl).append(colList)
 
-    tr1.append $("<td id='vals' class='pvtAxisContainer pvtHorizList'>")
-      .css("text-align", "center")
-      .append(aggregator).append($("<br>"))
+        tr1 = $("<tr>")
 
-    #column axes
-    tr1.append $("<td id='cols' class='pvtAxisContainer pvtHorizList'>")
+        #aggregator menu and value area
 
-    uiTable.append tr1
+        aggregator = $("<select id='aggregator'>")
+            .css("margin-bottom", "5px")
+            .bind "change", -> refresh() #capture reference
+        for own x of opts.aggregators
+            aggregator.append $("<option>").val(x).text(x)
 
-    tr2 = $("<tr>")
+        tr1.append $("<td id='vals' class='pvtAxisContainer pvtHorizList'>")
+          .css("text-align", "center")
+          .append(aggregator).append($("<br>"))
 
-    #row axes
-    tr2.append $("<td valign='top' id='rows' class='pvtAxisContainer'>")
+        #column axes
+        tr1.append $("<td id='cols' class='pvtAxisContainer pvtHorizList'>")
 
-    #the actual pivot table container
-    pivotTable = $("<td valign='top'>")
-    tr2.append pivotTable
+        uiTable.append tr1
 
-    uiTable.append tr2
+        tr2 = $("<tr>")
 
-    #render the UI in its default state
-    @html uiTable
+        #row axes
+        tr2.append $("<td valign='top' id='rows' class='pvtAxisContainer'>")
 
-    #set up the UI initial state as requested by moving elements around
+        #the actual pivot table container
+        pivotTable = $("<td valign='top'>")
+        tr2.append pivotTable
 
-    for x in opts.cols
-        @find("#cols").append @find("#axis_#{shownAttributes.indexOf(x)}")
-    for x in opts.rows
-        @find("#rows").append @find("#axis_#{shownAttributes.indexOf(x)}")
-    for x in opts.vals
-        @find("#vals").append @find("#axis_#{shownAttributes.indexOf(x)}")
-    if opts.aggregatorName?
-        @find("#aggregator").val opts.aggregatorName
-    if opts.rendererName?
-        @find("#renderer").val opts.rendererName
+        uiTable.append tr2
 
-    #set up for refreshing
-    refresh = =>
-        subopts = {derivedAttributes: opts.derivedAttributes}
-        subopts.cols = []
-        subopts.rows = []
-        vals = []
-        @find("#rows li nobr").each -> subopts.rows.push $(this).text()
-        @find("#cols li nobr").each -> subopts.cols.push $(this).text()
-        @find("#vals li nobr").each -> vals.push $(this).text()
+        #render the UI in its default state
+        @html uiTable
 
-        subopts.aggregator = opts.aggregators[aggregator.val()](vals)
-        subopts.renderer = opts.renderers[renderer.val()]
+        #set up the UI initial state as requested by moving elements around
 
-        #construct filter here
-        exclusions = []
-        @find('input.pvtFilter').not(':checked').each ->
-            exclusions.push $(this).data("filter")
+        for x in opts.cols
+            @find("#cols").append @find("#axis_#{shownAttributes.indexOf(x)}")
+        for x in opts.rows
+            @find("#rows").append @find("#axis_#{shownAttributes.indexOf(x)}")
+        for x in opts.vals
+            @find("#vals").append @find("#axis_#{shownAttributes.indexOf(x)}")
+        if opts.aggregatorName?
+            @find("#aggregator").val opts.aggregatorName
+        if opts.rendererName?
+            @find("#renderer").val opts.rendererName
 
-        subopts.filter = (record) ->
-            for [k,v] in exclusions
-                return false if "#{record[k]}" == v
-            return true
+        #set up for refreshing
+        refresh = =>
+            subopts = {derivedAttributes: opts.derivedAttributes}
+            subopts.cols = []
+            subopts.rows = []
+            vals = []
+            @find("#rows li nobr").each -> subopts.rows.push $(this).text()
+            @find("#cols li nobr").each -> subopts.cols.push $(this).text()
+            @find("#vals li nobr").each -> vals.push $(this).text()
 
-        pivotTable.pivot(input,subopts)
-        @data "pivotUIOptions",
-            cols: subopts.cols
-            rows: subopts.rows
-            vals: vals
-            hiddenAttributes: opts.hiddenAttributes
-            renderers: opts.renderers
-            aggregators: opts.aggregators
-            derivedAttributes: opts.derivedAttributes
-            aggregatorName: aggregator.val()
-            rendererName: renderer.val()
+            subopts.aggregator = opts.aggregators[aggregator.val()](vals)
+            subopts.renderer = opts.renderers[renderer.val()]
 
-    #the very first refresh will actually display the table
-    refresh()
+            #construct filter here
+            exclusions = []
+            @find('input.pvtFilter').not(':checked').each ->
+                exclusions.push $(this).data("filter")
 
-    @find(".pvtAxisContainer")
-         .sortable({connectWith:".pvtAxisContainer", items: 'li'})
-         .bind "sortstop", refresh
+            subopts.filter = (record) ->
+                for [k,v] in exclusions
+                    return false if "#{record[k]}" == v
+                return true
 
+            pivotTable.pivot(input,subopts)
+            @data "pivotUIOptions",
+                cols: subopts.cols
+                rows: subopts.rows
+                vals: vals
+                hiddenAttributes: opts.hiddenAttributes
+                renderers: opts.renderers
+                aggregators: opts.aggregators
+                derivedAttributes: opts.derivedAttributes
+                aggregatorName: aggregator.val()
+                rendererName: renderer.val()
+
+        #the very first refresh will actually display the table
+        refresh()
+
+        @find(".pvtAxisContainer")
+             .sortable({connectWith:".pvtAxisContainer", items: 'li'})
+             .bind "sortstop", refresh
+    catch e
+        console.error(e.stack)
+        @html "An error occurred rendering the PivotTable UI."
     return this
 
 ###
