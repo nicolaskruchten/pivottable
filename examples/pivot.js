@@ -744,7 +744,7 @@
         aggregators: aggregators,
         renderers: renderers,
         hiddenAttributes: [],
-        menuLimit: 50,
+        menuLimit: 200,
         cols: [],
         rows: [],
         vals: []
