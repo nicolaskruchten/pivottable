@@ -700,7 +700,7 @@
   Pivot Table
   */
   $.fn.pivot = function(input, opts) {
-    var defaults;
+    var defaults, pivotData, result;
     defaults = {
       cols: [],
       rows: [],
@@ -712,7 +712,18 @@
       renderer: pivotTableRenderer
     };
     opts = $.extend(defaults, opts);
-    this.html(opts.renderer(getPivotData(input, opts.cols, opts.rows, opts.aggregator, opts.filter, opts.derivedAttributes)));
+    result = null;
+    try {
+      pivotData = getPivotData(input, opts.cols, opts.rows, opts.aggregator, opts.filter, opts.derivedAttributes);
+      try {
+        result = opts.renderer(pivotData);
+      } catch (e) {
+        result = "an error occurred rendering the results";
+      }
+    } catch (e) {
+      result = "an error occurred computing the results";
+    }
+    this.html(result);
     return this;
   };
   /*

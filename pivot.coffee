@@ -407,12 +407,21 @@ $.fn.pivot = (input, opts) ->
 
     opts = $.extend defaults, opts
 
-    # iterate through input, accumulating data for cells
-    @html opts.renderer getPivotData(input, opts.cols, opts.rows, 
-                                opts.aggregator, opts.filter, 
-                                opts.derivedAttributes)
-
+    result = null
+    try
+        pivotData = getPivotData(input, opts.cols, opts.rows,
+                                    opts.aggregator, opts.filter,
+                                    opts.derivedAttributes)
+        try
+            result = opts.renderer(pivotData)
+        catch e
+            result = "an error occurred rendering the results"
+    catch e
+        result = "an error occurred computing the results"
+    
+    @html result
     return this
+
 
 ###
 UI code, calls pivot table above
