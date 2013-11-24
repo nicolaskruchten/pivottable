@@ -572,7 +572,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         tr2.append $("<td valign='top' id='rows' class='pvtAxisContainer'>")
 
         #the actual pivot table container
-        pivotTable = $("<td valign='top'>")
+        pivotTable = $("<td valign='top' class='pvtRendererArea'>")
         tr2.append pivotTable
 
         uiTable.append tr2

@@ -82,6 +82,7 @@ See the wiki for [full parameter documentation](https://github.com/nicolaskrucht
 
 More extensive documentation can be found in the [wiki](https://github.com/nicolaskruchten/pivottable/wiki):
 
+* [Frequently Asked Questions](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions)
 * [Step by step UI Tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial)
 * [Full Parameter Documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters)
 * [Input Formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
@@ -89,11 +90,12 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 * [Renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers)
 * [Derived Attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes)
 * [Google Charts Support](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
+* [Used By](https://github.com/nicolaskruchten/pivottable/wiki/Used-By)
 
 
 ## I have a question, how can I get in touch?
 
-Please log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if the documentation here or on the [wiki](https://github.com/nicolaskruchten/pivottable/wiki) doesn't answer your question!
+Please log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if the documentation here or in the [FAQ](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions) or on the [wiki](https://github.com/nicolaskruchten/pivottable/wiki) doesn't answer your question!
 
 
 ##Copyright & Licence

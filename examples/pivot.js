@@ -923,7 +923,7 @@
       uiTable.append(tr1);
       tr2 = $("<tr>");
       tr2.append($("<td valign='top' id='rows' class='pvtAxisContainer'>"));
-      pivotTable = $("<td valign='top'>");
+      pivotTable = $("<td valign='top' class='pvtRendererArea'>");
       tr2.append(pivotTable);
       uiTable.append(tr2);
       this.html(uiTable);
