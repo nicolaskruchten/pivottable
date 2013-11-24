@@ -2,8 +2,15 @@
   var $, makeGoogleChart;
   $ = jQuery;
   makeGoogleChart = function(chartType, extraOptions) {
-    return function(pivotData) {
-      var agg, colKey, colKeys, dataArray, dataTable, groupByTitle, h, hAxisTitle, headers, k, numCharsInHAxis, options, result, row, rowKey, rowKeys, title, v, vAxisTitle, wrapper, _i, _j, _len, _len2;
+    return function(pivotData, opts) {
+      var agg, colKey, colKeys, dataArray, dataTable, defaults, groupByTitle, h, hAxisTitle, headers, k, numCharsInHAxis, options, result, row, rowKey, rowKeys, title, v, vAxisTitle, wrapper, _i, _j, _len, _len2;
+      defaults = {
+        localeStrings: {
+          vs: "vs",
+          by: "by"
+        }
+      };
+      opts = $.extend(defaults, opts);
       rowKeys = pivotData.getRowKeys();
       if (rowKeys.length === 0) {
         rowKeys.push([]);
@@ -42,11 +49,11 @@
       title = vAxisTitle = pivotData.aggregator().label;
       hAxisTitle = pivotData.colAttrs.join("-");
       if (hAxisTitle !== "") {
-        title += " vs " + hAxisTitle;
+        title += " " + opts.localeStrings.vs + " " + hAxisTitle;
       }
       groupByTitle = pivotData.rowAttrs.join("-");
       if (groupByTitle !== "") {
-        title += " by " + groupByTitle;
+        title += " " + opts.localeStrings.by + " " + groupByTitle;
       }
       options = {
         width: $(window).width() / 1.4,

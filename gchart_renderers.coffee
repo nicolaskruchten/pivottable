@@ -1,6 +1,13 @@
 $ = jQuery
 
-makeGoogleChart = (chartType, extraOptions) -> (pivotData) ->
+makeGoogleChart = (chartType, extraOptions) -> (pivotData, opts) ->
+	defaults =
+		localeStrings:
+			vs: "vs"
+			by: "by"
+
+	opts = $.extend defaults, opts
+
 	rowKeys = pivotData.getRowKeys()
 	rowKeys.push [] if rowKeys.length == 0
 	colKeys = pivotData.getColKeys()
@@ -23,9 +30,9 @@ makeGoogleChart = (chartType, extraOptions) -> (pivotData) ->
 
 	title = vAxisTitle = pivotData.aggregator().label
 	hAxisTitle = pivotData.colAttrs.join("-")
-	title += " vs #{hAxisTitle}" if hAxisTitle != ""
+	title += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
 	groupByTitle = pivotData.rowAttrs.join("-")
-	title += " by #{groupByTitle}" if groupByTitle != ""
+	title += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
 
 	options = 
 		width: $(window).width() / 1.4
