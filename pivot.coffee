@@ -111,11 +111,11 @@ aggregators.countAsFractionOfCol= aggregatorTemplates.fractionOf(aggregators.cou
 
 
 renderers =
-    "Table": (pvtData) -> pivotTableRenderer(pvtData)
-    "Table Barchart": (pvtData) -> pivotTableRenderer(pvtData).barchart()
-    "Heatmap":      (pvtData) -> pivotTableRenderer(pvtData).heatmap()
-    "Row Heatmap":  (pvtData) -> pivotTableRenderer(pvtData).heatmap("rowheatmap")
-    "Col Heatmap":  (pvtData) -> pivotTableRenderer(pvtData).heatmap("colheatmap")
+    "Table": (pvtData, opts) -> pivotTableRenderer(pvtData, opts)
+    "Table Barchart": (pvtData, opts) -> pivotTableRenderer(pvtData, opts).barchart()
+    "Heatmap":      (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap()
+    "Row Heatmap":  (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap("rowheatmap")
+    "Col Heatmap":  (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap("colheatmap")
 
 mthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -305,7 +305,14 @@ spanSize = (arr, i, j) ->
         len++
     return len
 
-pivotTableRenderer = (pivotData) ->
+pivotTableRenderer = (pivotData, opts) ->
+
+    defaults =
+        localeStrings:
+            totals: "Totals"
+
+    opts = $.extend defaults, opts
+
     colAttrs = pivotData.colAttrs
     rowAttrs = pivotData.rowAttrs
     rowKeys = pivotData.getRowKeys()
@@ -330,7 +337,7 @@ pivotTableRenderer = (pivotData) ->
                     th.attr("rowspan", 2)
                 tr.append th
         if parseInt(j) == 0
-            tr.append $("<th class='pvtTotalLabel'>").text("Totals")
+            tr.append $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals)
                 .attr("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
         result.append tr
 
@@ -341,7 +348,7 @@ pivotTableRenderer = (pivotData) ->
             tr.append $("<th class='pvtAxisLabel'>").text(r)
         th = $("<th>")
         if colAttrs.length ==0
-            th.addClass("pvtTotalLabel").text("Totals")
+            th.addClass("pvtTotalLabel").text(opts.localeStrings.totals)
         tr.append th
         result.append tr
 
@@ -372,7 +379,7 @@ pivotTableRenderer = (pivotData) ->
 
     #finally, the row for col totals, and a grand total
     tr = $("<tr>")
-    th = $("<th class='pvtTotalLabel'>").text("Totals")
+    th = $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals)
     th.attr("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
     tr.append th
     for own j, colKey of colKeys
@@ -406,6 +413,10 @@ $.fn.pivot = (input, opts) ->
         aggregator: aggregators.count()
         derivedAttributes: {},
         renderer: pivotTableRenderer
+        rendererOptions: null
+        localeStrings:
+            renderError: "An error occurred rendering the PivotTable results."
+            computeError: "An error occurred computing the PivotTable results."
 
     opts = $.extend defaults, opts
 
@@ -415,13 +426,13 @@ $.fn.pivot = (input, opts) ->
                                     opts.aggregator, opts.filter,
                                     opts.derivedAttributes)
         try
-            result = opts.renderer(pivotData)
+            result = opts.renderer(pivotData, opts.rendererOptions)
         catch e
             console.error(e.stack)
-            result = "An error occurred rendering the PivotTable results."
+            result = opts.localeStrings.renderError
     catch e
         console.error(e.stack)
-        result = "An error occurred computing the PivotTable results."
+        result = opts.localeStrings.computeError
     
     @html result
     return this
@@ -432,21 +443,30 @@ UI code, calls pivot table above
 ###
 
 $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
+    defaults =
+        derivedAttributes: {}
+        aggregators: aggregators
+        renderers: renderers
+        hiddenAttributes: []
+        menuLimit: 200
+        cols: [], rows: [], vals: []
+        rendererOptions: null
+        localeStrings:
+            renderError: "An error occurred rendering the PivotTable results."
+            computeError: "An error occurred computing the PivotTable results."
+            uiRenderError: "An error occurred rendering the PivotTable UI."
+            selectAll: "Select All"
+            selectNone: "Select None"
+            tooMany: "(too many to list)"
+
+
+    existingOpts = @data "pivotUIOptions"
+    if not existingOpts? or overwrite
+        opts = $.extend defaults, inputOpts
+    else
+        opts = existingOpts 
+
     try
-        defaults =
-            derivedAttributes: {}
-            aggregators: aggregators
-            renderers: renderers
-            hiddenAttributes: []
-            menuLimit: 200
-            cols: [], rows: [], vals: []
-
-        existingOpts = @data "pivotUIOptions"
-        if not existingOpts? or overwrite
-            opts = $.extend defaults, inputOpts
-        else
-            opts = existingOpts 
-
         #cache the input in some useful form
         input = convertToArray(input)
         tblCols = (k for own k of input[0])
@@ -494,14 +514,18 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         "display": "none"
                         "position": "absolute"
                         "padding": "20px"
-                valueList.append $("<strong>").text "#{keys.length} values for #{c}"
+                valueList.append $("<div>")
+                    .css("text-align": "center", "font-weight": "bold")
+                    .text("#{c} (#{keys.length})")
                 if keys.length > opts.menuLimit
-                    valueList.append $("<p>").text "(too many to list)"
+                    valueList.append $("<p>")
+                        .css("text-align": "center")
+                        .text(opts.localeStrings.tooMany)
                 else
-                    btns = $("<p>")
-                    btns.append $("<button>").text("Select All").bind "click", ->
+                    btns = $("<p>").css("text-align": "center")
+                    btns.append $("<button>").text(opts.localeStrings.selectAll).bind "click", ->
                         valueList.find("input").attr "checked", true
-                    btns.append $("<button>").text("Select None").bind "click", ->
+                    btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").attr "checked", false
                     valueList.append btns
                     for k in keys.sort()
@@ -517,7 +541,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     $(document).one "click", ->
                         refresh()
                         valueList.toggle()
-                colList.append $("<li class='label label-info' id='axis_#{i}'>").append(colLabel).append(valueList)
+                colList.append $("<li class='label label-info' id='axis_#{i}'>").append(colLabel)
+                colList.append(valueList)
 
 
         uiTable.append $("<tr>").append(rendererControl).append(colList)
@@ -570,9 +595,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
         #set up for refreshing
         refresh = =>
-            subopts = {derivedAttributes: opts.derivedAttributes}
-            subopts.cols = []
-            subopts.rows = []
+            subopts =
+                derivedAttributes: opts.derivedAttributes
+                localeStrings: opts.localeStrings
+                rendererOptions: opts.rendererOptions
+                cols: [], rows: []
+
             vals = []
             @find("#rows li nobr").each -> subopts.rows.push $(this).text()
             @find("#cols li nobr").each -> subopts.cols.push $(this).text()
@@ -602,6 +630,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 derivedAttributes: opts.derivedAttributes
                 aggregatorName: aggregator.val()
                 rendererName: renderer.val()
+                localeStrings: opts.localeStrings
+                rendererOptions: opts.rendererOptions
 
         #the very first refresh will actually display the table
         refresh()
@@ -611,7 +641,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
              .bind "sortstop", refresh
     catch e
         console.error(e.stack)
-        @html "An error occurred rendering the PivotTable UI."
+        @html opts.localeStrings.uiRenderError
     return this
 
 ###

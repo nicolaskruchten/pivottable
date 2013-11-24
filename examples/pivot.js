@@ -263,20 +263,20 @@
   aggregators.countAsFractionOfRow = aggregatorTemplates.fractionOf(aggregators.count, "row");
   aggregators.countAsFractionOfCol = aggregatorTemplates.fractionOf(aggregators.count, "col");
   renderers = {
-    "Table": function(pvtData) {
-      return pivotTableRenderer(pvtData);
+    "Table": function(pvtData, opts) {
+      return pivotTableRenderer(pvtData, opts);
     },
-    "Table Barchart": function(pvtData) {
-      return pivotTableRenderer(pvtData).barchart();
+    "Table Barchart": function(pvtData, opts) {
+      return pivotTableRenderer(pvtData, opts).barchart();
     },
-    "Heatmap": function(pvtData) {
-      return pivotTableRenderer(pvtData).heatmap();
+    "Heatmap": function(pvtData, opts) {
+      return pivotTableRenderer(pvtData, opts).heatmap();
     },
-    "Row Heatmap": function(pvtData) {
-      return pivotTableRenderer(pvtData).heatmap("rowheatmap");
+    "Row Heatmap": function(pvtData, opts) {
+      return pivotTableRenderer(pvtData, opts).heatmap("rowheatmap");
     },
-    "Col Heatmap": function(pvtData) {
-      return pivotTableRenderer(pvtData).heatmap("colheatmap");
+    "Col Heatmap": function(pvtData, opts) {
+      return pivotTableRenderer(pvtData, opts).heatmap("colheatmap");
     }
   };
   mthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -606,8 +606,14 @@
     }
     return len;
   };
-  pivotTableRenderer = function(pivotData) {
-    var aggregator, c, colAttrs, colKey, colKeys, i, j, r, result, rowAttrs, rowKey, rowKeys, th, totalAggregator, tr, txt, val, x;
+  pivotTableRenderer = function(pivotData, opts) {
+    var aggregator, c, colAttrs, colKey, colKeys, defaults, i, j, r, result, rowAttrs, rowKey, rowKeys, th, totalAggregator, tr, txt, val, x;
+    defaults = {
+      localeStrings: {
+        totals: "Totals"
+      }
+    };
+    opts = $.extend(defaults, opts);
     colAttrs = pivotData.colAttrs;
     rowAttrs = pivotData.rowAttrs;
     rowKeys = pivotData.getRowKeys();
@@ -634,7 +640,7 @@
         }
       }
       if (parseInt(j) === 0) {
-        tr.append($("<th class='pvtTotalLabel'>").text("Totals").attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
+        tr.append($("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals).attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
       }
       result.append(tr);
     }
@@ -647,7 +653,7 @@
       }
       th = $("<th>");
       if (colAttrs.length === 0) {
-        th.addClass("pvtTotalLabel").text("Totals");
+        th.addClass("pvtTotalLabel").text(opts.localeStrings.totals);
       }
       tr.append(th);
       result.append(tr);
@@ -681,7 +687,7 @@
       result.append(tr);
     }
     tr = $("<tr>");
-    th = $("<th class='pvtTotalLabel'>").text("Totals");
+    th = $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals);
     th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
     tr.append(th);
     for (j in colKeys) {
@@ -711,21 +717,26 @@
       },
       aggregator: aggregators.count(),
       derivedAttributes: {},
-      renderer: pivotTableRenderer
+      renderer: pivotTableRenderer,
+      rendererOptions: null,
+      localeStrings: {
+        renderError: "An error occurred rendering the PivotTable results.",
+        computeError: "An error occurred computing the PivotTable results."
+      }
     };
     opts = $.extend(defaults, opts);
     result = null;
     try {
       pivotData = getPivotData(input, opts.cols, opts.rows, opts.aggregator, opts.filter, opts.derivedAttributes);
       try {
-        result = opts.renderer(pivotData);
+        result = opts.renderer(pivotData, opts.rendererOptions);
       } catch (e) {
         console.error(e.stack);
-        result = "An error occurred rendering the PivotTable results.";
+        result = opts.localeStrings.renderError;
       }
     } catch (e) {
       console.error(e.stack);
-      result = "An error occurred computing the PivotTable results.";
+      result = opts.localeStrings.computeError;
     }
     this.html(result);
     return this;
@@ -738,23 +749,32 @@
     if (overwrite == null) {
       overwrite = false;
     }
-    try {
-      defaults = {
-        derivedAttributes: {},
-        aggregators: aggregators,
-        renderers: renderers,
-        hiddenAttributes: [],
-        menuLimit: 200,
-        cols: [],
-        rows: [],
-        vals: []
-      };
-      existingOpts = this.data("pivotUIOptions");
-      if (!(existingOpts != null) || overwrite) {
-        opts = $.extend(defaults, inputOpts);
-      } else {
-        opts = existingOpts;
+    defaults = {
+      derivedAttributes: {},
+      aggregators: aggregators,
+      renderers: renderers,
+      hiddenAttributes: [],
+      menuLimit: 200,
+      cols: [],
+      rows: [],
+      vals: [],
+      rendererOptions: null,
+      localeStrings: {
+        renderError: "An error occurred rendering the PivotTable results.",
+        computeError: "An error occurred computing the PivotTable results.",
+        uiRenderError: "An error occurred rendering the PivotTable UI.",
+        selectAll: "Select All",
+        selectNone: "Select None",
+        tooMany: "(too many to list)"
       }
+    };
+    existingOpts = this.data("pivotUIOptions");
+    if (!(existingOpts != null) || overwrite) {
+      opts = $.extend(defaults, inputOpts);
+    } else {
+      opts = existingOpts;
+    }
+    try {
       input = convertToArray(input);
       tblCols = (function() {
         var _ref, _results;
@@ -839,15 +859,22 @@
           "position": "absolute",
           "padding": "20px"
         });
-        valueList.append($("<strong>").text("" + keys.length + " values for " + c));
+        valueList.append($("<div>").css({
+          "text-align": "center",
+          "font-weight": "bold"
+        }).text("" + c + " (" + keys.length + ")"));
         if (keys.length > opts.menuLimit) {
-          valueList.append($("<p>").text("(too many to list)"));
+          valueList.append($("<p>").css({
+            "text-align": "center"
+          }).text(opts.localeStrings.tooMany));
         } else {
-          btns = $("<p>");
-          btns.append($("<button>").text("Select All").bind("click", function() {
+          btns = $("<p>").css({
+            "text-align": "center"
+          });
+          btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
             return valueList.find("input").attr("checked", true);
           }));
-          btns.append($("<button>").text("Select None").bind("click", function() {
+          btns.append($("<button>").text(opts.localeStrings.selectNone).bind("click", function() {
             return valueList.find("input").attr("checked", false);
           }));
           valueList.append(btns);
@@ -874,7 +901,8 @@
             return valueList.toggle();
           });
         });
-        return colList.append($("<li class='label label-info' id='axis_" + i + "'>").append(colLabel).append(valueList));
+        colList.append($("<li class='label label-info' id='axis_" + i + "'>").append(colLabel));
+        return colList.append(valueList);
       };
       for (i in shownAttributes) {
         c = shownAttributes[i];
@@ -923,10 +951,12 @@
       refresh = __bind(function() {
         var exclusions, subopts, vals;
         subopts = {
-          derivedAttributes: opts.derivedAttributes
+          derivedAttributes: opts.derivedAttributes,
+          localeStrings: opts.localeStrings,
+          rendererOptions: opts.rendererOptions,
+          cols: [],
+          rows: []
         };
-        subopts.cols = [];
-        subopts.rows = [];
         vals = [];
         this.find("#rows li nobr").each(function() {
           return subopts.rows.push($(this).text());
@@ -963,7 +993,9 @@
           aggregators: opts.aggregators,
           derivedAttributes: opts.derivedAttributes,
           aggregatorName: aggregator.val(),
-          rendererName: renderer.val()
+          rendererName: renderer.val(),
+          localeStrings: opts.localeStrings,
+          rendererOptions: opts.rendererOptions
         });
       }, this);
       refresh();
@@ -973,7 +1005,7 @@
       }).bind("sortstop", refresh);
     } catch (e) {
       console.error(e.stack);
-      this.html("An error occurred rendering the PivotTable UI.");
+      this.html(opts.localeStrings.uiRenderError);
     }
     return this;
   };
