@@ -450,6 +450,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         hiddenAttributes: []
         menuLimit: 200
         cols: [], rows: [], vals: []
+        unusedAttrsVertical: false
         rendererOptions: null
         localeStrings:
             renderError: "An error occurred rendering the PivotTable results."
@@ -497,7 +498,11 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
         #axis list, including the double-click menu
 
-        colList = $("<td id='unused' class='pvtAxisContainer pvtHorizList'>")
+        colList = $("<td id='unused' class='pvtAxisContainer'>")
+        if opts.unusedAttrsVertical
+            colList.addClass('pvtVertList')
+        else
+            colList.addClass('pvtHorizList')
         shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
         for i, c of shownAttributes
             do (c) ->
@@ -544,9 +549,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 colList.append $("<li class='label label-info' id='axis_#{i}'>").append(colLabel)
                 colList.append(valueList)
 
-
-        uiTable.append $("<tr>").append(rendererControl).append(colList)
-
+        if opts.unusedAttrsVertical
+            unusedColsTd = $(colList).attr('rowspan','3')
+            uiTable.append $("<tr>").append(unusedColsTd).append(rendererControl)
+        else
+            uiTable.append $("<tr>").append(rendererControl).append(colList)        
+        
         tr1 = $("<tr>")
 
         #aggregator menu and value area
