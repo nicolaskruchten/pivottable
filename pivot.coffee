@@ -127,7 +127,7 @@ derivers =
         #thanks http://stackoverflow.com/a/12213072/112871
         (record) ->
             date = new Date(Date.parse(record[col]))
-            formatString.replace /%(.)/g, (m, p) -> 
+            formatString.replace /%(.)/g, (m, p) ->
                 switch p
                     when "y" then date.getFullYear()
                     when "m" then zeroPad(date.getMonth()+1)
@@ -140,7 +140,32 @@ derivers =
                     when "S" then zeroPad(date.getSeconds())
                     else "%" + p
 
-$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers}
+naturalSort = (as, bs) => #from http://stackoverflow.com/a/4373421/112871
+    rx = /(\d+)|(\D+)/g
+    rd = /\d/
+    rz = /^0/
+    if typeof as is "number" or typeof bs is "number"
+        return 1  if isNaN(as)
+        return -1  if isNaN(bs)
+        return as - bs
+    a = String(as).toLowerCase()
+    b = String(bs).toLowerCase()
+    return 0  if a is b
+    return (if a > b then 1 else -1)  unless rd.test(a) and rd.test(b)
+    a = a.match(rx)
+    b = b.match(rx)
+    while a.length and b.length
+        a1 = a.shift()
+        b1 = b.shift()
+        if a1 isnt b1
+            if rd.test(a1) and rd.test(b1)
+                return a1.replace(rz, ".0") - b1.replace(rz, ".0")
+            else
+                return (if a1 > b1 then 1 else -1)
+    a.length - b.length
+
+
+$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, naturalSort}
 
 ###
 functions for accessing input
@@ -192,30 +217,8 @@ class PivotData
         @colTotals = {}
         @allTotal = @aggregator(this, [], [])
         @sorted = false
-    
-    natSort: (as, bs) => #from http://stackoverflow.com/a/4373421/112871
-      rx = /(\d+)|(\D+)/g
-      rd = /\d/
-      rz = /^0/
-      if typeof as is "number" or typeof bs is "number"
-        return 1  if isNaN(as)
-        return -1  if isNaN(bs)
-        return as - bs
-      a = String(as).toLowerCase()
-      b = String(bs).toLowerCase()
-      return 0  if a is b
-      return (if a > b then 1 else -1)  unless rd.test(a) and rd.test(b)
-      a = a.match(rx)
-      b = b.match(rx)
-      while a.length and b.length
-        a1 = a.shift()
-        b1 = b.shift()
-        if a1 isnt b1
-          if rd.test(a1) and rd.test(b1)
-            return a1.replace(rz, ".0") - b1.replace(rz, ".0")
-          else
-            return (if a1 > b1 then 1 else -1)
-      a.length - b.length
+
+    natSort: (as, bs) => naturalSort(as, bs)
 
     arrSort: (a,b) => @natSort a.join(), b.join()
 
@@ -249,7 +252,7 @@ class PivotData
                 @rowKeys.push rowKey
                 @flatRowKeys.push flatRowKey
             if not @rowTotals[flatRowKey]
-                @rowTotals[flatRowKey] = @aggregator(this, rowKey, []) 
+                @rowTotals[flatRowKey] = @aggregator(this, rowKey, [])
             @rowTotals[flatRowKey].push record
 
         if colKey.length != 0
@@ -264,7 +267,7 @@ class PivotData
             if flatRowKey not of @tree
                 @tree[flatRowKey] = {}
             if flatColKey not of @tree[flatRowKey]
-                @tree[flatRowKey][flatColKey] = @aggregator(this, rowKey, colKey) 
+                @tree[flatRowKey][flatColKey] = @aggregator(this, rowKey, colKey)
             @tree[flatRowKey][flatColKey].push record
 
     getAggregator: (rowKey, colKey) =>
@@ -274,7 +277,7 @@ class PivotData
             agg = @allTotal
         else if rowKey.length == 0
             agg = @colTotals[flatColKey]
-        else if colKey.length == 0 
+        else if colKey.length == 0
             agg = @rowTotals[flatRowKey]
         else
             agg = @tree[flatRowKey][flatColKey]
@@ -433,7 +436,7 @@ $.fn.pivot = (input, opts) ->
     catch e
         console.error(e.stack)
         result = opts.localeStrings.computeError
-    
+
     @html result
     return this
 
@@ -466,7 +469,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
     if not existingOpts? or overwrite
         opts = $.extend defaults, inputOpts
     else
-        opts = existingOpts 
+        opts = existingOpts
 
     try
         #cache the input in some useful form
@@ -645,11 +648,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
             # if requested make sure unused columns are in alphabetical order
             if opts.autoSortUnusedAttrs
+                natSort = $.pivotUtilities.naturalSort
                 unusedAttrsContainer = $("td#unused.pvtAxisContainer")
-                $(unusedAttrsContainer).children("li").sort((a, b) ->
-                    (if $(a).text().toLowerCase() > $(b).text().toLowerCase() then 1 else -1)
-                ).appendTo unusedAttrsContainer    
-                
+                $(unusedAttrsContainer).children("li")
+                    .sort((a, b) => natSort($(a).text(), $(b).text()))
+                    .appendTo unusedAttrsContainer
+
         #the very first refresh will actually display the table
         refresh()
 
