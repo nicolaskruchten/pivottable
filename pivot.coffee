@@ -549,12 +549,6 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 colList.append $("<li class='label label-info' id='axis_#{i}'>").append(colLabel)
                 colList.append(valueList)
 
-        if opts.unusedAttrsVertical
-            unusedColsTd = $(colList).attr('rowspan','3')
-            uiTable.append $("<tr>").append(unusedColsTd).append(rendererControl)
-        else
-            uiTable.append $("<tr>").append(rendererControl).append(colList)        
-        
         tr1 = $("<tr>")
 
         #aggregator menu and value area
@@ -584,6 +578,13 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         tr2.append pivotTable
 
         uiTable.append tr2
+
+        #finally the renderer dropdown and unused attribs are inserted at the requested location
+        if opts.unusedAttrsVertical
+            uiTable.find('tr:nth-child(1)').prepend rendererControl
+            uiTable.find('tr:nth-child(2)').prepend colList.css('vertical-align','top')
+        else
+            uiTable.prepend $("<tr>").append(rendererControl).append(colList)
 
         #render the UI in its default state
         @html uiTable
