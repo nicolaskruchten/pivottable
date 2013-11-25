@@ -451,6 +451,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         menuLimit: 200
         cols: [], rows: [], vals: []
         unusedAttrsVertical: false
+        autoSortUnusedAttrs: false
         rendererOptions: null
         localeStrings:
             renderError: "An error occurred rendering the PivotTable results."
@@ -642,6 +643,13 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 localeStrings: opts.localeStrings
                 rendererOptions: opts.rendererOptions
 
+            # if requested make sure unused columns are in alphabetical order
+            if opts.autoSortUnusedAttrs
+                unusedAttrsContainer = $("td#unused.pvtAxisContainer")
+                $(unusedAttrsContainer).children("li").sort((a, b) ->
+                    (if $(a).text().toLowerCase() > $(b).text().toLowerCase() then 1 else -1)
+                ).appendTo unusedAttrsContainer    
+                
         #the very first refresh will actually display the table
         refresh()
 
