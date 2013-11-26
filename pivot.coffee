@@ -513,6 +513,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 keys = (k for k of axisValues[c])
                 colLabel = $("<nobr>").text(c)
                 valueList = $("<div>")
+                    .addClass('pvtFilterBox')
+                    .attr('data-attr-name', c)
                     .css
                         "z-index": 100
                         "width": "280px"
@@ -548,9 +550,17 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     valueList.css(left: e.pageX, top: e.pageY).toggle()
                     valueList.bind "click", (e) -> e.stopPropagation()
                     $(document).one "click", ->
+                        unselectedCount = $(valueList).find("[type='checkbox']").length -
+                                          $(valueList).find("[type='checkbox']:checked").length
+                        parentAttrName = valueList.data('attrName')
+                        parent = $("li[data-attr-name='#{parentAttrName}']")
+                        if unselectedCount > 0
+                            $(parent).addClass "pvtFilteredAttribute"
+                        else
+                            $(parent).removeClass "pvtFilteredAttribute"
                         refresh()
                         valueList.toggle()
-                colList.append $("<li class='label label-info' id='axis_#{i}'>").append(colLabel)
+                colList.append $("<li class='label label-info' id='axis_#{i}'>").attr('data-attr-name',c).append(colLabel)
                 colList.append(valueList)
 
         tr1 = $("<tr>")
