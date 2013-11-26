@@ -533,9 +533,9 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 else
                     btns = $("<p>").css("text-align": "center")
                     btns.append $("<button>").text(opts.localeStrings.selectAll).bind "click", ->
-                        valueList.find("input").attr "checked", true
+                        valueList.find("input").prop "checked", true
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
-                        valueList.find("input").attr "checked", false
+                        valueList.find("input").prop "checked", false
                     valueList.append btns
                     for k in keys.sort()
                          v = axisValues[c][k]
