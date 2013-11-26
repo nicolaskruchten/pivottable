@@ -900,7 +900,7 @@
           return _results;
         })();
         colLabel = $("<nobr>").text(c);
-        valueList = $("<div>").css({
+        valueList = $("<div>").addClass('pvtFilterBox').attr('data-attr-name', c).css({
           "z-index": 100,
           "width": "280px",
           "height": "350px",
@@ -924,10 +924,10 @@
             "text-align": "center"
           });
           btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
-            return valueList.find("input").attr("checked", true);
+            return valueList.find("input").prop("checked", true);
           }));
           btns.append($("<button>").text(opts.localeStrings.selectNone).bind("click", function() {
-            return valueList.find("input").attr("checked", false);
+            return valueList.find("input").prop("checked", false);
           }));
           valueList.append(btns);
           _ref2 = keys.sort();
@@ -949,11 +949,20 @@
             return e.stopPropagation();
           });
           return $(document).one("click", function() {
+            var parent, parentAttrName, unselectedCount;
+            unselectedCount = $(valueList).find("[type='checkbox']").length - $(valueList).find("[type='checkbox']:checked").length;
+            parentAttrName = valueList.data('attrName');
+            parent = $("li[data-attr-name='" + parentAttrName + "']");
+            if (unselectedCount > 0) {
+              $(parent).addClass("pvtFilteredAttribute");
+            } else {
+              $(parent).removeClass("pvtFilteredAttribute");
+            }
             refresh();
             return valueList.toggle();
           });
         });
-        colList.append($("<li class='label label-info' id='axis_" + i + "'>").append(colLabel));
+        colList.append($("<li class='label label-info' id='axis_" + i + "'>").attr('data-attr-name', c).append(colLabel));
         return colList.append(valueList);
       };
       for (i in shownAttributes) {

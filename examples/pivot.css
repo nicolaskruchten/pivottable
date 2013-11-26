@@ -41,3 +41,5 @@ table.pvtTable tr td {
 }
 
 .pvtHorizList li { display: inline; }
+
+.pvtFilteredAttribute { font-style: italic }
