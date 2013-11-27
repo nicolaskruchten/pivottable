@@ -456,6 +456,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         unusedAttrsVertical: false
         autoSortUnusedAttrs: false
         rendererOptions: null
+        onRefresh: null
         localeStrings:
             renderError: "An error occurred rendering the PivotTable results."
             computeError: "An error occurred computing the PivotTable results."
@@ -662,6 +663,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 $(unusedAttrsContainer).children("li")
                     .sort((a, b) => natSort($(a).text(), $(b).text()))
                     .appendTo unusedAttrsContainer
+
+            opts.onRefresh() if opts.onRefresh?
 
         #the very first refresh will actually display the table
         refresh()
