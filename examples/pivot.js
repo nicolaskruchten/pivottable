@@ -806,6 +806,7 @@
       unusedAttrsVertical: false,
       autoSortUnusedAttrs: false,
       rendererOptions: null,
+      onRefresh: null,
       localeStrings: {
         renderError: "An error occurred rendering the PivotTable results.",
         computeError: "An error occurred computing the PivotTable results.",
@@ -1063,9 +1064,12 @@
         if (opts.autoSortUnusedAttrs) {
           natSort = $.pivotUtilities.naturalSort;
           unusedAttrsContainer = $("td#unused.pvtAxisContainer");
-          return $(unusedAttrsContainer).children("li").sort(function(a, b) {
+          $(unusedAttrsContainer).children("li").sort(function(a, b) {
             return natSort($(a).text(), $(b).text());
           }).appendTo(unusedAttrsContainer);
+        }
+        if (opts.onRefresh != null) {
+          return opts.onRefresh();
         }
       };
       refresh();
