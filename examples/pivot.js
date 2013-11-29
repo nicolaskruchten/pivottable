@@ -715,11 +715,11 @@
         colKey = colKeys[j];
         aggregator = pivotData.getAggregator(rowKey, colKey);
         val = aggregator.value();
-        tr.append($("<td class='pvtVal row" + i + " col" + j + "'>").text(aggregator.format(val)).data("value", val));
+        tr.append($("<td class='pvtVal row" + i + " col" + j + "'>").html(aggregator.format(val)).data("value", val));
       }
       totalAggregator = pivotData.getAggregator(rowKey, []);
       val = totalAggregator.value();
-      tr.append($("<td class='pvtTotal rowTotal'>").text(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
+      tr.append($("<td class='pvtTotal rowTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
       result.append(tr);
     }
     tr = $("<tr>");
@@ -731,11 +731,11 @@
       colKey = colKeys[j];
       totalAggregator = pivotData.getAggregator([], colKey);
       val = totalAggregator.value();
-      tr.append($("<td class='pvtTotal colTotal'>").text(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
+      tr.append($("<td class='pvtTotal colTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
     }
     totalAggregator = pivotData.getAggregator([], []);
     val = totalAggregator.value();
-    tr.append($("<td class='pvtGrandTotal'>").text(totalAggregator.format(val)).data("value", val));
+    tr.append($("<td class='pvtGrandTotal'>").html(totalAggregator.format(val)).data("value", val));
     result.append(tr);
     result.data("dimensions", [rowKeys.length, colKeys.length]);
     return result;
