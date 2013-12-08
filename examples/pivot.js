@@ -930,7 +930,7 @@
             return valueList.find("input").prop("checked", false);
           }));
           valueList.append(btns);
-          _ref2 = keys.sort();
+          _ref2 = keys.sort(naturalSort);
           for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
             k = _ref2[_j];
             v = axisValues[c][k];
