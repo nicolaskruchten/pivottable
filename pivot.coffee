@@ -538,7 +538,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").prop "checked", false
                     valueList.append btns
-                    for k in keys.sort()
+                    for k in keys.sort(naturalSort)
                          v = axisValues[c][k]
                          filterItem = $("<label>")
                          filterItem.append $("<input type='checkbox' class='pvtFilter'>")
