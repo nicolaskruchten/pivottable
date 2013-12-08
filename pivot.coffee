@@ -369,13 +369,13 @@ pivotTableRenderer = (pivotData, opts) ->
             aggregator = pivotData.getAggregator(rowKey, colKey)
             val = aggregator.value()
             tr.append $("<td class='pvtVal row#{i} col#{j}'>")
-                .text(aggregator.format val)
+                .html(aggregator.format val)
                 .data("value", val)
 
         totalAggregator = pivotData.getAggregator(rowKey, [])
         val = totalAggregator.value()
         tr.append $("<td class='pvtTotal rowTotal'>")
-            .text(totalAggregator.format val)
+            .html(totalAggregator.format val)
             .data("value", val)
             .data("for", "row"+i)
         result.append tr
@@ -389,13 +389,13 @@ pivotTableRenderer = (pivotData, opts) ->
         totalAggregator = pivotData.getAggregator([], colKey)
         val = totalAggregator.value()
         tr.append $("<td class='pvtTotal colTotal'>")
-            .text(totalAggregator.format val)
+            .html(totalAggregator.format val)
             .data("value", val)
             .data("for", "col"+j)
     totalAggregator = pivotData.getAggregator([], [])
     val = totalAggregator.value()
     tr.append $("<td class='pvtGrandTotal'>")
-        .text(totalAggregator.format val)
+        .html(totalAggregator.format val)
         .data("value", val)
     result.append tr
 
