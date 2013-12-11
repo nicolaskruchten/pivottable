@@ -800,12 +800,16 @@
         result = opts.renderer(pivotData, opts.rendererOptions);
       } catch (_error) {
         e = _error;
-        console.error(e.stack);
+        if (typeof console !== "undefined" && console !== null) {
+          console.error(e.stack);
+        }
         result = opts.localeStrings.renderError;
       }
     } catch (_error) {
       e = _error;
-      console.error(e.stack);
+      if (typeof console !== "undefined" && console !== null) {
+        console.error(e.stack);
+      }
       result = opts.localeStrings.computeError;
     }
     this.html(result);
@@ -1108,7 +1112,9 @@
       }).bind("sortstop", refresh);
     } catch (_error) {
       e = _error;
-      console.error(e.stack);
+      if (typeof console !== "undefined" && console !== null) {
+        console.error(e.stack);
+      }
       this.html(opts.localeStrings.uiRenderError);
     }
     return this;

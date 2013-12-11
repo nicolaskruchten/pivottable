@@ -437,10 +437,10 @@ $.fn.pivot = (input, opts) ->
         try
             result = opts.renderer(pivotData, opts.rendererOptions)
         catch e
-            console.error(e.stack)
+            console.error(e.stack) if console?
             result = opts.localeStrings.renderError
     catch e
-        console.error(e.stack)
+        console.error(e.stack) if console?
         result = opts.localeStrings.computeError
 
     @html result
@@ -679,7 +679,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
              .sortable({connectWith:".pvtAxisContainer", items: 'li'})
              .bind "sortstop", refresh
     catch e
-        console.error(e.stack)
+        console.error(e.stack) if console?
         @html opts.localeStrings.uiRenderError
     return this
 
