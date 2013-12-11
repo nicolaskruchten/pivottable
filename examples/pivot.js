@@ -312,6 +312,9 @@
       return function(record) {
         var date;
         date = new Date(Date.parse(record[col]));
+        if (isNaN(date)) {
+          return "";
+        }
         return formatString.replace(/%(.)/g, function(m, p) {
           switch (p) {
             case "y":
