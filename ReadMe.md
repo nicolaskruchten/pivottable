@@ -95,7 +95,7 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 
 ## I have a question, how can I get in touch?
 
-Please log a [GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues) if the documentation here or in the [FAQ](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions) or on the [wiki](https://github.com/nicolaskruchten/pivottable/wiki) doesn't answer your question!
+Please [create a GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues/new) if the documentation here or in the [FAQ](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions) or elsewhere on the [wiki](https://github.com/nicolaskruchten/pivottable/wiki) doesn't answer your question!
 
 
 ##Copyright & Licence
