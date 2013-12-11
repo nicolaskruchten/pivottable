@@ -13,6 +13,7 @@
     <body>
         <script type="text/javascript">
             $(function(){
+                var numberFormat = $.pivotUtilities.numberFormat;
                 var derivers = $.pivotUtilities.derivers;
                 var aggregators = $.pivotUtilities.aggregators;
                 var aggTemplates = $.pivotUtilities.aggregatorTemplates;
@@ -20,7 +21,7 @@
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {
                         aggregators: {
-                            "Number of MPs": aggregators.count,
+                            "Number of MPs": aggTemplates.l10nWrapper(aggregators.count, numberFormat(4,2,"'","#"), function(){ return "CountHaha" }),
                             "Average Age of MPs": function() { return aggTemplates.average(3,1)(["Age"])},
                         },
                         derivedAttributes: {

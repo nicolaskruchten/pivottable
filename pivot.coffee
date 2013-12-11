@@ -4,19 +4,19 @@ $ = jQuery
 Utilities
 ###
 
-addCommas = (nStr) ->
+addSeparators = (nStr, thousandsSep, decimalSep) ->
     nStr += ''
     x = nStr.split('.')
     x1 = x[0]
-    x2 = if x.length > 1 then  '.' + x[1] else ''
+    x2 = if x.length > 1 then  decimalSep + x[1] else ''
     rgx = /(\d+)(\d{3})/
-    x1 = x1.replace(rgx, '$1' + ',' + '$2') while rgx.test(x1)
+    x1 = x1.replace(rgx, '$1' + thousandsSep + '$2') while rgx.test(x1)
     return x1 + x2
 
-numberFormat = (sigfig=3, scaler=1) ->
+numberFormat = (sigfig=3, scaler=1, thousandsSep=",", decimalSep=".") ->
     (x) ->
         if x==0 or isNaN(x) or not isFinite(x) then ""
-        else addCommas (scaler*x).toFixed(sigfig)
+        else addSeparators (scaler*x).toFixed(sigfig), thousandsSep, decimalSep
 
 #technically these are aggregator constructor generator generators (!)
 aggregatorTemplates =
@@ -70,7 +70,12 @@ aggregatorTemplates =
         label: wrapped(x...)(data, rowKey, colKey).label+" % of "+type
         value: -> @inner.value() / data.getAggregator(@selector...).inner.value()
 
-
+    l10nWrapper: ( wrapped, formatter, labelFn) -> (x...) -> (data, rowKey, colKey) ->
+        inner: wrapped(x...)(data, rowKey, colKey)
+        push: (record) -> @inner.push record
+        format: formatter
+        label: labelFn(data)
+        value: -> @inner.value()
 
 #technically these are aggregator constructor generators (!)
 aggregators =
@@ -166,7 +171,7 @@ naturalSort = (as, bs) => #from http://stackoverflow.com/a/4373421/112871
     a.length - b.length
 
 
-$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, naturalSort}
+$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, naturalSort, numberFormat}
 
 ###
 functions for accessing input
