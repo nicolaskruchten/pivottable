@@ -840,6 +840,9 @@
       autoSortUnusedAttrs: false,
       rendererOptions: null,
       onRefresh: null,
+      filter: function() {
+        return true;
+      },
       localeStrings: {
         renderError: "An error occurred rendering the PivotTable results.",
         computeError: "An error occurred computing the PivotTable results.",
@@ -1072,6 +1075,9 @@
         });
         subopts.filter = function(record) {
           var v, _len4, _m, _ref6;
+          if (!opts.filter(record)) {
+            return false;
+          }
           for (_m = 0, _len4 = exclusions.length; _m < _len4; _m++) {
             _ref6 = exclusions[_m], k = _ref6[0], v = _ref6[1];
             if (("" + record[k]) === v) {

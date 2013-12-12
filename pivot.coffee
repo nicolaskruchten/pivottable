@@ -463,6 +463,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         autoSortUnusedAttrs: false
         rendererOptions: null
         onRefresh: null
+        filter: -> true
         localeStrings:
             renderError: "An error occurred rendering the PivotTable results."
             computeError: "An error occurred computing the PivotTable results."
@@ -644,6 +645,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 exclusions.push $(this).data("filter")
 
             subopts.filter = (record) ->
+                return false if not opts.filter(record)
                 for [k,v] in exclusions
                     return false if "#{record[k]}" == v
                 return true
