@@ -20,6 +20,7 @@ With an optional add-on, the summary table can be rendered as a Google Chart, tu
 * complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (i.e. weighted averages)
 * built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional support for [Google Charts](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
+* works on mobile devices with jQuery UI Touch Punch
 
 
 ##Where's the demo?
@@ -27,6 +28,8 @@ With an optional add-on, the summary table can be rendered as a Google Chart, tu
 A demo of PivotTable.js loaded up with a sample dataset of Canadian Members of Parliament as of 2012 can be found here: [PivotTable.js demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html). 
 
 A version of this demo which include Google Chart renderers can be found here: [Google Charts demo](http://nicolaskruchten.github.io/pivottable/examples/gchart.html).
+
+A fully-loaded version with all renderers and jQuery UI Touch Punch for mobile compatibility is here: [Fully Loaded demo](http://nicolaskruchten.github.io/pivottable/examples/fully_loaded.html).
 
 Finally, here is a demo where you can view your own data from a local CSV file, all in-browser with no server support: [Local CSV demo](http://nicolaskruchten.github.io/pivottable/examples/local.html).
 
