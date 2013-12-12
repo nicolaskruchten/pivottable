@@ -25,7 +25,8 @@
                         },
                         rows: ["Province"],
                         cols: ["Party"],
-                        rendererName: "Heatmap"
+                        rendererName: "Heatmap",
+                        filter: function(x){return x.Age > 40;}
                     });
                 });
              });
