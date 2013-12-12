@@ -6,12 +6,12 @@ PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality
 
 PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. 
 
-With an optional add-on, the summary table can be rendered as a Google Chart, turning the pivot table into a pivot chart.
+With an optional add-on, the summary table can be rendered as a Google Chart, turning the pivot table into a pivot chart. A d3-based Treemap add-on is also included.
 
 
 ##Why is it good?
 
-* lightweight: less than 1000 LOC of CoffeeScript, 6.1kb minified and gzipped, depends only on jQuery and jQueryUI's 'sortable' (and optionally on Google Charts)
+* lightweight: less than 1000 LOC of CoffeeScript, 6.1kb minified and gzipped, depends only on jQuery and jQueryUI's 'sortable' (and optionally on Google Charts or d3)
 * works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
 * works acceptably fast in Chrome on commodity hardware up to around a hundred thousand records, depending on the cardinality of the attributes.
 * layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
