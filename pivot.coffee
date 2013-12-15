@@ -501,7 +501,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         #renderer control
         rendererControl = $("<td>")
 
-        renderer = $("<select id='renderer'>")
+        renderer = $("<select class='pvtRenderer'>")
             .bind "change", -> refresh() #capture reference
         for own x of opts.renderers
             renderer.append $("<option>").val(x).text(x)
@@ -510,7 +510,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
         #axis list, including the double-click menu
 
-        colList = $("<td id='unused' class='pvtAxisContainer'>")
+        colList = $("<td class='pvtAxisContainer pvtUnused'>")
         if opts.unusedAttrsVertical
             colList.addClass('pvtVertList')
         else
@@ -553,7 +553,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                          filterItem.append $("<span>").text "#{k} (#{v})"
                          valueList.append $("<p>").append(filterItem)
 
-                attrElem = $("<li class='label label-info' id='axis_#{i}'>")
+                attrElem = $("<li class='label label-info axis_#{i}'>")
                     .append($("<nobr>").text(c))
                 colList.append(attrElem).append(valueList)
 
@@ -574,25 +574,25 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
         #aggregator menu and value area
 
-        aggregator = $("<select id='aggregator'>")
+        aggregator = $("<select class='pvtAggregator'>")
             .css("margin-bottom", "5px")
             .bind "change", -> refresh() #capture reference
         for own x of opts.aggregators
             aggregator.append $("<option>").val(x).text(x)
 
-        tr1.append $("<td id='vals' class='pvtAxisContainer pvtHorizList'>")
+        tr1.append $("<td class='pvtAxisContainer pvtHorizList pvtRows'>")
           .css("text-align", "center")
           .append(aggregator).append($("<br>"))
 
         #column axes
-        tr1.append $("<td id='cols' class='pvtAxisContainer pvtHorizList'>")
+        tr1.append $("<td class='pvtAxisContainer pvtHorizList pvtCols'>")
 
         uiTable.append tr1
 
         tr2 = $("<tr>")
 
         #row axes
-        tr2.append $("<td valign='top' id='rows' class='pvtAxisContainer'>")
+        tr2.append $("<td valign='top' class='pvtAxisContainer pvtRows'>")
 
         #the actual pivot table container
         pivotTable = $("<td valign='top' class='pvtRendererArea'>")
@@ -613,15 +613,15 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         #set up the UI initial state as requested by moving elements around
 
         for x in opts.cols
-            @find("#cols").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find(".pvtCols").append @find(".axis_#{shownAttributes.indexOf(x)}")
         for x in opts.rows
-            @find("#rows").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find(".pvtRows").append @find(".axis_#{shownAttributes.indexOf(x)}")
         for x in opts.vals
-            @find("#vals").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find(".pvtVals").append @find(".axis_#{shownAttributes.indexOf(x)}")
         if opts.aggregatorName?
-            @find("#aggregator").val opts.aggregatorName
+            @find(".pvtAggregator").val opts.aggregatorName
         if opts.rendererName?
-            @find("#renderer").val opts.rendererName
+            @find(".pvtRenderer").val opts.rendererName
 
         #set up for refreshing
         refresh = =>
@@ -632,9 +632,9 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 cols: [], rows: []
 
             vals = []
-            @find("#rows li nobr").each -> subopts.rows.push $(this).text()
-            @find("#cols li nobr").each -> subopts.cols.push $(this).text()
-            @find("#vals li nobr").each -> vals.push $(this).text()
+            @find(".pvtRows li nobr").each -> subopts.rows.push $(this).text()
+            @find(".pvtCols li nobr").each -> subopts.cols.push $(this).text()
+            @find(".pvtVals li nobr").each -> vals.push $(this).text()
 
             subopts.aggregator = opts.aggregators[aggregator.val()](vals)
             subopts.renderer = opts.renderers[renderer.val()]
@@ -667,7 +667,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             # if requested make sure unused columns are in alphabetical order
             if opts.autoSortUnusedAttrs
                 natSort = $.pivotUtilities.naturalSort
-                unusedAttrsContainer = $("td#unused.pvtAxisContainer")
+                unusedAttrsContainer = @find("td.pvtUnused.pvtAxisContainer")
                 $(unusedAttrsContainer).children("li")
                     .sort((a, b) => natSort($(a).text(), $(b).text()))
                     .appendTo unusedAttrsContainer
@@ -678,7 +678,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         refresh()
 
         @find(".pvtAxisContainer")
-             .sortable({connectWith:".pvtAxisContainer", items: 'li'})
+             .sortable({connectWith: @find(".pvtAxisContainer"), items: 'li'})
              .bind "sortstop", refresh
     catch e
         console.error(e.stack) if console?
