@@ -93,7 +93,7 @@ aggregators =
         format: numberFormat(0)
         label: "Count Unique #{attr}"
 
-    listUnique: ([attr]) ->    ->
+    listUnique: ([attr]) ->  ->
         uniq: []
         push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
         value: -> @uniq.join ", "
