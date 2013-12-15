@@ -81,7 +81,7 @@ aggregatorTemplates =
 aggregators =
     count: -> ->
         count: 0
-        push:  -> @count++
+        push:    -> @count++
         value: -> @count
         format: numberFormat(0)
         label: "Count"
@@ -118,9 +118,9 @@ aggregators.countAsFractionOfCol= aggregatorTemplates.fractionOf(aggregators.cou
 renderers =
     "Table": (pvtData, opts) -> pivotTableRenderer(pvtData, opts)
     "Table Barchart": (pvtData, opts) -> pivotTableRenderer(pvtData, opts).barchart()
-    "Heatmap":      (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap()
-    "Row Heatmap":  (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap("rowheatmap")
-    "Col Heatmap":  (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap("colheatmap")
+    "Heatmap":            (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap()
+    "Row Heatmap":    (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap("rowheatmap")
+    "Col Heatmap":    (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap("colheatmap")
 
 mthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -151,13 +151,13 @@ naturalSort = (as, bs) => #from http://stackoverflow.com/a/4373421/112871
     rd = /\d/
     rz = /^0/
     if typeof as is "number" or typeof bs is "number"
-        return 1  if isNaN(as)
-        return -1  if isNaN(bs)
+        return 1    if isNaN(as)
+        return -1    if isNaN(bs)
         return as - bs
     a = String(as).toLowerCase()
     b = String(bs).toLowerCase()
-    return 0  if a is b
-    return (if a > b then 1 else -1)  unless rd.test(a) and rd.test(b)
+    return 0    if a is b
+    return (if a > b then 1 else -1)    unless rd.test(a) and rd.test(b)
     a = a.match(rx)
     b = b.match(rx)
     while a.length and b.length
@@ -304,7 +304,7 @@ spanSize = (arr, i, j) ->
             if arr[i-1][x] != arr[i][x]
                 noDraw = false
         if noDraw
-          return -1 #do not draw cell
+            return -1 #do not draw cell
     len = 0
     while i+len < arr.length
         stop = false
@@ -432,8 +432,8 @@ $.fn.pivot = (input, opts) ->
     result = null
     try
         pivotData = getPivotData(input, opts.cols, opts.rows,
-                                    opts.aggregator, opts.filter,
-                                    opts.derivedAttributes)
+            opts.aggregator, opts.filter,
+            opts.derivedAttributes)
         try
             result = opts.renderer(pivotData, opts.rendererOptions)
         catch e
@@ -459,6 +459,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         hiddenAttributes: []
         menuLimit: 200
         cols: [], rows: [], vals: []
+        rowsClass: "rows"
+        colsClass: "cols"
+        valsClass: "vals"
+        unusedClass: "unused"
+        aggregatorClass: "aggregator"
+        rendererClass: "renderer"
         unusedAttrsVertical: false
         autoSortUnusedAttrs: false
         rendererOptions: null
@@ -501,7 +507,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         #renderer control
         rendererControl = $("<td>")
 
-        renderer = $("<select id='renderer'>")
+        renderer = $("<select class=" + opts.rendererClass +    ">")
             .bind "change", -> refresh() #capture reference
         for own x of opts.renderers
             renderer.append $("<option>").val(x).text(x)
@@ -510,7 +516,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
         #axis list, including the double-click menu
 
-        colList = $("<td id='unused' class='pvtAxisContainer'>")
+        colList = $("<td class='pvtAxisContainer " + opts.unusedClass + "'>")
         if opts.unusedAttrsVertical
             colList.addClass('pvtVertList')
         else
@@ -546,14 +552,14 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         valueList.find("input").prop "checked", false
                     valueList.append btns
                     for k in keys.sort(naturalSort)
-                         v = axisValues[c][k]
-                         filterItem = $("<label>")
-                         filterItem.append $("<input type='checkbox' class='pvtFilter'>")
+                        v = axisValues[c][k]
+                        filterItem = $("<label>")
+                        filterItem.append $("<input type='checkbox' class='pvtFilter'>")
                             .attr("checked", true).data("filter", [c,k])
-                         filterItem.append $("<span>").text "#{k} (#{v})"
-                         valueList.append $("<p>").append(filterItem)
+                        filterItem.append $("<span>").text "#{k} (#{v})"
+                        valueList.append $("<p>").append(filterItem)
 
-                attrElem = $("<li class='label label-info' id='axis_#{i}'>")
+                attrElem = $("<li class='label label-info axis_#{i}'>")
                     .append($("<nobr>").text(c))
                 colList.append(attrElem).append(valueList)
 
@@ -562,7 +568,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     valueList.bind "click", (e) -> e.stopPropagation()
                     $(document).one "click", ->
                         unselectedCount = $(valueList).find("[type='checkbox']").length -
-                                          $(valueList).find("[type='checkbox']:checked").length
+                            $(valueList).find("[type='checkbox']:checked").length
                         if unselectedCount > 0
                             attrElem.addClass "pvtFilteredAttribute"
                         else
@@ -574,25 +580,25 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
         #aggregator menu and value area
 
-        aggregator = $("<select id='aggregator'>")
+        aggregator = $("<select class='" + opts.aggregatorClass + "'>")
             .css("margin-bottom", "5px")
             .bind "change", -> refresh() #capture reference
         for own x of opts.aggregators
             aggregator.append $("<option>").val(x).text(x)
 
-        tr1.append $("<td id='vals' class='pvtAxisContainer pvtHorizList'>")
-          .css("text-align", "center")
-          .append(aggregator).append($("<br>"))
+        tr1.append $("<td class='pvtAxisContainer pvtHorizList " + opts.rowsClass + "'>")
+            .css("text-align", "center")
+            .append(aggregator).append($("<br>"))
 
         #column axes
-        tr1.append $("<td id='cols' class='pvtAxisContainer pvtHorizList'>")
+        tr1.append $("<td class='pvtAxisContainer pvtHorizList " + opts.colsClass + "'>")
 
         uiTable.append tr1
 
         tr2 = $("<tr>")
 
         #row axes
-        tr2.append $("<td valign='top' id='rows' class='pvtAxisContainer'>")
+        tr2.append $("<td valign='top' class='pvtAxisContainer " +opts.rowsClass + "'>")
 
         #the actual pivot table container
         pivotTable = $("<td valign='top' class='pvtRendererArea'>")
@@ -613,15 +619,15 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         #set up the UI initial state as requested by moving elements around
 
         for x in opts.cols
-            @find("#cols").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find("." + @colsClass).append @find(".axis_#{shownAttributes.indexOf(x)}")
         for x in opts.rows
-            @find("#rows").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find("." + @rowsClass).append @find(".axis_#{shownAttributes.indexOf(x)}")
         for x in opts.vals
-            @find("#vals").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find("." + @valsClass).append @find(".axis_#{shownAttributes.indexOf(x)}")
         if opts.aggregatorName?
-            @find("#aggregator").val opts.aggregatorName
+            @find("." + @agggregatorClass).val opts.aggregatorName
         if opts.rendererName?
-            @find("#renderer").val opts.rendererName
+            @find("." + @rendererClass).val opts.rendererName
 
         #set up for refreshing
         refresh = =>
@@ -632,9 +638,9 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 cols: [], rows: []
 
             vals = []
-            @find("#rows li nobr").each -> subopts.rows.push $(this).text()
-            @find("#cols li nobr").each -> subopts.cols.push $(this).text()
-            @find("#vals li nobr").each -> vals.push $(this).text()
+            @find("." +opts.rowsClass + " li nobr").each -> subopts.rows.push $(this).text()
+            @find("." +opts.colsClass + " li nobr").each -> subopts.cols.push $(this).text()
+            @find("." +opts.valsClass + " li nobr").each -> vals.push $(this).text()
 
             subopts.aggregator = opts.aggregators[aggregator.val()](vals)
             subopts.renderer = opts.renderers[renderer.val()]
@@ -663,11 +669,17 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 rendererName: renderer.val()
                 localeStrings: opts.localeStrings
                 rendererOptions: opts.rendererOptions
+                rowsClass: opts.rowsClass
+                colsClass: opts.colssClass
+                valsClass: opts.valsClass
+                unusedClass: opts.unusedClass
+                aggregatorClass: opts.aggregatorClass
+                rendererClass: opts.rendererClass
 
             # if requested make sure unused columns are in alphabetical order
             if opts.autoSortUnusedAttrs
                 natSort = $.pivotUtilities.naturalSort
-                unusedAttrsContainer = $("td#unused.pvtAxisContainer")
+                unusedAttrsContainer = @find("td."+ opts.unusedClass + ".pvtAxisContainer")
                 $(unusedAttrsContainer).children("li")
                     .sort((a, b) => natSort($(a).text(), $(b).text()))
                     .appendTo unusedAttrsContainer
@@ -678,8 +690,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         refresh()
 
         @find(".pvtAxisContainer")
-             .sortable({connectWith:".pvtAxisContainer", items: 'li'})
-             .bind "sortstop", refresh
+            .sortable({connectWith: @find(".pvtAxisContainer"), items: 'li'})
+            .bind "sortstop", refresh
     catch e
         console.error(e.stack) if console?
         @html opts.localeStrings.uiRenderError
@@ -694,9 +706,9 @@ $.fn.heatmap = (scope = "heatmap") ->
 
     colorGen = (color, min, max) ->
         hexGen = switch color
-            when "red"   then (hex) -> "ff#{hex}#{hex}"
+            when "red"     then (hex) -> "ff#{hex}#{hex}"
             when "green" then (hex) -> "#{hex}ff#{hex}"
-            when "blue"  then (hex) -> "#{hex}#{hex}ff"
+            when "blue"    then (hex) -> "#{hex}#{hex}ff"
 
         return (x) ->
             intensity = 255 - Math.round 255*(x-min)/(max-min)
@@ -732,7 +744,7 @@ $.fn.heatmap = (scope = "heatmap") ->
 Barchart post-processing
 ###
 
-$.fn.barchart =  ->
+$.fn.barchart =    ->
     [numRows, numCols] = @data "dimensions"
 
     barcharter = (scope) =>
