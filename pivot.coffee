@@ -42,7 +42,7 @@ aggregatorTemplates =
         sumNum: 0
         sumDenom: 0
         push: (record) ->
-            @sumNum   += parseFloat(record[num])     if not isNaN parseFloat(record[num])
+            @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
             @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
         value: -> @sumNum/@sumDenom
         format: numberFormat(sigfig, scaler)
@@ -52,7 +52,7 @@ aggregatorTemplates =
         sumNum: 0
         sumDenom: 0
         push: (record) ->
-            @sumNum   += parseFloat(record[num])     if not isNaN parseFloat(record[num])
+            @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
             @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
         value: ->
             sign = if upper then 1 else -1
