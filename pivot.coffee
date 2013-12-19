@@ -459,6 +459,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         hiddenAttributes: []
         menuLimit: 200
         cols: [], rows: [], vals: []
+        exclusions: []
         unusedAttrsVertical: false
         autoSortUnusedAttrs: false
         rendererOptions: null
@@ -519,6 +520,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         for i, c of shownAttributes
             do (c) ->
                 keys = (k for k of axisValues[c])
+                hasExcludedItem = false
                 valueList = $("<div>")
                     .addClass('pvtFilterBox')
                     .css
@@ -548,13 +550,19 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     for k in keys.sort(naturalSort)
                          v = axisValues[c][k]
                          filterItem = $("<label>")
+                         filterItemExcluded = jQuery.grep(opts.exclusions, (element, index) ->
+                             element[0] is c and element[1] is k
+                         ).length > 0
+                         hasExcludedItem ||= filterItemExcluded
                          filterItem.append $("<input type='checkbox' class='pvtFilter'>")
-                            .attr("checked", true).data("filter", [c,k])
+                            .attr("checked", !filterItemExcluded).data("filter", [c,k])
                          filterItem.append $("<span>").text "#{k} (#{v})"
                          valueList.append $("<p>").append(filterItem)
 
+
                 attrElem = $("<li class='label label-info' id='axis_#{i}'>")
                     .append($("<nobr>").text(c))
+                attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                 colList.append(attrElem).append(valueList)
 
                 attrElem.bind "dblclick", (e) ->
@@ -655,6 +663,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 cols: subopts.cols
                 rows: subopts.rows
                 vals: vals
+                exclusions: exclusions
                 hiddenAttributes: opts.hiddenAttributes
                 renderers: opts.renderers
                 aggregators: opts.aggregators
