@@ -459,6 +459,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         hiddenAttributes: []
         menuLimit: 200
         cols: [], rows: [], vals: []
+        exclusions: {}
         unusedAttrsVertical: false
         autoSortUnusedAttrs: false
         rendererOptions: null
@@ -519,6 +520,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         for i, c of shownAttributes
             do (c) ->
                 keys = (k for k of axisValues[c])
+                hasExcludedItem = false
                 valueList = $("<div>")
                     .addClass('pvtFilterBox')
                     .css
@@ -548,13 +550,17 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     for k in keys.sort(naturalSort)
                          v = axisValues[c][k]
                          filterItem = $("<label>")
+                         filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
+                         hasExcludedItem ||= filterItemExcluded
                          filterItem.append $("<input type='checkbox' class='pvtFilter'>")
-                            .attr("checked", true).data("filter", [c,k])
+                            .attr("checked", !filterItemExcluded).data("filter", [c,k])
                          filterItem.append $("<span>").text "#{k} (#{v})"
                          valueList.append $("<p>").append(filterItem)
 
+
                 attrElem = $("<li class='label label-info' id='axis_#{i}'>")
                     .append($("<nobr>").text(c))
+                attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                 colList.append(attrElem).append(valueList)
 
                 attrElem.bind "dblclick", (e) ->
@@ -640,14 +646,18 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             subopts.renderer = opts.renderers[renderer.val()]
 
             #construct filter here
-            exclusions = []
+            exclusions = {}
             @find('input.pvtFilter').not(':checked').each ->
-                exclusions.push $(this).data("filter")
+                filter = $(this).data("filter")
+                if exclusions[filter[0]]?
+                    exclusions[filter[0]].push( filter[1] )
+                else
+                    exclusions[filter[0]] = [ filter[1] ]
 
             subopts.filter = (record) ->
                 return false if not opts.filter(record)
-                for [k,v] in exclusions
-                    return false if "#{record[k]}" == v
+                for k,excludedItems of exclusions
+                    return false if record[k] in excludedItems
                 return true
 
             pivotTable.pivot(input,subopts)
@@ -655,6 +665,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 cols: subopts.cols
                 rows: subopts.rows
                 vals: vals
+                exclusions: exclusions
                 hiddenAttributes: opts.hiddenAttributes
                 renderers: opts.renderers
                 aggregators: opts.aggregators
