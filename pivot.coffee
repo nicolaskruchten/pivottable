@@ -586,7 +586,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         for own x of opts.aggregators
             aggregator.append $("<option>").val(x).text(x)
 
-        tr1.append $("<td class='pvtAxisContainer pvtHorizList pvtRows'>")
+        tr1.append $("<td class='pvtAxisContainer pvtHorizList pvtVals'>")
           .css("text-align", "center")
           .append(aggregator).append($("<br>"))
 

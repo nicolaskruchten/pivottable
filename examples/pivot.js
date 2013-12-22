@@ -1019,7 +1019,7 @@
         if (!__hasProp.call(_ref2, x)) continue;
         aggregator.append($("<option>").val(x).text(x));
       }
-      tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtRows'>").css("text-align", "center").append(aggregator).append($("<br>")));
+      tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtVals'>").css("text-align", "center").append(aggregator).append($("<br>")));
       tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtCols'>"));
       uiTable.append(tr1);
       tr2 = $("<tr>");
