@@ -1,3 +1,10 @@
+table.table {
+    font-family:arial;
+    font-size: 8pt;
+    text-align: left;
+    /*border-collapse: collapse;*/
+}
+
 
 table.pvtTable {
     font-family:arial;
@@ -30,16 +37,18 @@ table.pvtTable tr td {
     border: 1px solid gray;
     background: #EEE;
     padding: 5px;
-    min-width: 20px;
-    min-height: 20px;
+    min-width: 40px;
+    min-height: 40px;
 }
 .pvtAxisContainer li {
     margin: 5px;
     padding: 5px;
     list-style-type: none;
     cursor:move;
+    
+    float:left;
+    border:solid 1px;
 }
 
-.pvtHorizList li { display: inline; }
-
+.pvtHorizList li div{ display: inline;text-align:center; float:left;}
 .pvtFilteredAttribute { font-style: italic }
