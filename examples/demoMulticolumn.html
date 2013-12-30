@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <link rel="stylesheet" type="text/css" href="pivot.css">
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="http://nicolaskruchten.github.io/pivottable/examples/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="http://nicolaskruchten.github.io/pivottable/examples/jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="pivot.js"></script>
+   </head>
+    <style>
+        * {font-family: Verdana;}
+		table.pvtTable {
+    font-family:arial;
+    font-size: 8pt;
+    text-align: left;
+    border-collapse: collapse;
+}
+table.pvtTable tr th, table.pvtTable tr th {
+    background-color: #e6EEEE;
+    border: 1px solid #CDCDCD;
+    font-size: 8pt;
+    padding: 5px;
+}
+
+table.pvtTable .pvtColLabel {text-align: center;}
+table.pvtTable .pvtTotalLabel {text-align: right;}
+
+table.pvtTable tr td {
+    color: #3D3D3D;
+    padding: 5px;
+    background-color: #FFF;
+    border: 1px solid #CDCDCD;
+    vertical-align: top;
+    text-align: right;
+}
+
+.pvtTotal, .pvtGrandTotal { font-weight: bold; }
+
+.pvtAxisContainer {
+    border: 1px solid gray;
+    background: #EEE;
+    padding: 5px;
+    min-width: 20px;
+    min-height: 20px;
+}
+.pvtAxisContainer li {
+    margin: 5px;
+    padding: 5px;
+    list-style-type: none;
+    cursor:move;
+}
+
+.pvtHorizList li { display: inline; }
+    </style>
+    <body>
+        <script type="text/javascript">
+            google.load("visualization", "1", {packages:["corechart", "charteditor"]});
+			var mps=[ {"Province": "Quebec", "Party": "NDP", "Age": 2002, "Name": "Liu, Laurin", "Gender": "Female"},{"Province": "Quebec", "Party": "Bloc Quebecois", "Age": 43, "Name": "Mourani, Maria", "Gender": "Female"},{"Province": "Quebec", "Party": "NDP", "Age": "0", "Name": "Sellah, Djaouida", "Gender": "Female"},{"Province": "Quebec", "Party": "NDP", "Age": 72, "Name": "St-Denis, Lise", "Gender": "Female"},{"Province": "British Columbia", "Party": "Liberal", "Age": 71, "Name": "Fry, Hedy", "Gender": "Female"},{"Province": "Quebec", "Party": "NDP", "Age": 70, "Name": "Turmel, Nycole", "Gender": "Female"},{"Province": "Ontario", "Party": "Liberal", "Age": 68, "Name": "Sgro, Judy", "Gender": "Female"},{"Province": "Quebec", "Party": "NDP", "Age": 67, "Name": "Raynault, Francine", "Gender": "Female"},{"Province": "Ontario", "Party": "Conservative", "Age": 66, "Name": "Davidson, Patricia", "Gender": "Female"},{"Province": "Manitoba", "Party": "Conservative", "Age": 65, "Name": "Smith, Joy", "Gender": "Female"},{"Province": "British Columbia", "Party": "Conservative", "Age": 64, "Name": "Wong, Alice", "Gender": "Female"},{"Province": "New Brunswick", "Party": "Conservative", "Age": 63, "Name": "O-Neill Gordon, Tilly", "Gender": "Female"},{"Province": "Alberta", "Party": "Conservative", "Age": 63, "Name": "Ablonczy, Diane", "Gender": "Female"} ]
+
+            $(function(){
+				
+                var custom_derivers = {};
+                var name_property = "Age bin";
+                var obj = {};
+                Object.defineProperty(obj, name_property, {
+                    value: $.pivotUtilities.derivers.bin("Age",10),
+                    writable: true,
+                    enumerable: true,
+                    configurable: true
+                });
+                custom_derivers = $.extend(custom_derivers, obj);
+
+				 
+				$("#output").pivotUI(mps, {
+				    derivedAttributes: $.extend(custom_derivers, $.pivotUtilities.derivedAttributes),
+					aggregators: $.pivotUtilities.aggregators,
+					renderers: $.extend($.pivotUtilities.renderers, $.pivotUtilities.gchart_renderers),
+				    unusedAttrsVertical:false
+				});
+
+             });
+        </script>
+
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>

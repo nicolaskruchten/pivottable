@@ -41,7 +41,7 @@ aggregatorTemplates =
     sumOverSum: (sigfig=3, scaler=1) -> ([num, denom]) -> ->
         sumNum: 0
         sumDenom: 0
-        push: (record) ->
+        push: (record,idx) ->
             @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
             @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
         value: -> @sumNum/@sumDenom
@@ -51,7 +51,7 @@ aggregatorTemplates =
     sumOverSumBound80: (sigfig=3, scaler=1, upper=true) -> ([num, denom]) -> ->
         sumNum: 0
         sumDenom: 0
-        push: (record) ->
+        push: (record,idx) ->
             @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
             @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
         value: ->
@@ -75,7 +75,7 @@ aggregatorTemplates =
 
     l10nWrapper: ( wrapped, formatter, labelFn) -> (x...) -> (data, rowKey, colKey) ->
         inner: wrapped(x...)(data, rowKey, colKey)
-        push: (record) -> @inner.push record
+        push: (record,idx) -> @inner.push record
         format: formatter
         label: labelFn(data)
         value: -> @inner.value()
@@ -240,7 +240,6 @@ class PivotData
         @allTotal=[@aggregatorKeys.length]
         @sorted = false
 
-        
         if @aggregatorKeys.length==0
             @allTotal[0] = @aggregator[0](this, [], [])
             @rowTotals[0] = {}
@@ -254,7 +253,6 @@ class PivotData
                 @colTotals[i] = {}
                 @tree[i]  = {}
                 i++
-    
 
     natSort: (as, bs) => naturalSort(as, bs)
 
@@ -282,7 +280,7 @@ class PivotData
 
         flatRowKey = @flattenKey rowKey
         flatColKey = @flattenKey colKey
-        
+
         i=0
         while i<aggregatorKeys.length
             @allTotal[i].push record,i,@valAttrs[i]
@@ -292,7 +290,7 @@ class PivotData
             if flatRowKey not in @flatRowKeys
                 @rowKeys.push rowKey
                 @flatRowKeys.push flatRowKey
-            
+
             i=0
             while i<aggregatorKeys.length
                 if not @rowTotals[i][flatRowKey]
@@ -367,7 +365,7 @@ pivotTableRenderer = (pivotData, opts) ->
             totals: "Totals"
 
     opts = $.extend defaults, opts
-    
+
     valAttrs = pivotData.valAttrs
     colAttrs = pivotData.colAttrs
     rowAttrs = pivotData.rowAttrs
@@ -460,7 +458,6 @@ pivotTableRenderer = (pivotData, opts) ->
                 .data("for", "row"+i)
             xx++
         #/\ADD JAVG    
-        
 
         result.append tr
 
@@ -469,7 +466,7 @@ pivotTableRenderer = (pivotData, opts) ->
     th = $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals)
     th.attr("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
     tr.append th
-    #/\MODIFIED JAVG   
+    #\/MODIFIED JAVG   
     for own j, colKey of colKeys
         xx=0
         while xx < pivotData.aggregatorKeys.length
@@ -491,7 +488,7 @@ pivotTableRenderer = (pivotData, opts) ->
             .data("value", val)
         xx++
     #/\MODIFIED JAVG
-   
+
     result.append tr
 
     #squirrel this away for later
@@ -510,7 +507,7 @@ $.fn.pivot = (input, opts) ->
         vals:[]
         aggregatorKeys:[]
         filter: -> true
-        aggregator: []#aggregators.count()
+        aggregator: aggregators.count()
         derivedAttributes: {},
         renderer: pivotTableRenderer
         rendererOptions: null
@@ -548,12 +545,13 @@ UI code, calls pivot table above
 $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
     defaults =
         derivedAttributes: {}
-        aggregators: []
+        aggregators: aggregators
         renderers: renderers
         hiddenAttributes: []
         menuLimit: 200
         tblCols:[]
         cols: [], rows: [], vals: [],aggregatorKeys:[]
+        exclusions: {}
         unusedAttrsVertical: false
         autoSortUnusedAttrs: false
         rendererOptions: null
@@ -580,9 +578,11 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         tblCols = (k for own k of input[0])
         tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
 
-        opts.tblCols=tblCols
-
         #figure out the cardinality and some stats
+        axisValues = {}
+        axisValues[x] = {} for x in tblCols
+
+        opts.tblCols=tblCols
         axisValues = {}
         axisValues[x] = {} for x in tblCols
 
@@ -592,32 +592,31 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 axisValues[k][v] ?= 0
                 axisValues[k][v]++
 
-
         #start building the output
         uiTable = $("<table class='table table-bordered' cellpadding='5'>")
 
         #renderer control
         rendererControl = $("<td>")
 
-        renderer = $("<select id='renderer'>")
+        renderer = $("<select class='pvtRenderer'>")
             .bind "change", -> refresh() #capture reference
         for own x of opts.renderers
             renderer.append $("<option>").val(x).text(x)
         rendererControl.append renderer
 
-       
 
         #axis list, including the double-click menu
-        colList = $("<td id='unused' class='pvtAxisContainer'>")
+
+        colList = $("<td class='pvtAxisContainer pvtUnused'>")
         if opts.unusedAttrsVertical
             colList.addClass('pvtVertList')
         else
             colList.addClass('pvtHorizList')
-
         shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
         for i, c of shownAttributes
             do (c) ->
                 keys = (k for k of axisValues[c])
+                hasExcludedItem = false
                 valueList = $("<div>")
                     .addClass('pvtFilterBox')
                     .css
@@ -647,15 +646,18 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     for k in keys.sort(naturalSort)
                          v = axisValues[c][k]
                          filterItem = $("<label>")
+                         filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
+                         hasExcludedItem ||= filterItemExcluded
                          filterItem.append $("<input type='checkbox' class='pvtFilter'>")
-                            .attr("checked", true).data("filter", [c,k])
+                            .attr("checked", !filterItemExcluded).data("filter", [c,k])
                          filterItem.append $("<span>").text "#{k} (#{v})"
                          valueList.append $("<p>").append(filterItem)
 
-                attrElem = $("<li class='label label-info' id='axis_#{i}'>")
-                    .append $("<div id='div_axis_#{i}'>")
-                    .append $("<nobr>").text(c)
-                    
+
+                attrElem = $("<li class='label label-info axis_#{i}'>")
+                    .append $("<div class='div_axis_#{i}'>")
+                    .append($("<nobr>").text(c))
+                attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                 colList.append(attrElem).append(valueList)
 
                 attrElem.bind "dblclick", (e) ->
@@ -671,44 +673,46 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         refresh()
                         valueList.toggle()
 
+        
+
         #aggregator menu and value area
         #THIS isn't util, because each attr in vals has an aggregator
-        aggregator = $("<select id='aggregator'>")
+        aggregator = $("<select class='pvtAggregator'>")
             .css("margin-bottom", "5px")
             .bind "change", -> refresh() #capture reference
         for own x of opts.aggregators
             aggregator.append $("<option>").val(x).text(x)
-        
-        #\/ADD JAVG
+
+                #\/ADD JAVG
         #compare controls, aggregator
         #I put a way to compare two columns
         selectCompareControl= $("<td>")
-        selectCompare1= $("<select id='toCompare1'>")
-        selectCompare2= $("<select id='toCompare2'>")
-        buttonCompare= $("<button id='toComparebtn'>")
+        selectCompare1= $("<select class='toCompare1'>")
+        selectCompare2= $("<select class='toCompare2'>")
+        buttonCompare= $("<button class='toComparebtn'>")
             .text("Agregar")
             .bind "click", ->
 
-                optionSelected1=$("#toCompare1 option:selected")
-                optionSelected2=$("#toCompare2 option:selected")
+                optionSelected1=$(".toCompare1 option:selected")
+                optionSelected2=$(".toCompare2 option:selected")
                 #add field to vals area
                 cantidadCampos = $(".pvtAxisContainer").find("li").length
                 ++cantidadCampos
-                cuentaSelect = $(event.target).find("select").legth
+                cuentaSelect = $(event.target).find("select").length
                 ++cuentaSelect
 
-                selectCompare= $("<select id='aggregator" + (++cuentaSelect) + "'>")
+                selectCompare= $("<select class='pvtAggregator" + (++cuentaSelect) + "'>")
                 $.each opts.aggregators, (key, value) ->
                         if(key.toUpperCase().indexOf("COMPARE")>=0) #are not necesary all
                             selectCompare.append $("<option>").val(key).text(key)
                 selectCompare.val("compareWith").attr("disabled", true)
 
                 #aggregatorCompare.find(":selected")
-                newVal = $("<li class='label label-info' id='axis_#{cantidadCampos}'>")
-                    .append $("<div id='div_axis_#{cantidadCampos}'>")
+                newVal = $("<li class='label label-info axis_#{cantidadCampos}'>")
+                    .append $("<div class='div_axis_#{cantidadCampos}'>")
                 newVal.append $("<nobr>").text(optionSelected1.text() + "->" + optionSelected2.text())
                 newVal.append selectCompare 
-                $("#vals").append newVal
+                $(".pvtVals").append newVal
 
                 #refresh
                 refresh()
@@ -722,18 +726,18 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
 
         tr2 = $("<tr>")
-        tr2.append $("<td id='vals' class='pvtAxisContainer pvtHorizList'>")
+        tr2.append $("<td class='pvtAxisContainer pvtHorizList pvtVals'>")
           .css("text-align", "center")
         #/\ADD JAVG
 
         #column axes
-        tr2.append $("<td id='cols' class='pvtAxisContainer pvtHorizList'>")
+        tr2.append $("<td  class='pvtAxisContainer pvtHorizList pvtCols'>")
         uiTable.append tr2
 
         tr3 = $("<tr>")
 
         #row axes
-        tr3.append $("<td valign='top' id='rows' class='pvtAxisContainer'>")
+        tr3.append $("<td valign='top' class='pvtAxisContainer pvtRows'>")
 
         #the actual pivot table container
         pivotTable = $("<td valign='top' class='pvtRendererArea'>")
@@ -754,18 +758,19 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         #render the UI in its default state
         @html uiTable
 
+
         #set up the UI initial state as requested by moving elements around
 
         for x in opts.cols
-            @find("#cols").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find(".pvtCols").append @find(".axis_#{shownAttributes.indexOf(x)}")
         for x in opts.rows
-            @find("#rows").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find(".pvtRows").append @find(".axis_#{shownAttributes.indexOf(x)}")
         for x in opts.vals
-            @find("#vals").append @find("#axis_#{shownAttributes.indexOf(x)}")
+            @find(".pvtVals").append @find(".axis_#{shownAttributes.indexOf(x)}")
         if opts.aggregatorName?
-            @find("#aggregator").val opts.aggregatorName
+            @find(".pvtAggregator").val opts.aggregatorName
         if opts.rendererName?
-            @find("#renderer").val opts.rendererName
+            @find(".pvtRenderer").val opts.rendererName
 
         #set up for refreshing
         refresh = =>
@@ -776,29 +781,33 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 aggregator:[]
                 cols: [], rows: [], vals: [], aggregatorKeys:[] #ADD JAVG
 
-            @find("#rows li nobr").each -> subopts.rows.push $(this).text()
-            @find("#cols li nobr").each -> subopts.cols.push $(this).text()
-            @find("#vals li nobr").each -> subopts.vals.push $(this).text()
-            @find("#vals li select option:selected").each -> subopts.aggregatorKeys.push $(this).text() #ADD JAVG
-            
+            vals = []
+            @find(".pvtRows li nobr").each -> subopts.rows.push $(this).text()
+            @find(".pvtCols li nobr").each -> subopts.cols.push $(this).text()
+            @find(".pvtVals li nobr").each -> subopts.vals.push $(this).text()
+            @find(".pvtVals li select option:selected").each -> subopts.aggregatorKeys.push $(this).text() #ADD JAVG
+
             #Ejecutar el array de aggregators
             i=0
             while i < subopts.aggregatorKeys.length
                 subopts.aggregator[i] = opts.aggregators[subopts.aggregatorKeys[i]](subopts.vals,i)
                 i++
 
-            
             subopts.renderer = opts.renderers[renderer.val()]
 
             #construct filter here
-            exclusions = []
+            exclusions = {}
             @find('input.pvtFilter').not(':checked').each ->
-                exclusions.push $(this).data("filter")
+                filter = $(this).data("filter")
+                if exclusions[filter[0]]?
+                    exclusions[filter[0]].push( filter[1] )
+                else
+                    exclusions[filter[0]] = [ filter[1] ]
 
             subopts.filter = (record) ->
                 return false if not opts.filter(record)
-                for [k,v] in exclusions
-                    return false if "#{record[k]}" == v
+                for k,excludedItems of exclusions
+                    return false if record[k] in excludedItems
                 return true
 
             pivotTable.pivot(input,subopts)
@@ -806,6 +815,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 cols: subopts.cols
                 rows: subopts.rows
                 vals: subopts.vals
+                exclusions: exclusions
                 hiddenAttributes: opts.hiddenAttributes
                 renderers: opts.renderers
                 aggregators: opts.aggregators
@@ -818,7 +828,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             # if requested make sure unused columns are in alphabetical order
             if opts.autoSortUnusedAttrs
                 natSort = $.pivotUtilities.naturalSort
-                unusedAttrsContainer = $("td#unused.pvtAxisContainer")
+                unusedAttrsContainer = @find("td.pvtUnused.pvtAxisContainer")
                 $(unusedAttrsContainer).children("li")
                     .sort((a, b) => natSort($(a).text(), $(b).text()))
                     .appendTo unusedAttrsContainer
@@ -829,7 +839,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         refresh()
 
         @find(".pvtAxisContainer")
-             .sortable({connectWith:".pvtAxisContainer", items: 'li',
+             .sortable({connectWith: @find(".pvtAxisContainer"), items: 'li',
              #\/ADD JAVG
              #When an attribute is added to vals area, a <select> is created, so the user select its aggregator
              receive: (event, ui) ->
@@ -841,14 +851,20 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     $(this).remove()  if i > 0
                     i++
 
-                if event.target.id == "vals"
+                if event.target.className.toUpperCase().indexOf("VALS")>=0
                     #Agregar el combo de modos de agregación
                     cuentaSelect = 0
 
                     $(event.target).find("select").each -> ++cuentaSelect
-                    select = $("<select id='aggregator" + (++cuentaSelect) + "'>")
+                    select = $("<select class='pvtAggregator" + (++cuentaSelect) + "'>")
                         .bind "change", ->
                             if $(this).val()=="sum" || $(this).val()=="count"
+                                #Remove all divs attached, without Aggregator primary
+                                i = 0
+                                $(this).parent().parent().children("div").each ->
+                                    $(this).remove()  unless i is 0
+                                    i++
+
                                 newItemConSelect=$(this).parent().clone()
                                 newSelect=newItemConSelect.children("select")
                                 newSelect.find("option").remove()
@@ -869,10 +885,10 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     #for own x of opts.aggregators.filter(function (el) {  return el.price <= 1000 &&
                         
                     
-                    $("#" + ui.item.attr("id") + " div").append(select) #Agregar al area de vals
+                    $("." + ui.item[0].className.replace(/\s/g, '.') + " div").append(select) #Agregar al area de vals
             #/\ADD JAVG
             })
-             .bind "sortstop", refresh
+            .bind "sortstop", refresh
     catch e
         console.error(e.stack) if console?
         @html opts.localeStrings.uiRenderError
