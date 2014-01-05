@@ -8,7 +8,6 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 
 With an optional add-on, the summary table can be rendered as a Google Chart, turning the pivot table into a pivot chart. A d3-based Treemap add-on is also included.
 
-
 ##Why is it good?
 
 * lightweight: less than 1000 LOC of CoffeeScript, 6.1kb minified and gzipped, depends only on jQuery and jQueryUI's 'sortable' (and optionally on Google Charts or d3)
