@@ -669,6 +669,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 hiddenAttributes: opts.hiddenAttributes
                 renderers: opts.renderers
                 aggregators: opts.aggregators
+                filter: opts.filter
                 derivedAttributes: opts.derivedAttributes
                 aggregatorName: aggregator.val()
                 rendererName: renderer.val()
