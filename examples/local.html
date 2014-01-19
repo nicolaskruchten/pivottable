@@ -30,7 +30,15 @@
                 $("#csv").bind("change", function(event){
                     var reader = new FileReader();
                     reader.onload = function(theFile) { 
-                        $("#output").pivotUI( $.csv.toArrays(theFile.target.result), {
+                        try {
+                            var input = $.csv.toArrays(theFile.target.result);
+
+                        }
+                        catch(e) { 
+                            alert("CSV Parse error.");
+                            return; 
+                        }
+                        $("#output").pivotUI( input, {
                             renderers: $.extend(
                             $.pivotUtilities.renderers, 
                             $.pivotUtilities.gchart_renderers, 
