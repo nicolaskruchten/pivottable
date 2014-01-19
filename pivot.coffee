@@ -573,8 +573,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                             attrElem.addClass "pvtFilteredAttribute"
                         else
                             attrElem.removeClass "pvtFilteredAttribute"
-                        refresh()
-                        valueList.toggle()
+                        valueList.toggle(0, refresh)
 
         tr1 = $("<tr>")
 
@@ -630,7 +629,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             @find(".pvtRenderer").val opts.rendererName
 
         #set up for refreshing
-        refresh = =>
+        refreshDelayed = =>
             subopts =
                 derivedAttributes: opts.derivedAttributes
                 localeStrings: opts.localeStrings
@@ -649,6 +648,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             exclusions = {}
             @find('input.pvtFilter').not(':checked').each ->
                 filter = $(this).data("filter")
+                console.log filter
                 if exclusions[filter[0]]?
                     exclusions[filter[0]].push( filter[1] )
                 else
@@ -657,7 +657,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             subopts.filter = (record) ->
                 return false if not opts.filter(record)
                 for k,excludedItems of exclusions
-                    return false if record[k] in excludedItems
+                    return false if ""+record[k] in excludedItems
                 return true
 
             pivotTable.pivot(input,subopts)
@@ -684,14 +684,21 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     .sort((a, b) => natSort($(a).text(), $(b).text()))
                     .appendTo unusedAttrsContainer
 
+            pivotTable.css("opacity", 1)
             opts.onRefresh() if opts.onRefresh?
+
+        refresh = =>
+            pivotTable.css("opacity", 0.5)
+            setTimeout refreshDelayed, 10
 
         #the very first refresh will actually display the table
         refresh()
 
-        @find(".pvtAxisContainer")
-             .sortable({connectWith: @find(".pvtAxisContainer"), items: 'li'})
-             .bind "sortstop", refresh
+        @find(".pvtAxisContainer").sortable
+                update: refresh
+                connectWith: @find(".pvtAxisContainer")
+                items: 'li'
+                placeholder: 'placeholder'
     catch e
         console.error(e.stack) if console?
         @html opts.localeStrings.uiRenderError

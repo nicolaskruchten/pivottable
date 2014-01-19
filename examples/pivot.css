@@ -34,10 +34,26 @@ table.pvtTable tr td {
     min-height: 20px;
 }
 .pvtAxisContainer li {
-    margin: 5px;
-    padding: 5px;
+    padding: 8px 6px;
     list-style-type: none;
     cursor:move;
+}
+.pvtAxisContainer li.placeholder {
+    -webkit-border-radius: 5px;
+    padding: 3px 15px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px dashed #aaa;
+}
+
+.pvtAxisContainer li nobr {
+    background: #F3F3F3;
+    border: 1px solid #DEDEDE;
+    padding: 2px 5px;
+    
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 
 .pvtHorizList li { display: inline; }

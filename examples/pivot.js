@@ -822,7 +822,7 @@
 
 
   $.fn.pivotUI = function(input, inputOpts, overwrite) {
-    var aggregator, axisValues, c, colList, defaults, e, existingOpts, i, k, opts, pivotTable, refresh, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, x, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4, _ref5,
+    var aggregator, axisValues, c, colList, defaults, e, existingOpts, i, k, opts, pivotTable, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, x, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4, _ref5,
       _this = this;
     if (overwrite == null) {
       overwrite = false;
@@ -1001,8 +1001,7 @@
             } else {
               attrElem.removeClass("pvtFilteredAttribute");
             }
-            refresh();
-            return valueList.toggle();
+            return valueList.toggle(0, refresh);
           });
         });
       };
@@ -1055,7 +1054,7 @@
       if (opts.rendererName != null) {
         this.find(".pvtRenderer").val(opts.rendererName);
       }
-      refresh = function() {
+      refreshDelayed = function() {
         var exclusions, natSort, subopts, unusedAttrsContainer, vals;
         subopts = {
           derivedAttributes: opts.derivedAttributes,
@@ -1080,6 +1079,7 @@
         _this.find('input.pvtFilter').not(':checked').each(function() {
           var filter;
           filter = $(this).data("filter");
+          console.log(filter);
           if (exclusions[filter[0]] != null) {
             return exclusions[filter[0]].push(filter[1]);
           } else {
@@ -1093,7 +1093,7 @@
           }
           for (k in exclusions) {
             excludedItems = exclusions[k];
-            if (_ref6 = record[k], __indexOf.call(excludedItems, _ref6) >= 0) {
+            if (_ref6 = "" + record[k], __indexOf.call(excludedItems, _ref6) >= 0) {
               return false;
             }
           }
@@ -1122,15 +1122,22 @@
             return natSort($(a).text(), $(b).text());
           }).appendTo(unusedAttrsContainer);
         }
+        pivotTable.css("opacity", 1);
         if (opts.onRefresh != null) {
           return opts.onRefresh();
         }
       };
+      refresh = function() {
+        pivotTable.css("opacity", 0.5);
+        return setTimeout(refreshDelayed, 10);
+      };
       refresh();
       this.find(".pvtAxisContainer").sortable({
+        update: refresh,
         connectWith: this.find(".pvtAxisContainer"),
-        items: 'li'
-      }).bind("sortstop", refresh);
+        items: 'li',
+        placeholder: 'placeholder'
+      });
     } catch (_error) {
       e = _error;
       if (typeof console !== "undefined" && console !== null) {
