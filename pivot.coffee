@@ -526,13 +526,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     .css
                         "z-index": 100
                         "width": "280px"
-                        "height": "350px"
-                        "overflow": "scroll"
                         "border": "1px solid gray"
                         "background": "white"
                         "display": "none"
                         "position": "absolute"
                         "padding": "20px"
+
                 valueList.append $("<div>")
                     .css("text-align": "center", "font-weight": "bold")
                     .text("#{c} (#{keys.length})")
@@ -541,12 +540,17 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         .css("text-align": "center")
                         .text(opts.localeStrings.tooMany)
                 else
-                    btns = $("<p>").css("text-align": "center")
+                    btns = $("<p>").css("text-align": "center", "margin-bottom": "5px")
                     btns.append $("<button>").text(opts.localeStrings.selectAll).bind "click", ->
                         valueList.find("input").prop "checked", true
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").prop "checked", false
                     valueList.append btns
+                    checkContainer = $("<div>").css
+                        "overflow": "scroll"
+                        "width": "280px"
+                        "max-height": "200px"
+
                     for k in keys.sort(naturalSort)
                          v = axisValues[c][k]
                          filterItem = $("<label>")
@@ -555,8 +559,23 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                          filterItem.append $("<input type='checkbox' class='pvtFilter'>")
                             .attr("checked", !filterItemExcluded).data("filter", [c,k])
                          filterItem.append $("<span>").text "#{k} (#{v})"
-                         valueList.append $("<p>").append(filterItem)
+                         checkContainer.append $("<p>").css("margin", "5px").append(filterItem)
+                    valueList.append checkContainer
 
+                updateFilter = ->
+                    unselectedCount = $(valueList).find("[type='checkbox']").length -
+                                      $(valueList).find("[type='checkbox']:checked").length
+                    if unselectedCount > 0
+                        attrElem.addClass "pvtFilteredAttribute"
+                    else
+                        attrElem.removeClass "pvtFilteredAttribute"
+                    if keys.length > opts.menuLimit
+                        valueList.toggle()
+                    else
+                        valueList.toggle(0, refresh)
+
+                valueList.append $("<p>").css("text-align": "center", "margin-bottom": 0)
+                    .append $("<button>").text("OK").bind "click", updateFilter
 
                 attrElem = $("<li class='label label-info axis_#{i}'>")
                     .append($("<nobr>").text(c))
@@ -565,15 +584,6 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
                 attrElem.bind "dblclick", (e) ->
                     valueList.css(left: e.pageX, top: e.pageY).toggle()
-                    valueList.bind "click", (e) -> e.stopPropagation()
-                    $(document).one "click", ->
-                        unselectedCount = $(valueList).find("[type='checkbox']").length -
-                                          $(valueList).find("[type='checkbox']:checked").length
-                        if unselectedCount > 0
-                            attrElem.addClass "pvtFilteredAttribute"
-                        else
-                            attrElem.removeClass "pvtFilteredAttribute"
-                        valueList.toggle(0, refresh)
 
         tr1 = $("<tr>")
 
