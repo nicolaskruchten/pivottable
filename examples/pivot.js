@@ -928,7 +928,7 @@
         return _results;
       })();
       _fn = function(c) {
-        var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, updateFilter, v, valueList, _j, _len1, _ref2;
+        var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, v, valueList, _j, _len1, _ref2;
         keys = (function() {
           var _results;
           _results = [];
@@ -1003,17 +1003,19 @@
           "text-align": "center",
           "margin-bottom": 0
         }).append($("<button>").text("OK").bind("click", updateFilter)));
-        attrElem = $("<li class='label label-info axis_" + i + "'>").append($("<nobr>").text(c));
-        if (hasExcludedItem) {
-          attrElem.addClass('pvtFilteredAttribute');
-        }
-        colList.append(attrElem).append(valueList);
-        return attrElem.bind("dblclick", function(e) {
+        showFilterList = function(e) {
           return valueList.css({
             left: e.pageX,
             top: e.pageY
           }).toggle();
-        });
+        };
+        triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
+        attrElem = $("<li class='label label-info axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));
+        if (hasExcludedItem) {
+          attrElem.addClass('pvtFilteredAttribute');
+        }
+        colList.append(attrElem).append(valueList);
+        return attrElem.bind("dblclick", showFilterList);
       };
       for (i in shownAttributes) {
         c = shownAttributes[i];
@@ -1075,13 +1077,13 @@
         };
         vals = [];
         _this.find(".pvtRows li nobr").each(function() {
-          return subopts.rows.push($(this).text());
+          return subopts.rows.push($(this).data("attrName"));
         });
         _this.find(".pvtCols li nobr").each(function() {
-          return subopts.cols.push($(this).text());
+          return subopts.cols.push($(this).data("attrName"));
         });
         _this.find(".pvtVals li nobr").each(function() {
-          return vals.push($(this).text());
+          return vals.push($(this).data("attrName"));
         });
         subopts.aggregator = opts.aggregators[aggregator.val()](vals);
         subopts.renderer = opts.renderers[renderer.val()];

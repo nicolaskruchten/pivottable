@@ -577,13 +577,18 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 valueList.append $("<p>").css("text-align": "center", "margin-bottom": 0)
                     .append $("<button>").text("OK").bind "click", updateFilter
 
+                showFilterList = (e) ->
+                    valueList.css(left: e.pageX, top: e.pageY).toggle()
+
+                triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;")
+                    .bind "click", showFilterList
+
                 attrElem = $("<li class='label label-info axis_#{i}'>")
-                    .append($("<nobr>").text(c))
+                    .append $("<nobr>").text(c).data("attrName", c).append(triangleLink)
                 attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                 colList.append(attrElem).append(valueList)
 
-                attrElem.bind "dblclick", (e) ->
-                    valueList.css(left: e.pageX, top: e.pageY).toggle()
+                attrElem.bind "dblclick", showFilterList
 
         tr1 = $("<tr>")
 
@@ -647,9 +652,9 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 cols: [], rows: []
 
             vals = []
-            @find(".pvtRows li nobr").each -> subopts.rows.push $(this).text()
-            @find(".pvtCols li nobr").each -> subopts.cols.push $(this).text()
-            @find(".pvtVals li nobr").each -> vals.push $(this).text()
+            @find(".pvtRows li nobr").each -> subopts.rows.push $(this).data("attrName")
+            @find(".pvtCols li nobr").each -> subopts.cols.push $(this).data("attrName")
+            @find(".pvtVals li nobr").each -> vals.push $(this).data("attrName")
 
             subopts.aggregator = opts.aggregators[aggregator.val()](vals)
             subopts.renderer = opts.renderers[renderer.val()]
