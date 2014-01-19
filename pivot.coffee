@@ -648,6 +648,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             exclusions = {}
             @find('input.pvtFilter').not(':checked').each ->
                 filter = $(this).data("filter")
+                console.log filter
                 if exclusions[filter[0]]?
                     exclusions[filter[0]].push( filter[1] )
                 else
@@ -656,7 +657,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             subopts.filter = (record) ->
                 return false if not opts.filter(record)
                 for k,excludedItems of exclusions
-                    return false if record[k] in excludedItems
+                    return false if ""+record[k] in excludedItems
                 return true
 
             pivotTable.pivot(input,subopts)

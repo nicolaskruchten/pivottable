@@ -1079,6 +1079,7 @@
         _this.find('input.pvtFilter').not(':checked').each(function() {
           var filter;
           filter = $(this).data("filter");
+          console.log(filter);
           if (exclusions[filter[0]] != null) {
             return exclusions[filter[0]].push(filter[1]);
           } else {
@@ -1092,7 +1093,7 @@
           }
           for (k in exclusions) {
             excludedItems = exclusions[k];
-            if (_ref6 = record[k], __indexOf.call(excludedItems, _ref6) >= 0) {
+            if (_ref6 = "" + record[k], __indexOf.call(excludedItems, _ref6) >= 0) {
               return false;
             }
           }
