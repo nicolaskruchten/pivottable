@@ -56,6 +56,11 @@ table.pvtTable tr td {
     border-radius: 5px;
 }
 
+.pvtTriangle {
+    cursor:pointer;
+    color: grey;
+}
+
 .pvtHorizList li { display: inline; }
 
 .pvtFilteredAttribute { font-style: italic }
