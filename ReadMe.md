@@ -94,6 +94,9 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 * [Google Charts Support](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
 * [Used By](https://github.com/nicolaskruchten/pivottable/wiki/Used-By)
 
+## How can I contribute?
+
+Pull requests are welcome! Here are some [Contribution Guidelines](https://github.com/nicolaskruchten/pivottable/wiki/Contribution-Guidelines).
 
 ## I have a question, how can I get in touch?
 
