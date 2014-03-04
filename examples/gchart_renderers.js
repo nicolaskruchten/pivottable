@@ -13,7 +13,9 @@
           by: "by"
         }
       };
-      opts = $.extend(defaults, opts);
+      // NOTE: Cube19 changes at work...
+      opts = $.extend(defaults, opts, extraOptions);
+      extraOptions = opts;
       rowKeys = pivotData.getRowKeys();
       if (rowKeys.length === 0) {
         rowKeys.push([]);
@@ -44,7 +46,7 @@
           if (agg.value() != null) {
             row.push(agg.value());
           } else {
-            row.push(null);
+            row.push(0);  // NOTE: Cube19 changes at work...
           }
         }
         dataArray.push(row);
