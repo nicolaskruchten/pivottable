@@ -41,7 +41,8 @@
       decimalSep = ".";
     }
     return function(x) {
-      if (x === 0 || isNaN(x) || !isFinite(x)) {
+      // NOTE: Cube19 changes at work...
+      if (isNaN(x) || !isFinite(x)) {
         return "";
       } else {
         return addSeparators((scaler * x).toFixed(sigfig), thousandsSep, decimalSep);
@@ -282,11 +283,11 @@
       };
     },
     intSum: aggregatorTemplates.sum(0),
-    sum: aggregatorTemplates.sum(3),
-    average: aggregatorTemplates.average(3),
-    sumOverSum: aggregatorTemplates.sumOverSum(3),
-    ub80: aggregatorTemplates.sumOverSumBound80(3, 1, true),
-    lb80: aggregatorTemplates.sumOverSumBound80(3, 1, false)
+    sum: aggregatorTemplates.sum(0),  // NOTE: Cube19 changes at work...
+    average: aggregatorTemplates.average(0),
+    sumOverSum: aggregatorTemplates.sumOverSum(0),
+    ub80: aggregatorTemplates.sumOverSumBound80(0, 1, true),
+    lb80: aggregatorTemplates.sumOverSumBound80(0, 1, false)
   };
 
   aggregators.sumAsFractionOfTotal = aggregatorTemplates.fractionOf(aggregators.sum);
@@ -705,7 +706,12 @@
         }
       }
       if (parseInt(j) === 0) {
-        tr.append($("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals).attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
+        // NOTE: Cube19 changes at work...
+        if (opts.showTotals.column) {
+          tr.append($("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals).attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
+        } else if (!opts.showTotals.column && opts.showTotals.grand) {
+          tr.append($("<th class='pvtTotalLabel'>").text("").attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
+        }
       }
       result.append(tr);
     }
@@ -748,23 +754,43 @@
       }
       totalAggregator = pivotData.getAggregator(rowKey, []);
       val = totalAggregator.value();
-      tr.append($("<td class='pvtTotal rowTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
+      // NOTE: Cube19 changes at work...
+      if (opts.showTotals.column) {
+        tr.append($("<td class='pvtTotal rowTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
+      } else if (!opts.showTotals.column && opts.showTotals.grand) {
+        tr.append($("<td class='pvtTotal rowTotal'>").html(""));
+      }
       result.append(tr);
     }
     tr = $("<tr>");
-    th = $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals);
-    th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
-    tr.append(th);
+    // NOTE: Cube19 changes at work...
+    if (opts.showTotals.row) {
+      th = $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals);
+      th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
+      tr.append(th);
+    } else if (!opts.showTotals.row && opts.showTotals.grand) {
+      th = $("<th class='pvtTotalLabel'>").text("");
+      th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
+      tr.append(th);
+    }
     for (j in colKeys) {
       if (!__hasProp.call(colKeys, j)) continue;
       colKey = colKeys[j];
       totalAggregator = pivotData.getAggregator([], colKey);
       val = totalAggregator.value();
-      tr.append($("<td class='pvtTotal colTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
+      // NOTE: Cube19 changes at work...
+      if (opts.showTotals.row) {
+        tr.append($("<td class='pvtTotal colTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
+      } else if (!opts.showTotals.row && opts.showTotals.grand) {
+        tr.append($("<td class='pvtTotal colTotal'></td>").html(""));
+      }
     }
     totalAggregator = pivotData.getAggregator([], []);
     val = totalAggregator.value();
-    tr.append($("<td class='pvtGrandTotal'>").html(totalAggregator.format(val)).data("value", val));
+    // NOTE: Cube19 changes at work...
+    if (opts.showTotals.grand) {
+      tr.append($("<td class='pvtGrandTotal'>").html(totalAggregator.format(val)).data("value", val));
+    }
     result.append(tr);
     result.data("dimensions", [rowKeys.length, colKeys.length]);
     return result;
@@ -938,19 +964,11 @@
           return _results;
         })();
         hasExcludedItem = false;
-        valueList = $("<div>").addClass('pvtFilterBox').css({
-          "z-index": 100,
-          "width": "280px",
-          "border": "1px solid gray",
-          "background": "white",
-          "display": "none",
-          "position": "absolute",
-          "padding": "20px"
-        });
-        valueList.append($("<div>").css({
-          "text-align": "center",
-          "font-weight": "bold"
-        }).text("" + c + " (" + keys.length + ")"));
+        valueList = $("<div>").addClass('pvtFilterBox');
+
+        // NOTE: Cube19 changes at work...
+        valueList.append($("<div>").addClass("pvt-box-title")
+          .text("" + c + " (" + keys.length + ")"));
         if (keys.length > opts.menuLimit) {
           valueList.append($("<p>").css({
             "text-align": "center"
@@ -967,11 +985,8 @@
             return valueList.find("input").prop("checked", false);
           }));
           valueList.append(btns);
-          checkContainer = $("<div>").css({
-            "overflow": "scroll",
-            "width": "280px",
-            "max-height": "200px"
-          });
+          // NOTE: Cube19 changes at work...
+          checkContainer = $("<div>").addClass("filter-container");
           _ref2 = keys.sort(naturalSort);
           for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
             k = _ref2[_j];
@@ -981,7 +996,8 @@
             hasExcludedItem || (hasExcludedItem = filterItemExcluded);
             filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", !filterItemExcluded).data("filter", [c, k]));
             filterItem.append($("<span>").text("" + k + " (" + v + ")"));
-            checkContainer.append($("<p>").css("margin", "5px").append(filterItem));
+            // NOTE: Cube19 changes at work...
+            checkContainer.append($("<p>").addClass("filter-label").append(filterItem));
           }
           valueList.append(checkContainer);
         }
@@ -1005,8 +1021,9 @@
         }).append($("<button>").text("OK").bind("click", updateFilter)));
         showFilterList = function(e) {
           return valueList.css({
-            left: e.pageX,
-            top: e.pageY
+            // NOTE: Cube19 changes at work...
+            left: e.currentTarget.offsetLeft + 6, // BEFORE: $target.offset().left - $button.outerWidth(true),
+            top: e.currentTarget.offsetTop + 6    // BEFORE: $target.position().top + $button.outerHeight()
           }).toggle();
         };
         triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
@@ -1030,7 +1047,8 @@
         if (!__hasProp.call(_ref2, x)) continue;
         aggregator.append($("<option>").val(x).text(x));
       }
-      tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtVals'>").css("text-align", "center").append(aggregator).append($("<br>")));
+      // NOTE: Cube19 changes at work...
+      tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtVals'>").css("text-align", "center").append(aggregator));
       tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtCols'>"));
       uiTable.append(tr1);
       tr2 = $("<tr>");
@@ -1135,6 +1153,8 @@
           }).appendTo(unusedAttrsContainer);
         }
         pivotTable.css("opacity", 1);
+        // NOTE: Cube19 changes at work...
+        pivotTable.wrapInner($("<div class=\"scrollable\" />"));
         if (opts.onRefresh != null) {
           return opts.onRefresh();
         }
@@ -1280,7 +1300,7 @@
           "left": 0,
           "right": 0,
           "height": scaler(x) + "%",
-          "background-color": "gray"
+          "background-color": "#677076" // NOTE: Cube19 changes at work...
         }));
         wrapper.append($("<div>").text(text).css({
           "position": "relative",
