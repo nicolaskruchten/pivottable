@@ -1,4 +1,3 @@
-
 table.pvtTable {
     font-family:arial;
     font-size: 8pt;
@@ -12,8 +11,8 @@ table.pvtTable tr th, table.pvtTable tr th {
     padding: 5px;
 }
 
-table.pvtTable .pvtColLabel {text-align: center;}
-table.pvtTable .pvtTotalLabel {text-align: right;}
+table.pvtTable .pvtColLabel { text-align: center; }
+table.pvtTable .pvtTotalLabel { text-align: right; }
 
 table.pvtTable tr td {
     color: #3D3D3D;
@@ -33,16 +32,17 @@ table.pvtTable tr td {
     min-width: 20px;
     min-height: 20px;
 }
+
 .pvtAxisContainer li {
     padding: 8px 6px;
     list-style-type: none;
-    cursor:move;
+    cursor: move;
 }
 .pvtAxisContainer li.placeholder {
-    -webkit-border-radius: 5px;
     padding: 3px 15px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
     border: 1px dashed #aaa;
 }
 
@@ -50,10 +50,10 @@ table.pvtTable tr td {
     background: #F3F3F3;
     border: 1px solid #DEDEDE;
     padding: 2px 5px;
-    
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
 }
 
 .pvtTriangle {
@@ -61,6 +61,4 @@ table.pvtTable tr td {
     color: grey;
 }
 
-.pvtHorizList li { display: inline; }
-
-.pvtFilteredAttribute { font-style: italic }
+.pvtHorizList li { display: inline; margin-bottom: 10px; }
