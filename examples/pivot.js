@@ -283,7 +283,7 @@
       };
     },
     intSum: aggregatorTemplates.sum(0),
-    sum: aggregatorTemplates.sum(0),  // NOTE: Cube19 changes at work...
+    sum: aggregatorTemplates.sum(2),
     average: aggregatorTemplates.average(0),
     sumOverSum: aggregatorTemplates.sumOverSum(0),
     ub80: aggregatorTemplates.sumOverSumBound80(0, 1, true),
