@@ -62,3 +62,26 @@ table.pvtTable tr td {
 }
 
 .pvtHorizList li { display: inline; margin-bottom: 10px; }
+
+
+/* Externalised styling */
+
+.pvtFilterBox {
+    z-index: 100;
+    width: 280px;
+    border: 1px solid gray;
+    background: white;
+    display: none;
+    position: absolute;
+    padding: 20px;
+}
+
+.filter-container {
+    overflow: scroll;
+    width: 280px;
+    max-height: 200px;
+}
+
+.filter-label {
+    margin: 5px;
+}
