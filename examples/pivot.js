@@ -707,10 +707,14 @@
       }
       if (parseInt(j) === 0) {
         // NOTE: Cube19 changes at work...
-        if (opts.showTotals.column) {
+        if (opts.hasOwnProperty("showTotals")) {
+          if (opts.showTotals.column) {
+            tr.append($("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals).attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
+          } else if (!opts.showTotals.column && opts.showTotals.grand) {
+            tr.append($("<th class='pvtTotalLabel'>").text("").attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
+          }
+        } else {
           tr.append($("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals).attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
-        } else if (!opts.showTotals.column && opts.showTotals.grand) {
-          tr.append($("<th class='pvtTotalLabel'>").text("").attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
         }
       }
       result.append(tr);
@@ -755,21 +759,31 @@
       totalAggregator = pivotData.getAggregator(rowKey, []);
       val = totalAggregator.value();
       // NOTE: Cube19 changes at work...
-      if (opts.showTotals.column) {
+      if (opts.hasOwnProperty("showTotals")) {
+        if (opts.showTotals.column) {
+          tr.append($("<td class='pvtTotal rowTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
+        } else if (!opts.showTotals.column && opts.showTotals.grand) {
+          tr.append($("<td class='pvtTotal rowTotal'>").html(""));
+        }
+      } else {
         tr.append($("<td class='pvtTotal rowTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
-      } else if (!opts.showTotals.column && opts.showTotals.grand) {
-        tr.append($("<td class='pvtTotal rowTotal'>").html(""));
       }
       result.append(tr);
     }
     tr = $("<tr>");
     // NOTE: Cube19 changes at work...
-    if (opts.showTotals.row) {
+    if (opts.hasOwnProperty("showTotals")) {
+      if (opts.showTotals.row) {
+        th = $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals);
+        th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
+        tr.append(th);
+      } else if (!opts.showTotals.row && opts.showTotals.grand) {
+        th = $("<th class='pvtTotalLabel'>").text("");
+        th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
+        tr.append(th);
+      }
+    } else {
       th = $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals);
-      th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
-      tr.append(th);
-    } else if (!opts.showTotals.row && opts.showTotals.grand) {
-      th = $("<th class='pvtTotalLabel'>").text("");
       th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
       tr.append(th);
     }
@@ -779,16 +793,20 @@
       totalAggregator = pivotData.getAggregator([], colKey);
       val = totalAggregator.value();
       // NOTE: Cube19 changes at work...
-      if (opts.showTotals.row) {
+      if (opts.hasOwnProperty("showTotals")) {
+        if (opts.showTotals.row) {
+          tr.append($("<td class='pvtTotal colTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
+        } else if (!opts.showTotals.row && opts.showTotals.grand) {
+          tr.append($("<td class='pvtTotal colTotal'></td>").html(""));
+        }
+      } else {
         tr.append($("<td class='pvtTotal colTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
-      } else if (!opts.showTotals.row && opts.showTotals.grand) {
-        tr.append($("<td class='pvtTotal colTotal'></td>").html(""));
       }
     }
     totalAggregator = pivotData.getAggregator([], []);
     val = totalAggregator.value();
     // NOTE: Cube19 changes at work...
-    if (opts.showTotals.grand) {
+    if ((opts.hasOwnProperty("showTotals") && opts.showTotals.grand) || !opts.hasOwnProperty("showTotals")) {
       tr.append($("<td class='pvtGrandTotal'>").html(totalAggregator.format(val)).data("value", val));
     }
     result.append(tr);
