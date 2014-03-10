@@ -10,7 +10,7 @@ With an optional add-on, the summary table can be rendered as a Google Chart, tu
 
 ##Why is it good?
 
-* lightweight: less than 1000 LOC of CoffeeScript, 6.1kb minified and gzipped, depends only on jQuery and jQueryUI's 'sortable' (and optionally on Google Charts or d3)
+* lightweight: the core (without Google Charts or D3 support) is a single file with less than 1000 LOC of CoffeeScript, compiles down to 6.3kb of Javascript minified and gzipped, depends only on jQuery and jQueryUI's 'sortable'
 * works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
 * works acceptably fast in Chrome on commodity hardware up to around a hundred thousand records, depending on the cardinality of the attributes.
 * layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
@@ -94,6 +94,9 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 * [Google Charts Support](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
 * [Used By](https://github.com/nicolaskruchten/pivottable/wiki/Used-By)
 
+## How can I contribute?
+
+Pull requests are welcome! Here are some [Contribution Guidelines](https://github.com/nicolaskruchten/pivottable/wiki/Contribution-Guidelines).
 
 ## I have a question, how can I get in touch?
 
