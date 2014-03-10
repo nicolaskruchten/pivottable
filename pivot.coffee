@@ -1,5 +1,4 @@
 $ = jQuery
-
 ###
 Utilities
 ###
@@ -414,7 +413,7 @@ pivotTableRenderer = (pivotData, opts) ->
 Pivot Table
 ###
 
-$.fn.pivot = (input, opts) ->
+$.fn.pivot = (input, opts) -> 
     defaults =
         cols : []
         rows: []
@@ -491,7 +490,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         axisValues[x] = {} for x in tblCols
 
         forEachRecord input, opts.derivedAttributes, (record) ->
-            for own k, v of record
+            for own k, v of record when opts.filter(record)
                 v ?= "null"
                 axisValues[k][v] ?= 0
                 axisValues[k][v]++
@@ -663,7 +662,6 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             exclusions = {}
             @find('input.pvtFilter').not(':checked').each ->
                 filter = $(this).data("filter")
-                console.log filter
                 if exclusions[filter[0]]?
                     exclusions[filter[0]].push( filter[1] )
                 else
@@ -676,7 +674,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 return true
 
             pivotTable.pivot(input,subopts)
-            @data "pivotUIOptions",
+            pivotUIOptions = 
                 cols: subopts.cols
                 rows: subopts.rows
                 vals: vals
@@ -690,6 +688,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 rendererName: renderer.val()
                 localeStrings: opts.localeStrings
                 rendererOptions: opts.rendererOptions
+            @data "pivotUIOptions", pivotUIOptions
 
             # if requested make sure unused columns are in alphabetical order
             if opts.autoSortUnusedAttrs
@@ -700,7 +699,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     .appendTo unusedAttrsContainer
 
             pivotTable.css("opacity", 1)
-            opts.onRefresh() if opts.onRefresh?
+            opts.onRefresh(pivotUIOptions) if opts.onRefresh?
 
         refresh = =>
             pivotTable.css("opacity", 0.5)

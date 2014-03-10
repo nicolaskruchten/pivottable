@@ -889,6 +889,9 @@
         for (k in record) {
           if (!__hasProp.call(record, k)) continue;
           v = record[k];
+          if (!(opts.filter(record))) {
+            continue;
+          }
           if (v == null) {
             v = "null";
           }
@@ -1067,7 +1070,7 @@
         this.find(".pvtRenderer").val(opts.rendererName);
       }
       refreshDelayed = function() {
-        var exclusions, natSort, subopts, unusedAttrsContainer, vals;
+        var exclusions, natSort, pivotUIOptions, subopts, unusedAttrsContainer, vals;
         subopts = {
           derivedAttributes: opts.derivedAttributes,
           localeStrings: opts.localeStrings,
@@ -1091,7 +1094,6 @@
         _this.find('input.pvtFilter').not(':checked').each(function() {
           var filter;
           filter = $(this).data("filter");
-          console.log(filter);
           if (exclusions[filter[0]] != null) {
             return exclusions[filter[0]].push(filter[1]);
           } else {
@@ -1112,7 +1114,7 @@
           return true;
         };
         pivotTable.pivot(input, subopts);
-        _this.data("pivotUIOptions", {
+        pivotUIOptions = {
           cols: subopts.cols,
           rows: subopts.rows,
           vals: vals,
@@ -1126,7 +1128,8 @@
           rendererName: renderer.val(),
           localeStrings: opts.localeStrings,
           rendererOptions: opts.rendererOptions
-        });
+        };
+        _this.data("pivotUIOptions", pivotUIOptions);
         if (opts.autoSortUnusedAttrs) {
           natSort = $.pivotUtilities.naturalSort;
           unusedAttrsContainer = _this.find("td.pvtUnused.pvtAxisContainer");
@@ -1136,7 +1139,7 @@
         }
         pivotTable.css("opacity", 1);
         if (opts.onRefresh != null) {
-          return opts.onRefresh();
+          return opts.onRefresh(pivotUIOptions);
         }
       };
       refresh = function() {
