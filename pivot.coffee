@@ -529,7 +529,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         .css("text-align": "center")
                         .text(opts.localeStrings.tooMany)
                 else
-                    btns = $("<p>").css("text-align": "center", "margin-bottom": "5px")
+                    btns = $("<p>").addClass("btns-search")
                     btns.append $("<button>").text(opts.localeStrings.selectAll).bind "click", ->
                         valueList.find("input").prop "checked", true
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
@@ -543,10 +543,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                             else
                                 $(this).parent().hide();
                     valueList.append btns
-                    checkContainer = $("<div>").css
-                        "overflow": "scroll"
-                        "width": "280px"
-                        "max-height": "200px"
+                    checkContainer = $("<div>").addClass("checkContainer")
 
                     for k in keys.sort(naturalSort)
                          v = axisValues[c][k]

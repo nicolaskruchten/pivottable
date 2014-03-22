@@ -948,10 +948,7 @@
             "text-align": "center"
           }).text(opts.localeStrings.tooMany));
         } else {
-          btns = $("<p>").css({
-            "text-align": "center",
-            "margin-bottom": "5px"
-          });
+          btns = $("<p>").addClass("btns-search");
           btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
             return valueList.find("input").prop("checked", true);
           }));
@@ -972,11 +969,7 @@
             });
           }));
           valueList.append(btns);
-          checkContainer = $("<div>").css({
-            "overflow": "scroll",
-            "width": "280px",
-            "max-height": "200px"
-          });
+          checkContainer = $("<div>").addClass("checkContainer");
           _ref2 = keys.sort(naturalSort);
           for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
             k = _ref2[_j];

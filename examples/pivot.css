@@ -77,3 +77,12 @@ table.pvtTable tr td {
     text-align: center;
     margin:0;
 }
+.btns-search{
+    text-align: center;
+    margin-bottom: 5px;
+}
+.checkContainer{
+    overflow: scroll;
+    width: 280px;
+    max-height: 200px;
+}
