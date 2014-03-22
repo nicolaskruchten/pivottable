@@ -73,3 +73,7 @@ table.pvtTable tr td {
     position: absolute;
     padding: 20px;
 }
+.pvtFilterBox h4{
+    text-align: center;
+    margin:0;
+}

@@ -522,8 +522,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 hasExcludedItem = false
                 valueList = $("<div>").addClass('pvtFilterBox').hide();
 
-                valueList.append $("<div>")
-                    .css("text-align": "center", "font-weight": "bold")
+                valueList.append $("<h4>")
                     .text("#{c} (#{keys.length})")
                 if keys.length > opts.menuLimit
                     valueList.append $("<p>")
