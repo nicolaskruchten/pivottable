@@ -86,3 +86,6 @@ table.pvtTable tr td {
     width: 280px;
     max-height: 200px;
 }
+.checkContainer p{
+    margin: 5px;
+}

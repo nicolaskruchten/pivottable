@@ -979,7 +979,7 @@
             hasExcludedItem || (hasExcludedItem = filterItemExcluded);
             filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", !filterItemExcluded).data("filter", [c, k]));
             filterItem.append($("<span>").text("" + k + " (" + v + ")"));
-            checkContainer.append($("<p>").css("margin", "5px").append(filterItem));
+            checkContainer.append($("<p>").append(filterItem));
           }
           valueList.append(checkContainer);
         }
