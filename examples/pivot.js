@@ -969,6 +969,19 @@
           btns.append($("<button>").text(opts.localeStrings.selectNone).bind("click", function() {
             return valueList.find("input").prop("checked", false);
           }));
+          btns.append($("<input>").addClass("pvtSearch").attr("placeholder", "Filter results").bind("keyup", function() {
+            var filter;
+            filter = $(this).val().toLowerCase();
+            return $(this).parents(".pvtFilterBox").find('label span').each(function() {
+              var testString;
+              testString = this.innerText.toLowerCase().indexOf(filter);
+              if (testString !== -1) {
+                return $(this).parent().show();
+              } else {
+                return $(this).parent().hide();
+              }
+            });
+          }));
           valueList.append(btns);
           checkContainer = $("<div>").css({
             "overflow": "scroll",
@@ -1007,10 +1020,12 @@
           "margin-bottom": 0
         }).append($("<button>").text("OK").bind("click", updateFilter)));
         showFilterList = function(e) {
-          return valueList.css({
+          valueList.css({
             left: e.pageX,
             top: e.pageY
           }).toggle();
+          $('.pvtSearch').val('');
+          return $('label').show();
         };
         triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
         attrElem = $("<li class='label label-info axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));

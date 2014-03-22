@@ -413,7 +413,7 @@ pivotTableRenderer = (pivotData, opts) ->
 Pivot Table
 ###
 
-$.fn.pivot = (input, opts) -> 
+$.fn.pivot = (input, opts) ->
     defaults =
         cols : []
         rows: []
@@ -544,6 +544,14 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         valueList.find("input").prop "checked", true
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").prop "checked", false
+                    btns.append $("<input>").addClass("pvtSearch").attr("placeholder", "Filter results").bind "keyup", ->
+                        filter = $(this).val().toLowerCase();
+                        $(this).parents(".pvtFilterBox").find('label span').each ->
+                            testString = this.innerText.toLowerCase().indexOf(filter)
+                            if testString isnt -1
+                                $(this).parent().show();
+                            else
+                                $(this).parent().hide();
                     valueList.append btns
                     checkContainer = $("<div>").css
                         "overflow": "scroll"
@@ -578,6 +586,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
                 showFilterList = (e) ->
                     valueList.css(left: e.pageX, top: e.pageY).toggle()
+                    $('.pvtSearch').val('')
+                    $('label').show()
 
                 triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;")
                     .bind "click", showFilterList
@@ -674,7 +684,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 return true
 
             pivotTable.pivot(input,subopts)
-            pivotUIOptions = 
+            pivotUIOptions =
                 cols: subopts.cols
                 rows: subopts.rows
                 vals: vals
