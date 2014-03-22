@@ -50,7 +50,7 @@ table.pvtTable tr td {
     background: #F3F3F3;
     border: 1px solid #DEDEDE;
     padding: 2px 5px;
-    
+
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
@@ -64,3 +64,12 @@ table.pvtTable tr td {
 .pvtHorizList li { display: inline; }
 
 .pvtFilteredAttribute { font-style: italic }
+
+.pvtFilterBox{
+    z-index: 100;
+    width: 280px;
+    border: 1px solid gray;
+    background-color: #fff;
+    position: absolute;
+    padding: 20px;
+}

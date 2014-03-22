@@ -941,15 +941,7 @@
           return _results;
         })();
         hasExcludedItem = false;
-        valueList = $("<div>").addClass('pvtFilterBox').css({
-          "z-index": 100,
-          "width": "280px",
-          "border": "1px solid gray",
-          "background": "white",
-          "display": "none",
-          "position": "absolute",
-          "padding": "20px"
-        });
+        valueList = $("<div>").addClass('pvtFilterBox').hide();
         valueList.append($("<div>").css({
           "text-align": "center",
           "font-weight": "bold"
