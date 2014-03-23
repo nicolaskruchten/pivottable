@@ -472,6 +472,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             selectNone: "Select None"
             tooMany: "(too many to list)"
             filterResults: "Filter results"
+            btnSubmit: "hit it"
 
 
     existingOpts = @data "pivotUIOptions"
@@ -569,7 +570,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         valueList.toggle(0, refresh)
 
                 valueList.append $("<p>").addClass("submit-btn")
-                    .append $("<button>").text("OK").bind "click", updateFilter
+
+                    .append $("<button>").text(opts.localeStrings.btnSubmit).bind "click", updateFilter
 
                 showFilterList = (e) ->
                     valueList.css(left: e.pageX, top: e.pageY).toggle()

@@ -851,7 +851,8 @@
         selectAll: "Select All",
         selectNone: "Select None",
         tooMany: "(too many to list)",
-        filterResults: "Filter results"
+        filterResults: "Filter results",
+        btnSubmit: "hit it"
       }
     };
     existingOpts = this.data("pivotUIOptions");
@@ -996,7 +997,7 @@
             return valueList.toggle(0, refresh);
           }
         };
-        valueList.append($("<p>").addClass("submit-btn").append($("<button>").text("OK").bind("click", updateFilter)));
+        valueList.append($("<p>").addClass("submit-btn").append($("<button>").text(opts.localeStrings.btnSubmit).bind("click", updateFilter)));
         showFilterList = function(e) {
           valueList.css({
             left: e.pageX,
