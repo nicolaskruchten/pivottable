@@ -850,7 +850,8 @@
         uiRenderError: "An error occurred rendering the PivotTable UI.",
         selectAll: "Select All",
         selectNone: "Select None",
-        tooMany: "(too many to list)"
+        tooMany: "(too many to list)",
+        filterResults: "Filter results"
       }
     };
     existingOpts = this.data("pivotUIOptions");
@@ -941,40 +942,35 @@
           return _results;
         })();
         hasExcludedItem = false;
-        valueList = $("<div>").addClass('pvtFilterBox').css({
-          "z-index": 100,
-          "width": "280px",
-          "border": "1px solid gray",
-          "background": "white",
-          "display": "none",
-          "position": "absolute",
-          "padding": "20px"
-        });
-        valueList.append($("<div>").css({
-          "text-align": "center",
-          "font-weight": "bold"
-        }).text("" + c + " (" + keys.length + ")"));
+        valueList = $("<div>").addClass('pvtFilterBox').hide();
+        valueList.append($("<h4>").text("" + c + " (" + keys.length + ")"));
         if (keys.length > opts.menuLimit) {
           valueList.append($("<p>").css({
             "text-align": "center"
           }).text(opts.localeStrings.tooMany));
         } else {
-          btns = $("<p>").css({
-            "text-align": "center",
-            "margin-bottom": "5px"
-          });
+          btns = $("<p>").addClass("btns-search");
           btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
             return valueList.find("input").prop("checked", true);
           }));
           btns.append($("<button>").text(opts.localeStrings.selectNone).bind("click", function() {
             return valueList.find("input").prop("checked", false);
           }));
+          btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
+            var filter;
+            filter = $(this).val().toLowerCase();
+            return $(this).parents(".pvtFilterBox").find('label span').each(function() {
+              var testString;
+              testString = this.innerText.toLowerCase().indexOf(filter);
+              if (testString !== -1) {
+                return $(this).parent().show();
+              } else {
+                return $(this).parent().hide();
+              }
+            });
+          }));
           valueList.append(btns);
-          checkContainer = $("<div>").css({
-            "overflow": "scroll",
-            "width": "280px",
-            "max-height": "200px"
-          });
+          checkContainer = $("<div>").addClass("checkContainer");
           _ref2 = keys.sort(naturalSort);
           for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
             k = _ref2[_j];
@@ -984,7 +980,7 @@
             hasExcludedItem || (hasExcludedItem = filterItemExcluded);
             filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", !filterItemExcluded).data("filter", [c, k]));
             filterItem.append($("<span>").text("" + k + " (" + v + ")"));
-            checkContainer.append($("<p>").css("margin", "5px").append(filterItem));
+            checkContainer.append($("<p>").append(filterItem));
           }
           valueList.append(checkContainer);
         }
@@ -1002,15 +998,14 @@
             return valueList.toggle(0, refresh);
           }
         };
-        valueList.append($("<p>").css({
-          "text-align": "center",
-          "margin-bottom": 0
-        }).append($("<button>").text("OK").bind("click", updateFilter)));
+        valueList.append($("<p>").addClass("submit-btn").append($("<button>").text("OK").bind("click", updateFilter)));
         showFilterList = function(e) {
-          return valueList.css({
+          valueList.css({
             left: e.pageX,
             top: e.pageY
           }).toggle();
+          $('.pvtSearch').val('');
+          return $('label').show();
         };
         triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
         attrElem = $("<li class='label label-info axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));
