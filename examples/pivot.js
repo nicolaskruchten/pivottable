@@ -933,7 +933,7 @@
         return _results;
       })();
       _fn = function(c) {
-        var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, v, valueList, _j, _len1, _ref2;
+        var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, updateSelected, v, valueList, _j, _len1, _ref2;
         keys = (function() {
           var _results;
           _results = [];
@@ -944,6 +944,12 @@
         })();
         hasExcludedItem = false;
         valueList = $("<div>").addClass('pvtFilterBox').hide();
+        updateSelected = function() {
+          var checked;
+          checked = $(valueList).find("[type='checkbox']:checked").length;
+          $(".test em").text(checked);
+          return checked;
+        };
         valueList.append($("<h4>").text("" + c + " (" + keys.length + ")"));
         if (keys.length > opts.menuLimit) {
           valueList.append($("<p>").text(opts.localeStrings.tooMany));
@@ -977,7 +983,7 @@
             filterItem = $("<label>");
             filterItemExcluded = opts.exclusions[c] ? (__indexOf.call(opts.exclusions[c], k) >= 0) : false;
             hasExcludedItem || (hasExcludedItem = filterItemExcluded);
-            filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", !filterItemExcluded).data("filter", [c, k]));
+            filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", !filterItemExcluded).data("filter", [c, k]).bind("change", updateSelected));
             filterItem.append($("<span>").text("" + k + " (" + v + ")"));
             checkContainer.append($("<p>").append(filterItem));
           }
@@ -998,6 +1004,7 @@
           }
         };
         valueList.append($("<p>").addClass("submit-btn").append($("<button>").text(opts.localeStrings.btnSubmit).bind("click", updateFilter)));
+        valueList.append($("<span>").html('<em>' + updateSelected() + '</em>' + (" selected of " + keys.length + " total values")).addClass("test"));
         showFilterList = function(e) {
           valueList.css({
             left: e.pageX,

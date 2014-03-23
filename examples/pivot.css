@@ -98,3 +98,7 @@ table.pvtTable tr td {
     text-align: center;
     margin-bottom: 0;
 }
+.selected-val{
+    color: #8c8c8c;
+    font-size: .8em;
+}

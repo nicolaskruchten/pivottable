@@ -509,7 +509,6 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             renderer.append $("<option>").val(x).text(x)
         rendererControl.append renderer
 
-
         #axis list, including the double-click menu
 
         colList = $("<td class='pvtAxisContainer pvtUnused'>")
@@ -523,6 +522,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 keys = (k for k of axisValues[c])
                 hasExcludedItem = false
                 valueList = $("<div>").addClass('pvtFilterBox').hide()
+
+
+                updateSelected = ->
+                    checked = $(valueList).find("[type='checkbox']:checked").length
+                    $(".test em").text(checked)
+                    return checked
 
                 valueList.append $("<h4>")
                     .text("#{c} (#{keys.length})")
@@ -552,7 +557,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                          filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
                          hasExcludedItem ||= filterItemExcluded
                          filterItem.append $("<input type='checkbox' class='pvtFilter'>")
-                            .attr("checked", !filterItemExcluded).data("filter", [c,k])
+                            .attr("checked", !filterItemExcluded).data("filter", [c,k]).bind "change", updateSelected
                          filterItem.append $("<span>").text "#{k} (#{v})"
                          checkContainer.append $("<p>").append(filterItem)
                     valueList.append checkContainer
@@ -572,6 +577,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 valueList.append $("<p>").addClass("submit-btn")
 
                     .append $("<button>").text(opts.localeStrings.btnSubmit).bind "click", updateFilter
+
+
+                valueList.append $("<span>").html('<em>' + updateSelected() + '</em>' + " selected of #{keys.length} total values").addClass("selected-val")
+
+
+
 
                 showFilterList = (e) ->
                     valueList.css(left: e.pageX, top: e.pageY).toggle()
