@@ -945,9 +945,7 @@
         valueList = $("<div>").addClass('pvtFilterBox').hide();
         valueList.append($("<h4>").text("" + c + " (" + keys.length + ")"));
         if (keys.length > opts.menuLimit) {
-          valueList.append($("<p>").css({
-            "text-align": "center"
-          }).text(opts.localeStrings.tooMany));
+          valueList.append($("<p>").text(opts.localeStrings.tooMany));
         } else {
           btns = $("<p>").addClass("btns-search");
           btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
@@ -1020,7 +1018,7 @@
         _fn(c);
       }
       tr1 = $("<tr>");
-      aggregator = $("<select class='pvtAggregator'>").css("margin-bottom", "5px").bind("change", function() {
+      aggregator = $("<select class='pvtAggregator'>").bind("change", function() {
         return refresh();
       });
       _ref2 = opts.aggregators;
@@ -1028,7 +1026,7 @@
         if (!__hasProp.call(_ref2, x)) continue;
         aggregator.append($("<option>").val(x).text(x));
       }
-      tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtVals'>").css("text-align", "center").append(aggregator).append($("<br>")));
+      tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtVals'>").append(aggregator).append($("<br>")));
       tr1.append($("<td class='pvtAxisContainer pvtHorizList pvtCols'>"));
       uiTable.append(tr1);
       tr2 = $("<tr>");
@@ -1038,7 +1036,7 @@
       uiTable.append(tr2);
       if (opts.unusedAttrsVertical) {
         uiTable.find('tr:nth-child(1)').prepend(rendererControl);
-        uiTable.find('tr:nth-child(2)').prepend(colList.css('vertical-align', 'top'));
+        uiTable.find('tr:nth-child(2)').prepend(colList);
       } else {
         uiTable.prepend($("<tr>").append(rendererControl).append(colList));
       }

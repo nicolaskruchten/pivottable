@@ -26,6 +26,9 @@ table.pvtTable tr td {
 
 .pvtTotal, .pvtGrandTotal { font-weight: bold; }
 
+.pvtVals { text-align: center;}
+.pvtAggregator { margin-bottom: 5px ;}
+
 .pvtAxisContainer {
     border: 1px solid gray;
     background: #EEE;
@@ -62,6 +65,7 @@ table.pvtTable tr td {
 }
 
 .pvtHorizList li { display: inline; }
+.pvtVertList { vertical-align: top; }
 
 .pvtFilteredAttribute { font-style: italic }
 
@@ -72,16 +76,17 @@ table.pvtTable tr td {
     background-color: #fff;
     position: absolute;
     padding: 20px;
-}
-.pvtFilterBox h4{
     text-align: center;
-    margin:0;
 }
+
+.pvtFilterBox h4{ margin:0; }
+
 .btns-search{
     text-align: center;
     margin-bottom: 5px;
 }
 .checkContainer{
+    text-align: left;
     overflow: scroll;
     width: 280px;
     max-height: 200px;
