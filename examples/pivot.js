@@ -997,10 +997,7 @@
             return valueList.toggle(0, refresh);
           }
         };
-        valueList.append($("<p>").css({
-          "text-align": "center",
-          "margin-bottom": 0
-        }).append($("<button>").text("OK").bind("click", updateFilter)));
+        valueList.append($("<p>").addClass("submit-btn").append($("<button>").text("OK").bind("click", updateFilter)));
         showFilterList = function(e) {
           valueList.css({
             left: e.pageX,

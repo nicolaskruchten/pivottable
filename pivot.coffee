@@ -520,7 +520,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             do (c) ->
                 keys = (k for k of axisValues[c])
                 hasExcludedItem = false
-                valueList = $("<div>").addClass('pvtFilterBox').hide();
+                valueList = $("<div>").addClass('pvtFilterBox').hide()
 
                 valueList.append $("<h4>")
                     .text("#{c} (#{keys.length})")
@@ -535,13 +535,13 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").prop "checked", false
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", "Filter results").bind "keyup", ->
-                        filter = $(this).val().toLowerCase();
+                        filter = $(this).val().toLowerCase()
                         $(this).parents(".pvtFilterBox").find('label span').each ->
                             testString = this.innerText.toLowerCase().indexOf(filter)
                             if testString isnt -1
-                                $(this).parent().show();
+                                $(this).parent().show()
                             else
-                                $(this).parent().hide();
+                                $(this).parent().hide()
                     valueList.append btns
                     checkContainer = $("<div>").addClass("checkContainer")
 
@@ -568,7 +568,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     else
                         valueList.toggle(0, refresh)
 
-                valueList.append $("<p>").css("text-align": "center", "margin-bottom": 0)
+                valueList.append $("<p>").addClass("submit-btn")
                     .append $("<button>").text("OK").bind "click", updateFilter
 
                 showFilterList = (e) ->

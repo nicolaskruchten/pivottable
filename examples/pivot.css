@@ -89,3 +89,7 @@ table.pvtTable tr td {
 .checkContainer p{
     margin: 5px;
 }
+.submit-btn{
+    text-align: center;
+    margin-bottom: 0;
+}
