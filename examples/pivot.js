@@ -850,7 +850,8 @@
         uiRenderError: "An error occurred rendering the PivotTable UI.",
         selectAll: "Select All",
         selectNone: "Select None",
-        tooMany: "(too many to list)"
+        tooMany: "(too many to list)",
+        filterResults: "Filter results"
       }
     };
     existingOpts = this.data("pivotUIOptions");
@@ -955,7 +956,7 @@
           btns.append($("<button>").text(opts.localeStrings.selectNone).bind("click", function() {
             return valueList.find("input").prop("checked", false);
           }));
-          btns.append($("<input>").addClass("pvtSearch").attr("placeholder", "Filter results").bind("keyup", function() {
+          btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
             var filter;
             filter = $(this).val().toLowerCase();
             return $(this).parents(".pvtFilterBox").find('label span').each(function() {

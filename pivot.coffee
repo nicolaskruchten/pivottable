@@ -471,6 +471,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             selectAll: "Select All"
             selectNone: "Select None"
             tooMany: "(too many to list)"
+            filterResults: "Filter results"
 
 
     existingOpts = @data "pivotUIOptions"
@@ -534,7 +535,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         valueList.find("input").prop "checked", true
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").prop "checked", false
-                    btns.append $("<input>").addClass("pvtSearch").attr("placeholder", "Filter results").bind "keyup", ->
+                    btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
                         $(this).parents(".pvtFilterBox").find('label span').each ->
                             testString = this.innerText.toLowerCase().indexOf(filter)
