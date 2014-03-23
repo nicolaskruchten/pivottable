@@ -852,7 +852,7 @@
         selectNone: "Select None",
         tooMany: "(too many to list)",
         filterResults: "Filter results",
-        btnSubmit: "hit it"
+        btnSubmit: "OK"
       }
     };
     existingOpts = this.data("pivotUIOptions");
