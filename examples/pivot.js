@@ -1010,7 +1010,7 @@
         showFilterList = function(e) {
           var bottom, nobr, position;
           nobr = $(this).parents("nobr");
-          nobr.addClass("active_filter");
+          nobr.toggleClass("active_filter");
           position = nobr.offset();
           bottom = position.top + nobr.height() + 8;
           valueList.css({
