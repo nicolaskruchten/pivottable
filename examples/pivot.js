@@ -301,6 +301,18 @@
 
   aggregators.countAsFractionOfCol = aggregatorTemplates.fractionOf(aggregators.count, "col");
 
+  monkeyPatchCapture = function(aggregator) {
+    return (function(){
+      var agg = aggregator();
+      _push = agg.push;
+      agg.push = function(r){
+        (this.records = this.records || []).push(r);
+        return _push.apply(this,arguments);
+      }
+      return agg;
+    });
+  }
+
   renderers = {
     "Table": function(pvtData, opts) {
       return pivotTableRenderer(pvtData, opts);
@@ -744,11 +756,11 @@
         colKey = colKeys[j];
         aggregator = pivotData.getAggregator(rowKey, colKey);
         val = aggregator.value();
-        tr.append($("<td class='pvtVal row" + i + " col" + j + "'>").html(aggregator.format(val)).data("value", val));
+        tr.append($("<td class='pvtVal row" + i + " col" + j + "'>").html(aggregator.format(val)).data("value", val).data("records",aggregator.records));
       }
       totalAggregator = pivotData.getAggregator(rowKey, []);
       val = totalAggregator.value();
-      tr.append($("<td class='pvtTotal rowTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
+      tr.append($("<td class='pvtTotal rowTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "row" + i).data("records",totalAggregator.records));
       result.append(tr);
     }
     tr = $("<tr>");
@@ -760,11 +772,11 @@
       colKey = colKeys[j];
       totalAggregator = pivotData.getAggregator([], colKey);
       val = totalAggregator.value();
-      tr.append($("<td class='pvtTotal colTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
+      tr.append($("<td class='pvtTotal colTotal'>").html(totalAggregator.format(val)).data("value", val).data("for", "col" + j).data("records",totalAggregator.records));
     }
     totalAggregator = pivotData.getAggregator([], []);
     val = totalAggregator.value();
-    tr.append($("<td class='pvtGrandTotal'>").html(totalAggregator.format(val)).data("value", val));
+    tr.append($("<td class='pvtGrandTotal'>").html(totalAggregator.format(val)).data("value", val).data("records",totalAggregator.records));
     result.append(tr);
     result.data("dimensions", [rowKeys.length, colKeys.length]);
     return result;
@@ -793,6 +805,7 @@
       }
     };
     opts = $.extend(defaults, opts);
+
     result = null;
     try {
       pivotData = getPivotData(input, opts.cols, opts.rows, opts.aggregator, opts.filter, opts.derivedAttributes);
@@ -841,6 +854,7 @@
       autoSortUnusedAttrs: false,
       rendererOptions: null,
       onRefresh: null,
+      capture:false,
       filter: function() {
         return true;
       },
@@ -1082,6 +1096,9 @@
           return vals.push($(this).data("attrName"));
         });
         subopts.aggregator = opts.aggregators[aggregator.val()](vals);
+        if(opts.capture) {
+          subopts.aggregator = monkeyPatchCapture(subopts.aggregator);
+        }
         subopts.renderer = opts.renderers[renderer.val()];
         exclusions = {};
         _this.find('input.pvtFilter').not(':checked').each(function() {

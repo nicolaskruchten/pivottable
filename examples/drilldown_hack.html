@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Pivot Demo</title>
+		<link rel="stylesheet" type="text/css" href="pivot.css">
+		<script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="jquery-ui-1.9.2.custom.min.js"></script>
+		<script type="text/javascript" src="pivot.js"></script>
+	</head>
+	<style>
+		* {font-family: Verdana;}
+		.pvtTable td {
+			cursor: pointer;
+		}
+		#row_output {
+			font-size: 90%;
+		}
+		#row_output th {
+			background-color: #333;
+			color:#fff;
+			padding:2px 5px;
+		}
+	</style>
+	<body>
+<script type="text/javascript">
+	$(function(){
+		$("#output").pivotUI(
+			[
+				{country: "USA", order_id: 1, payment_source: "Credit Card", order_total: 10},
+				{country: "USA", order_id: 2, payment_source: "PayPal", order_total: 50},
+				{country: "USA", order_id: 3, payment_source: "Credit Card", order_total: 30},
+				{country: "USA", order_id: 4, payment_source: "PayPal", order_total: 20},
+				{country: "USA", order_id: 5, payment_source: "Credit Card", order_total: 25},
+				{country: "USA", order_id: 6, payment_source: "PayPal", order_total: 71},
+				{country: "Canada", order_id: 7, payment_source: "Credit Card", order_total: 12},
+				{country: "Canada", order_id: 8, payment_source: "PayPal", order_total: 15},
+				{country: "Canada", order_id: 9, payment_source: "Credit Card", order_total: 92},
+			],
+			{
+				rows: ["country"],
+				cols: ["payment_source"],
+				vals: ["order_total"],
+				aggregatorName: "sum",
+				capture:true,
+			}
+		).on('click','td',function(e) {
+			e.stopPropagation();
+		 	console.log($(this).data('records'));
+			drawRecords($(this).data('records'),$('#row_output'));
+		});
+	});
+
+	function drawRecords(d,t) {
+		var $table = $('#global-records').empty();
+		if(!$table.length) 
+			$table = $('<table>').attr('id','global-records').appendTo(t);
+		console.log(d);
+		if(d[0]) {
+			var $thead = $('<thead>');
+			var $row = $('<tr>').appendTo($thead);
+			$.each(d[0],function(k,v){
+				$row.append($('<th>').text(k));
+			});
+			var $tbody = $('<tbody>');
+			$.each(d,function(i,row){
+				$row = $('<tr>').appendTo($tbody);
+				$.each(row,function(key,val){
+					$row.append($('<td>').text(val));
+				});
+			})
+			$table.append($thead).append($tbody);
+		}
+	}
+</script>
+
+		<div id="output" style="margin: 10px;"></div>
+
+		<div id="row_output">
+
+		</div>
+	</body>
+</html>
