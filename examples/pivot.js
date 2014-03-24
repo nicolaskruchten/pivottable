@@ -848,11 +848,11 @@
         renderError: "An error occurred rendering the PivotTable results.",
         computeError: "An error occurred computing the PivotTable results.",
         uiRenderError: "An error occurred rendering the PivotTable UI.",
-        selectAll: "Select All",
-        selectNone: "Select None",
+        selectAll: "Select <span>All</span>",
+        selectNone: "Select <span>None</span>",
         tooMany: "(too many to list)",
         filterResults: "Filter results",
-        btnSubmit: "OK"
+        btnSubmit: "Update"
       }
     };
     existingOpts = this.data("pivotUIOptions");
@@ -933,7 +933,7 @@
         return _results;
       })();
       _fn = function(c) {
-        var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, updateSelected, v, valueList, _j, _len1, _ref2;
+        var attrElem, btn_submit, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, updateSelected, v, valueList, _j, _len1, _ref2;
         keys = (function() {
           var _results;
           _results = [];
@@ -947,7 +947,7 @@
         updateSelected = function() {
           var checked;
           checked = $(valueList).find("[type='checkbox']:checked").length;
-          $(".test em").text(checked);
+          $(".selected-val em").html(checked);
           return checked;
         };
         valueList.append($("<h4>").text("" + c + " (" + keys.length + ")"));
@@ -955,10 +955,10 @@
           valueList.append($("<p>").text(opts.localeStrings.tooMany));
         } else {
           btns = $("<p>").addClass("btns-search");
-          btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
+          btns.append($("<button>").html(opts.localeStrings.selectAll).bind("click", function() {
             return valueList.find("input").prop("checked", true);
           }));
-          btns.append($("<button>").text(opts.localeStrings.selectNone).bind("click", function() {
+          btns.append($("<button>").html(opts.localeStrings.selectNone).bind("click", function() {
             return valueList.find("input").prop("checked", false);
           }));
           btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
@@ -998,17 +998,24 @@
             attrElem.removeClass("pvtFilteredAttribute");
           }
           if (keys.length > opts.menuLimit) {
-            return valueList.toggle();
+            valueList.toggle();
           } else {
-            return valueList.toggle(0, refresh);
+            valueList.toggle(0, refresh);
           }
+          return $("nobr").removeClass("active_filter");
         };
-        valueList.append($("<p>").addClass("submit-btn").append($("<button>").text(opts.localeStrings.btnSubmit).bind("click", updateFilter)));
-        valueList.append($("<span>").html('<em>' + updateSelected() + '</em>' + (" selected of " + keys.length + " total values")).addClass("test"));
+        btn_submit = $("<p>").addClass("submit-btn");
+        valueList.append(btn_submit.append($("<button>").text(opts.localeStrings.btnSubmit).bind("click", updateFilter)));
+        btn_submit.append($("<span>").html('<em>' + updateSelected() + '</em>' + (" selected of " + keys.length + " total values")).addClass("selected-val"));
         showFilterList = function(e) {
+          var bottom, nobr, position;
+          nobr = $(this).parents("nobr");
+          nobr.addClass("active_filter");
+          position = nobr.offset();
+          bottom = position.top + nobr.height() + 8;
           valueList.css({
-            left: e.pageX,
-            top: e.pageY
+            left: position.left,
+            top: bottom
           }).toggle();
           $('.pvtSearch').val('');
           return $('label').show();
