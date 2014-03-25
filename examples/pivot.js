@@ -974,6 +974,7 @@
               }
             });
           }));
+          btns.append($("<span>").addClass("clear-search"));
           valueList.append(btns);
           checkContainer = $("<div>").addClass("checkContainer");
           _ref2 = keys.sort(naturalSort);

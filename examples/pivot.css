@@ -41,7 +41,7 @@ table.pvtTable tr td {
     list-style-type: none;
     cursor:move;
 }
-.pvtAxisContainer li.placeholder {
+.pvtAxisContainer .placeholder {
     -webkit-border-radius: 5px;
     padding: 3px 15px;
     -moz-border-radius: 5px;
@@ -61,7 +61,7 @@ table.pvtTable tr td {
 
 .pvtTriangle {
     cursor:pointer;
-    color: grey;
+    color: gray;
 }
 
 .pvtHorizList li { display: inline; }
@@ -79,11 +79,21 @@ table.pvtTable tr td {
     text-align: center;
 }
 
-.pvtFilterBox h4{ margin:0; }
+h4{ margin:0; }
 
 .btns-search{
     text-align: center;
     margin-bottom: 5px;
+}
+.clear-search{
+        background: #fff url("img/clear_ico.gif") 50% 50% no-repeat;
+        width: 14px;
+        height: 14px;
+        display: inline-block;
+        position: relative;
+        left: -20px;
+        top: 2px;
+        cursor: pointer;
 }
 .checkContainer{
     text-align: left;

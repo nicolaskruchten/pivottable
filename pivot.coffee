@@ -548,6 +548,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                                 $(this).parent().show()
                             else
                                 $(this).parent().hide()
+                    btns.append $("<span>").addClass("clear-search")
                     valueList.append btns
                     checkContainer = $("<div>").addClass("checkContainer")
 
