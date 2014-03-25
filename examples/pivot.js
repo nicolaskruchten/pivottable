@@ -1010,6 +1010,8 @@
         btn_submit.append($("<span>").html('<em>' + updateSelected() + '</em>' + (" selected of " + keys.length + " total values")).addClass("selected-val"));
         showFilterList = function(e) {
           var bottom, nobr, position;
+          $(".pvtFilterBox").hide();
+          $("nobr").removeClass();
           nobr = $(this).parents("nobr");
           nobr.toggleClass("active_filter");
           position = nobr.offset();

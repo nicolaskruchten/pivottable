@@ -588,6 +588,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
 
                 showFilterList = (e) ->
+                    $(".pvtFilterBox").hide();
+                    $("nobr").removeClass();
                     nobr = $(this).parents("nobr")
                     nobr.toggleClass("active_filter")
                     position = nobr.offset()
