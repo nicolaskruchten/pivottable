@@ -156,6 +156,9 @@ button:nth-child(2){
     border: 1px solid #c9c9c9;
     background: url("img/search_ico.gif") 6px 50% no-repeat;
 }
+.nobkgd{
+    background-image: none;
+}
 table.pvtTable .pvtColLabel{
     padding: 14px 18px;
 }

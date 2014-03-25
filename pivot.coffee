@@ -523,6 +523,9 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 hasExcludedItem = false
                 valueList = $("<div>").addClass('pvtFilterBox').hide()
 
+                clearSearch = ->
+                    $('.pvtSearch').val('')
+                    $('label').show()
 
                 updateSelected = ->
                     checked = $(valueList).find("[type='checkbox']:checked").length
@@ -540,15 +543,22 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         valueList.find("input").prop "checked", true
                     btns.append $("<button>").html(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").prop "checked", false
+                    btns.append $("<span>").addClass("clear-search").bind "click", clearSearch
+
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
                         $(this).parents(".pvtFilterBox").find('label span').each ->
                             testString = this.innerText.toLowerCase().indexOf(filter)
                             if testString isnt -1
                                 $(this).parent().show()
+                                $(".clear-search").hide()
+                                $(".pvtSearch").removeClass("nobkgd")
                             else
                                 $(this).parent().hide()
-                    btns.append $("<span>").addClass("clear-search")
+                                $(".clear-search").css('display', 'inline-block');
+                                $(".pvtSearch").addClass("nobkgd")
+
+
                     valueList.append btns
                     checkContainer = $("<div>").addClass("checkContainer")
 
@@ -595,9 +605,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     position = nobr.offset()
                     bottom = position.top + nobr.height() + 8
                     valueList.css(left: position.left, top: bottom).toggle()
-
-                    $('.pvtSearch').val('')
-                    $('label').show()
+                    clearSearch()
 
                 triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;")
                     .bind "click", showFilterList

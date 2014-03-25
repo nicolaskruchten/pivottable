@@ -90,10 +90,11 @@ h4{ margin:0; }
         width: 14px;
         height: 14px;
         display: inline-block;
-        position: relative;
-        left: -20px;
-        top: 2px;
+        position: absolute;
+        right: 193px;
+        top: 23px;
         cursor: pointer;
+        display: none;
 }
 .checkContainer{
     text-align: left;

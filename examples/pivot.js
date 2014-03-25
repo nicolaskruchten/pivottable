@@ -933,7 +933,7 @@
         return _results;
       })();
       _fn = function(c) {
-        var attrElem, btn_submit, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, updateSelected, v, valueList, _j, _len1, _ref2;
+        var attrElem, btn_submit, btns, checkContainer, clearSearch, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, updateSelected, v, valueList, _j, _len1, _ref2;
         keys = (function() {
           var _results;
           _results = [];
@@ -944,6 +944,10 @@
         })();
         hasExcludedItem = false;
         valueList = $("<div>").addClass('pvtFilterBox').hide();
+        clearSearch = function() {
+          $('.pvtSearch').val('');
+          return $('label').show();
+        };
         updateSelected = function() {
           var checked;
           checked = $(valueList).find("[type='checkbox']:checked").length;
@@ -961,6 +965,7 @@
           btns.append($("<button>").html(opts.localeStrings.selectNone).bind("click", function() {
             return valueList.find("input").prop("checked", false);
           }));
+          btns.append($("<span>").addClass("clear-search").bind("click", clearSearch));
           btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
             var filter;
             filter = $(this).val().toLowerCase();
@@ -968,13 +973,16 @@
               var testString;
               testString = this.innerText.toLowerCase().indexOf(filter);
               if (testString !== -1) {
-                return $(this).parent().show();
+                $(this).parent().show();
+                $(".clear-search").hide();
+                return $(".pvtSearch").removeClass("nobkgd");
               } else {
-                return $(this).parent().hide();
+                $(this).parent().hide();
+                $(".clear-search").css('display', 'inline-block');
+                return $(".pvtSearch").addClass("nobkgd");
               }
             });
           }));
-          btns.append($("<span>").addClass("clear-search"));
           valueList.append(btns);
           checkContainer = $("<div>").addClass("checkContainer");
           _ref2 = keys.sort(naturalSort);
@@ -1020,8 +1028,7 @@
             left: position.left,
             top: bottom
           }).toggle();
-          $('.pvtSearch').val('');
-          return $('label').show();
+          return clearSearch();
         };
         triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
         attrElem = $("<li class='label label-info axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));
