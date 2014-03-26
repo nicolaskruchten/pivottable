@@ -933,7 +933,7 @@
         return _results;
       })();
       _fn = function(c) {
-        var attrElem, btn_submit, btns, checkContainer, clearSearch, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, updateSelected, v, valueList, _j, _len1, _ref2;
+        var attrElem, btn_submit, btns, checkContainer, clearSearch, filterItem, filterItemExcluded, hasExcludedItem, hideFilterList, keys, showFilterList, triangleLink, updateFilter, updateSelected, v, valueList, _j, _len1, _ref2;
         keys = (function() {
           var _results;
           _results = [];
@@ -947,6 +947,10 @@
         clearSearch = function() {
           $('.pvtSearch').val('');
           return $('label').show();
+        };
+        hideFilterList = function() {
+          $(".pvtFilterBox").hide();
+          return $("nobr").removeClass();
         };
         updateSelected = function() {
           var checked;
@@ -966,6 +970,7 @@
             return valueList.find("input").prop("checked", false);
           }));
           btns.append($("<span>").addClass("clear-search").bind("click", clearSearch));
+          btns.append($("<div>").text("x").addClass("close-btn").bind("click", hideFilterList));
           btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
             var filter;
             filter = $(this).val().toLowerCase();
@@ -1017,9 +1022,9 @@
         valueList.append(btn_submit.append($("<button>").text(opts.localeStrings.btnSubmit).bind("click", updateFilter)));
         btn_submit.append($("<span>").html('<em>' + updateSelected() + '</em>' + (" selected of " + keys.length + " total values")).addClass("selected-val"));
         showFilterList = function(e) {
-          var bottom, nobr, position;
-          $(".pvtFilterBox").hide();
-          $("nobr").removeClass();
+          var bottom, nobr, position, pvtFilterBox;
+          pvtFilterBox = $(".pvtFilterBox");
+          hideFilterList();
           nobr = $(this).parents("nobr");
           nobr.toggleClass("active_filter");
           position = nobr.offset();
@@ -1028,7 +1033,12 @@
             left: position.left,
             top: bottom
           }).toggle();
-          return clearSearch();
+          clearSearch();
+          return $(document).mouseup(function(e) {
+            if (!pvtFilterBox.is(e.target) && pvtFilterBox.has(e.target).length === 0) {
+              return hideFilterList();
+            }
+          });
         };
         triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
         attrElem = $("<li class='label label-info axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));

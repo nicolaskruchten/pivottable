@@ -96,6 +96,17 @@ h4{ margin:0; }
         cursor: pointer;
         display: none;
 }
+.close-btn{
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 2px 5px;
+    color: hsl(0, 0%, 52%);
+    background-color: hsl(0, 0%, 96%);
+    border: 1px solid #d0d0d0;
+    border-width: 0 0 1px 1px;
+    cursor: pointer;
+}
 .checkContainer{
     text-align: left;
     overflow: scroll;

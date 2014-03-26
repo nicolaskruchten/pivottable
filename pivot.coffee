@@ -527,6 +527,10 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     $('.pvtSearch').val('')
                     $('label').show()
 
+                hideFilterList = ->
+                    $(".pvtFilterBox").hide();
+                    $("nobr").removeClass();
+
                 updateSelected = ->
                     checked = $(valueList).find("[type='checkbox']:checked").length
                     $(".selected-val em").html(checked)
@@ -544,7 +548,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     btns.append $("<button>").html(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").prop "checked", false
                     btns.append $("<span>").addClass("clear-search").bind "click", clearSearch
-
+                    btns.append $("<div>").text("x").addClass("close-btn").bind "click", hideFilterList
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
                         $(this).parents(".pvtFilterBox").find('label span').each ->
@@ -594,18 +598,19 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
                 btn_submit.append $("<span>").html('<em>' + updateSelected() + '</em>' + " selected of #{keys.length} total values").addClass("selected-val")
 
-
-
-
                 showFilterList = (e) ->
-                    $(".pvtFilterBox").hide();
-                    $("nobr").removeClass();
+                    pvtFilterBox = $(".pvtFilterBox")
+                    hideFilterList()
                     nobr = $(this).parents("nobr")
                     nobr.toggleClass("active_filter")
                     position = nobr.offset()
                     bottom = position.top + nobr.height() + 8
                     valueList.css(left: position.left, top: bottom).toggle()
                     clearSearch()
+
+                    $(document).mouseup (e) ->
+                        if (!pvtFilterBox.is(e.target) && pvtFilterBox.has(e.target).length is 0)
+                            hideFilterList()
 
                 triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;")
                     .bind "click", showFilterList
