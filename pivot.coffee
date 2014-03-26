@@ -544,9 +544,15 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 else
                     btns = $("<p>").addClass("btns-search")
                     btns.append $("<button>").html(opts.localeStrings.selectAll).bind "click", ->
-                        valueList.find("input").prop "checked", true
+                        valueList.find("input").each ->
+                            if $(this).is(':visible')
+                                $(this).prop "checked", true
+                                updateSelected()
                     btns.append $("<button>").html(opts.localeStrings.selectNone).bind "click", ->
-                        valueList.find("input").prop "checked", false
+                        valueList.find("input").each ->
+                            if $(this).is(':visible')
+                                $(this).prop "checked", false
+                                updateSelected()
                     btns.append $("<span>").addClass("clear-search").bind "click", clearSearch
                     btns.append $("<div>").text("x").addClass("close-btn").bind "click", hideFilterList
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->

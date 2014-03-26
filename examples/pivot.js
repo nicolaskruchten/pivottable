@@ -964,10 +964,20 @@
         } else {
           btns = $("<p>").addClass("btns-search");
           btns.append($("<button>").html(opts.localeStrings.selectAll).bind("click", function() {
-            return valueList.find("input").prop("checked", true);
+            return valueList.find("input").each(function() {
+              if ($(this).is(':visible')) {
+                $(this).prop("checked", true);
+                return updateSelected();
+              }
+            });
           }));
           btns.append($("<button>").html(opts.localeStrings.selectNone).bind("click", function() {
-            return valueList.find("input").prop("checked", false);
+            return valueList.find("input").each(function() {
+              if ($(this).is(':visible')) {
+                $(this).prop("checked", false);
+                return updateSelected();
+              }
+            });
           }));
           btns.append($("<span>").addClass("clear-search").bind("click", clearSearch));
           btns.append($("<div>").text("x").addClass("close-btn").bind("click", hideFilterList));
