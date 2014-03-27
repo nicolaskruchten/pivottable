@@ -945,8 +945,9 @@
         hasExcludedItem = false;
         valueList = $("<div>").addClass('pvtFilterBox').hide();
         clearSearch = function() {
-          $('.pvtSearch').val('');
-          return $('label').show();
+          $('.pvtSearch').val('').removeClass("nobkgd");
+          $('label').show();
+          return $(".clear-search").hide();
         };
         hideFilterList = function() {
           $(".pvtFilterBox").hide();
@@ -984,17 +985,20 @@
           btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
             var filter;
             filter = $(this).val().toLowerCase();
+            if (filter) {
+              $(".clear-search").css('display', 'inline-block');
+              $(".pvtSearch").addClass("nobkgd");
+            } else {
+              $(".clear-search").hide();
+              $(".pvtSearch").removeClass("nobkgd");
+            }
             return $(this).parents(".pvtFilterBox").find('label span').each(function() {
               var testString;
               testString = this.innerText.toLowerCase().indexOf(filter);
               if (testString !== -1) {
-                $(this).parent().show();
-                $(".clear-search").hide();
-                return $(".pvtSearch").removeClass("nobkgd");
+                return $(this).parent().show();
               } else {
-                $(this).parent().hide();
-                $(".clear-search").css('display', 'inline-block');
-                return $(".pvtSearch").addClass("nobkgd");
+                return $(this).parent().hide();
               }
             });
           }));

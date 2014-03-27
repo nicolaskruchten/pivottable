@@ -524,8 +524,10 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 valueList = $("<div>").addClass('pvtFilterBox').hide()
 
                 clearSearch = ->
-                    $('.pvtSearch').val('')
+                    $('.pvtSearch').val('').removeClass("nobkgd")
                     $('label').show()
+                    $(".clear-search").hide()
+
 
                 hideFilterList = ->
                     $(".pvtFilterBox").hide();
@@ -557,16 +559,20 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     btns.append $("<div>").text("x").addClass("close-btn").bind "click", hideFilterList
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
+                        if filter
+                            $(".clear-search").css('display', 'inline-block')
+                            $(".pvtSearch").addClass("nobkgd")
+                        else
+                            $(".clear-search").hide()
+                            $(".pvtSearch").removeClass("nobkgd")
+
+
                         $(this).parents(".pvtFilterBox").find('label span').each ->
                             testString = this.innerText.toLowerCase().indexOf(filter)
                             if testString isnt -1
                                 $(this).parent().show()
-                                $(".clear-search").hide()
-                                $(".pvtSearch").removeClass("nobkgd")
                             else
                                 $(this).parent().hide()
-                                $(".clear-search").css('display', 'inline-block');
-                                $(".pvtSearch").addClass("nobkgd")
 
 
                     valueList.append btns

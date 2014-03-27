@@ -2,6 +2,7 @@
 .table-bordered{
     font-family: Arial;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 .pvtAxisContainer{
     padding: 10px;
@@ -21,6 +22,7 @@
 .pvtUnused {background: #f7f7f7;border-width: 0 0 0 1px;}
 .pvtHorizList {border-top-color: #fff;border-left-width: 1px;}
 .pvtHorizList li { display: inline; }
+.pvtVals{ width: 233px;white-space: nowrap;}
 
 .pvtFilteredAttribute { font-style: italic }
 .pvtRendererArea{ padding:0;}
