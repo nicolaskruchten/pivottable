@@ -1,6 +1,6 @@
 
 .table-bordered{
-    font-family: Arial;
+    font-family: Arial,Helvetica, sans-serif;
     border-collapse: collapse;
     table-layout: fixed;
 }
@@ -59,7 +59,7 @@ input[type=checkbox]:checked{
 .pvtAxisContainer li nobr{
     background-color: #fff;
     border: 1px solid #c1c1c1;
-    height: 28px;
+    height: 18px;
     padding: 4px 0 4px 14px;
     font-size: 14px;
     font-weight: bold;
@@ -67,6 +67,7 @@ input[type=checkbox]:checked{
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
+    position: absolute;
 }
 
 .pvtTriangle{
@@ -165,10 +166,9 @@ table.pvtTable .pvtColLabel{
     padding: 14px 18px;
 }
 .pvtAxisContainer  .active_filter{
-    position: absolute;
     z-index: 100;
     border-bottom: 0;
-    height: 20px;
+    height: 15px;
     -webkit-border-bottom-right-radius: 0;
     -webkit-border-bottom-left-radius: 0;
     -moz-border-radius-bottomright: 0;
