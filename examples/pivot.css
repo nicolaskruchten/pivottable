@@ -88,7 +88,7 @@ table.pvtTable tr td {
 .checkContainer{
     text-align: left;
     overflow: scroll;
-    width: 280px;
+    width: 100%;
     max-height: 200px;
 }
 .checkContainer p{
