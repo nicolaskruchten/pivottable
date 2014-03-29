@@ -556,7 +556,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                                 $(this).prop "checked", false
                                 updateSelected()
                     btns.append $("<span>").addClass("clear-search").bind "click", clearSearch
-                    btns.append $("<div>").text("x").addClass("close-btn").bind "click", hideFilterList
+                    btns.append $("<div>").addClass("close-btn").bind "click", hideFilterList
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
                         if filter

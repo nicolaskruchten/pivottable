@@ -1,4 +1,9 @@
-
+.close-btn,.pvtTriangle, select, .pvtSearch, input[type=checkbox]:checked, .clear-search, .pvtAxisContainer li nobr{
+    background: transparent url("img/pivot_sprite.png") 100% 0 no-repeat;
+}
+.close-btn{
+    background-position: -2px -129px;
+}
 .table-bordered{
     font-family: Arial,Helvetica, sans-serif;
     border-collapse: collapse;
@@ -32,7 +37,8 @@ select, input[type=checkbox]{
     appearance:none;
 }
 select{
-    background: #fff url("img/dropdown_arrow.gif") right 50% no-repeat;
+    background-color: #fff;
+    background-position: 100% 0;
     border: 1px solid #c1c1c1;
     height: 28px;
     width: 210px;
@@ -54,9 +60,10 @@ input[type=checkbox]{
     height: 17px;
 }
 input[type=checkbox]:checked{
-    background: url("img/check.gif") 50% 50% no-repeat;
+    background-position: -7px -62px;
 }
 .pvtAxisContainer li nobr{
+    background-position: 100% 0;
     background-color: #fff;
     border: 1px solid #c1c1c1;
     height: 18px;
@@ -71,11 +78,12 @@ input[type=checkbox]:checked{
 }
 
 .pvtTriangle{
-    background: #fff url("img/dropdown_drag.gif") right 50% no-repeat;
+    background-position: 3px -106px;
     width: 60px;
     display: inline-block;
     color: #fff;
     height: 19px;
+
 }
 .pvtRows .label{
     padding-right: 0;
@@ -157,7 +165,10 @@ button:nth-child(2){
     width:117px;
     margin-left: 12px;
     border: 1px solid #c9c9c9;
-    background: url("img/search_ico.gif") 6px 50% no-repeat;
+    background-position: 0 -23px;
+}
+.clear-search{
+    background-position: -7px -83px;
 }
 .nobkgd{
     background-image: none;
@@ -169,7 +180,8 @@ table.pvtTable .pvtColLabel{
     z-index: 100;
     border-bottom: 0;
     height: 15px;
-    -webkit-border-bottom-right-radius: 0;
+/*    background-position: right 1px;
+*/    -webkit-border-bottom-right-radius: 0;
     -webkit-border-bottom-left-radius: 0;
     -moz-border-radius-bottomright: 0;
     -moz-border-radius-bottomleft: 0;

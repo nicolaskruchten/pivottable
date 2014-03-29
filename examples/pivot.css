@@ -106,6 +106,8 @@ h4{ margin:0; }
     border: 1px solid #d0d0d0;
     border-width: 0 0 1px 1px;
     cursor: pointer;
+    height: 21px;
+    width: 14px;
 }
 .checkContainer{
     text-align: left;
