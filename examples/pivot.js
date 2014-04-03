@@ -947,7 +947,9 @@
         clearSearch = function() {
           $('.pvtSearch').val('').removeClass("nobkgd");
           $('label').show();
-          return $(".clear-search").hide();
+          $(".clear-search").hide();
+          $(".checkContainer").css("border-color", "hsl(0, 0%, 87%)");
+          return $(".none").remove();
         };
         hideFilterList = function() {
           $(".pvtFilterBox").hide();
@@ -983,7 +985,7 @@
           btns.append($("<span>").addClass("clear-search").bind("click", clearSearch));
           btns.append($("<div>").addClass("close-btn").bind("click", hideFilterList));
           btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
-            var filter;
+            var count, filter;
             filter = $(this).val().toLowerCase();
             if (filter) {
               $(".clear-search").css('display', 'inline-block');
@@ -992,13 +994,22 @@
               $(".clear-search").hide();
               $(".pvtSearch").removeClass("nobkgd");
             }
+            count = 0;
             return $(this).parents(".pvtFilterBox").find('label span').each(function() {
               var testString;
               testString = this.innerText.toLowerCase().indexOf(filter);
               if (testString !== -1) {
-                return $(this).parent().show();
+                $(this).parent().show();
+                count++;
               } else {
-                return $(this).parent().hide();
+                $(this).parent().hide();
+              }
+              if (count === 0 && $('.none').length <= 0) {
+                console.log("trying");
+                $(".checkContainer").css("border-color", "#fffff");
+                return $(".checkContainer").append("<p class='none'>No results. <a href='#'>Clear filter?</a></p>").bind("click", clearSearch);
+              } else {
+
               }
             });
           }));

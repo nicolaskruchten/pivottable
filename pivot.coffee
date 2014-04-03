@@ -527,6 +527,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     $('.pvtSearch').val('').removeClass("nobkgd")
                     $('label').show()
                     $(".clear-search").hide()
+                    $(".checkContainer").css("border-color","hsl(0, 0%, 87%)")
+                    $(".none").remove()
 
 
                 hideFilterList = ->
@@ -566,13 +568,21 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                             $(".clear-search").hide()
                             $(".pvtSearch").removeClass("nobkgd")
 
+                        count = 0
 
                         $(this).parents(".pvtFilterBox").find('label span').each ->
                             testString = this.innerText.toLowerCase().indexOf(filter)
+
                             if testString isnt -1
                                 $(this).parent().show()
+                                count++
                             else
                                 $(this).parent().hide()
+                            if count is 0 and $('.none').length <= 0
+                                $(".checkContainer").css("border-color","#fffff")
+                                $(".checkContainer").append("<p class='none'>No results. <a href='#'>Clear filter?</a></p>").bind "click", clearSearch
+                            else
+                                #$(".none").remove()
 
 
                     valueList.append btns
