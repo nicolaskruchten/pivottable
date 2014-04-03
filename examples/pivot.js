@@ -848,10 +848,11 @@
         renderError: "An error occurred rendering the PivotTable results.",
         computeError: "An error occurred computing the PivotTable results.",
         uiRenderError: "An error occurred rendering the PivotTable UI.",
-        selectAll: "Select All",
-        selectNone: "Select None",
+        selectAll: "Select <span>All</span>",
+        selectNone: "Select <span>None</span>",
         tooMany: "(too many to list)",
-        filterResults: "Filter results"
+        filterResults: "Filter results",
+        btnSubmit: "Update"
       }
     };
     existingOpts = this.data("pivotUIOptions");
@@ -932,7 +933,7 @@
         return _results;
       })();
       _fn = function(c) {
-        var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, v, valueList, _j, _len1, _ref2;
+        var attrElem, btn_submit, btns, checkContainer, clearSearch, filterItem, filterItemExcluded, hasExcludedItem, hideFilterList, keys, showFilterList, triangleLink, updateFilter, updateSelected, v, valueList, _j, _len1, _ref2;
         keys = (function() {
           var _results;
           _results = [];
@@ -943,27 +944,71 @@
         })();
         hasExcludedItem = false;
         valueList = $("<div>").addClass('pvtFilterBox').hide();
+        clearSearch = function() {
+          $('.pvtSearch').val('').removeClass("nobkgd");
+          $('label').show();
+          $(".clear-search").hide();
+          $(".checkContainer").css("border-color", "hsl(0, 0%, 87%)");
+          return $(".none").remove();
+        };
+        hideFilterList = function() {
+          $(".pvtFilterBox").hide();
+          return $("nobr").removeClass();
+        };
+        updateSelected = function() {
+          var checked;
+          checked = $(valueList).find("[type='checkbox']:checked").length;
+          $(".selected-val em").html(checked);
+          return checked;
+        };
         valueList.append($("<h4>").text("" + c + " (" + keys.length + ")"));
         if (keys.length > opts.menuLimit) {
           valueList.append($("<p>").text(opts.localeStrings.tooMany));
         } else {
           btns = $("<p>").addClass("btns-search");
-          btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
-            return valueList.find("input").prop("checked", true);
+          btns.append($("<button>").html(opts.localeStrings.selectAll).bind("click", function() {
+            return valueList.find("input").each(function() {
+              if ($(this).is(':visible')) {
+                $(this).prop("checked", true);
+                return updateSelected();
+              }
+            });
           }));
-          btns.append($("<button>").text(opts.localeStrings.selectNone).bind("click", function() {
-            return valueList.find("input").prop("checked", false);
+          btns.append($("<button>").html(opts.localeStrings.selectNone).bind("click", function() {
+            return valueList.find("input").each(function() {
+              if ($(this).is(':visible')) {
+                $(this).prop("checked", false);
+                return updateSelected();
+              }
+            });
           }));
+          btns.append($("<span>").addClass("clear-search").bind("click", clearSearch));
+          btns.append($("<div>").addClass("close-btn").bind("click", hideFilterList));
           btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
-            var filter;
+            var count, filter;
             filter = $(this).val().toLowerCase();
+            if (filter) {
+              $(".clear-search").css('display', 'inline-block');
+              $(".pvtSearch").addClass("nobkgd");
+            } else {
+              $(".clear-search").hide();
+              $(".pvtSearch").removeClass("nobkgd");
+            }
+            count = 0;
             return $(this).parents(".pvtFilterBox").find('label span').each(function() {
               var testString;
               testString = this.innerText.toLowerCase().indexOf(filter);
               if (testString !== -1) {
-                return $(this).parent().show();
+                $(this).parent().show();
+                count++;
               } else {
-                return $(this).parent().hide();
+                $(this).parent().hide();
+              }
+              if (count === 0 && $('.none').length <= 0) {
+                $(".checkContainer").css("border-color", "#fffff");
+                return $(".checkContainer").append("<p class='none'>No results. <a href='#'>Clear filter?</a></p>").bind("click", clearSearch);
+              } else if (count >= 1) {
+                return clearSearch();
               }
             });
           }));
@@ -976,7 +1021,7 @@
             filterItem = $("<label>");
             filterItemExcluded = opts.exclusions[c] ? (__indexOf.call(opts.exclusions[c], k) >= 0) : false;
             hasExcludedItem || (hasExcludedItem = filterItemExcluded);
-            filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", !filterItemExcluded).data("filter", [c, k]));
+            filterItem.append($("<input type='checkbox' class='pvtFilter'>").attr("checked", !filterItemExcluded).data("filter", [c, k]).bind("change", updateSelected));
             filterItem.append($("<span>").text("" + k + " (" + v + ")"));
             checkContainer.append($("<p>").append(filterItem));
           }
@@ -991,19 +1036,33 @@
             attrElem.removeClass("pvtFilteredAttribute");
           }
           if (keys.length > opts.menuLimit) {
-            return valueList.toggle();
+            valueList.toggle();
           } else {
-            return valueList.toggle(0, refresh);
+            valueList.toggle(0, refresh);
           }
+          return $("nobr").removeClass("active_filter");
         };
-        valueList.append($("<p>").addClass("submit-btn").append($("<button>").text("OK").bind("click", updateFilter)));
+        btn_submit = $("<p>").addClass("submit-btn");
+        valueList.append(btn_submit.append($("<button>").text(opts.localeStrings.btnSubmit).bind("click", updateFilter)));
+        btn_submit.append($("<span>").html('<em>' + updateSelected() + '</em>' + (" selected of " + keys.length + " total values")).addClass("selected-val"));
         showFilterList = function(e) {
+          var bottom, nobr, position, pvtFilterBox;
+          pvtFilterBox = $(".pvtFilterBox");
+          hideFilterList();
+          nobr = $(this).parents("nobr");
+          nobr.toggleClass("active_filter");
+          position = nobr.offset();
+          bottom = position.top + nobr.height() + 8;
           valueList.css({
-            left: e.pageX,
-            top: e.pageY
+            left: position.left,
+            top: bottom
           }).toggle();
-          $('.pvtSearch').val('');
-          return $('label').show();
+          clearSearch();
+          return $(document).mouseup(function(e) {
+            if (!pvtFilterBox.is(e.target) && pvtFilterBox.has(e.target).length === 0) {
+              return hideFilterList();
+            }
+          });
         };
         triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
         attrElem = $("<li class='label label-info axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));

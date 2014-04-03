@@ -468,10 +468,11 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             renderError: "An error occurred rendering the PivotTable results."
             computeError: "An error occurred computing the PivotTable results."
             uiRenderError: "An error occurred rendering the PivotTable UI."
-            selectAll: "Select All"
-            selectNone: "Select None"
+            selectAll: "Select <span>All</span>"
+            selectNone: "Select <span>None</span>"
             tooMany: "(too many to list)"
             filterResults: "Filter results"
+            btnSubmit: "Update"
 
 
     existingOpts = @data "pivotUIOptions"
@@ -508,7 +509,6 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             renderer.append $("<option>").val(x).text(x)
         rendererControl.append renderer
 
-
         #axis list, including the double-click menu
 
         colList = $("<td class='pvtAxisContainer pvtUnused'>")
@@ -523,6 +523,23 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 hasExcludedItem = false
                 valueList = $("<div>").addClass('pvtFilterBox').hide()
 
+                clearSearch = ->
+                    $('.pvtSearch').val('').removeClass("nobkgd")
+                    $('label').show()
+                    $(".clear-search").hide()
+                    $(".checkContainer").css("border-color","hsl(0, 0%, 87%)")
+                    $(".none").remove()
+
+
+                hideFilterList = ->
+                    $(".pvtFilterBox").hide();
+                    $("nobr").removeClass();
+
+                updateSelected = ->
+                    checked = $(valueList).find("[type='checkbox']:checked").length
+                    $(".selected-val em").html(checked)
+                    return checked
+
                 valueList.append $("<h4>")
                     .text("#{c} (#{keys.length})")
                 if keys.length > opts.menuLimit
@@ -530,18 +547,44 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         .text(opts.localeStrings.tooMany)
                 else
                     btns = $("<p>").addClass("btns-search")
-                    btns.append $("<button>").text(opts.localeStrings.selectAll).bind "click", ->
-                        valueList.find("input").prop "checked", true
-                    btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
-                        valueList.find("input").prop "checked", false
+                    btns.append $("<button>").html(opts.localeStrings.selectAll).bind "click", ->
+                        valueList.find("input").each ->
+                            if $(this).is(':visible')
+                                $(this).prop "checked", true
+                                updateSelected()
+                    btns.append $("<button>").html(opts.localeStrings.selectNone).bind "click", ->
+                        valueList.find("input").each ->
+                            if $(this).is(':visible')
+                                $(this).prop "checked", false
+                                updateSelected()
+                    btns.append $("<span>").addClass("clear-search").bind "click", clearSearch
+                    btns.append $("<div>").addClass("close-btn").bind "click", hideFilterList
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
+                        if filter
+                            $(".clear-search").css('display', 'inline-block')
+                            $(".pvtSearch").addClass("nobkgd")
+                        else
+                            $(".clear-search").hide()
+                            $(".pvtSearch").removeClass("nobkgd")
+
+                        count = 0
+
                         $(this).parents(".pvtFilterBox").find('label span').each ->
                             testString = this.innerText.toLowerCase().indexOf(filter)
+
                             if testString isnt -1
                                 $(this).parent().show()
+                                count++
                             else
                                 $(this).parent().hide()
+                            if count is 0 and $('.none').length <= 0
+                                $(".checkContainer").css("border-color","#fffff")
+                                $(".checkContainer").append("<p class='none'>No results. <a href='#'>Clear filter?</a></p>").bind "click", clearSearch
+                            else if count >= 1
+                                clearSearch()
+
+
                     valueList.append btns
                     checkContainer = $("<div>").addClass("checkContainer")
 
@@ -551,7 +594,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                          filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
                          hasExcludedItem ||= filterItemExcluded
                          filterItem.append $("<input type='checkbox' class='pvtFilter'>")
-                            .attr("checked", !filterItemExcluded).data("filter", [c,k])
+                            .attr("checked", !filterItemExcluded).data("filter", [c,k]).bind "change", updateSelected
                          filterItem.append $("<span>").text "#{k} (#{v})"
                          checkContainer.append $("<p>").append(filterItem)
                     valueList.append checkContainer
@@ -567,14 +610,29 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                         valueList.toggle()
                     else
                         valueList.toggle(0, refresh)
+                    $("nobr").removeClass("active_filter")
 
-                valueList.append $("<p>").addClass("submit-btn")
-                    .append $("<button>").text("OK").bind "click", updateFilter
+                btn_submit = $("<p>").addClass("submit-btn")
+                valueList.append btn_submit
+
+                    .append $("<button>").text(opts.localeStrings.btnSubmit).bind "click", updateFilter
+
+
+                btn_submit.append $("<span>").html('<em>' + updateSelected() + '</em>' + " selected of #{keys.length} total values").addClass("selected-val")
 
                 showFilterList = (e) ->
-                    valueList.css(left: e.pageX, top: e.pageY).toggle()
-                    $('.pvtSearch').val('')
-                    $('label').show()
+                    pvtFilterBox = $(".pvtFilterBox")
+                    hideFilterList()
+                    nobr = $(this).parents("nobr")
+                    nobr.toggleClass("active_filter")
+                    position = nobr.offset()
+                    bottom = position.top + nobr.height() + 8
+                    valueList.css(left: position.left, top: bottom).toggle()
+                    clearSearch()
+
+                    $(document).mouseup (e) ->
+                        if (!pvtFilterBox.is(e.target) && pvtFilterBox.has(e.target).length is 0)
+                            hideFilterList()
 
                 triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;")
                     .bind "click", showFilterList
