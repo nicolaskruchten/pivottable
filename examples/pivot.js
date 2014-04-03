@@ -1005,11 +1005,10 @@
                 $(this).parent().hide();
               }
               if (count === 0 && $('.none').length <= 0) {
-                console.log("trying");
                 $(".checkContainer").css("border-color", "#fffff");
                 return $(".checkContainer").append("<p class='none'>No results. <a href='#'>Clear filter?</a></p>").bind("click", clearSearch);
-              } else {
-
+              } else if (count >= 1) {
+                return clearSearch();
               }
             });
           }));

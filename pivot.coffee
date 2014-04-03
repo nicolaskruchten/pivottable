@@ -581,8 +581,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                             if count is 0 and $('.none').length <= 0
                                 $(".checkContainer").css("border-color","#fffff")
                                 $(".checkContainer").append("<p class='none'>No results. <a href='#'>Clear filter?</a></p>").bind "click", clearSearch
-                            else
-                                #$(".none").remove()
+                            else if count >= 1
+                                clearSearch()
 
 
                     valueList.append btns
