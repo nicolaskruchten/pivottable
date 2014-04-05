@@ -81,20 +81,11 @@ table.pvtTable tr td {
 
 .pvtFilterBox h4{ margin:0; }
 
-.btns-search{
-    text-align: center;
-    margin-bottom: 5px;
-}
-.checkContainer{
+.pvtCheckContainer{
     text-align: left;
     overflow: scroll;
     width: 100%;
     max-height: 200px;
 }
-.checkContainer p{
-    margin: 5px;
-}
-.submit-btn{
-    text-align: center;
-    margin-bottom: 0;
-}
+.pvtCheckContainer p{ margin: 5px; }
+

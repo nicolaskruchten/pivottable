@@ -327,7 +327,7 @@ pivotTableRenderer = (pivotData, opts) ->
     colKeys = pivotData.getColKeys()
 
     #now actually build the output
-    result = $("<table class='table table-bordered pvtTable'>")
+    result = $("<table class='pvtTable'>")
 
     #the first few rows are for col headers
     for own j, c of colAttrs
@@ -497,7 +497,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 axisValues[k][v]++
 
         #start building the output
-        uiTable = $("<table class='table table-bordered' cellpadding='5'>")
+        uiTable = $("<table cellpadding='5'>")
 
         #renderer control
         rendererControl = $("<td>")
@@ -529,7 +529,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     valueList.append $("<p>")
                         .text(opts.localeStrings.tooMany)
                 else
-                    btns = $("<p>").addClass("btns-search")
+                    btns = $("<p>")
                     btns.append $("<button>").text(opts.localeStrings.selectAll).bind "click", ->
                         valueList.find("input").prop "checked", true
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
@@ -543,7 +543,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                             else
                                 $(this).parent().hide()
                     valueList.append btns
-                    checkContainer = $("<div>").addClass("checkContainer")
+                    checkContainer = $("<div>").addClass("pvtCheckContainer")
 
                     for k in keys.sort(naturalSort)
                          v = axisValues[c][k]
@@ -568,7 +568,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     else
                         valueList.toggle(0, refresh)
 
-                valueList.append $("<p>").addClass("submit-btn")
+                valueList.append $("<p>")
                     .append $("<button>").text("OK").bind "click", updateFilter
 
                 showFilterList = (e) ->
@@ -579,7 +579,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;")
                     .bind "click", showFilterList
 
-                attrElem = $("<li class='label label-info axis_#{i}'>")
+                attrElem = $("<li class='axis_#{i}'>")
                     .append $("<nobr>").text(c).data("attrName", c).append(triangleLink)
                 attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                 colList.append(attrElem).append(valueList)
