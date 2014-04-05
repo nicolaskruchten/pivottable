@@ -683,7 +683,7 @@
     rowAttrs = pivotData.rowAttrs;
     rowKeys = pivotData.getRowKeys();
     colKeys = pivotData.getColKeys();
-    result = $("<table class='table table-bordered pvtTable'>");
+    result = $("<table class='pvtTable'>");
     for (j in colAttrs) {
       if (!__hasProp.call(colAttrs, j)) continue;
       c = colAttrs[j];
@@ -903,7 +903,7 @@
         }
         return _results;
       });
-      uiTable = $("<table class='table table-bordered' cellpadding='5'>");
+      uiTable = $("<table cellpadding='5'>");
       rendererControl = $("<td>");
       renderer = $("<select class='pvtRenderer'>").bind("change", function() {
         return refresh();
@@ -947,7 +947,7 @@
         if (keys.length > opts.menuLimit) {
           valueList.append($("<p>").text(opts.localeStrings.tooMany));
         } else {
-          btns = $("<p>").addClass("btns-search");
+          btns = $("<p>");
           btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
             return valueList.find("input").prop("checked", true);
           }));
@@ -968,7 +968,7 @@
             });
           }));
           valueList.append(btns);
-          checkContainer = $("<div>").addClass("checkContainer");
+          checkContainer = $("<div>").addClass("pvtCheckContainer");
           _ref2 = keys.sort(naturalSort);
           for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
             k = _ref2[_j];
@@ -996,7 +996,7 @@
             return valueList.toggle(0, refresh);
           }
         };
-        valueList.append($("<p>").addClass("submit-btn").append($("<button>").text("OK").bind("click", updateFilter)));
+        valueList.append($("<p>").append($("<button>").text("OK").bind("click", updateFilter)));
         showFilterList = function(e) {
           valueList.css({
             left: e.pageX,
@@ -1006,7 +1006,7 @@
           return $('label').show();
         };
         triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
-        attrElem = $("<li class='label label-info axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));
+        attrElem = $("<li class='axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));
         if (hasExcludedItem) {
           attrElem.addClass('pvtFilteredAttribute');
         }
