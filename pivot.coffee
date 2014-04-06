@@ -580,7 +580,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     .bind "click", showFilterList
 
                 attrElem = $("<li class='axis_#{i}'>")
-                    .append $("<nobr>").text(c).data("attrName", c).append(triangleLink)
+                    .append $("<span class='pvtAttr'>").text(c).data("attrName", c).append(triangleLink)
                 attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                 colList.append(attrElem).append(valueList)
 
@@ -646,9 +646,9 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 cols: [], rows: []
 
             vals = []
-            @find(".pvtRows li nobr").each -> subopts.rows.push $(this).data("attrName")
-            @find(".pvtCols li nobr").each -> subopts.cols.push $(this).data("attrName")
-            @find(".pvtVals li nobr").each -> vals.push $(this).data("attrName")
+            @find(".pvtRows li span.pvtAttr").each -> subopts.rows.push $(this).data("attrName")
+            @find(".pvtCols li span.pvtAttr").each -> subopts.cols.push $(this).data("attrName")
+            @find(".pvtVals li span.pvtAttr").each -> vals.push $(this).data("attrName")
 
             subopts.aggregator = opts.aggregators[aggregator.val()](vals)
             subopts.renderer = opts.renderers[renderer.val()]
