@@ -1144,7 +1144,7 @@
         update: refresh,
         connectWith: this.find(".pvtAxisContainer"),
         items: 'li',
-        placeholder: 'placeholder'
+        placeholder: 'pvtPlaceholder'
       });
     } catch (_error) {
       e = _error;

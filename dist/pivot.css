@@ -41,7 +41,7 @@ table.pvtTable tr td {
     list-style-type: none;
     cursor:move;
 }
-.pvtAxisContainer li.placeholder {
+.pvtAxisContainer li.pvtPlaceholder {
     -webkit-border-radius: 5px;
     padding: 3px 15px;
     -moz-border-radius: 5px;
