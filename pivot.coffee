@@ -707,7 +707,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 update: refresh
                 connectWith: @find(".pvtAxisContainer")
                 items: 'li'
-                placeholder: 'placeholder'
+                placeholder: 'pvtPlaceholder'
     catch e
         console.error(e.stack) if console?
         @html opts.localeStrings.uiRenderError
