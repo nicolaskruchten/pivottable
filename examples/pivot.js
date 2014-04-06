@@ -1006,7 +1006,7 @@
           return $('label').show();
         };
         triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
-        attrElem = $("<li class='axis_" + i + "'>").append($("<nobr>").text(c).data("attrName", c).append(triangleLink));
+        attrElem = $("<li class='axis_" + i + "'>").append($("<span class='pvtAttr'>").text(c).data("attrName", c).append(triangleLink));
         if (hasExcludedItem) {
           attrElem.addClass('pvtFilteredAttribute');
         }
@@ -1072,13 +1072,13 @@
           rows: []
         };
         vals = [];
-        _this.find(".pvtRows li nobr").each(function() {
+        _this.find(".pvtRows li span.pvtAttr").each(function() {
           return subopts.rows.push($(this).data("attrName"));
         });
-        _this.find(".pvtCols li nobr").each(function() {
+        _this.find(".pvtCols li span.pvtAttr").each(function() {
           return subopts.cols.push($(this).data("attrName"));
         });
-        _this.find(".pvtVals li nobr").each(function() {
+        _this.find(".pvtVals li span.pvtAttr").each(function() {
           return vals.push($(this).data("attrName"));
         });
         subopts.aggregator = opts.aggregators[aggregator.val()](vals);

@@ -49,11 +49,11 @@ table.pvtTable tr td {
     border: 1px dashed #aaa;
 }
 
-.pvtAxisContainer li nobr {
+.pvtAxisContainer li span.pvtAttr {
     background: #F3F3F3;
     border: 1px solid #DEDEDE;
     padding: 2px 5px;
-
+    white-space:nowrap;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
@@ -88,4 +88,3 @@ table.pvtTable tr td {
     max-height: 200px;
 }
 .pvtCheckContainer p{ margin: 5px; }
-
