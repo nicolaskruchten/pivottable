@@ -1,0 +1,30 @@
+{
+    "name": "pivottable",
+    "title": "PivotTable.js",
+    "description": "Javascript Pivot Table (aka Pivot Grid, Pivot Chart, Cross-Tab) implementation with drag'n'drop",
+    "keywords": [
+    "pivot",
+    "crosstab",
+    "grid"
+    ],
+    "version": "1.1.1",
+    "author": 
+        {
+            "name": "Nicolas Kruchten",
+            "email": "nicolas@kruchten.com",
+            "url": "http://nicolas.kruchten.com"
+        },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://github.com/nicolaskruchten/pivottable/blob/master/ReadMe.md"
+        }
+    ],
+    "bugs": "https://github.com/nicolaskruchten/pivottable/issues",
+    "homepage": "http://nicolas.kruchten.com/pivottable",
+    "docs": "https://github.com/nicolaskruchten/pivottable/wiki",
+    "dependencies": {
+        "jquery": "*",
+        "jqueryui": "*"
+    }
+}
