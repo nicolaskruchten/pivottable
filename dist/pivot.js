@@ -501,7 +501,6 @@
       this.colAttrs = colAttrs;
       this.rowAttrs = rowAttrs;
       this.getAggregator = __bind(this.getAggregator, this);
-      this.flattenKey = __bind(this.flattenKey, this);
       this.getRowKeys = __bind(this.getRowKeys, this);
       this.getColKeys = __bind(this.getColKeys, this);
       this.sortKeys = __bind(this.sortKeys, this);
@@ -548,28 +547,20 @@
       return x.join(String.fromCharCode(0));
     };
 
+    PivotData.prototype.makeKey = function(record, attrs) {
+      var x, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = attrs.length; _i < _len; _i++) {
+        x = attrs[_i];
+        _results.push(record[x]);
+      }
+      return _results;
+    };
+
     PivotData.prototype.processRecord = function(record) {
-      var colKey, flatColKey, flatRowKey, rowKey, x;
-      colKey = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this.colAttrs;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          x = _ref[_i];
-          _results.push(record[x]);
-        }
-        return _results;
-      }).call(this);
-      rowKey = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this.rowAttrs;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          x = _ref[_i];
-          _results.push(record[x]);
-        }
-        return _results;
-      }).call(this);
+      var colKey, flatColKey, flatRowKey, rowKey;
+      colKey = this.makeKey(record, this.colAttrs);
+      rowKey = this.makeKey(record, this.rowAttrs);
       flatRowKey = this.flattenKey(rowKey);
       flatColKey = this.flattenKey(colKey);
       this.allTotal.push(record);
@@ -1141,7 +1132,7 @@
       };
       refresh();
       this.find(".pvtAxisContainer").sortable({
-        update: refresh,
+        receive: refresh,
         connectWith: this.find(".pvtAxisContainer"),
         items: 'li',
         placeholder: 'pvtPlaceholder'
