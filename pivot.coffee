@@ -241,11 +241,13 @@ class PivotData
         @sortKeys()
         return @rowKeys
 
-    flattenKey: (x) => x.join(String.fromCharCode(0))
+    flattenKey: (x) -> x.join(String.fromCharCode(0))
+
+    makeKey: (record, attrs) -> record[x] for x in attrs
 
     processRecord: (record) ->
-        colKey = (record[x] for x in @colAttrs)
-        rowKey = (record[x] for x in @rowAttrs)
+        colKey = @makeKey record, @colAttrs
+        rowKey = @makeKey record, @rowAttrs
 
         flatRowKey = @flattenKey rowKey
         flatColKey = @flattenKey colKey
@@ -704,7 +706,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         refresh()
 
         @find(".pvtAxisContainer").sortable
-                update: refresh
+                receive: refresh
                 connectWith: @find(".pvtAxisContainer")
                 items: 'li'
                 placeholder: 'pvtPlaceholder'
