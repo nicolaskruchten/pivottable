@@ -306,16 +306,16 @@
       return pivotTableRenderer(pvtData, opts);
     },
     "Table Barchart": function(pvtData, opts) {
-      return pivotTableRenderer(pvtData, opts).barchart();
+      return $(pivotTableRenderer(pvtData, opts)).barchart();
     },
     "Heatmap": function(pvtData, opts) {
-      return pivotTableRenderer(pvtData, opts).heatmap();
+      return $(pivotTableRenderer(pvtData, opts)).heatmap();
     },
     "Row Heatmap": function(pvtData, opts) {
-      return pivotTableRenderer(pvtData, opts).heatmap("rowheatmap");
+      return $(pivotTableRenderer(pvtData, opts)).heatmap("rowheatmap");
     },
     "Col Heatmap": function(pvtData, opts) {
-      return pivotTableRenderer(pvtData, opts).heatmap("colheatmap");
+      return $(pivotTableRenderer(pvtData, opts)).heatmap("colheatmap");
     }
   };
 
@@ -645,7 +645,7 @@
   };
 
   pivotTableRenderer = function(pivotData, opts) {
-    var aggregator, c, colArr, colAttrs, colKey, colKeys, defaults, elm, i, j, r, result, rowArr, rowAttrs, rowKey, rowKeys, th, totalAggregator, tr, txt, val, x;
+    var aggregator, c, colAttrs, colKey, colKeys, defaults, i, j, r, result, rowAttrs, rowKey, rowKeys, td, th, totalAggregator, tr, txt, val, x;
     defaults = {
       localeStrings: {
         totals: "Totals"
@@ -656,64 +656,81 @@
     rowAttrs = pivotData.rowAttrs;
     rowKeys = pivotData.getRowKeys();
     colKeys = pivotData.getColKeys();
-    elm = function(x) {
-      return $(document.createElement(x));
-    };
-    result = elm("table").addClass("pvtTable");
+    result = document.createElement("table");
+    result.className = "pvtTable";
     for (j in colAttrs) {
       if (!__hasProp.call(colAttrs, j)) continue;
       c = colAttrs[j];
-      tr = elm("tr");
+      tr = document.createElement("tr");
       if (parseInt(j) === 0 && rowAttrs.length !== 0) {
-        tr.append(elm("th").attr("colspan", rowAttrs.length).attr("rowspan", colAttrs.length));
+        th = document.createElement("th");
+        th.setAttribute("colspan", rowAttrs.length);
+        th.setAttribute("rowspan", colAttrs.length);
+        tr.appendChild(th);
       }
-      tr.append(elm("th").addClass("pvtAxisLabel").text(c));
+      th = document.createElement("th");
+      th.className = "pvtAxisLabel";
+      th.textContent = c;
+      tr.appendChild(th);
       for (i in colKeys) {
         if (!__hasProp.call(colKeys, i)) continue;
         colKey = colKeys[i];
         x = spanSize(colKeys, parseInt(i), parseInt(j));
         if (x !== -1) {
-          th = elm("th").addClass("pvtColLabel").text(colKey[j]).attr("colspan", x);
+          th = document.createElement("th");
+          th.className = "pvtColLabel";
+          th.textContent = colKey[j];
+          th.setAttribute("colspan", x);
           if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
-            th.attr("rowspan", 2);
+            th.setAttribute("rowspan", 2);
           }
-          tr.append(th);
+          tr.appendChild(th);
         }
       }
       if (parseInt(j) === 0) {
-        tr.append(elm("th").addClass("pvtTotalLabel").text(opts.localeStrings.totals).attr("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1)));
+        th = document.createElement("th");
+        th.className = "pvtTotalLabel";
+        th.textContent = opts.localeStrings.totals;
+        th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
+        tr.appendChild(th);
       }
-      result.append(tr);
+      result.appendChild(tr);
     }
     if (rowAttrs.length !== 0) {
-      tr = elm("tr");
+      tr = document.createElement("tr");
       for (i in rowAttrs) {
         if (!__hasProp.call(rowAttrs, i)) continue;
         r = rowAttrs[i];
-        tr.append(elm("th").addClass("pvtAxisLabel").text(r));
+        th = document.createElement("th");
+        th.className = "pvtAxisLabel";
+        th.textContent = r;
+        tr.appendChild(th);
       }
-      th = elm("th");
+      th = document.createElement("th");
       if (colAttrs.length === 0) {
-        th.addClass("pvtTotalLabel").text(opts.localeStrings.totals);
+        th.className = "pvtTotalLabel";
+        th.textContent = opts.localeStrings.totals;
       }
-      tr.append(th);
-      result.append(tr);
+      tr.appendChild(th);
+      result.appendChild(tr);
     }
-    rowArr = [];
     for (i in rowKeys) {
       if (!__hasProp.call(rowKeys, i)) continue;
       rowKey = rowKeys[i];
-      colArr = [];
+      tr = document.createElement("tr");
       for (j in rowKey) {
         if (!__hasProp.call(rowKey, j)) continue;
         txt = rowKey[j];
         x = spanSize(rowKeys, parseInt(i), parseInt(j));
         if (x !== -1) {
-          th = elm("th").addClass("pvtRowLabel").text(txt).attr("rowspan", x);
+          th = document.createElement("th");
+          th.className = "pvtRowLabel";
+          th.textContent = txt;
+          th.setAttribute("rowspan", x);
           if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
-            th.attr("colspan", 2);
+            th.setAttribute("colspan", 2);
           }
-          colArr.push(th);
+          tr.appendChild(th);
         }
       }
       for (j in colKeys) {
@@ -721,30 +738,49 @@
         colKey = colKeys[j];
         aggregator = pivotData.getAggregator(rowKey, colKey);
         val = aggregator.value();
-        colArr.push($(document.createElement("td")).addClass("pvtVal row" + i + " col" + j).html(aggregator.format(val)).data("value", val));
+        td = document.createElement("td");
+        td.className = "pvtVal row" + i + " col" + j;
+        td.textContent = aggregator.format(val);
+        td.setAttribute("data-value", val);
+        tr.appendChild(td);
       }
       totalAggregator = pivotData.getAggregator(rowKey, []);
       val = totalAggregator.value();
-      colArr.push(elm("td").addClass("pvtTotal rowTotal").html(totalAggregator.format(val)).data("value", val).data("for", "row" + i));
-      rowArr.push(elm("tr").append(colArr));
+      td = document.createElement("td");
+      td.className = "pvtTotal rowTotal";
+      td.textContent = totalAggregator.format(val);
+      td.setAttribute("data-value", val);
+      td.setAttribute("data-for", "row" + i);
+      tr.appendChild(td);
+      result.appendChild(tr);
     }
-    result.append(rowArr);
-    tr = elm("tr");
-    th = elm("th").addClass("pvtTotalLabel").text(opts.localeStrings.totals);
-    th.attr("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
-    tr.append(th);
+    tr = document.createElement("tr");
+    th = document.createElement("th");
+    th.className = "pvtTotalLabel";
+    th.textContent = opts.localeStrings.totals;
+    th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
+    tr.appendChild(th);
     for (j in colKeys) {
       if (!__hasProp.call(colKeys, j)) continue;
       colKey = colKeys[j];
       totalAggregator = pivotData.getAggregator([], colKey);
       val = totalAggregator.value();
-      tr.append(elm("td").addClass("pvtTotal colTotal").html(totalAggregator.format(val)).data("value", val).data("for", "col" + j));
+      td = document.createElement("td");
+      td.className = "pvtTotal colTotal";
+      td.textContent = totalAggregator.format(val);
+      td.setAttribute("data-value", val);
+      td.setAttribute("data-for", "col" + j);
+      tr.appendChild(td);
     }
     totalAggregator = pivotData.getAggregator([], []);
     val = totalAggregator.value();
-    tr.append(elm("td").addClass("pvtGrandTotal").html(totalAggregator.format(val)).data("value", val));
-    result.append(tr);
-    result.data("dimensions", [rowKeys.length, colKeys.length]);
+    td = document.createElement("td");
+    td.className = "pvtGrandTotal";
+    td.textContent = totalAggregator.format(val);
+    td.setAttribute("data-value", val);
+    tr.appendChild(td);
+    result.appendChild(tr);
+    result.setAttribute("data-dimensions", [rowKeys.length, colKeys.length]);
     return result;
   };
 
@@ -754,7 +790,7 @@
 
 
   $.fn.pivot = function(input, opts) {
-    var defaults, e, pivotData, result;
+    var defaults, e, pivotData, result, x;
     defaults = {
       cols: [],
       rows: [],
@@ -781,17 +817,20 @@
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }
-        result = opts.localeStrings.renderError;
+        result = $("<span>").text(opts.localeStrings.renderError);
       }
     } catch (_error) {
       e = _error;
       if (typeof console !== "undefined" && console !== null) {
         console.error(e.stack);
       }
-      result = opts.localeStrings.computeError;
+      result = $("<span>").text(opts.localeStrings.computeError);
     }
-    this.html(result);
-    return this;
+    x = this[0];
+    while (x.hasChildNodes()) {
+      x.removeChild(x.lastChild);
+    }
+    return this.append(result);
   };
 
   /*
