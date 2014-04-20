@@ -427,7 +427,8 @@ pivotTableRenderer = (pivotData, opts) ->
     result.appendChild tr
 
     #squirrel this away for later
-    result.setAttribute("data-dimensions", [rowKeys.length, colKeys.length])
+    result.setAttribute("data-numrows", rowKeys.length)
+    result.setAttribute("data-numcols", colKeys.length)
 
     return result
 
@@ -741,7 +742,8 @@ Heatmap post-processing
 ###
 
 $.fn.heatmap = (scope = "heatmap") ->
-    [numRows, numCols] = @data "dimensions"
+    numRows = @data "numrows"
+    numCols = @data "numcols"
 
     colorGen = (color, min, max) ->
         hexGen = switch color
@@ -784,7 +786,8 @@ Barchart post-processing
 ###
 
 $.fn.barchart =  ->
-    [numRows, numCols] = @data "dimensions"
+    numRows = @data "numrows"
+    numCols = @data "numcols"
 
     barcharter = (scope) =>
         forEachCell = (f) =>

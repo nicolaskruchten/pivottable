@@ -780,7 +780,8 @@
     td.setAttribute("data-value", val);
     tr.appendChild(td);
     result.appendChild(tr);
-    result.setAttribute("data-dimensions", [rowKeys.length, colKeys.length]);
+    result.setAttribute("data-numrows", rowKeys.length);
+    result.setAttribute("data-numcols", colKeys.length);
     return result;
   };
 
@@ -1183,12 +1184,13 @@
 
 
   $.fn.heatmap = function(scope) {
-    var colorGen, heatmapper, i, j, numCols, numRows, _i, _j, _ref,
+    var colorGen, heatmapper, i, j, numCols, numRows, _i, _j,
       _this = this;
     if (scope == null) {
       scope = "heatmap";
     }
-    _ref = this.data("dimensions"), numRows = _ref[0], numCols = _ref[1];
+    numRows = this.data("numrows");
+    numCols = this.data("numcols");
     colorGen = function(color, min, max) {
       var hexGen;
       hexGen = (function() {
@@ -1262,9 +1264,10 @@
 
 
   $.fn.barchart = function() {
-    var barcharter, i, numCols, numRows, _i, _ref,
+    var barcharter, i, numCols, numRows, _i,
       _this = this;
-    _ref = this.data("dimensions"), numRows = _ref[0], numCols = _ref[1];
+    numRows = this.data("numrows");
+    numCols = this.data("numcols");
     barcharter = function(scope) {
       var forEachCell, max, scaler, values;
       forEachCell = function(f) {
