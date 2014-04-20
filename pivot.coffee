@@ -116,10 +116,10 @@ aggregators.countAsFractionOfCol= aggregatorTemplates.fractionOf(aggregators.cou
 
 renderers =
     "Table": (pvtData, opts) -> pivotTableRenderer(pvtData, opts)
-    "Table Barchart": (pvtData, opts) -> pivotTableRenderer(pvtData, opts).barchart()
-    "Heatmap":      (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap()
-    "Row Heatmap":  (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap("rowheatmap")
-    "Col Heatmap":  (pvtData, opts) -> pivotTableRenderer(pvtData, opts).heatmap("colheatmap")
+    "Table Barchart": (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).barchart()
+    "Heatmap":      (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap()
+    "Row Heatmap":  (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("rowheatmap")
+    "Col Heatmap":  (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("colheatmap")
 
 mthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -321,89 +321,113 @@ pivotTableRenderer = (pivotData, opts) ->
     colKeys = pivotData.getColKeys()
 
     #now actually build the output
-    elm = (x) -> $(document.createElement(x))
-    result = elm("table").addClass("pvtTable")
+    result = document.createElement("table")
+    result.className = "pvtTable"
 
     #the first few rows are for col headers
     for own j, c of colAttrs
-        tr = elm("tr")
+        tr = document.createElement("tr")
         if parseInt(j) == 0 and rowAttrs.length != 0
-            tr.append elm("th")
-                .attr("colspan", rowAttrs.length)
-                .attr("rowspan", colAttrs.length)
-        tr.append elm("th").addClass("pvtAxisLabel").text(c)
+            th = document.createElement("th")
+            th.setAttribute("colspan", rowAttrs.length)
+            th.setAttribute("rowspan", colAttrs.length)
+            tr.appendChild th
+        th = document.createElement("th")
+        th.className = "pvtAxisLabel"
+        th.textContent = c
+        tr.appendChild th
         for own i, colKey of colKeys
             x = spanSize(colKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = elm("th").addClass("pvtColLabel").text(colKey[j]).attr("colspan", x)
+                th = document.createElement("th")
+                th.className = "pvtColLabel"
+                th.textContent = colKey[j]
+                th.setAttribute("colspan", x)
                 if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
-                    th.attr("rowspan", 2)
-                tr.append th
+                    th.setAttribute("rowspan", 2)
+                tr.appendChild th
         if parseInt(j) == 0
-            tr.append elm("th").addClass("pvtTotalLabel").text(opts.localeStrings.totals)
-                .attr("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
-        result.append tr
+            th = document.createElement("th")
+            th.className = "pvtTotalLabel"
+            th.textContent = opts.localeStrings.totals
+            th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
+            tr.appendChild th
+        result.appendChild tr
 
     #then a row for row header headers
     if rowAttrs.length !=0
-        tr = elm("tr")
+        tr = document.createElement("tr")
         for own i, r of rowAttrs
-            tr.append elm("th").addClass("pvtAxisLabel").text(r)
-        th = elm("th")
+            th = document.createElement("th")
+            th.className = "pvtAxisLabel"
+            th.textContent = r
+            tr.appendChild th 
+        th = document.createElement("th")
         if colAttrs.length ==0
-            th.addClass("pvtTotalLabel").text(opts.localeStrings.totals)
-        tr.append th
-        result.append tr
+            th.className = "pvtTotalLabel"
+            th.textContent = opts.localeStrings.totals
+        tr.appendChild th
+        result.appendChild tr
 
-    rowArr = []
     #now the actual data rows, with their row headers and totals
     for own i, rowKey of rowKeys
-        colArr = []
+        tr = document.createElement("tr")
         for own j, txt of rowKey
             x = spanSize(rowKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = elm("th").addClass("pvtRowLabel").text(txt).attr("rowspan", x)
+                th = document.createElement("th")
+                th.className = "pvtRowLabel"
+                th.textContent = txt
+                th.setAttribute("rowspan", x)
                 if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
-                    th.attr("colspan",2)
-                colArr.push th
+                    th.setAttribute("colspan",2)
+                tr.appendChild th
         for own j, colKey of colKeys #this is the tight loop
             aggregator = pivotData.getAggregator(rowKey, colKey)
             val = aggregator.value()
-            colArr.push $(document.createElement("td"))
-                .addClass("pvtVal row#{i} col#{j}")
-                .html(aggregator.format val)
-                .data("value", val)
+            td = document.createElement("td")
+            td.className = "pvtVal row#{i} col#{j}"
+            td.textContent = aggregator.format(val)
+            td.setAttribute("data-value", val)
+            tr.appendChild td
 
         totalAggregator = pivotData.getAggregator(rowKey, [])
         val = totalAggregator.value()
-        colArr.push elm("td").addClass("pvtTotal rowTotal")
-            .html(totalAggregator.format val)
-            .data("value", val)
-            .data("for", "row"+i)
-        rowArr.push elm("tr").append colArr
-    result.append rowArr
+        td = document.createElement("td")
+        td.className = "pvtTotal rowTotal"
+        td.textContent = totalAggregator.format(val)
+        td.setAttribute("data-value", val)
+        td.setAttribute("data-for", "row"+i)
+        tr.appendChild td
+        result.appendChild tr
 
     #finally, the row for col totals, and a grand total
-    tr = elm("tr")
-    th = elm("th").addClass("pvtTotalLabel").text(opts.localeStrings.totals)
-    th.attr("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
-    tr.append th
+    tr = document.createElement("tr")
+    th = document.createElement("th")
+    th.className = "pvtTotalLabel"
+    th.textContent = opts.localeStrings.totals
+    th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
+    tr.appendChild th
     for own j, colKey of colKeys
         totalAggregator = pivotData.getAggregator([], colKey)
         val = totalAggregator.value()
-        tr.append elm("td").addClass("pvtTotal colTotal")
-            .html(totalAggregator.format val)
-            .data("value", val)
-            .data("for", "col"+j)
+        td = document.createElement("td")
+        td.className = "pvtTotal colTotal"
+        td.textContent = totalAggregator.format(val)
+        td.setAttribute("data-value", val)
+        td.setAttribute("data-for", "col"+j)
+        tr.appendChild td
     totalAggregator = pivotData.getAggregator([], [])
     val = totalAggregator.value()
-    tr.append elm("td").addClass("pvtGrandTotal")
-        .html(totalAggregator.format val)
-        .data("value", val)
-    result.append tr
+    td = document.createElement("td")
+    td.className = "pvtGrandTotal"
+    td.textContent = totalAggregator.format(val)
+    td.setAttribute("data-value", val)
+    tr.appendChild td
+    result.appendChild tr
 
     #squirrel this away for later
-    result.data "dimensions", [rowKeys.length, colKeys.length]
+    result.setAttribute("data-dimensions", [rowKeys.length, colKeys.length])
 
     return result
 
@@ -435,13 +459,14 @@ $.fn.pivot = (input, opts) ->
             result = opts.renderer(pivotData, opts.rendererOptions)
         catch e
             console.error(e.stack) if console?
-            result = opts.localeStrings.renderError
+            result = $("<span>").text opts.localeStrings.renderError
     catch e
         console.error(e.stack) if console?
-        result = opts.localeStrings.computeError
-
-    @html result
-    return this
+        result = $("<span>").text opts.localeStrings.computeError
+    
+    x = this[0]
+    x.removeChild(x.lastChild) while x.hasChildNodes()
+    return @append result
 
 
 ###
