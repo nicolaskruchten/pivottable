@@ -176,14 +176,15 @@ $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, natur
 functions for accessing input
 ###
 
-deriveAttributes = (record, derivedAttributes, f) ->
-    record[k] = v(record) ? record[k] for k, v of derivedAttributes
-    record[k] ?= "null" for own k of record
-    f(record)
-
 #can handle arrays or jQuery selections of tables
 forEachRecord = (input, derivedAttributes, f) ->
-    addRecord = (record) -> deriveAttributes(record, derivedAttributes, f)
+    if $.isEmptyObject derivedAttributes
+        addRecord = f
+    else
+        addRecord = (record) -> 
+            record[k] = v(record) ? record[k] for k, v of derivedAttributes
+            f(record)
+
     #if it's a function, have it call us back
     if $.isFunction(input)
         input(addRecord)
@@ -216,8 +217,6 @@ class PivotData
         @tree = {}
         @rowKeys = []
         @colKeys = []
-        @flatRowKeys = []
-        @flatColKeys = []
         @rowTotals = {}
         @colTotals = {}
         @allTotal = @aggregator(this, [], [])
@@ -241,45 +240,38 @@ class PivotData
         @sortKeys()
         return @rowKeys
 
-    flattenKey: (x) -> x.join(String.fromCharCode(0))
-
-    makeKey: (record, attrs) -> record[x] for x in attrs
-
-    processRecord: (record) ->
-        colKey = @makeKey record, @colAttrs
-        rowKey = @makeKey record, @rowAttrs
-
-        flatRowKey = @flattenKey rowKey
-        flatColKey = @flattenKey colKey
+    processRecord: (record) -> #this code is called in a tight loop
+        colKey = []
+        rowKey = []
+        colKey.push record[x] ? "null" for x in @colAttrs 
+        rowKey.push record[x] ? "null" for x in @rowAttrs
+        flatRowKey = rowKey.join(String.fromCharCode(0))
+        flatColKey = colKey.join(String.fromCharCode(0))
 
         @allTotal.push record
 
         if rowKey.length != 0
-            if flatRowKey not in @flatRowKeys
-                @rowKeys.push rowKey
-                @flatRowKeys.push flatRowKey
             if not @rowTotals[flatRowKey]
+                @rowKeys.push rowKey
                 @rowTotals[flatRowKey] = @aggregator(this, rowKey, [])
             @rowTotals[flatRowKey].push record
 
         if colKey.length != 0
-            if flatColKey not in @flatColKeys
-                @colKeys.push colKey
-                @flatColKeys.push flatColKey
             if not @colTotals[flatColKey]
+                @colKeys.push colKey
                 @colTotals[flatColKey] = @aggregator(this, [], colKey)
             @colTotals[flatColKey].push record
 
         if colKey.length != 0 and rowKey.length != 0
-            if flatRowKey not of @tree
+            if not @tree[flatRowKey]
                 @tree[flatRowKey] = {}
-            if flatColKey not of @tree[flatRowKey]
+            if not @tree[flatRowKey][flatColKey]
                 @tree[flatRowKey][flatColKey] = @aggregator(this, rowKey, colKey)
             @tree[flatRowKey][flatColKey].push record
 
     getAggregator: (rowKey, colKey) =>
-        flatRowKey = @flattenKey rowKey
-        flatColKey = @flattenKey colKey
+        flatRowKey = rowKey.join(String.fromCharCode(0))
+        flatColKey = colKey.join(String.fromCharCode(0))
         if rowKey.length == 0 and colKey.length == 0
             agg = @allTotal
         else if rowKey.length == 0
@@ -329,79 +321,83 @@ pivotTableRenderer = (pivotData, opts) ->
     colKeys = pivotData.getColKeys()
 
     #now actually build the output
-    result = $("<table class='pvtTable'>")
+    elm = (x) -> $(document.createElement(x))
+    result = elm("table").addClass("pvtTable")
 
     #the first few rows are for col headers
     for own j, c of colAttrs
-        tr = $("<tr>")
+        tr = elm("tr")
         if parseInt(j) == 0 and rowAttrs.length != 0
-            tr.append $("<th>")
+            tr.append elm("th")
                 .attr("colspan", rowAttrs.length)
                 .attr("rowspan", colAttrs.length)
-        tr.append $("<th class='pvtAxisLabel'>").text(c)
+        tr.append elm("th").addClass("pvtAxisLabel").text(c)
         for own i, colKey of colKeys
             x = spanSize(colKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = $("<th class='pvtColLabel'>").text(colKey[j]).attr("colspan", x)
+                th = elm("th").addClass("pvtColLabel").text(colKey[j]).attr("colspan", x)
                 if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                     th.attr("rowspan", 2)
                 tr.append th
         if parseInt(j) == 0
-            tr.append $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals)
+            tr.append elm("th").addClass("pvtTotalLabel").text(opts.localeStrings.totals)
                 .attr("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
         result.append tr
 
     #then a row for row header headers
     if rowAttrs.length !=0
-        tr = $("<tr>")
+        tr = elm("tr")
         for own i, r of rowAttrs
-            tr.append $("<th class='pvtAxisLabel'>").text(r)
-        th = $("<th>")
+            tr.append elm("th").addClass("pvtAxisLabel").text(r)
+        th = elm("th")
         if colAttrs.length ==0
             th.addClass("pvtTotalLabel").text(opts.localeStrings.totals)
         tr.append th
         result.append tr
 
+    rowArr = []
     #now the actual data rows, with their row headers and totals
     for own i, rowKey of rowKeys
-        tr = $("<tr>")
+        colArr = []
         for own j, txt of rowKey
             x = spanSize(rowKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = $("<th class='pvtRowLabel'>").text(txt).attr("rowspan", x)
+                th = elm("th").addClass("pvtRowLabel").text(txt).attr("rowspan", x)
                 if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                     th.attr("colspan",2)
-                tr.append th
-        for own j, colKey of colKeys
+                colArr.push th
+        for own j, colKey of colKeys #this is the tight loop
             aggregator = pivotData.getAggregator(rowKey, colKey)
             val = aggregator.value()
-            tr.append $("<td class='pvtVal row#{i} col#{j}'>")
+            colArr.push $(document.createElement("td"))
+                .addClass("pvtVal row#{i} col#{j}")
                 .html(aggregator.format val)
                 .data("value", val)
 
         totalAggregator = pivotData.getAggregator(rowKey, [])
         val = totalAggregator.value()
-        tr.append $("<td class='pvtTotal rowTotal'>")
+        colArr.push elm("td").addClass("pvtTotal rowTotal")
             .html(totalAggregator.format val)
             .data("value", val)
             .data("for", "row"+i)
-        result.append tr
+        rowArr.push elm("tr").append colArr
+    result.append rowArr
 
     #finally, the row for col totals, and a grand total
-    tr = $("<tr>")
-    th = $("<th class='pvtTotalLabel'>").text(opts.localeStrings.totals)
+    tr = elm("tr")
+    th = elm("th").addClass("pvtTotalLabel").text(opts.localeStrings.totals)
     th.attr("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
     tr.append th
     for own j, colKey of colKeys
         totalAggregator = pivotData.getAggregator([], colKey)
         val = totalAggregator.value()
-        tr.append $("<td class='pvtTotal colTotal'>")
+        tr.append elm("td").addClass("pvtTotal colTotal")
             .html(totalAggregator.format val)
             .data("value", val)
             .data("for", "col"+j)
     totalAggregator = pivotData.getAggregator([], [])
     val = totalAggregator.value()
-    tr.append $("<td class='pvtGrandTotal'>")
+    tr.append elm("td").addClass("pvtGrandTotal")
         .html(totalAggregator.format val)
         .data("value", val)
     result.append tr
@@ -706,7 +702,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         refresh()
 
         @find(".pvtAxisContainer").sortable
-                receive: refresh
+                update: (e, ui) -> refresh() if not ui.sender?
                 connectWith: @find(".pvtAxisContainer")
                 items: 'li'
                 placeholder: 'pvtPlaceholder'
