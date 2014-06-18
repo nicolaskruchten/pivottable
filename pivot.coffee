@@ -527,10 +527,10 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         rendererControl = $("<td>")
 
         renderer = $("<select class='pvtRenderer'>")
+            .appendTo(rendererControl)
             .bind "change", -> refresh() #capture reference
         for own x of opts.renderers
-            renderer.append $("<option>").val(x).text(x)
-        rendererControl.append renderer
+            $("<option>").val(x).text(x).appendTo(renderer)
 
 
         #axis list, including the double-click menu
@@ -547,13 +547,11 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                 hasExcludedItem = false
                 valueList = $("<div>").addClass('pvtFilterBox').hide()
 
-                valueList.append $("<h4>")
-                    .text("#{c} (#{keys.length})")
+                valueList.append $("<h4>").text("#{c} (#{keys.length})")
                 if keys.length > opts.menuLimit
-                    valueList.append $("<p>")
-                        .text(opts.localeStrings.tooMany)
+                    valueList.append $("<p>").text(opts.localeStrings.tooMany)
                 else
-                    btns = $("<p>")
+                    btns = $("<p>").appendTo(valueList)
                     btns.append $("<button>").text(opts.localeStrings.selectAll).bind "click", ->
                         valueList.find("input").prop "checked", true
                     btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
@@ -566,19 +564,19 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                                 $(this).parent().show()
                             else
                                 $(this).parent().hide()
-                    valueList.append btns
-                    checkContainer = $("<div>").addClass("pvtCheckContainer")
+
+                    checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
                     for k in keys.sort(naturalSort)
                          v = axisValues[c][k]
                          filterItem = $("<label>")
                          filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
                          hasExcludedItem ||= filterItemExcluded
-                         filterItem.append $("<input type='checkbox' class='pvtFilter'>")
+                         $("<input type='checkbox' class='pvtFilter'>")
                             .attr("checked", !filterItemExcluded).data("filter", [c,k])
+                            .appendTo filterItem
                          filterItem.append $("<span>").text "#{k} (#{v})"
                          checkContainer.append $("<p>").append(filterItem)
-                    valueList.append checkContainer
 
                 updateFilter = ->
                     unselectedCount = $(valueList).find("[type='checkbox']").length -
@@ -592,7 +590,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
                     else
                         valueList.toggle(0, refresh)
 
-                valueList.append $("<p>")
+                $("<p>").appendTo(valueList)
                     .append $("<button>").text("OK").bind "click", updateFilter
 
                 showFilterList = (e) ->
@@ -610,7 +608,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
                 attrElem.bind "dblclick", showFilterList
 
-        tr1 = $("<tr>")
+        tr1 = $("<tr>").appendTo(uiTable)
 
         #aggregator menu and value area
 
@@ -619,24 +617,22 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         for own x of opts.aggregators
             aggregator.append $("<option>").val(x).text(x)
 
-        tr1.append $("<td class='pvtAxisContainer pvtHorizList pvtVals'>")
-          .append(aggregator).append($("<br>"))
+        $("<td class='pvtAxisContainer pvtHorizList pvtVals'>")
+          .appendTo(tr1)
+          .append(aggregator)
+          .append($("<br>"))
 
         #column axes
-        tr1.append $("<td class='pvtAxisContainer pvtHorizList pvtCols'>")
+        $("<td class='pvtAxisContainer pvtHorizList pvtCols'>").appendTo(tr1)
 
-        uiTable.append tr1
-
-        tr2 = $("<tr>")
+        tr2 = $("<tr>").appendTo(uiTable)
 
         #row axes
         tr2.append $("<td valign='top' class='pvtAxisContainer pvtRows'>")
 
         #the actual pivot table container
-        pivotTable = $("<td valign='top' class='pvtRendererArea'>")
-        tr2.append pivotTable
+        pivotTable = $("<td valign='top' class='pvtRendererArea'>").appendTo(tr2)
 
-        uiTable.append tr2
 
         #finally the renderer dropdown and unused attribs are inserted at the requested location
         if opts.unusedAttrsVertical
