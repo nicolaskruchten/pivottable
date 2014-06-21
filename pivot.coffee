@@ -1,4 +1,5 @@
 $ = jQuery
+
 ###
 Utilities
 ###
@@ -12,21 +13,50 @@ addSeparators = (nStr, thousandsSep, decimalSep) ->
     x1 = x1.replace(rgx, '$1' + thousandsSep + '$2') while rgx.test(x1)
     return x1 + x2
 
-numberFormat = (sigfig=3, scaler=1, thousandsSep=",", decimalSep=".") ->
+numberFormat = (opts) ->
+    defaults = 
+        sigfig: 3, scaler: 1, 
+        thousandsSep: ",", decimalSep: "."
+        prefix: "", suffix: ""
+        showZero: false
+    opts = $.extend defaults, opts
     (x) ->
-        if x==0 or isNaN(x) or not isFinite(x) then ""
-        else addSeparators (scaler*x).toFixed(sigfig), thousandsSep, decimalSep
+        return "" if isNaN(x) or not isFinite(x)
+        return "" if x == 0 and not opts.showZero
+        result = addSeparators (opts.scaler*x).toFixed(opts.sigfig), opts.thousandsSep, opts.decimalSep
+        return ""+opts.prefix+result+opts.suffix
 
-#technically these are aggregator constructor generator generators (!)
+#aggregator templates default to US number formatting but this is overrideable
+usFmt = numberFormat()
+usFmtInt = numberFormat(sigfig: 0)
+usFmtPct = numberFormat(sigfig:1, scaler: 100, suffix: "%")
+
 aggregatorTemplates =
-    sum: (sigfig=3, scaler=1) -> ([attr]) -> ->
+    count: (formatter=usFmtInt) -> () -> (data, rowKey, colKey) ->
+        count: 0
+        push:  -> @count++
+        value: -> @count
+        format: formatter
+
+    countUnique: (formatter=usFmtInt) -> ([attr]) -> (data, rowKey, colKey) ->
+        uniq: []
+        push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
+        value: -> @uniq.length
+        format: formatter
+
+    listUnique: (sep) -> ([attr]) -> (data, rowKey, colKey)  ->
+        uniq: []
+        push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
+        value: -> @uniq.join sep
+        format: (x) -> x
+
+    sum: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
         sum: 0
         push: (record) -> @sum += parseFloat(record[attr]) if not isNaN parseFloat(record[attr])
         value: -> @sum
-        format: numberFormat(sigfig, scaler)
-        label: "Sum of #{attr}"
+        format: formatter
 
-    average:  (sigfig=3, scaler=1) -> ([attr]) -> ->
+    average:  (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
         sum: 0
         len: 0
         push: (record) ->
@@ -34,20 +64,18 @@ aggregatorTemplates =
                 @sum += parseFloat(record[attr])
                 @len++
         value: -> @sum/@len
-        format: numberFormat(sigfig, scaler)
-        label: "Average of #{attr}"
+        format: formatter
 
-    sumOverSum: (sigfig=3, scaler=1) -> ([num, denom]) -> ->
+    sumOverSum: (formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
         sumNum: 0
         sumDenom: 0
         push: (record) ->
             @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
             @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
         value: -> @sumNum/@sumDenom
-        format: numberFormat(sigfig, scaler)
-        label: "#{num}/#{denom}"
+        format: formatter
 
-    sumOverSumBound80: (sigfig=3, scaler=1, upper=true) -> ([num, denom]) -> ->
+    sumOverSumBound80: (upper=true, formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
         sumNum: 0
         sumDenom: 0
         push: (record) ->
@@ -58,78 +86,48 @@ aggregatorTemplates =
             (0.821187207574908/@sumDenom + @sumNum/@sumDenom + 1.2815515655446004*sign*
                 Math.sqrt(0.410593603787454/ (@sumDenom*@sumDenom) + (@sumNum*(1 - @sumNum/ @sumDenom))/ (@sumDenom*@sumDenom)))/
                 (1 + 1.642374415149816/@sumDenom)
-        format: numberFormat(sigfig, scaler)
-        label: "#{if upper then "Upper" else "Lower"} Bound of #{num}/#{denom}"
+        format: formatter
 
-    fractionOf: (wrapped, type="total") -> (x...) -> (data, rowKey, colKey) ->
+    fractionOf: (wrapped, type="total", formatter=usFmtPct) -> (x...) -> (data, rowKey, colKey) ->
         selector: {total:[[],[]],row:[rowKey,[]],col:[[],colKey]}[type]
         inner: wrapped(x...)(data, rowKey, colKey)
         push: (record) -> @inner.push record
-        format: (v) -> numberFormat(2)(100*v)+"%"
-        label: wrapped(x...)(data, rowKey, colKey).label+" % of "+type
+        format: formatter
         value: -> @inner.value() / data.getAggregator(@selector...).inner.value()
 
-    l10nWrapper: ( wrapped, formatter, labelFn) -> (x...) -> (data, rowKey, colKey) ->
-        inner: wrapped(x...)(data, rowKey, colKey)
-        push: (record) -> @inner.push record
-        format: formatter
-        label: labelFn(data)
-        value: -> @inner.value()
-
-#technically these are aggregator constructor generators (!)
-aggregators =
-    count: -> ->
-        count: 0
-        push:  -> @count++
-        value: -> @count
-        format: numberFormat(0)
-        label: "Count"
-
-    countUnique: ([attr]) -> ->
-        uniq: []
-        push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
-        value: -> @uniq.length
-        format: numberFormat(0)
-        label: "Count Unique #{attr}"
-
-    listUnique: ([attr]) ->  ->
-        uniq: []
-        push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
-        value: -> @uniq.join ", "
-        format: (x) -> x
-        label: "List Unique #{attr}"
-
-    intSum: aggregatorTemplates.sum(0)
-    sum: aggregatorTemplates.sum(3)
-    average: aggregatorTemplates.average(3)
-    sumOverSum: aggregatorTemplates.sumOverSum(3)
-    ub80: aggregatorTemplates.sumOverSumBound80(3, 1, true)
-    lb80: aggregatorTemplates.sumOverSumBound80(3, 1, false)
-
-aggregators.sumAsFractionOfTotal= aggregatorTemplates.fractionOf(aggregators.sum)
-aggregators.sumAsFractionOfRow= aggregatorTemplates.fractionOf(aggregators.sum, "row")
-aggregators.sumAsFractionOfCol= aggregatorTemplates.fractionOf(aggregators.sum, "col")
-aggregators.countAsFractionOfTotal= aggregatorTemplates.fractionOf(aggregators.count)
-aggregators.countAsFractionOfRow= aggregatorTemplates.fractionOf(aggregators.count, "row")
-aggregators.countAsFractionOfCol= aggregatorTemplates.fractionOf(aggregators.count, "col")
-
+#default aggregators & renderers use US naming and number formatting
+aggregators = do (tpl = aggregatorTemplates) -> 
+    "Count":                tpl.count(usFmtInt)
+    "Count Unique Values":  tpl.countUnique(usFmtInt)
+    "List Unique Values":   tpl.listUnique(",")
+    "Sum":                  tpl.sum(usFmt)
+    "Integer Sum":          tpl.sum(usFmtInt)
+    "Average":              tpl.average(usFmt)
+    "Sum over Sum":         tpl.sumOverSum(usFmt)
+    "80% Upper Bound":      tpl.sumOverSumBound80(true, usFmt)
+    "80% Lower Bound":      tpl.sumOverSumBound80(false, usFmt)
+    "Sum as Fraction of Total":     tpl.fractionOf(tpl.sum(),   "total", usFmtPct)
+    "Sum as Fraction of Rows":      tpl.fractionOf(tpl.sum(),   "row",   usFmtPct)
+    "Sum as Fraction of Columns":   tpl.fractionOf(tpl.sum(),   "col",   usFmtPct)
+    "Count as Fraction of Total":   tpl.fractionOf(tpl.count(), "total", usFmtPct)
+    "Count as Fraction of Rows":    tpl.fractionOf(tpl.count(), "row",   usFmtPct)
+    "Count as Fraction of Columns": tpl.fractionOf(tpl.count(), "col",   usFmtPct)
 
 renderers =
-    "Table": (pvtData, opts) -> pivotTableRenderer(pvtData, opts)
+    "Table":          (pvtData, opts) ->   pivotTableRenderer(pvtData, opts)
     "Table Barchart": (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).barchart()
-    "Heatmap":      (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap()
-    "Row Heatmap":  (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("rowheatmap")
-    "Col Heatmap":  (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("colheatmap")
+    "Heatmap":        (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap()
+    "Row Heatmap":    (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("rowheatmap")
+    "Col Heatmap":    (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("colheatmap")
 
-mthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+mthNamesEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+dayNamesEn = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
 zeroPad = (number) -> ("0"+number).substr(-2,2)
 
 derivers =
     bin: (col, binWidth) -> (record) -> record[col] - record[col] % binWidth
-    dateFormat: (col, formatString) ->
-        #thanks http://stackoverflow.com/a/12213072/112871
-        (record) ->
+    dateFormat: (col, formatString, mthNames=mthNamesEn, dayNames=dayNamesEn) ->
+        (record) -> #thanks http://stackoverflow.com/a/12213072/112871
             date = new Date(Date.parse(record[col]))
             if isNaN(date) then return ""
             formatString.replace /%(.)/g, (m, p) ->
@@ -145,7 +143,7 @@ derivers =
                     when "S" then zeroPad(date.getSeconds())
                     else "%" + p
 
-naturalSort = (as, bs) => #from http://stackoverflow.com/a/4373421/112871
+naturalSort = (as, bs) => #thanks http://stackoverflow.com/a/4373421/112871
     rx = /(\d+)|(\D+)/g
     rd = /\d/
     rz = /^0/
@@ -211,6 +209,10 @@ convertToArray = (input) ->
     result = []
     forEachRecord input, {}, (record) -> result.push record
     return result
+
+###
+Data Model class
+###
 
 class PivotData
     constructor: (@aggregator, @colAttrs, @rowAttrs) ->
@@ -289,7 +291,7 @@ getPivotData = (input, cols, rows, aggregator, filter, derivedAttributes) ->
         pivotData.processRecord(record) if filter(record)
     return pivotData
 
-#helper function for setting row/col-span
+#helper function for setting row/col-span in pivotTableRenderer
 spanSize = (arr, i, j) ->
     if i != 0
         noDraw = true
@@ -306,6 +308,10 @@ spanSize = (arr, i, j) ->
         break if stop
         len++
     return len
+
+###
+Default Renderer for hierarchical table layout
+###
 
 pivotTableRenderer = (pivotData, opts) ->
 
@@ -433,7 +439,7 @@ pivotTableRenderer = (pivotData, opts) ->
     return result
 
 ###
-Pivot Table
+Pivot Table core function: create PivotData object and call Renderer
 ###
 
 $.fn.pivot = (input, opts) ->
@@ -441,7 +447,7 @@ $.fn.pivot = (input, opts) ->
         cols : []
         rows: []
         filter: -> true
-        aggregator: aggregators.count()
+        aggregator: aggregatorTemplates.count()()
         derivedAttributes: {},
         renderer: pivotTableRenderer
         rendererOptions: null
@@ -471,7 +477,7 @@ $.fn.pivot = (input, opts) ->
 
 
 ###
-UI code, calls pivot table above
+UI code, calls pivot table core above with options set by user
 ###
 
 $.fn.pivotUI = (input, inputOpts, overwrite = false) ->

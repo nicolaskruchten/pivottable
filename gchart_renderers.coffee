@@ -28,16 +28,12 @@ makeGoogleChart = (chartType, extraOptions) -> (pivotData, opts) ->
 			else row.push null
 		dataArray.push row
 
-	title = vAxisTitle = pivotData.aggregator().label
+	vAxisTitle = pivotData.aggregator().label
 	hAxisTitle = pivotData.colAttrs.join("-")
-	title += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
-	groupByTitle = pivotData.rowAttrs.join("-")
-	title += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
 
 	options = 
 		width: $(window).width() / 1.4
 		height: $(window).height() / 1.4
-		title: title
 		hAxis: {title: hAxisTitle, slantedText: numCharsInHAxis > 50}
 		vAxis: {title: vAxisTitle}
 

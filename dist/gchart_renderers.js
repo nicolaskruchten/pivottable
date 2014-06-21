@@ -6,7 +6,7 @@
 
   makeGoogleChart = function(chartType, extraOptions) {
     return function(pivotData, opts) {
-      var agg, colKey, colKeys, dataArray, dataTable, defaults, groupByTitle, h, hAxisTitle, headers, k, numCharsInHAxis, options, result, row, rowKey, rowKeys, title, v, vAxisTitle, wrapper, _i, _j, _len, _len1;
+      var agg, colKey, colKeys, dataArray, dataTable, defaults, h, hAxisTitle, headers, k, numCharsInHAxis, options, result, row, rowKey, rowKeys, v, vAxisTitle, wrapper, _i, _j, _len, _len1;
       defaults = {
         localeStrings: {
           vs: "vs",
@@ -49,19 +49,11 @@
         }
         dataArray.push(row);
       }
-      title = vAxisTitle = pivotData.aggregator().label;
+      vAxisTitle = pivotData.aggregator().label;
       hAxisTitle = pivotData.colAttrs.join("-");
-      if (hAxisTitle !== "") {
-        title += " " + opts.localeStrings.vs + " " + hAxisTitle;
-      }
-      groupByTitle = pivotData.rowAttrs.join("-");
-      if (groupByTitle !== "") {
-        title += " " + opts.localeStrings.by + " " + groupByTitle;
-      }
       options = {
         width: $(window).width() / 1.4,
         height: $(window).height() / 1.4,
-        title: title,
         hAxis: {
           title: hAxisTitle,
           slantedText: numCharsInHAxis > 50
