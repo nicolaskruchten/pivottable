@@ -12,13 +12,13 @@
   });
 
   frFmtInt = nf({
-    sigfig: 0,
+    digitsAfterDecimal: 0,
     thousandsSep: " ",
     decimalSep: ","
   });
 
   frFmtPct = nf({
-    sigfig: 1,
+    digitsAfterDecimal: 1,
     scaler: 100,
     suffix: "%",
     thousandsSep: " ",
@@ -27,13 +27,13 @@
 
   $.pivotUtilities.locales.fr = {
     localeStrings: {
-      renderError: "An error occurred rendering the PivotTable results.",
-      computeError: "An error occurred computing the PivotTable results.",
-      uiRenderError: "An error occurred rendering the PivotTable UI.",
-      selectAll: "Select All",
-      selectNone: "Select None",
-      tooMany: "(too many to list)",
-      filterResults: "Filter results",
+      renderError: "Une erreur est survenue en dessinnant le tableau croisé.",
+      computeError: "Une erreur est survenue en calculant le tableau croisé.",
+      uiRenderError: "Une erreur est survenue en dessinnant l'interface du tableau croisé.",
+      selectAll: "Selectionner tout",
+      selectNone: "Selectionner rien",
+      tooMany: "(trop de valeur à afficher)",
+      filterResults: "Filtrer les resultats",
       totals: "Totaux",
       vs: "versus",
       by: "par"
@@ -41,26 +41,26 @@
     aggregators: {
       "Nombre": tpl.count(frFmtInt),
       "Nombre de valeurs uniques": tpl.countUnique(frFmtInt),
-      "List Unique Values": tpl.listUnique(","),
-      "Sum": tpl.sum(frFmt),
-      "Integer Sum": tpl.sum(frFmtInt),
-      "Average": tpl.average(frFmt),
-      "Sum over Sum": tpl.sumOverSum(frFmt),
-      "80% Upper Bound": tpl.sumOverSumBound80(true, frFmt),
-      "80% Lower Bound": tpl.sumOverSumBound80(false, frFmt),
-      "Sum as Fraction of Total": tpl.fractionOf(tpl.sum(), "total", frFmtPct),
-      "Sum as Fraction of Rows": tpl.fractionOf(tpl.sum(), "row", frFmtPct),
-      "Sum as Fraction of Columns": tpl.fractionOf(tpl.sum(), "col", frFmtPct),
-      "Count as Fraction of Total": tpl.fractionOf(tpl.count(), "total", frFmtPct),
-      "Count as Fraction of Rows": tpl.fractionOf(tpl.count(), "row", frFmtPct),
-      "Count as Fraction of Columns": tpl.fractionOf(tpl.count(), "col", frFmtPct)
+      "Liste de valeurs uniques": tpl.listUnique(","),
+      "Somme": tpl.sum(frFmt),
+      "Somme en entiers": tpl.sum(frFmtInt),
+      "Moyenne": tpl.average(frFmt),
+      "Ratio de sommes": tpl.sumOverSum(frFmt),
+      "Borne superieure 80%": tpl.sumOverSumBound80(true, frFmt),
+      "Borne inferieure 80%": tpl.sumOverSumBound80(false, frFmt),
+      "Somme en proportion du totale": tpl.fractionOf(tpl.sum(), "total", frFmtPct),
+      "Somme en proportion de la ligne": tpl.fractionOf(tpl.sum(), "row", frFmtPct),
+      "Somme en proportion de la colonne": tpl.fractionOf(tpl.sum(), "col", frFmtPct),
+      "Nombre en proportion du totale": tpl.fractionOf(tpl.count(), "total", frFmtPct),
+      "Nombre en proportion de la ligne": tpl.fractionOf(tpl.count(), "row", frFmtPct),
+      "Nombre en proportion de la colonne": tpl.fractionOf(tpl.count(), "col", frFmtPct)
     },
     renderers: {
       "Table": $.pivotUtilities.renderers["Table"],
-      "Table Barcharte": $.pivotUtilities.renderers["Table Barchart"],
-      "Heatmape": $.pivotUtilities.renderers["Heatmap"],
-      "Row Heatmape": $.pivotUtilities.renderers["Row Heatmap"],
-      "Col Heatmape": $.pivotUtilities.renderers["Col Heatmap"]
+      "Table avec barres": $.pivotUtilities.renderers["Table Barchart"],
+      "Carte de chaleur": $.pivotUtilities.renderers["Heatmap"],
+      "Carte de chaleur (lignes)": $.pivotUtilities.renderers["Row Heatmap"],
+      "Carte de chaleur (colonnes)": $.pivotUtilities.renderers["Col Heatmap"]
     }
   };
 

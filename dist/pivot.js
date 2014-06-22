@@ -29,7 +29,7 @@
   numberFormat = function(opts) {
     var defaults;
     defaults = {
-      sigfig: 3,
+      digitsAfterDecimal: 2,
       scaler: 1,
       thousandsSep: ",",
       decimalSep: ".",
@@ -46,7 +46,7 @@
       if (x === 0 && !opts.showZero) {
         return "";
       }
-      result = addSeparators((opts.scaler * x).toFixed(opts.sigfig), opts.thousandsSep, opts.decimalSep);
+      result = addSeparators((opts.scaler * x).toFixed(opts.digitsAfterDecimal), opts.thousandsSep, opts.decimalSep);
       return "" + opts.prefix + result + opts.suffix;
     };
   };
@@ -54,11 +54,11 @@
   usFmt = numberFormat();
 
   usFmtInt = numberFormat({
-    sigfig: 0
+    digitsAfterDecimal: 0
   });
 
   usFmtPct = numberFormat({
-    sigfig: 1,
+    digitsAfterDecimal: 1,
     scaler: 100,
     suffix: "%"
   });
