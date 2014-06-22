@@ -120,6 +120,21 @@ renderers =
     "Row Heatmap":    (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("rowheatmap")
     "Col Heatmap":    (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("colheatmap")
 
+locales = 
+    en: 
+        aggregators: aggregators
+        renderers: renderers
+        localeStrings: 
+            renderError: "An error occurred rendering the PivotTable results."
+            computeError: "An error occurred computing the PivotTable results."
+            uiRenderError: "An error occurred rendering the PivotTable UI."
+            selectAll: "Select All"
+            selectNone: "Select None"
+            tooMany: "(too many to list)"
+            filterResults: "Filter results"
+            totals: "Totals"
+
+#dateFormat deriver l10n requires month and day names to be passed in directly
 mthNamesEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 dayNamesEn = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
 zeroPad = (number) -> ("0"+number).substr(-2,2)
@@ -167,55 +182,21 @@ naturalSort = (as, bs) => #thanks http://stackoverflow.com/a/4373421/112871
                 return (if a1 > b1 then 1 else -1)
     a.length - b.length
 
-
-$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, naturalSort, numberFormat}
-
-###
-functions for accessing input
-###
-
-#can handle arrays or jQuery selections of tables
-forEachRecord = (input, derivedAttributes, f) ->
-    if $.isEmptyObject derivedAttributes
-        addRecord = f
-    else
-        addRecord = (record) -> 
-            record[k] = v(record) ? record[k] for k, v of derivedAttributes
-            f(record)
-
-    #if it's a function, have it call us back
-    if $.isFunction(input)
-        input(addRecord)
-    else if $.isArray(input)
-        if $.isArray(input[0]) #array of arrays
-            for own i, compactRecord of input when i > 0
-                record = {}
-                record[k] = compactRecord[j] for own j, k of input[0]
-                addRecord(record)
-        else #array of objects
-            addRecord(record) for record in input
-    else if input instanceof jQuery
-        tblCols = []
-        $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
-        $("tbody > tr", input).each (i) ->
-            record = {}
-            $("td", this).each (j) -> record[tblCols[j]] = $(this).text()
-            addRecord(record)
-    else
-        throw new Error("unknown input format")
-
-#converts to [{attr:val, attr:val},{attr:val, attr:val}] using method above
-convertToArray = (input) ->
-    result = []
-    forEachRecord input, {}, (record) -> result.push record
-    return result
+#expose these to the outside world
+$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
+    naturalSort, numberFormat}
 
 ###
 Data Model class
 ###
 
 class PivotData
-    constructor: (@aggregator, @colAttrs, @rowAttrs) ->
+    constructor: (input, opts) ->
+        @aggregator = opts.aggregator
+        @aggregatorName = opts.aggregatorName
+        @colAttrs = opts.cols
+        @rowAttrs = opts.rows
+        @valAttrs = opts.vals
         @tree = {}
         @rowKeys = []
         @colKeys = []
@@ -223,6 +204,46 @@ class PivotData
         @colTotals = {}
         @allTotal = @aggregator(this, [], [])
         @sorted = false
+
+        # iterate through input, accumulating data for cells
+        PivotData.forEachRecord input, opts.derivedAttributes, (record) =>
+            @processRecord(record) if opts.filter(record)
+
+    #can handle arrays or jQuery selections of tables
+    @forEachRecord = (input, derivedAttributes, f) ->
+        if $.isEmptyObject derivedAttributes
+            addRecord = f
+        else
+            addRecord = (record) -> 
+                record[k] = v(record) ? record[k] for k, v of derivedAttributes
+                f(record)
+
+        #if it's a function, have it call us back
+        if $.isFunction(input)
+            input(addRecord)
+        else if $.isArray(input)
+            if $.isArray(input[0]) #array of arrays
+                for own i, compactRecord of input when i > 0
+                    record = {}
+                    record[k] = compactRecord[j] for own j, k of input[0]
+                    addRecord(record)
+            else #array of objects
+                addRecord(record) for record in input
+        else if input instanceof jQuery
+            tblCols = []
+            $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
+            $("tbody > tr", input).each (i) ->
+                record = {}
+                $("td", this).each (j) -> record[tblCols[j]] = $(this).text()
+                addRecord(record)
+        else
+            throw new Error("unknown input format")
+
+    #converts to [{attr:val, attr:val},{attr:val, attr:val}] using method above
+    @convertToArray = (input) ->
+        result = []
+        PivotData.forEachRecord input, {}, (record) -> result.push record
+        return result
 
     natSort: (as, bs) => naturalSort(as, bs)
 
@@ -284,31 +305,6 @@ class PivotData
             agg = @tree[flatRowKey][flatColKey]
         return agg ? {value: (-> null), format: -> ""}
 
-getPivotData = (input, cols, rows, aggregator, filter, derivedAttributes) ->
-    # iterate through input, accumulating data for cells
-    pivotData = new PivotData(aggregator, cols, rows)
-    forEachRecord input, derivedAttributes, (record) ->
-        pivotData.processRecord(record) if filter(record)
-    return pivotData
-
-#helper function for setting row/col-span in pivotTableRenderer
-spanSize = (arr, i, j) ->
-    if i != 0
-        noDraw = true
-        for x in [0..j]
-            if arr[i-1][x] != arr[i][x]
-                noDraw = false
-        if noDraw
-          return -1 #do not draw cell
-    len = 0
-    while i+len < arr.length
-        stop = false
-        for x in [0..j]
-            stop = true if arr[i][x] != arr[i+len][x]
-        break if stop
-        len++
-    return len
-
 ###
 Default Renderer for hierarchical table layout
 ###
@@ -329,6 +325,24 @@ pivotTableRenderer = (pivotData, opts) ->
     #now actually build the output
     result = document.createElement("table")
     result.className = "pvtTable"
+
+    #helper function for setting row/col-span in pivotTableRenderer
+    spanSize = (arr, i, j) ->
+        if i != 0
+            noDraw = true
+            for x in [0..j]
+                if arr[i-1][x] != arr[i][x]
+                    noDraw = false
+            if noDraw
+              return -1 #do not draw cell
+        len = 0
+        while i+len < arr.length
+            stop = false
+            for x in [0..j]
+                stop = true if arr[i][x] != arr[i+len][x]
+            break if stop
+            len++
+        return len
 
     #the first few rows are for col headers
     for own j, c of colAttrs
@@ -393,7 +407,7 @@ pivotTableRenderer = (pivotData, opts) ->
             val = aggregator.value()
             td = document.createElement("td")
             td.className = "pvtVal row#{i} col#{j}"
-            td.textContent = aggregator.format(val)
+            td.innerHTML = aggregator.format(val)
             td.setAttribute("data-value", val)
             tr.appendChild td
 
@@ -401,7 +415,7 @@ pivotTableRenderer = (pivotData, opts) ->
         val = totalAggregator.value()
         td = document.createElement("td")
         td.className = "pvtTotal rowTotal"
-        td.textContent = totalAggregator.format(val)
+        td.innerHTML = totalAggregator.format(val)
         td.setAttribute("data-value", val)
         td.setAttribute("data-for", "row"+i)
         tr.appendChild td
@@ -419,7 +433,7 @@ pivotTableRenderer = (pivotData, opts) ->
         val = totalAggregator.value()
         td = document.createElement("td")
         td.className = "pvtTotal colTotal"
-        td.textContent = totalAggregator.format(val)
+        td.innerHTML = totalAggregator.format(val)
         td.setAttribute("data-value", val)
         td.setAttribute("data-for", "col"+j)
         tr.appendChild td
@@ -427,7 +441,7 @@ pivotTableRenderer = (pivotData, opts) ->
     val = totalAggregator.value()
     td = document.createElement("td")
     td.className = "pvtGrandTotal"
-    td.textContent = totalAggregator.format(val)
+    td.innerHTML = totalAggregator.format(val)
     td.setAttribute("data-value", val)
     tr.appendChild td
     result.appendChild tr
@@ -439,7 +453,7 @@ pivotTableRenderer = (pivotData, opts) ->
     return result
 
 ###
-Pivot Table core function: create PivotData object and call Renderer
+Pivot Table core: create PivotData object and call Renderer on it
 ###
 
 $.fn.pivot = (input, opts) ->
@@ -448,20 +462,17 @@ $.fn.pivot = (input, opts) ->
         rows: []
         filter: -> true
         aggregator: aggregatorTemplates.count()()
+        aggregatorName: "Count"
         derivedAttributes: {},
         renderer: pivotTableRenderer
         rendererOptions: null
-        localeStrings:
-            renderError: "An error occurred rendering the PivotTable results."
-            computeError: "An error occurred computing the PivotTable results."
+        localeStrings: locales.en.localeStrings
 
     opts = $.extend defaults, opts
 
     result = null
     try
-        pivotData = getPivotData(input, opts.cols, opts.rows,
-                                    opts.aggregator, opts.filter,
-                                    opts.derivedAttributes)
+        pivotData = new PivotData(input, opts)
         try
             result = opts.renderer(pivotData, opts.rendererOptions)
         catch e
@@ -477,32 +488,24 @@ $.fn.pivot = (input, opts) ->
 
 
 ###
-UI code, calls pivot table core above with options set by user
+Pivot Table UI: calls Pivot Table core above with options set by user
 ###
 
-$.fn.pivotUI = (input, inputOpts, overwrite = false) ->
+$.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
     defaults =
         derivedAttributes: {}
-        aggregators: aggregators
-        renderers: renderers
+        aggregators: locales[locale].aggregators
+        renderers: locales[locale].renderers
         hiddenAttributes: []
         menuLimit: 200
         cols: [], rows: [], vals: []
         exclusions: {}
         unusedAttrsVertical: false
         autoSortUnusedAttrs: false
-        rendererOptions: null
+        rendererOptions: localeStrings: locales[locale].localeStrings
         onRefresh: null
         filter: -> true
-        localeStrings:
-            renderError: "An error occurred rendering the PivotTable results."
-            computeError: "An error occurred computing the PivotTable results."
-            uiRenderError: "An error occurred rendering the PivotTable UI."
-            selectAll: "Select All"
-            selectNone: "Select None"
-            tooMany: "(too many to list)"
-            filterResults: "Filter results"
-
+        localeStrings: locales[locale].localeStrings
 
     existingOpts = @data "pivotUIOptions"
     if not existingOpts? or overwrite
@@ -512,7 +515,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
 
     try
         #cache the input in some useful form
-        input = convertToArray(input)
+        input = PivotData.convertToArray(input)
         tblCols = (k for own k of input[0])
         tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
 
@@ -520,7 +523,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
         axisValues = {}
         axisValues[x] = {} for x in tblCols
 
-        forEachRecord input, opts.derivedAttributes, (record) ->
+        PivotData.forEachRecord input, opts.derivedAttributes, (record) ->
             for own k, v of record when opts.filter(record)
                 v ?= "null"
                 axisValues[k][v] ?= 0
@@ -676,6 +679,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false) ->
             @find(".pvtCols li span.pvtAttr").each -> subopts.cols.push $(this).data("attrName")
             @find(".pvtVals li span.pvtAttr").each -> vals.push $(this).data("attrName")
 
+            subopts.aggregatorName = aggregator.val()
+            subopts.vals = vals
             subopts.aggregator = opts.aggregators[aggregator.val()](vals)
             subopts.renderer = opts.renderers[renderer.val()]
 
