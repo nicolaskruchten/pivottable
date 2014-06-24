@@ -13,15 +13,14 @@
     <body>
         <script type="text/javascript">
             $(function(){
-                var derivers = $.pivotUtilities.derivers;
-                var aggregators = $.pivotUtilities.aggregators;
-                var aggTemplates = $.pivotUtilities.aggregatorTemplates;
+                var derivers =     $.pivotUtilities.derivers;
+                var tpl =          $.pivotUtilities.aggregatorTemplates;
 
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {
                         aggregators: {
-                            "Number of MPs": aggregators.count,
-                            "Average Age of MPs": function() { return aggTemplates.average(3,1)(["Age"])},
+                            "Number of MPs":      function() { return tpl.count()() },
+                            "Average Age of MPs": function() { return tpl.average()(["Age"])},
                         },
                         derivedAttributes: {
                             "Age Bin": derivers.bin("Age", 10),

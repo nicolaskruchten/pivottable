@@ -28,7 +28,8 @@ makeGoogleChart = (chartType, extraOptions) -> (pivotData, opts) ->
 			else row.push null
 		dataArray.push row
 
-	title = vAxisTitle = pivotData.aggregator().label
+	title = vAxisTitle = pivotData.aggregatorName+ 
+		if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
 	hAxisTitle = pivotData.colAttrs.join("-")
 	title += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
 	groupByTitle = pivotData.rowAttrs.join("-")

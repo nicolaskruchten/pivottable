@@ -49,7 +49,7 @@
         }
         dataArray.push(row);
       }
-      title = vAxisTitle = pivotData.aggregator().label;
+      title = vAxisTitle = pivotData.aggregatorName + (pivotData.valAttrs.length ? "(" + (pivotData.valAttrs.join(", ")) + ")" : "");
       hAxisTitle = pivotData.colAttrs.join("-");
       if (hAxisTitle !== "") {
         title += " " + opts.localeStrings.vs + " " + hAxisTitle;
