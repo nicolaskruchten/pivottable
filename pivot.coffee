@@ -132,7 +132,9 @@ locales =
             selectNone: "Select None"
             tooMany: "(too many to list)"
             filterResults: "Filter results"
-            totals: "Totals"
+            totals: "Totals" #for table renderer
+            vs: "vs" #for gchart renderer
+            by: "by" #for gchart renderer
 
 #dateFormat deriver l10n requires month and day names to be passed in directly
 mthNamesEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -369,7 +371,7 @@ pivotTableRenderer = (pivotData, opts) ->
         if parseInt(j) == 0
             th = document.createElement("th")
             th.className = "pvtTotalLabel"
-            th.textContent = opts.localeStrings.totals
+            th.innerHTML = opts.localeStrings.totals
             th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
             tr.appendChild th
         result.appendChild tr
@@ -385,7 +387,7 @@ pivotTableRenderer = (pivotData, opts) ->
         th = document.createElement("th")
         if colAttrs.length ==0
             th.className = "pvtTotalLabel"
-            th.textContent = opts.localeStrings.totals
+            th.innerHTML = opts.localeStrings.totals
         tr.appendChild th
         result.appendChild tr
 
@@ -425,7 +427,7 @@ pivotTableRenderer = (pivotData, opts) ->
     tr = document.createElement("tr")
     th = document.createElement("th")
     th.className = "pvtTotalLabel"
-    th.textContent = opts.localeStrings.totals
+    th.innerHTML = opts.localeStrings.totals
     th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
     tr.appendChild th
     for own j, colKey of colKeys
@@ -477,10 +479,10 @@ $.fn.pivot = (input, opts) ->
             result = opts.renderer(pivotData, opts.rendererOptions)
         catch e
             console.error(e.stack) if console?
-            result = $("<span>").text opts.localeStrings.renderError
+            result = $("<span>").html opts.localeStrings.renderError
     catch e
         console.error(e.stack) if console?
-        result = $("<span>").text opts.localeStrings.computeError
+        result = $("<span>").html opts.localeStrings.computeError
     
     x = this[0]
     x.removeChild(x.lastChild) while x.hasChildNodes()
@@ -539,7 +541,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
             .appendTo(rendererControl)
             .bind "change", -> refresh() #capture reference
         for own x of opts.renderers
-            $("<option>").val(x).text(x).appendTo(renderer)
+            $("<option>").val(x).html(x).appendTo(renderer)
 
 
         #axis list, including the double-click menu
@@ -558,12 +560,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
 
                 valueList.append $("<h4>").text("#{c} (#{keys.length})")
                 if keys.length > opts.menuLimit
-                    valueList.append $("<p>").text(opts.localeStrings.tooMany)
+                    valueList.append $("<p>").html(opts.localeStrings.tooMany)
                 else
                     btns = $("<p>").appendTo(valueList)
-                    btns.append $("<button>").text(opts.localeStrings.selectAll).bind "click", ->
+                    btns.append $("<button>").html(opts.localeStrings.selectAll).bind "click", ->
                         valueList.find("input").prop "checked", true
-                    btns.append $("<button>").text(opts.localeStrings.selectNone).bind "click", ->
+                    btns.append $("<button>").html(opts.localeStrings.selectNone).bind "click", ->
                         valueList.find("input").prop "checked", false
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
@@ -624,7 +626,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         aggregator = $("<select class='pvtAggregator'>")
             .bind "change", -> refresh() #capture reference
         for own x of opts.aggregators
-            aggregator.append $("<option>").val(x).text(x)
+            aggregator.append $("<option>").val(x).html(x)
 
         $("<td class='pvtAxisContainer pvtHorizList pvtVals'>")
           .appendTo(tr1)

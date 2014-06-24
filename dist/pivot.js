@@ -318,7 +318,9 @@
         selectNone: "Select None",
         tooMany: "(too many to list)",
         filterResults: "Filter results",
-        totals: "Totals"
+        totals: "Totals",
+        vs: "vs",
+        by: "by"
       }
     }
   };
@@ -705,7 +707,7 @@
       if (parseInt(j) === 0) {
         th = document.createElement("th");
         th.className = "pvtTotalLabel";
-        th.textContent = opts.localeStrings.totals;
+        th.innerHTML = opts.localeStrings.totals;
         th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
         tr.appendChild(th);
       }
@@ -724,7 +726,7 @@
       th = document.createElement("th");
       if (colAttrs.length === 0) {
         th.className = "pvtTotalLabel";
-        th.textContent = opts.localeStrings.totals;
+        th.innerHTML = opts.localeStrings.totals;
       }
       tr.appendChild(th);
       result.appendChild(tr);
@@ -772,7 +774,7 @@
     tr = document.createElement("tr");
     th = document.createElement("th");
     th.className = "pvtTotalLabel";
-    th.textContent = opts.localeStrings.totals;
+    th.innerHTML = opts.localeStrings.totals;
     th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
     tr.appendChild(th);
     for (j in colKeys) {
@@ -831,14 +833,14 @@
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }
-        result = $("<span>").text(opts.localeStrings.renderError);
+        result = $("<span>").html(opts.localeStrings.renderError);
       }
     } catch (_error) {
       e = _error;
       if (typeof console !== "undefined" && console !== null) {
         console.error(e.stack);
       }
-      result = $("<span>").text(opts.localeStrings.computeError);
+      result = $("<span>").html(opts.localeStrings.computeError);
     }
     x = this[0];
     while (x.hasChildNodes()) {
@@ -938,7 +940,7 @@
       _ref1 = opts.renderers;
       for (x in _ref1) {
         if (!__hasProp.call(_ref1, x)) continue;
-        $("<option>").val(x).text(x).appendTo(renderer);
+        $("<option>").val(x).html(x).appendTo(renderer);
       }
       colList = $("<td class='pvtAxisContainer pvtUnused'>");
       if (opts.unusedAttrsVertical) {
@@ -971,13 +973,13 @@
         valueList = $("<div>").addClass('pvtFilterBox').hide();
         valueList.append($("<h4>").text("" + c + " (" + keys.length + ")"));
         if (keys.length > opts.menuLimit) {
-          valueList.append($("<p>").text(opts.localeStrings.tooMany));
+          valueList.append($("<p>").html(opts.localeStrings.tooMany));
         } else {
           btns = $("<p>").appendTo(valueList);
-          btns.append($("<button>").text(opts.localeStrings.selectAll).bind("click", function() {
+          btns.append($("<button>").html(opts.localeStrings.selectAll).bind("click", function() {
             return valueList.find("input").prop("checked", true);
           }));
-          btns.append($("<button>").text(opts.localeStrings.selectNone).bind("click", function() {
+          btns.append($("<button>").html(opts.localeStrings.selectNone).bind("click", function() {
             return valueList.find("input").prop("checked", false);
           }));
           btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
@@ -1048,7 +1050,7 @@
       _ref2 = opts.aggregators;
       for (x in _ref2) {
         if (!__hasProp.call(_ref2, x)) continue;
-        aggregator.append($("<option>").val(x).text(x));
+        aggregator.append($("<option>").val(x).html(x));
       }
       $("<td class='pvtAxisContainer pvtHorizList pvtVals'>").appendTo(tr1).append(aggregator).append($("<br>"));
       $("<td class='pvtAxisContainer pvtHorizList pvtCols'>").appendTo(tr1);
