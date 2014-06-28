@@ -37,7 +37,6 @@ aggregatorTemplates =
         push:  -> @count++
         value: -> @count
         format: formatter
-        numInputs: 0
 
     countUnique: (formatter=usFmtInt) -> ([attr]) -> (data, rowKey, colKey) ->
         uniq: []
@@ -683,7 +682,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                 rendererOptions: opts.rendererOptions
                 cols: [], rows: []
 
-            numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs
+            numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0
             vals = []
             @find(".pvtRows li span.pvtAttr").each -> subopts.rows.push $(this).data("attrName")
             @find(".pvtCols li span.pvtAttr").each -> subopts.cols.push $(this).data("attrName")
