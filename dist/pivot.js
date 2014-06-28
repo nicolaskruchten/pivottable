@@ -78,7 +78,8 @@
             value: function() {
               return this.count;
             },
-            format: formatter
+            format: formatter,
+            numInputs: 0
           };
         };
       };
@@ -102,7 +103,8 @@
             value: function() {
               return this.uniq.length;
             },
-            format: formatter
+            format: formatter,
+            numInputs: 1
           };
         };
       };
@@ -125,7 +127,8 @@
             },
             format: function(x) {
               return x;
-            }
+            },
+            numInputs: 1
           };
         };
       };
@@ -148,7 +151,8 @@
             value: function() {
               return this.sum;
             },
-            format: formatter
+            format: formatter,
+            numInputs: 1
           };
         };
       };
@@ -173,7 +177,8 @@
             value: function() {
               return this.sum / this.len;
             },
-            format: formatter
+            format: formatter,
+            numInputs: 1
           };
         };
       };
@@ -200,7 +205,8 @@
             value: function() {
               return this.sumNum / this.sumDenom;
             },
-            format: formatter
+            format: formatter,
+            numInputs: 2
           };
         };
       };
@@ -232,7 +238,8 @@
               sign = upper ? 1 : -1;
               return (0.821187207574908 / this.sumDenom + this.sumNum / this.sumDenom + 1.2815515655446004 * sign * Math.sqrt(0.410593603787454 / (this.sumDenom * this.sumDenom) + (this.sumNum * (1 - this.sumNum / this.sumDenom)) / (this.sumDenom * this.sumDenom))) / (1 + 1.642374415149816 / this.sumDenom);
             },
-            format: formatter
+            format: formatter,
+            numInputs: 2
           };
         };
       };
@@ -261,7 +268,8 @@
             format: formatter,
             value: function() {
               return this.inner.value() / data.getAggregator.apply(data, this.selector).inner.value();
-            }
+            },
+            numInputs: wrapped.apply(null, x)().numInputs
           };
         };
       };
@@ -272,7 +280,7 @@
     return {
       "Count": tpl.count(usFmtInt),
       "Count Unique Values": tpl.countUnique(usFmtInt),
-      "List Unique Values": tpl.listUnique(","),
+      "List Unique Values": tpl.listUnique(", "),
       "Sum": tpl.sum(usFmt),
       "Integer Sum": tpl.sum(usFmtInt),
       "Average": tpl.average(usFmt),
@@ -855,7 +863,7 @@
    */
 
   $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-    var aggregator, axisValues, c, colList, defaults, e, existingOpts, i, k, opts, pivotTable, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, x, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+    var aggregator, axisValues, c, colList, defaults, e, existingOpts, i, initialRender, k, opts, pivotTable, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, x, _fn, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4;
     if (overwrite == null) {
       overwrite = false;
     }
@@ -1052,7 +1060,7 @@
         if (!__hasProp.call(_ref2, x)) continue;
         aggregator.append($("<option>").val(x).html(x));
       }
-      $("<td class='pvtAxisContainer pvtHorizList pvtVals'>").appendTo(tr1).append(aggregator).append($("<br>"));
+      $("<td class='pvtVals'>").appendTo(tr1).append(aggregator).append($("<br>"));
       $("<td class='pvtAxisContainer pvtHorizList pvtCols'>").appendTo(tr1);
       tr2 = $("<tr>").appendTo(uiTable);
       tr2.append($("<td valign='top' class='pvtAxisContainer pvtRows'>"));
@@ -1074,20 +1082,16 @@
         x = _ref4[_k];
         this.find(".pvtRows").append(this.find(".axis_" + (shownAttributes.indexOf(x))));
       }
-      _ref5 = opts.vals;
-      for (_l = 0, _len3 = _ref5.length; _l < _len3; _l++) {
-        x = _ref5[_l];
-        this.find(".pvtVals").append(this.find(".axis_" + (shownAttributes.indexOf(x))));
-      }
       if (opts.aggregatorName != null) {
         this.find(".pvtAggregator").val(opts.aggregatorName);
       }
       if (opts.rendererName != null) {
         this.find(".pvtRenderer").val(opts.rendererName);
       }
+      initialRender = true;
       refreshDelayed = (function(_this) {
         return function() {
-          var exclusions, natSort, pivotUIOptions, subopts, unusedAttrsContainer, vals;
+          var attr, exclusions, natSort, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, subopts, unusedAttrsContainer, vals, _l, _len3, _m;
           subopts = {
             derivedAttributes: opts.derivedAttributes,
             localeStrings: opts.localeStrings,
@@ -1095,6 +1099,7 @@
             cols: [],
             rows: []
           };
+          numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs;
           vals = [];
           _this.find(".pvtRows li span.pvtAttr").each(function() {
             return subopts.rows.push($(this).data("attrName"));
@@ -1102,9 +1107,38 @@
           _this.find(".pvtCols li span.pvtAttr").each(function() {
             return subopts.cols.push($(this).data("attrName"));
           });
-          _this.find(".pvtVals li span.pvtAttr").each(function() {
-            return vals.push($(this).data("attrName"));
+          _this.find(".pvtVals select.pvtAttrDropdown").each(function() {
+            if (numInputsToProcess === 0) {
+              return $(this).remove();
+            } else {
+              numInputsToProcess--;
+              if ($(this).val() !== "") {
+                return vals.push($(this).val());
+              }
+            }
           });
+          if (numInputsToProcess !== 0) {
+            pvtVals = _this.find(".pvtVals");
+            for (x = _l = 0; 0 <= numInputsToProcess ? _l < numInputsToProcess : _l > numInputsToProcess; x = 0 <= numInputsToProcess ? ++_l : --_l) {
+              newDropdown = $("<select class='pvtAttrDropdown'>").append($("<option>")).bind("change", function() {
+                return refresh();
+              });
+              for (_m = 0, _len3 = shownAttributes.length; _m < _len3; _m++) {
+                attr = shownAttributes[_m];
+                newDropdown.append($("<option>").text(attr));
+              }
+              pvtVals.append(newDropdown);
+            }
+          }
+          if (initialRender) {
+            vals = opts.vals;
+            i = 0;
+            _this.find(".pvtVals select.pvtAttrDropdown").each(function() {
+              $(this).val(vals[i]);
+              return i++;
+            });
+            initialRender = false;
+          }
           subopts.aggregatorName = aggregator.val();
           subopts.vals = vals;
           subopts.aggregator = opts.aggregators[aggregator.val()](vals);
@@ -1120,13 +1154,13 @@
             }
           });
           subopts.filter = function(record) {
-            var excludedItems, _ref6;
+            var excludedItems, _ref5;
             if (!opts.filter(record)) {
               return false;
             }
             for (k in exclusions) {
               excludedItems = exclusions[k];
-              if (_ref6 = "" + record[k], __indexOf.call(excludedItems, _ref6) >= 0) {
+              if (_ref5 = "" + record[k], __indexOf.call(excludedItems, _ref5) >= 0) {
                 return false;
               }
             }

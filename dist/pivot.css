@@ -29,7 +29,7 @@ table.pvtTable tr td {
 .pvtVals { text-align: center;}
 .pvtAggregator { margin-bottom: 5px ;}
 
-.pvtAxisContainer {
+.pvtAxisContainer, .pvtVals {
     border: 1px solid gray;
     background: #EEE;
     padding: 5px;
