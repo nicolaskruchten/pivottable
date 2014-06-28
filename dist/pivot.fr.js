@@ -33,7 +33,7 @@
       selectAll: "S&eacute;lectionner tout",
       selectNone: "S&eacute;lectionner rien",
       tooMany: "(trop de valeurs &agrave; afficher)",
-      filterResults: "Filtrer les r&eacute;sultats",
+      filterResults: "Filtrer les valeurs",
       totals: "Totaux",
       vs: "sur",
       by: "par"
