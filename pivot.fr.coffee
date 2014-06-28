@@ -22,7 +22,7 @@ $.pivotUtilities.locales.fr =
     aggregators: 
         "Nombre":                             tpl.count(frFmtInt)
         "Nombre de valeurs uniques":          tpl.countUnique(frFmtInt)
-        "Liste de valeurs uniques":           tpl.listUnique(",")
+        "Liste de valeurs uniques":           tpl.listUnique(", ")
         "Somme":                              tpl.sum(frFmt)
         "Somme en entiers":                   tpl.sum(frFmtInt)
         "Moyenne":                            tpl.average(frFmt)
