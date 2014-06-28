@@ -13,10 +13,11 @@ With an optional add-on, the summary table can be rendered as a Google Chart, tu
 * lightweight: the core (without Google Charts or D3 support) is a single file with less than 1000 LOC of CoffeeScript, compiles down to 6.3kb of Javascript minified and gzipped, depends only on jQuery and jQueryUI's 'sortable'
 * works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
 * works acceptably fast in Chrome on commodity hardware up to around a hundred thousand records, depending on the cardinality of the attributes.
+* UI is [localizable](https://github.com/nicolaskruchten/pivottable/wiki/Localization)
 * layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
 * works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
 * [derived attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes) can be created on the fly based on the whole input record by passing in a function
-* complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (i.e. weighted averages)
+* complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (e.g. weighted averages)
 * built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional support for [Google Charts](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
 * works on mobile devices with jQuery UI Touch Punch
@@ -91,7 +92,8 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 * [Aggregators](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators)
 * [Renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers)
 * [Derived Attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes)
-* [Google Charts Support](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
+* [Localization](https://github.com/nicolaskruchten/pivottable/wiki/Localization)
+* [Google Charts and D3 Support](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-and-D3-Support)
 * [Used By](https://github.com/nicolaskruchten/pivottable/wiki/Used-By)
 
 ## How can I contribute?
