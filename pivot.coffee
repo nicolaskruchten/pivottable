@@ -509,7 +509,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         menuLimit: 200
         cols: [], rows: [], vals: []
         exclusions: {}
-        unusedAttrsVertical: false
+        unusedAttrsVertical: "auto"
         autoSortUnusedAttrs: false
         rendererOptions: localeStrings: locales[locale].localeStrings
         onRefresh: null
@@ -552,13 +552,19 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
 
 
         #axis list, including the double-click menu
-
         colList = $("<td class='pvtAxisContainer pvtUnused'>")
+        shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
+
+        if opts.unusedAttrsVertical == "auto"
+            attrLength = 0
+            attrLength += a.length for a in shownAttributes
+            opts.unusedAttrsVertical = attrLength > 120
+
         if opts.unusedAttrsVertical
             colList.addClass('pvtVertList')
         else
             colList.addClass('pvtHorizList')
-        shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
+
         for i, c of shownAttributes
             do (c) ->
                 keys = (k for k of axisValues[c])
