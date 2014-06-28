@@ -78,8 +78,7 @@
             value: function() {
               return this.count;
             },
-            format: formatter,
-            numInputs: 0
+            format: formatter
           };
         };
       };
@@ -1091,7 +1090,7 @@
       initialRender = true;
       refreshDelayed = (function(_this) {
         return function() {
-          var attr, exclusions, natSort, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, subopts, unusedAttrsContainer, vals, _l, _len3, _m;
+          var attr, exclusions, natSort, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, subopts, unusedAttrsContainer, vals, _l, _len3, _m, _ref5;
           subopts = {
             derivedAttributes: opts.derivedAttributes,
             localeStrings: opts.localeStrings,
@@ -1099,7 +1098,7 @@
             cols: [],
             rows: []
           };
-          numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs;
+          numInputsToProcess = (_ref5 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? _ref5 : 0;
           vals = [];
           _this.find(".pvtRows li span.pvtAttr").each(function() {
             return subopts.rows.push($(this).data("attrName"));
@@ -1154,13 +1153,13 @@
             }
           });
           subopts.filter = function(record) {
-            var excludedItems, _ref5;
+            var excludedItems, _ref6;
             if (!opts.filter(record)) {
               return false;
             }
             for (k in exclusions) {
               excludedItems = exclusions[k];
-              if (_ref5 = "" + record[k], __indexOf.call(excludedItems, _ref5) >= 0) {
+              if (_ref6 = "" + record[k], __indexOf.call(excludedItems, _ref6) >= 0) {
                 return false;
               }
             }
