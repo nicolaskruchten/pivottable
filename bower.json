@@ -11,6 +11,10 @@
     "pivot",
     "crosstab",
     "grid",
+    "table",
+    "pivottable",
+    "pivotgrid",
+    "pivotchart",
     "jquery"
   ],
   "homepage": "http://nicolas.kruchten.com/pivottable",
