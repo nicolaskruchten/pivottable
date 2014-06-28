@@ -37,24 +37,28 @@ aggregatorTemplates =
         push:  -> @count++
         value: -> @count
         format: formatter
+        numInputs: 0
 
     countUnique: (formatter=usFmtInt) -> ([attr]) -> (data, rowKey, colKey) ->
         uniq: []
         push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
         value: -> @uniq.length
         format: formatter
+        numInputs: 1
 
     listUnique: (sep) -> ([attr]) -> (data, rowKey, colKey)  ->
         uniq: []
         push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
         value: -> @uniq.join sep
         format: (x) -> x
+        numInputs: 1
 
     sum: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
         sum: 0
         push: (record) -> @sum += parseFloat(record[attr]) if not isNaN parseFloat(record[attr])
         value: -> @sum
         format: formatter
+        numInputs: 1
 
     average:  (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
         sum: 0
@@ -65,6 +69,7 @@ aggregatorTemplates =
                 @len++
         value: -> @sum/@len
         format: formatter
+        numInputs: 1
 
     sumOverSum: (formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
         sumNum: 0
@@ -74,6 +79,7 @@ aggregatorTemplates =
             @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
         value: -> @sumNum/@sumDenom
         format: formatter
+        numInputs: 2
 
     sumOverSumBound80: (upper=true, formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
         sumNum: 0
@@ -87,6 +93,7 @@ aggregatorTemplates =
                 Math.sqrt(0.410593603787454/ (@sumDenom*@sumDenom) + (@sumNum*(1 - @sumNum/ @sumDenom))/ (@sumDenom*@sumDenom)))/
                 (1 + 1.642374415149816/@sumDenom)
         format: formatter
+        numInputs: 2
 
     fractionOf: (wrapped, type="total", formatter=usFmtPct) -> (x...) -> (data, rowKey, colKey) ->
         selector: {total:[[],[]],row:[rowKey,[]],col:[[],colKey]}[type]
@@ -94,6 +101,7 @@ aggregatorTemplates =
         push: (record) -> @inner.push record
         format: formatter
         value: -> @inner.value() / data.getAggregator(@selector...).inner.value()
+        numInputs: wrapped(x...)().numInputs
 
 #default aggregators & renderers use US naming and number formatting
 aggregators = do (tpl = aggregatorTemplates) -> 
@@ -628,7 +636,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         for own x of opts.aggregators
             aggregator.append $("<option>").val(x).html(x)
 
-        $("<td class='pvtAxisContainer pvtHorizList pvtVals'>")
+        $("<td class='pvtVals'>")
           .appendTo(tr1)
           .append(aggregator)
           .append($("<br>"))
@@ -643,7 +651,6 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
 
         #the actual pivot table container
         pivotTable = $("<td valign='top' class='pvtRendererArea'>").appendTo(tr2)
-
 
         #finally the renderer dropdown and unused attribs are inserted at the requested location
         if opts.unusedAttrsVertical
@@ -661,12 +668,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
             @find(".pvtCols").append @find(".axis_#{shownAttributes.indexOf(x)}")
         for x in opts.rows
             @find(".pvtRows").append @find(".axis_#{shownAttributes.indexOf(x)}")
-        for x in opts.vals
-            @find(".pvtVals").append @find(".axis_#{shownAttributes.indexOf(x)}")
         if opts.aggregatorName?
             @find(".pvtAggregator").val opts.aggregatorName
         if opts.rendererName?
             @find(".pvtRenderer").val opts.rendererName
+
+        initialRender = true
 
         #set up for refreshing
         refreshDelayed = =>
@@ -676,10 +683,34 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                 rendererOptions: opts.rendererOptions
                 cols: [], rows: []
 
+            numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs
             vals = []
             @find(".pvtRows li span.pvtAttr").each -> subopts.rows.push $(this).data("attrName")
             @find(".pvtCols li span.pvtAttr").each -> subopts.cols.push $(this).data("attrName")
-            @find(".pvtVals li span.pvtAttr").each -> vals.push $(this).data("attrName")
+            @find(".pvtVals select.pvtAttrDropdown").each ->
+                if numInputsToProcess == 0
+                    $(this).remove()
+                else
+                    numInputsToProcess--
+                    vals.push $(this).val() if $(this).val() != ""
+
+            if numInputsToProcess != 0
+                pvtVals = @find(".pvtVals")
+                for x in [0...numInputsToProcess]
+                    newDropdown = $("<select class='pvtAttrDropdown'>")
+                        .append($("<option>"))
+                        .bind "change", -> refresh()
+                    for attr in shownAttributes
+                        newDropdown.append($("<option>").text(attr))
+                    pvtVals.append(newDropdown)
+
+            if initialRender
+                vals = opts.vals
+                i = 0
+                @find(".pvtVals select.pvtAttrDropdown").each ->
+                    $(this).val vals[i]
+                    i++
+                initialRender = false
 
             subopts.aggregatorName = aggregator.val()
             subopts.vals = vals
