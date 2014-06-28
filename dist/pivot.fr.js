@@ -27,15 +27,15 @@
 
   $.pivotUtilities.locales.fr = {
     localeStrings: {
-      renderError: "Une erreur est survenue en dessinnant le tableau crois&eacute;.",
+      renderError: "Une erreur est survenue en dessinant le tableau crois&eacute;.",
       computeError: "Une erreur est survenue en calculant le tableau crois&eacute;.",
-      uiRenderError: "Une erreur est survenue en dessinnant l'interface du tableau crois&eacute;.",
+      uiRenderError: "Une erreur est survenue en dessinant l'interface du tableau crois&eacute; dynamique.",
       selectAll: "S&eacute;lectionner tout",
       selectNone: "S&eacute;lectionner rien",
       tooMany: "(trop de valeurs &agrave; afficher)",
-      filterResults: "Filtrer les resultats",
+      filterResults: "Filtrer les r&eacute;sultats",
       totals: "Totaux",
-      vs: "versus",
+      vs: "sur",
       by: "par"
     },
     aggregators: {
