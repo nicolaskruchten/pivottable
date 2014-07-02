@@ -555,12 +555,13 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         colList = $("<td class='pvtAxisContainer pvtUnused'>")
         shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
 
+        unusedAttrsVerticalAutoOverride = false
         if opts.unusedAttrsVertical == "auto"
             attrLength = 0
             attrLength += a.length for a in shownAttributes
-            opts.unusedAttrsVertical = attrLength > 120
+            unusedAttrsVerticalAutoOverride = attrLength > 120
 
-        if opts.unusedAttrsVertical
+        if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
             colList.addClass('pvtVertList')
         else
             colList.addClass('pvtHorizList')
@@ -658,7 +659,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         pivotTable = $("<td valign='top' class='pvtRendererArea'>").appendTo(tr2)
 
         #finally the renderer dropdown and unused attribs are inserted at the requested location
-        if opts.unusedAttrsVertical
+        if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
             uiTable.find('tr:nth-child(1)').prepend rendererControl
             uiTable.find('tr:nth-child(2)').prepend colList
         else
@@ -706,7 +707,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                         .append($("<option>"))
                         .bind "change", -> refresh()
                     for attr in shownAttributes
-                        newDropdown.append($("<option>").text(attr))
+                        newDropdown.append($("<option>").val(attr).text(attr))
                     pvtVals.append(newDropdown)
 
             if initialRender
@@ -738,20 +739,14 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                 return true
 
             pivotTable.pivot(input,subopts)
-            pivotUIOptions =
+            pivotUIOptions = $.extend opts,
                 cols: subopts.cols
                 rows: subopts.rows
                 vals: vals
                 exclusions: exclusions
-                hiddenAttributes: opts.hiddenAttributes
-                renderers: opts.renderers
-                aggregators: opts.aggregators
-                filter: opts.filter
-                derivedAttributes: opts.derivedAttributes
                 aggregatorName: aggregator.val()
                 rendererName: renderer.val()
-                localeStrings: opts.localeStrings
-                rendererOptions: opts.rendererOptions
+
             @data "pivotUIOptions", pivotUIOptions
 
             # if requested make sure unused columns are in alphabetical order
