@@ -692,19 +692,14 @@
         th.setAttribute("rowspan", colAttrs.length);
         tr.appendChild(th);
       }
-      th = document.createElement("th");
-      th.className = "pvtAxisLabel";
-      th.textContent = c;
+      th = $("<th>").addClass("pvtAxisLabel").text(c)[0];
       tr.appendChild(th);
       for (i in colKeys) {
         if (!__hasProp.call(colKeys, i)) continue;
         colKey = colKeys[i];
         x = spanSize(colKeys, parseInt(i), parseInt(j));
         if (x !== -1) {
-          th = document.createElement("th");
-          th.className = "pvtColLabel";
-          th.textContent = colKey[j];
-          th.setAttribute("colspan", x);
+          th = $("<th>").addClass("pvtColLabel").text(colKey[j]).attr("colspan", x)[0];
           if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
             th.setAttribute("rowspan", 2);
           }
@@ -725,9 +720,7 @@
       for (i in rowAttrs) {
         if (!__hasProp.call(rowAttrs, i)) continue;
         r = rowAttrs[i];
-        th = document.createElement("th");
-        th.className = "pvtAxisLabel";
-        th.textContent = r;
+        th = $("<th>").addClass("pvtAxisLabel").text(r)[0];
         tr.appendChild(th);
       }
       th = document.createElement("th");
@@ -747,10 +740,7 @@
         txt = rowKey[j];
         x = spanSize(rowKeys, parseInt(i), parseInt(j));
         if (x !== -1) {
-          th = document.createElement("th");
-          th.className = "pvtRowLabel";
-          th.textContent = txt;
-          th.setAttribute("rowspan", x);
+          th = $("<th>").addClass("pvtRowLabel").text(txt).attr("rowspan", x)[0];
           if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
             th.setAttribute("colspan", 2);
           }
@@ -1047,8 +1037,8 @@
           $('.pvtSearch').val('');
           return $('label').show();
         };
-        triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
-        attrElem = $("<li class='axis_" + i + "'>").append($("<span class='pvtAttr'>").text(c).data("attrName", c).append(triangleLink));
+        triangleLink = $("<span>").addClass("pvtTriangle").html(" &#x25BE;").bind("click", showFilterList);
+        attrElem = $("<li class='axis_" + i + "'>").append($("<span>").addClass("pvtAttr").text(c).data("attrName", c).append(triangleLink));
         if (hasExcludedItem) {
           attrElem.addClass('pvtFilteredAttribute');
         }

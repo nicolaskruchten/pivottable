@@ -361,17 +361,12 @@ pivotTableRenderer = (pivotData, opts) ->
             th.setAttribute("colspan", rowAttrs.length)
             th.setAttribute("rowspan", colAttrs.length)
             tr.appendChild th
-        th = document.createElement("th")
-        th.className = "pvtAxisLabel"
-        th.textContent = c
+        th = $("<th>").addClass("pvtAxisLabel").text(c)[0]
         tr.appendChild th
         for own i, colKey of colKeys
             x = spanSize(colKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = document.createElement("th")
-                th.className = "pvtColLabel"
-                th.textContent = colKey[j]
-                th.setAttribute("colspan", x)
+                th = $("<th>").addClass("pvtColLabel").text(colKey[j]).attr("colspan", x)[0]
                 if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                     th.setAttribute("rowspan", 2)
                 tr.appendChild th
@@ -387,9 +382,7 @@ pivotTableRenderer = (pivotData, opts) ->
     if rowAttrs.length !=0
         tr = document.createElement("tr")
         for own i, r of rowAttrs
-            th = document.createElement("th")
-            th.className = "pvtAxisLabel"
-            th.textContent = r
+            th = $("<th>").addClass("pvtAxisLabel").text(r)[0]
             tr.appendChild th 
         th = document.createElement("th")
         if colAttrs.length ==0
@@ -404,10 +397,7 @@ pivotTableRenderer = (pivotData, opts) ->
         for own j, txt of rowKey
             x = spanSize(rowKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = document.createElement("th")
-                th.className = "pvtRowLabel"
-                th.textContent = txt
-                th.setAttribute("rowspan", x)
+                th = $("<th>").addClass("pvtRowLabel").text(txt).attr("rowspan", x)[0]
                 if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                     th.setAttribute("colspan",2)
                 tr.appendChild th
@@ -623,11 +613,11 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                     $('.pvtSearch').val('')
                     $('label').show()
 
-                triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;")
+                triangleLink = $("<span>").addClass("pvtTriangle").html(" &#x25BE;")
                     .bind "click", showFilterList
 
                 attrElem = $("<li class='axis_#{i}'>")
-                    .append $("<span class='pvtAttr'>").text(c).data("attrName", c).append(triangleLink)
+                    .append $("<span>").addClass("pvtAttr").text(c).data("attrName", c).append(triangleLink)
                 attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                 colList.append(attrElem).append(valueList)
 
