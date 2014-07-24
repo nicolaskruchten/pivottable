@@ -107,7 +107,8 @@
     }),
     "Area Chart": makeGoogleChart("AreaChart", {
       isStacked: true
-    })
+    }),
+    "Pie Chart": makeGoogleChart("PieChart")
   };
 
 }).call(this);
