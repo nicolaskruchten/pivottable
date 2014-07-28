@@ -718,11 +718,11 @@
 
         // NOTE: Cube19 changes at work...
         if (opts.hasOwnProperty("showTotals")) {
-          if (opts.showTotals.row) {
+          if (opts.showTotals.column) {
             th.innerHTML = opts.localeStrings.totals;
             th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
             tr.appendChild(th);
-          } else if (!opts.showTotals.row && opts.showTotals.grand) {
+          } else if (!opts.showTotals.column && opts.showTotals.grand) {
             th.innerHTML = "";
             th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
             tr.appendChild(th);
@@ -793,12 +793,12 @@
 
       // NOTE: Cube19 changes at work...
       if (opts.hasOwnProperty("showTotals")) {
-        if (opts.showTotals.row) {
+        if (opts.showTotals.column) {
           td.innerHTML = totalAggregator.format(val);
           td.setAttribute("data-value", val);
           td.setAttribute("data-for", "row" + i);
           tr.appendChild(td);
-        } else if (!opts.showTotals.row && opts.showTotals.grand) {
+        } else if (!opts.showTotals.column && opts.showTotals.grand) {
           td.innerHTML = "";
           tr.appendChild(td);
         }
@@ -818,11 +818,11 @@
 
     // NOTE: Cube19 changes at work...
     if (opts.hasOwnProperty("showTotals")) {
-      if (opts.showTotals.column) {
+      if (opts.showTotals.row) {
         th.innerHTML = opts.localeStrings.totals;
         th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
         tr.appendChild(th);
-      } else if (!opts.showTotals.column && opts.showTotals.grand) {
+      } else if (!opts.showTotals.row && opts.showTotals.grand) {
         th.innerHTML = "";
         th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
         tr.appendChild(th);
@@ -844,12 +844,12 @@
 
       // NOTE: Cube19 changes at work...
       if (opts.hasOwnProperty("showTotals")) {
-        if (opts.showTotals.column) {
+        if (opts.showTotals.row) {
           td.innerHTML = totalAggregator.format(val);
           td.setAttribute("data-value", val);
           td.setAttribute("data-for", "col" + j);
           tr.appendChild(td);
-        } else if (!opts.showTotals.column && opts.showTotals.grand) {
+        } else if (!opts.showTotals.row && opts.showTotals.grand) {
           td.innerHTML = "";
           tr.appendChild(td);
         }
@@ -945,7 +945,7 @@
       aggregators: locales[locale].aggregators,
       renderers: locales[locale].renderers,
       hiddenAttributes: [],
-      menuLimit: 200,
+      menuLimit: 1000,  // NOTE: Cube19 changes at work...
       cols: [],
       rows: [],
       vals: [],
