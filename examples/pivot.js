@@ -118,7 +118,14 @@
             push: function(record) {
               var _ref;
               if (_ref = record[attr], __indexOf.call(this.uniq, _ref) < 0) {
-                return this.uniq.push(record[attr]);
+                // NOTE: CUBE19 changes at work
+                var number = record[attr];
+                var decimalPlaces = 2;
+                var _nb = number * Math.pow(10, decimalPlaces);
+                _nb = Math.round(_nb);
+                _nb = _nb / Math.pow(10, decimalPlaces);
+                return this.uniq.push(_nb);
+                // END: CUBE19
               }
             },
             value: function() {
