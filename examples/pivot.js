@@ -710,7 +710,20 @@
         if (x !== -1) {
           th = document.createElement("th");
           th.className = "pvtColLabel";
-          th.textContent = colKey[j];
+
+          // NOTE: CUBE19 CHANGES
+          var colVal = colKey[j];
+          if(isNaN(colVal)){
+            th.textContent = colKey[j];
+          }else{
+            var decimalPlaces = 2;
+            var _nb = colVal * Math.pow(10, decimalPlaces);
+            _nb = Math.round(_nb);
+            _nb = _nb / Math.pow(10, decimalPlaces);
+            th.textContent = _nb;
+          }
+
+          // END: CUBE19 changes
           th.setAttribute("colspan", x);
           if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
             th.setAttribute("rowspan", 2);
@@ -836,7 +849,8 @@
       }
     } else {
       th.innerHTML = opts.localeStrings.totals;
-      th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
+      th.innerHTML = opts.localeStrings.totals;
+      th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
       tr.appendChild(th);
     }
     // END: Cube19 changes.
