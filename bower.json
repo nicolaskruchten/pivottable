@@ -2,7 +2,12 @@
   "name": "pivottable",
   "description": "Javascript Pivot Table (aka Pivot Grid, Pivot Chart, Cross-Tab) implementation with drag'n'drop",
   "version": "1.2.1",
-  "main": "dist/pivot.js",
+  "main": [
+    "dist/pivot.js",
+    "dist/renderers/table.js",
+    "dist/aggregators/count.js"
+    "dist/aggregators/sum.js"
+  ],
   "license": "MIT",
   "ignore": [
     "examples"

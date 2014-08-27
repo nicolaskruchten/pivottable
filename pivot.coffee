@@ -14,8 +14,8 @@ addSeparators = (nStr, thousandsSep, decimalSep) ->
     return x1 + x2
 
 numberFormat = (opts) ->
-    defaults = 
-        digitsAfterDecimal: 2, scaler: 1, 
+    defaults =
+        digitsAfterDecimal: 2, scaler: 1,
         thousandsSep: ",", decimalSep: "."
         prefix: "", suffix: ""
         showZero: false
@@ -27,73 +27,11 @@ numberFormat = (opts) ->
         return ""+opts.prefix+result+opts.suffix
 
 #aggregator templates default to US number formatting but this is overrideable
-usFmt = numberFormat()
-usFmtInt = numberFormat(digitsAfterDecimal: 0)
+# usFmt = numberFormat()
+# usFmtInt = numberFormat(digitsAfterDecimal: 0)
 usFmtPct = numberFormat(digitsAfterDecimal:1, scaler: 100, suffix: "%")
 
 aggregatorTemplates =
-    count: (formatter=usFmtInt) -> () -> (data, rowKey, colKey) ->
-        count: 0
-        push:  -> @count++
-        value: -> @count
-        format: formatter
-
-    countUnique: (formatter=usFmtInt) -> ([attr]) -> (data, rowKey, colKey) ->
-        uniq: []
-        push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
-        value: -> @uniq.length
-        format: formatter
-        numInputs: 1
-
-    listUnique: (sep) -> ([attr]) -> (data, rowKey, colKey)  ->
-        uniq: []
-        push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
-        value: -> @uniq.join sep
-        format: (x) -> x
-        numInputs: 1
-
-    sum: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
-        sum: 0
-        push: (record) -> @sum += parseFloat(record[attr]) if not isNaN parseFloat(record[attr])
-        value: -> @sum
-        format: formatter
-        numInputs: 1
-
-    average:  (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
-        sum: 0
-        len: 0
-        push: (record) ->
-            if not isNaN parseFloat(record[attr])
-                @sum += parseFloat(record[attr])
-                @len++
-        value: -> @sum/@len
-        format: formatter
-        numInputs: 1
-
-    sumOverSum: (formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
-        sumNum: 0
-        sumDenom: 0
-        push: (record) ->
-            @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
-            @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
-        value: -> @sumNum/@sumDenom
-        format: formatter
-        numInputs: 2
-
-    sumOverSumBound80: (upper=true, formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
-        sumNum: 0
-        sumDenom: 0
-        push: (record) ->
-            @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
-            @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
-        value: ->
-            sign = if upper then 1 else -1
-            (0.821187207574908/@sumDenom + @sumNum/@sumDenom + 1.2815515655446004*sign*
-                Math.sqrt(0.410593603787454/ (@sumDenom*@sumDenom) + (@sumNum*(1 - @sumNum/ @sumDenom))/ (@sumDenom*@sumDenom)))/
-                (1 + 1.642374415149816/@sumDenom)
-        format: formatter
-        numInputs: 2
-
     fractionOf: (wrapped, type="total", formatter=usFmtPct) -> (x...) -> (data, rowKey, colKey) ->
         selector: {total:[[],[]],row:[rowKey,[]],col:[[],colKey]}[type]
         inner: wrapped(x...)(data, rowKey, colKey)
@@ -103,35 +41,16 @@ aggregatorTemplates =
         numInputs: wrapped(x...)().numInputs
 
 #default aggregators & renderers use US naming and number formatting
-aggregators = do (tpl = aggregatorTemplates) -> 
-    "Count":                tpl.count(usFmtInt)
-    "Count Unique Values":  tpl.countUnique(usFmtInt)
-    "List Unique Values":   tpl.listUnique(", ")
-    "Sum":                  tpl.sum(usFmt)
-    "Integer Sum":          tpl.sum(usFmtInt)
-    "Average":              tpl.average(usFmt)
-    "Sum over Sum":         tpl.sumOverSum(usFmt)
-    "80% Upper Bound":      tpl.sumOverSumBound80(true, usFmt)
-    "80% Lower Bound":      tpl.sumOverSumBound80(false, usFmt)
-    "Sum as Fraction of Total":     tpl.fractionOf(tpl.sum(),   "total", usFmtPct)
-    "Sum as Fraction of Rows":      tpl.fractionOf(tpl.sum(),   "row",   usFmtPct)
-    "Sum as Fraction of Columns":   tpl.fractionOf(tpl.sum(),   "col",   usFmtPct)
-    "Count as Fraction of Total":   tpl.fractionOf(tpl.count(), "total", usFmtPct)
-    "Count as Fraction of Rows":    tpl.fractionOf(tpl.count(), "row",   usFmtPct)
-    "Count as Fraction of Columns": tpl.fractionOf(tpl.count(), "col",   usFmtPct)
+aggregators = {}
 
-renderers =
-    "Table":          (pvtData, opts) ->   pivotTableRenderer(pvtData, opts)
-    "Table Barchart": (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).barchart()
-    "Heatmap":        (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap()
-    "Row Heatmap":    (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("rowheatmap")
-    "Col Heatmap":    (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("colheatmap")
 
-locales = 
-    en: 
+renderers = {}
+
+locales =
+    en:
         aggregators: aggregators
         renderers: renderers
-        localeStrings: 
+        localeStrings:
             renderError: "An error occurred rendering the PivotTable results."
             computeError: "An error occurred computing the PivotTable results."
             uiRenderError: "An error occurred rendering the PivotTable UI."
@@ -223,7 +142,7 @@ class PivotData
         if $.isEmptyObject derivedAttributes
             addRecord = f
         else
-            addRecord = (record) -> 
+            addRecord = (record) ->
                 record[k] = v(record) ? record[k] for k, v of derivedAttributes
                 f(record)
 
@@ -275,7 +194,7 @@ class PivotData
     processRecord: (record) -> #this code is called in a tight loop
         colKey = []
         rowKey = []
-        colKey.push record[x] ? "null" for x in @colAttrs 
+        colKey.push record[x] ? "null" for x in @colAttrs
         rowKey.push record[x] ? "null" for x in @rowAttrs
         flatRowKey = rowKey.join(String.fromCharCode(0))
         flatColKey = colKey.join(String.fromCharCode(0))
@@ -315,153 +234,6 @@ class PivotData
         return agg ? {value: (-> null), format: -> ""}
 
 ###
-Default Renderer for hierarchical table layout
-###
-
-pivotTableRenderer = (pivotData, opts) ->
-
-    defaults =
-        localeStrings:
-            totals: "Totals"
-
-    opts = $.extend defaults, opts
-
-    colAttrs = pivotData.colAttrs
-    rowAttrs = pivotData.rowAttrs
-    rowKeys = pivotData.getRowKeys()
-    colKeys = pivotData.getColKeys()
-
-    #now actually build the output
-    result = document.createElement("table")
-    result.className = "pvtTable"
-
-    #helper function for setting row/col-span in pivotTableRenderer
-    spanSize = (arr, i, j) ->
-        if i != 0
-            noDraw = true
-            for x in [0..j]
-                if arr[i-1][x] != arr[i][x]
-                    noDraw = false
-            if noDraw
-              return -1 #do not draw cell
-        len = 0
-        while i+len < arr.length
-            stop = false
-            for x in [0..j]
-                stop = true if arr[i][x] != arr[i+len][x]
-            break if stop
-            len++
-        return len
-
-    #the first few rows are for col headers
-    for own j, c of colAttrs
-        tr = document.createElement("tr")
-        if parseInt(j) == 0 and rowAttrs.length != 0
-            th = document.createElement("th")
-            th.setAttribute("colspan", rowAttrs.length)
-            th.setAttribute("rowspan", colAttrs.length)
-            tr.appendChild th
-        th = document.createElement("th")
-        th.className = "pvtAxisLabel"
-        th.textContent = c
-        tr.appendChild th
-        for own i, colKey of colKeys
-            x = spanSize(colKeys, parseInt(i), parseInt(j))
-            if x != -1
-                th = document.createElement("th")
-                th.className = "pvtColLabel"
-                th.textContent = colKey[j]
-                th.setAttribute("colspan", x)
-                if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
-                    th.setAttribute("rowspan", 2)
-                tr.appendChild th
-        if parseInt(j) == 0
-            th = document.createElement("th")
-            th.className = "pvtTotalLabel"
-            th.innerHTML = opts.localeStrings.totals
-            th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
-            tr.appendChild th
-        result.appendChild tr
-
-    #then a row for row header headers
-    if rowAttrs.length !=0
-        tr = document.createElement("tr")
-        for own i, r of rowAttrs
-            th = document.createElement("th")
-            th.className = "pvtAxisLabel"
-            th.textContent = r
-            tr.appendChild th 
-        th = document.createElement("th")
-        if colAttrs.length ==0
-            th.className = "pvtTotalLabel"
-            th.innerHTML = opts.localeStrings.totals
-        tr.appendChild th
-        result.appendChild tr
-
-    #now the actual data rows, with their row headers and totals
-    for own i, rowKey of rowKeys
-        tr = document.createElement("tr")
-        for own j, txt of rowKey
-            x = spanSize(rowKeys, parseInt(i), parseInt(j))
-            if x != -1
-                th = document.createElement("th")
-                th.className = "pvtRowLabel"
-                th.textContent = txt
-                th.setAttribute("rowspan", x)
-                if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
-                    th.setAttribute("colspan",2)
-                tr.appendChild th
-        for own j, colKey of colKeys #this is the tight loop
-            aggregator = pivotData.getAggregator(rowKey, colKey)
-            val = aggregator.value()
-            td = document.createElement("td")
-            td.className = "pvtVal row#{i} col#{j}"
-            td.innerHTML = aggregator.format(val)
-            td.setAttribute("data-value", val)
-            tr.appendChild td
-
-        totalAggregator = pivotData.getAggregator(rowKey, [])
-        val = totalAggregator.value()
-        td = document.createElement("td")
-        td.className = "pvtTotal rowTotal"
-        td.innerHTML = totalAggregator.format(val)
-        td.setAttribute("data-value", val)
-        td.setAttribute("data-for", "row"+i)
-        tr.appendChild td
-        result.appendChild tr
-
-    #finally, the row for col totals, and a grand total
-    tr = document.createElement("tr")
-    th = document.createElement("th")
-    th.className = "pvtTotalLabel"
-    th.innerHTML = opts.localeStrings.totals
-    th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
-    tr.appendChild th
-    for own j, colKey of colKeys
-        totalAggregator = pivotData.getAggregator([], colKey)
-        val = totalAggregator.value()
-        td = document.createElement("td")
-        td.className = "pvtTotal colTotal"
-        td.innerHTML = totalAggregator.format(val)
-        td.setAttribute("data-value", val)
-        td.setAttribute("data-for", "col"+j)
-        tr.appendChild td
-    totalAggregator = pivotData.getAggregator([], [])
-    val = totalAggregator.value()
-    td = document.createElement("td")
-    td.className = "pvtGrandTotal"
-    td.innerHTML = totalAggregator.format(val)
-    td.setAttribute("data-value", val)
-    tr.appendChild td
-    result.appendChild tr
-
-    #squirrel this away for later
-    result.setAttribute("data-numrows", rowKeys.length)
-    result.setAttribute("data-numcols", colKeys.length)
-
-    return result
-
-###
 Pivot Table core: create PivotData object and call Renderer on it
 ###
 
@@ -470,10 +242,10 @@ $.fn.pivot = (input, opts) ->
         cols : []
         rows: []
         filter: -> true
-        aggregator: aggregatorTemplates.count()()
-        aggregatorName: "Count"
+        aggregator: ""
+        aggregatorName: ""
         derivedAttributes: {},
-        renderer: pivotTableRenderer
+        renderer: ""
         rendererOptions: null
         localeStrings: locales.en.localeStrings
 
@@ -490,7 +262,7 @@ $.fn.pivot = (input, opts) ->
     catch e
         console.error(e.stack) if console?
         result = $("<span>").html opts.localeStrings.computeError
-    
+
     x = this[0]
     x.removeChild(x.lastChild) while x.hasChildNodes()
     return @append result
@@ -775,90 +547,4 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
     catch e
         console.error(e.stack) if console?
         @html opts.localeStrings.uiRenderError
-    return this
-
-###
-Heatmap post-processing
-###
-
-$.fn.heatmap = (scope = "heatmap") ->
-    numRows = @data "numrows"
-    numCols = @data "numcols"
-
-    colorGen = (color, min, max) ->
-        hexGen = switch color
-            when "red"   then (hex) -> "ff#{hex}#{hex}"
-            when "green" then (hex) -> "#{hex}ff#{hex}"
-            when "blue"  then (hex) -> "#{hex}#{hex}ff"
-
-        return (x) ->
-            intensity = 255 - Math.round 255*(x-min)/(max-min)
-            hex = intensity.toString(16).split(".")[0]
-            hex = 0+hex if hex.length == 1
-            return hexGen(hex)
-
-    heatmapper = (scope, color) =>
-        forEachCell = (f) =>
-            @find(scope).each ->
-                x = $(this).data("value")
-                f(x, $(this)) if x? and isFinite(x)
-
-        values = []
-        forEachCell (x) -> values.push x
-        colorFor = colorGen color, Math.min(values...), Math.max(values...)
-        forEachCell (x, elem) -> elem.css "background-color", "#" + colorFor(x)
-
-    switch scope
-        when "heatmap"
-            heatmapper ".pvtVal", "red"
-        when "rowheatmap"
-            heatmapper ".pvtVal.row#{i}", "red" for i in [0...numRows]
-        when "colheatmap"
-            heatmapper ".pvtVal.col#{j}", "red" for j in [0...numCols]
-
-    heatmapper ".pvtTotal.rowTotal", "red"
-    heatmapper ".pvtTotal.colTotal", "red"
-
-    return this
-
-###
-Barchart post-processing
-###
-
-$.fn.barchart =  ->
-    numRows = @data "numrows"
-    numCols = @data "numcols"
-
-    barcharter = (scope) =>
-        forEachCell = (f) =>
-            @find(scope).each ->
-                x = $(this).data("value")
-                f(x, $(this)) if x? and isFinite(x)
-
-        values = []
-        forEachCell (x) -> values.push x
-        max = Math.max(values...)
-        scaler = (x) -> 100*x/(1.4*max)
-        forEachCell (x, elem) ->
-            text = elem.text()
-            wrapper = $("<div>").css
-                "position": "relative"
-                "height": "55px"
-            wrapper.append $("<div>").css
-                "position": "absolute"
-                "bottom": 0
-                "left": 0
-                "right": 0
-                "height": scaler(x) + "%"
-                "background-color": "gray"
-            wrapper.append $("<div>").text(text).css
-                "position":"relative"
-                "padding-left":"5px"
-                "padding-right":"5px"
-
-            elem.css("padding": 0,"padding-top": "5px", "text-align": "center").html wrapper
-
-    barcharter ".pvtVal.row#{i}" for i in [0...numRows]
-    barcharter ".pvtTotal.colTotal"
-
     return this
