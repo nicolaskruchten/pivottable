@@ -578,9 +578,9 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                 else
                     btns = $("<p>").appendTo(valueList)
                     btns.append $("<button>").html(opts.localeStrings.selectAll).bind "click", ->
-                        valueList.find("input").prop "checked", true
+                        valueList.find("input:visible").prop "checked", true
                     btns.append $("<button>").html(opts.localeStrings.selectNone).bind "click", ->
-                        valueList.find("input").prop "checked", false
+                        valueList.find("input:visible").prop "checked", false
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
                         $(this).parents(".pvtFilterBox").find('label span').each ->
