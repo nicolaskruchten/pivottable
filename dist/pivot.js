@@ -1003,7 +1003,7 @@
             filter = $(this).val().toLowerCase();
             return $(this).parents(".pvtFilterBox").find('label span').each(function() {
               var testString;
-              testString = this.innerText.toLowerCase().indexOf(filter);
+              testString = $(this).text().toLowerCase().indexOf(filter);
               if (testString !== -1) {
                 return $(this).parent().show();
               } else {

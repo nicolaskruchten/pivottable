@@ -584,7 +584,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
                         $(this).parents(".pvtFilterBox").find('label span').each ->
-                            testString = this.innerText.toLowerCase().indexOf(filter)
+                            testString = $(this).text().toLowerCase().indexOf(filter)
                             if testString isnt -1
                                 $(this).parent().show()
                             else
