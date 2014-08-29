@@ -15,3 +15,5 @@ average =
   "Average": Average($.pivotUtilities.numberFormat())
 
 $.extend $.pivotUtilities.aggregators, average
+
+$.pivotUtilities.aggregatorTemplates?.Average = Average
