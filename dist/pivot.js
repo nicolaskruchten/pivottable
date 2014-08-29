@@ -103,7 +103,7 @@
               return this.uniq.length;
             },
             format: formatter,
-            numInputs: 1
+            numInputs: attr != null ? 0 : 1
           };
         };
       };
@@ -127,7 +127,7 @@
             format: function(x) {
               return x;
             },
-            numInputs: 1
+            numInputs: attr != null ? 0 : 1
           };
         };
       };
@@ -151,7 +151,7 @@
               return this.sum;
             },
             format: formatter,
-            numInputs: 1
+            numInputs: attr != null ? 0 : 1
           };
         };
       };
@@ -177,7 +177,7 @@
               return this.sum / this.len;
             },
             format: formatter,
-            numInputs: 1
+            numInputs: attr != null ? 0 : 1
           };
         };
       };
@@ -205,7 +205,7 @@
               return this.sumNum / this.sumDenom;
             },
             format: formatter,
-            numInputs: 2
+            numInputs: (num != null) && (denom != null) ? 0 : 2
           };
         };
       };
@@ -238,7 +238,7 @@
               return (0.821187207574908 / this.sumDenom + this.sumNum / this.sumDenom + 1.2815515655446004 * sign * Math.sqrt(0.410593603787454 / (this.sumDenom * this.sumDenom) + (this.sumNum * (1 - this.sumNum / this.sumDenom)) / (this.sumDenom * this.sumDenom))) / (1 + 1.642374415149816 / this.sumDenom);
             },
             format: formatter,
-            numInputs: 2
+            numInputs: (num != null) && (denom != null) ? 0 : 2
           };
         };
       };
