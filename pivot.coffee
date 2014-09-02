@@ -273,6 +273,8 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
     derivedAttributes: {}
     aggregators: locales[locale].aggregators
     renderers: locales[locale].renderers
+    attributes: []
+    values: []
     hiddenAttributes: []
     menuLimit: 200
     cols: [], rows: [], vals: []
@@ -321,7 +323,12 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
 
     #axis list, including the double-click menu
     colList = $("<td class='pvtAxisContainer pvtUnused'>")
-    shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
+    if opts.attributes.length > 0
+      shownAttributes = (c for c in tblCols when c in opts.attributes)
+    else
+      shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes and c not in opts.values)
+
+    shownValues = if opts.values.length > 0 then (d for d in tblCols when d in opts.values) else shownAttributes
 
     unusedAttrsVerticalAutoOverride = false
     if opts.unusedAttrsVertical == "auto"
@@ -474,7 +481,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
           newDropdown = $("<select class='pvtAttrDropdown'>")
             .append($("<option>"))
             .bind "change", -> refresh()
-          for attr in shownAttributes
+          for attr in shownValues
             newDropdown.append($("<option>").val(attr).text(attr))
           pvtVals.append(newDropdown)
 
