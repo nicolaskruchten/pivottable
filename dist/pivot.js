@@ -469,7 +469,7 @@
    */
 
   $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-    var a, aggregator, attrLength, axisValues, c, colList, defaults, e, existingOpts, i, initialRender, k, opts, pivotTable, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoOverride, x, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4;
+    var a, aggregator, attrLength, axisValues, c, colList, d, defaults, e, existingOpts, i, initialRender, k, opts, pivotTable, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, shownValues, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoOverride, x, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4;
     if (overwrite == null) {
       overwrite = false;
     }
@@ -480,6 +480,8 @@
       derivedAttributes: {},
       aggregators: locales[locale].aggregators,
       renderers: locales[locale].renderers,
+      attributes: [],
+      values: [],
       hiddenAttributes: [],
       menuLimit: 200,
       cols: [],
@@ -557,17 +559,42 @@
         $("<option>").val(x).html(x).appendTo(renderer);
       }
       colList = $("<td class='pvtAxisContainer pvtUnused'>");
-      shownAttributes = (function() {
+      if (opts.attributes.length > 0) {
+        shownAttributes = (function() {
+          var _j, _len1, _results;
+          _results = [];
+          for (_j = 0, _len1 = tblCols.length; _j < _len1; _j++) {
+            c = tblCols[_j];
+            if (__indexOf.call(opts.attributes, c) >= 0) {
+              _results.push(c);
+            }
+          }
+          return _results;
+        })();
+      } else {
+        shownAttributes = (function() {
+          var _j, _len1, _results;
+          _results = [];
+          for (_j = 0, _len1 = tblCols.length; _j < _len1; _j++) {
+            c = tblCols[_j];
+            if (__indexOf.call(opts.hiddenAttributes, c) < 0 && __indexOf.call(opts.values, c) < 0) {
+              _results.push(c);
+            }
+          }
+          return _results;
+        })();
+      }
+      shownValues = opts.values.length > 0 ? (function() {
         var _j, _len1, _results;
         _results = [];
         for (_j = 0, _len1 = tblCols.length; _j < _len1; _j++) {
-          c = tblCols[_j];
-          if (__indexOf.call(opts.hiddenAttributes, c) < 0) {
-            _results.push(c);
+          d = tblCols[_j];
+          if (__indexOf.call(opts.values, d) >= 0) {
+            _results.push(d);
           }
         }
         return _results;
-      })();
+      })() : shownAttributes;
       unusedAttrsVerticalAutoOverride = false;
       if (opts.unusedAttrsVertical === "auto") {
         attrLength = 0;
@@ -738,8 +765,8 @@
               newDropdown = $("<select class='pvtAttrDropdown'>").append($("<option>")).bind("change", function() {
                 return refresh();
               });
-              for (_n = 0, _len4 = shownAttributes.length; _n < _len4; _n++) {
-                attr = shownAttributes[_n];
+              for (_n = 0, _len4 = shownValues.length; _n < _len4; _n++) {
+                attr = shownValues[_n];
                 newDropdown.append($("<option>").val(attr).text(attr));
               }
               pvtVals.append(newDropdown);
