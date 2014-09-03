@@ -542,6 +542,9 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
     #the very first refresh will actually display the table
     refresh()
 
+    # expose the refresh method for externally tiggered re-renders
+    @data "refresh", refresh
+
     @find(".pvtAxisContainer").sortable
         update: (e, ui) -> refresh() if not ui.sender?
         connectWith: @find(".pvtAxisContainer")
