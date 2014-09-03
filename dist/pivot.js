@@ -838,6 +838,7 @@
         };
       })(this);
       refresh();
+      this.data("refresh", refresh);
       this.find(".pvtAxisContainer").sortable({
         update: function(e, ui) {
           if (ui.sender == null) {
