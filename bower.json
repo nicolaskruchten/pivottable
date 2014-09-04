@@ -7,7 +7,10 @@
     "dist/renderers/table.js",
     "dist/aggregators/count.js",
     "dist/aggregators/sum.js",
-    "dist/aggregators/average.js"
+    "dist/aggregators/average.js",
+    "dist/aggregators/max.js",
+    "dist/aggregators/min.js",
+    "dist/aggregators/standard-deviation.js"
   ],
   "license": "MIT",
   "ignore": [
