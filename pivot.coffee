@@ -26,11 +26,13 @@ numberFormat = (opts) ->
     result = addSeparators (opts.scaler*x).toFixed(opts.digitsAfterDecimal), opts.thousandsSep, opts.decimalSep
     return ""+opts.prefix+result+opts.suffix
 
-#aggregator templates default to US number formatting but this is overrideable
-usFmtPct = numberFormat(digitsAfterDecimal:1, scaler: 100, suffix: "%")
+formatterTemplates =
+  default: (x) -> x
+  percentFormat: numberFormat(digitsAfterDecimal:1, scaler: 100, suffix: "%")
 
+#aggregator templates default to US number formatting but this is overrideable
 aggregatorTemplates =
-  fractionOf: (wrapped, type="total", formatter=usFmtPct) -> (x...) -> (data, rowKey, colKey) ->
+  fractionOf: (wrapped, type="total", formatter=formatterTemplates.percentFormat) -> (x...) -> (data, rowKey, colKey) ->
     selector: {total:[[],[]],row:[rowKey,[]],col:[[],colKey]}[type]
     inner: wrapped(x...)(data, rowKey, colKey)
     push: (record) -> @inner.push record
@@ -108,7 +110,7 @@ naturalSort = (as, bs) => #thanks http://stackoverflow.com/a/4373421/112871
 
 #expose these to the outside world
 $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
-  naturalSort, numberFormat}
+  naturalSort, numberFormat, formatterTemplates}
 
 ###
 Data Model class
