@@ -9,7 +9,7 @@ SumOverSumBound80 = (formatter, upper=true) -> ([num, denom]) -> (data, rowKey, 
       (0.821187207574908/@sumDenom + @sumNum/@sumDenom + 1.2815515655446004*sign*
           Math.sqrt(0.410593603787454/ (@sumDenom*@sumDenom) + (@sumNum*(1 - @sumNum/ @sumDenom))/ (@sumDenom*@sumDenom)))/
           (1 + 1.642374415149816/@sumDenom)
-  format: formatter
+  format: formatter or $.pivotUtilities.formatterTemplates.default
   numInputs: 2
 
 

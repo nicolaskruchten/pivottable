@@ -3,7 +3,7 @@
   var ListUnique, listUnique,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  ListUnique = function() {
+  ListUnique = function(formatter) {
     return function(_arg) {
       var attr;
       attr = _arg[0];
@@ -19,9 +19,7 @@
           value: function() {
             return this.uniq.join(", ");
           },
-          format: function(x) {
-            return x;
-          },
+          format: formatter || $.pivotUtilities.formatterTemplates["default"],
           numInputs: 1
         };
       };

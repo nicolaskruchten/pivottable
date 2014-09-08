@@ -19,7 +19,7 @@
           value: function() {
             return this.sum / this.len;
           },
-          format: formatter,
+          format: formatter || $.pivotUtilities.formatterTemplates["default"],
           numInputs: 1
         };
       };

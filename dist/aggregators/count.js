@@ -15,7 +15,7 @@
           value: function() {
             return this.count;
           },
-          format: formatter
+          format: formatter || $.pivotUtilities.formatterTemplates["default"]
         };
       };
     };

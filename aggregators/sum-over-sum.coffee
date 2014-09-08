@@ -5,7 +5,7 @@ SumOverSum = (formatter) -> ([num, denom]) -> (data, rowKey, colKey) ->
       @sumNum   += parseFloat(record[num])   if not isNaN parseFloat(record[num])
       @sumDenom += parseFloat(record[denom]) if not isNaN parseFloat(record[denom])
   value: -> @sumNum/@sumDenom
-  format: formatter
+  format: formatter or $.pivotUtilities.formatterTemplates.default
   numInputs: 2
 
 

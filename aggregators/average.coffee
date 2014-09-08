@@ -6,7 +6,7 @@ Average = (formatter) -> ([attr]) -> (data, rowKey, colKey) ->
           @sum += parseFloat(record[attr])
           @len++
   value: -> @sum/@len
-  format: formatter
+  format: formatter or $.pivotUtilities.formatterTemplates.default
   numInputs: 1
 
 
