@@ -627,7 +627,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                     .bind "click", showFilterList
 
                 attrElem = $("<li class='axis_#{i}'>")
-                    .append $("<span class='pvtAttr'>").text(c).data("attrName", c).append(triangleLink)
+                    .append $("<span class='pvtAttr'></span>").text(c).data("attrName", c).append(triangleLink)
                 attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                 colList.append(attrElem).append(valueList)
 
