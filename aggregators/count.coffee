@@ -2,7 +2,7 @@ Count = (formatter) -> ([attr]) -> (data, rowKey, colKey) ->
   count: 0
   push:  -> @count++
   value: -> @count
-  format: formatter
+  format: formatter or $.pivotUtilities.formatterTemplates.default
 
 
 

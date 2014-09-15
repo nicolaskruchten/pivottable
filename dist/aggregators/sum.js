@@ -17,7 +17,7 @@
           value: function() {
             return this.sum;
           },
-          format: formatter,
+          format: formatter || $.pivotUtilities.formatterTemplates["default"],
           numInputs: 1
         };
       };

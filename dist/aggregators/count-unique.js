@@ -19,7 +19,7 @@
           value: function() {
             return this.uniq.length;
           },
-          format: formatter,
+          format: formatter || $.pivotUtilities.formatterTemplates["default"],
           numInputs: 1
         };
       };

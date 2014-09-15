@@ -21,7 +21,7 @@
           value: function() {
             return this.sumNum / this.sumDenom;
           },
-          format: formatter,
+          format: formatter || $.pivotUtilities.formatterTemplates["default"],
           numInputs: 2
         };
       };
