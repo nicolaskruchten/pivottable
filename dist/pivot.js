@@ -645,9 +645,13 @@
     defaults = {
       localeStrings: {
         totals: "Totals"
-      }
+      },
+	  thContent: "text"/*possible values: text,html*/
     };
     opts = $.extend(defaults, opts);
+	var thSetContent = "textContent";
+	if(opts.thContent == "html")
+		thSetContent = "innerHTML"
     colAttrs = pivotData.colAttrs;
     rowAttrs = pivotData.rowAttrs;
     rowKeys = pivotData.getRowKeys();
@@ -694,7 +698,7 @@
       }
       th = document.createElement("th");
       th.className = "pvtAxisLabel";
-      th.textContent = c;
+      th[thSetContent] = c;
       tr.appendChild(th);
       for (i in colKeys) {
         if (!__hasProp.call(colKeys, i)) continue;
@@ -703,7 +707,7 @@
         if (x !== -1) {
           th = document.createElement("th");
           th.className = "pvtColLabel";
-          th.textContent = colKey[j];
+          th[thSetContent] = colKey[j];
           th.setAttribute("colspan", x);
           if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
             th.setAttribute("rowspan", 2);
@@ -727,7 +731,7 @@
         r = rowAttrs[i];
         th = document.createElement("th");
         th.className = "pvtAxisLabel";
-        th.textContent = r;
+        th[thSetContent] = r;
         tr.appendChild(th);
       }
       th = document.createElement("th");
@@ -749,7 +753,7 @@
         if (x !== -1) {
           th = document.createElement("th");
           th.className = "pvtRowLabel";
-          th.textContent = txt;
+          th[thSetContent] = txt;
           th.setAttribute("rowspan", x);
           if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
             th.setAttribute("colspan", 2);
