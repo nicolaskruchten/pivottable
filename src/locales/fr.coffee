@@ -20,21 +20,16 @@ $.pivotUtilities.locales.fr =
         by: "par"
 
     aggregators:
-        "Nombre":                             tpl.count(frFmtInt)
-        "Nombre de valeurs uniques":          tpl.countUnique(frFmtInt)
-        "Liste de valeurs uniques":           tpl.listUnique(", ")
-        "Somme":                              tpl.sum(frFmt)
-        "Somme en entiers":                   tpl.sum(frFmtInt)
-        "Moyenne":                            tpl.average(frFmt)
-        "Ratio de sommes":                    tpl.sumOverSum(frFmt)
-        "Borne sup&eacute;rieure 80%":        tpl.sumOverSumBound80(true, frFmt)
-        "Borne inf&eacute;rieure 80%":        tpl.sumOverSumBound80(false, frFmt)
-        "Somme en proportion du totale":      tpl.fractionOf(tpl.sum(),   "total", frFmtPct)
-        "Somme en proportion de la ligne":    tpl.fractionOf(tpl.sum(),   "row",   frFmtPct)
-        "Somme en proportion de la colonne":  tpl.fractionOf(tpl.sum(),   "col",   frFmtPct)
-        "Nombre en proportion du totale":     tpl.fractionOf(tpl.count(), "total", frFmtPct)
-        "Nombre en proportion de la ligne":   tpl.fractionOf(tpl.count(), "row",   frFmtPct)
-        "Nombre en proportion de la colonne": tpl.fractionOf(tpl.count(), "col",   frFmtPct)
+        "Nombre":                             tpl.Count(frFmtInt)
+        "Somme":                              tpl.Sum(frFmt)
+        "Somme en entiers":                   tpl.Sum(frFmtInt)
+        "Moyenne":                            tpl.Average(frFmt)
+        "Somme en proportion du totale":      tpl.fractionOf(tpl.Sum(),   "total", frFmtPct)
+        "Somme en proportion de la ligne":    tpl.fractionOf(tpl.Sum(),   "row",   frFmtPct)
+        "Somme en proportion de la colonne":  tpl.fractionOf(tpl.Sum(),   "col",   frFmtPct)
+        "Nombre en proportion du totale":     tpl.fractionOf(tpl.Count(), "total", frFmtPct)
+        "Nombre en proportion de la ligne":   tpl.fractionOf(tpl.Count(), "row",   frFmtPct)
+        "Nombre en proportion de la colonne": tpl.fractionOf(tpl.Count(), "col",   frFmtPct)
 
     renderers:
         "Table":                           $.pivotUtilities.renderers["Table"]

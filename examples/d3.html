@@ -7,6 +7,12 @@
         <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
         <script type="text/javascript" src="../dist/pivot.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/average.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/count.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-over-sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-as-fraction.js"></script>
+        <script type="text/javascript" src="../dist/renderers/table.js"></script>
         <script type="text/javascript" src="../dist/renderers/d3_renderers.js"></script>
     </head>
     <style>
@@ -36,7 +42,7 @@
                                 return mp["Gender"] == "Male" ? 1 : -1;
                             }
                         },
-                        cols: [], rows: ["Province", "Party"],
+                        cols: [], rows: ["Province", "Party"], vals: ["Age"],
                         rendererName: "Treemap"
                     });
                 });
