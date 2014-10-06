@@ -2,14 +2,20 @@
 <html>
     <head>
         <title>Pivot Demo</title>
-        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <link rel="stylesheet" type="text/css" href="../dist/css/pivot.css">
         <script type="text/javascript" src="ext/d3.v3.min.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
         <script type="text/javascript" src="../dist/pivot.js"></script>
-        <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
-        <script type="text/javascript" src="../dist/d3_renderers.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/average.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/count.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-over-sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-as-fraction.js"></script>
+        <script type="text/javascript" src="../dist/renderers/table.js"></script>
+        <script type="text/javascript" src="../dist/renderers/gchart_renderers.js"></script>
+        <script type="text/javascript" src="../dist/renderers/d3_renderers.js"></script>
         <script type="text/javascript" src="ext/jquery.ui.touch-punch.min.js"></script>
     </head>
     <style>
@@ -32,8 +38,8 @@
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {
                         renderers: $.extend(
-                            $.pivotUtilities.renderers, 
-                            $.pivotUtilities.gchart_renderers, 
+                            $.pivotUtilities.renderers,
+                            $.pivotUtilities.gchart_renderers,
                             $.pivotUtilities.d3_renderers
                             ),
                         derivedAttributes: {
@@ -42,7 +48,7 @@
                                 return mp["Gender"] == "Male" ? 1 : -1;
                             }
                         },
-                        cols: ["Age Bin"], rows: ["Gender"],
+                        cols: ["Age Bin"], rows: ["Gender"], vals: ["Age"],
                         rendererName: "Area Chart"
                     });
                 });

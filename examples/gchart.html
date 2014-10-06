@@ -2,12 +2,18 @@
 <html>
     <head>
         <title>Pivot Demo</title>
-        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <link rel="stylesheet" type="text/css" href="../dist/css/pivot.css">
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
         <script type="text/javascript" src="../dist/pivot.js"></script>
-        <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/average.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/count.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-over-sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-as-fraction.js"></script>
+        <script type="text/javascript" src="../dist/renderers/table.js"></script>
+        <script type="text/javascript" src="../dist/renderers/gchart_renderers.js"></script>
     </head>
     <style>
         * {font-family: Verdana;}
@@ -17,7 +23,7 @@
             google.load("visualization", "1", {packages:["corechart", "charteditor"]});
             $(function(){
                 var derivers = $.pivotUtilities.derivers;
-                var renderers = $.extend($.pivotUtilities.renderers, 
+                var renderers = $.extend($.pivotUtilities.renderers,
                     $.pivotUtilities.gchart_renderers);
 
                 $.getJSON("mps.json", function(mps) {
@@ -29,7 +35,7 @@
                                 return mp["Gender"] == "Male" ? 1 : -1;
                             }
                         },
-                        cols: ["Age Bin"], rows: ["Gender"],
+                        cols: ["Age Bin"], rows: ["Gender"], vals: ["Age"],
                         rendererName: "Area Chart"
                     });
                 });
