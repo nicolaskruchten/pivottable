@@ -2,12 +2,12 @@
 <html>
     <head>
         <title>Pivot Demo</title>
-        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <link rel="stylesheet" type="text/css" href="../dist/css/pivot.css">
         <script type="text/javascript" src="ext/d3.v3.min.js"></script>
         <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
         <script type="text/javascript" src="../dist/pivot.js"></script>
-        <script type="text/javascript" src="../dist/d3_renderers.js"></script>
+        <script type="text/javascript" src="../dist/renderers/d3_renderers.js"></script>
     </head>
     <style>
         * {font-family: Verdana;}
@@ -24,7 +24,7 @@
         <script type="text/javascript">
             $(function(){
                 var derivers = $.pivotUtilities.derivers;
-                var renderers = $.extend($.pivotUtilities.renderers, 
+                var renderers = $.extend($.pivotUtilities.renderers,
                     $.pivotUtilities.d3_renderers);
 
                 $.getJSON("mps.json", function(mps) {
