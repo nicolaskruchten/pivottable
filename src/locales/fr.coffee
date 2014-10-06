@@ -5,7 +5,7 @@ frFmt =    nf(thousandsSep: " ", decimalSep: ",")
 frFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: " ", decimalSep: ",")
 frFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: " ", decimalSep: ",")
 
-$.pivotUtilities.locales.fr = 
+$.pivotUtilities.locales.fr =
 
     localeStrings:
         renderError: "Une erreur est survenue en dessinant le tableau crois&eacute;."
@@ -19,7 +19,7 @@ $.pivotUtilities.locales.fr =
         vs: "sur"
         by: "par"
 
-    aggregators: 
+    aggregators:
         "Nombre":                             tpl.count(frFmtInt)
         "Nombre de valeurs uniques":          tpl.countUnique(frFmtInt)
         "Liste de valeurs uniques":           tpl.listUnique(", ")

@@ -3,14 +3,8 @@
   "description": "Javascript Pivot Table (aka Pivot Grid, Pivot Chart, Cross-Tab) implementation with drag'n'drop",
   "version": "1.3.3",
   "main": [
-    "dist/pivot.js",
-    "dist/renderers/table.js",
-    "dist/aggregators/count.js",
-    "dist/aggregators/sum.js",
-    "dist/aggregators/average.js",
-    "dist/aggregators/max.js",
-    "dist/aggregators/min.js",
-    "dist/aggregators/standard-deviation.js"
+    "dist/pivot-all.min.js",
+    "dist/css/pivot.min.css"
   ],
   "license": "MIT",
   "ignore": [
