@@ -2,15 +2,21 @@
 <html>
     <head>
         <title>Pivot Demo From Local CSV</title>
-        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <link rel="stylesheet" type="text/css" href="../dist/css/pivot.css">
         <script type="text/javascript" src="ext/d3.v3.min.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
         <script type="text/javascript" src="ext/jquery.csv-0.71.min.js"></script>
         <script type="text/javascript" src="../dist/pivot.js"></script>
-        <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
-        <script type="text/javascript" src="../dist/d3_renderers.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/average.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/count.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-over-sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-as-fraction.js"></script>
+        <script type="text/javascript" src="../dist/renderers/table.js"></script>
+        <script type="text/javascript" src="../dist/renderers/gchart_renderers.js"></script>
+        <script type="text/javascript" src="../dist/renderers/d3_renderers.js"></script>
     </head>
     <style>
         * {font-family: Verdana;}
@@ -29,25 +35,25 @@
             $(function(){
                 $("#csv").bind("change", function(event){
                     var reader = new FileReader();
-                    reader.onload = function(theFile) { 
+                    reader.onload = function(theFile) {
                         try {
                             var input = $.csv.toArrays(theFile.target.result);
 
                         }
-                        catch(e) { 
+                        catch(e) {
                             alert("CSV Parse error.");
-                            return; 
+                            return;
                         }
                         $("#output").pivotUI( input, {
                             renderers: $.extend(
-                            $.pivotUtilities.renderers, 
-                            $.pivotUtilities.gchart_renderers, 
+                            $.pivotUtilities.renderers,
+                            $.pivotUtilities.gchart_renderers,
                             $.pivotUtilities.d3_renderers
                             )
                         });
                     };
                     reader.readAsText(event.target.files[0]);
-                });  
+                });
              });
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>

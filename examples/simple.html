@@ -1,33 +1,50 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Pivot Demo</title>
-        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
-        <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
-        <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
-        <script type="text/javascript" src="../dist/pivot.js"></script>
-    </head>
-    <style>
-        * {font-family: Verdana;}
-    </style>
-    <body>
-        <script type="text/javascript">
-            $(function(){
-                        $("#output").pivot(
-        [
-            {color: "blue", shape: "circle"},
-            {color: "red", shape: "triangle"}
-        ],
-        {
-            rows: ["color"],
-            cols: ["shape"]
-        }
-    );
-             });
-        </script>
 
-        <p><a href="index.html">&laquo; back to examples</a></p>
-        <div id="output" style="margin: 10px;"></div>
+<head>
+    <title>Pivot Demo</title>
+    <link rel="stylesheet" type="text/css" href="../dist/css/pivot.css">
+    <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
+    <script type="text/javascript" src="../dist/pivot.js"></script>
+    <script type="text/javascript" src="../dist/aggregators/list-unique.js"></script>
+    <script type="text/javascript" src="../dist/renderers/table.js"></script>
+</head>
+<style>
+* {
+    font-family: Verdana;
+}
+</style>
 
-    </body>
+<body>
+    <script type="text/javascript">
+    $(function() {
+        $("#output").pivot(
+            [{
+                color: "blue",
+                shape: "circle"
+            }, {
+                color: "red",
+                shape: "triangle"
+            }], {
+                "aggregator": $.pivotUtilities.aggregators["List Unique"](["color"]),
+                "aggregatorName": "List Unique",
+                "renderer": $.pivotUtilities.renderers["Table"],
+                "cols": [
+                    "color"
+                ],
+                "rows": [
+                    "shape"
+                ]
+            }
+        );
+    });
+    </script>
+
+    <p><a href="index.html">&laquo; back to examples</a>
+    </p>
+    <div id="output" style="margin: 10px;"></div>
+
+</body>
+
 </html>
