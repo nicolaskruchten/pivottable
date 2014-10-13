@@ -1,0 +1,19 @@
+{
+  "name": "pivottable",
+  "location": "cube19/pivottable",
+  "version": "1.4.0",
+  "description": "cube19 fork of PivotTable.js (original repo @ https://github.com/nicolaskruchten/pivottable/)",
+  "homepage": "https://github.com/cube19/pivottable/",
+  "main": [
+    "examples/pivot.js",
+    "examples/pivot.css",
+    "examples/gchart_renderers.js",
+    "examples/d3_renderers.js"
+  ],
+  "ignore": [
+    "*",
+    "!examples",
+    "!examples/*"
+  ],
+  "private": true
+}
