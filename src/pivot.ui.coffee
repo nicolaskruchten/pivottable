@@ -31,7 +31,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
 
   try
     #cache the input in some useful form
-    input = PivotData.convertToArray(input)
+    input = $.pivotUtilities.PivotData.convertToArray(input)
     tblCols = (k for own k of input[0])
     tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
 
@@ -39,7 +39,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
     axisValues = {}
     axisValues[x] = {} for x in tblCols
 
-    PivotData.forEachRecord input, opts.derivedAttributes, (record) ->
+    $.pivotUtilities.PivotData.forEachRecord input, opts.derivedAttributes, (record) ->
       for own k, v of record when opts.filter(record)
         v ?= "null"
         axisValues[k][v] ?= 0
@@ -104,7 +104,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
 
           checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
-          for k in keys.sort(naturalSort)
+          for k in keys.sort($.pivotUtilities.naturalSort)
              v = axisValues[c][k]
              filterItem = $("<label>")
              filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
