@@ -4,6 +4,8 @@ $ = jQuery
 Utilities
 ###
 
+textProp = if "textContent" of document.createElement("div") then "textContent" else "innerText"
+
 addSeparators = (nStr, thousandsSep, decimalSep) ->
     nStr += ''
     x = nStr.split('.')
@@ -361,12 +363,17 @@ pivotTableRenderer = (pivotData, opts) ->
             th.setAttribute("colspan", rowAttrs.length)
             th.setAttribute("rowspan", colAttrs.length)
             tr.appendChild th
-        th = $("<th>").addClass("pvtAxisLabel").text(c)[0]
+        th = document.createElement("th")
+        th.className = "pvtAxisLabel"
+        th[textProp] = c
         tr.appendChild th
         for own i, colKey of colKeys
             x = spanSize(colKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = $("<th>").addClass("pvtColLabel").text(colKey[j]).attr("colspan", x)[0]
+                th = document.createElement("th")
+                th.className = "pvtColLabel"
+                th[textProp] = colKey[j]
+                th.setAttribute("colspan", x)
                 if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                     th.setAttribute("rowspan", 2)
                 tr.appendChild th
@@ -382,7 +389,9 @@ pivotTableRenderer = (pivotData, opts) ->
     if rowAttrs.length !=0
         tr = document.createElement("tr")
         for own i, r of rowAttrs
-            th = $("<th>").addClass("pvtAxisLabel").text(r)[0]
+            th = document.createElement("th")
+            th.className = "pvtAxisLabel"
+            th[textProp] = r
             tr.appendChild th 
         th = document.createElement("th")
         if colAttrs.length ==0
@@ -397,7 +406,10 @@ pivotTableRenderer = (pivotData, opts) ->
         for own j, txt of rowKey
             x = spanSize(rowKeys, parseInt(i), parseInt(j))
             if x != -1
-                th = $("<th>").addClass("pvtRowLabel").text(txt).attr("rowspan", x)[0]
+                th = document.createElement("th")
+                th.className = "pvtRowLabel"
+                th[textProp] = txt
+                th.setAttribute("rowspan", x)
                 if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                     th.setAttribute("colspan",2)
                 tr.appendChild th
@@ -574,7 +586,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
                     btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                         filter = $(this).val().toLowerCase()
                         $(this).parents(".pvtFilterBox").find('label span').each ->
-                            testString = this.innerText.toLowerCase().indexOf(filter)
+                            testString = this[textProp].toLowerCase().indexOf(filter)
                             if testString isnt -1
                                 $(this).parent().show()
                             else
