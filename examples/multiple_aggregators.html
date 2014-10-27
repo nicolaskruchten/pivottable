@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Pivot Demo</title>
+        <link rel="stylesheet" type="text/css" href="../dist/css/pivot.css">
+        <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="../dist/pivot.core.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/templates/sum.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/templates/average.js"></script>
+        <script type="text/javascript" src="../dist/renderers/table.js"></script>
+    </head>
+    <style>
+    * {
+        font-family: Verdana;
+    }
+    </style>
+
+    <body>
+        <script type="text/javascript">
+        $(function() {
+
+            var data = [{
+                color: "blue",
+                shape: "circle",
+                value: 10
+            }, {
+                color: "red",
+                shape: "triangle",
+                value: 15
+            }, {
+                color: "red",
+                shape: "circle",
+                value: 20
+            }, {
+                color: "red",
+                shape: "triangle",
+                value: 25
+            }, {
+                color: "blue",
+                shape: "circle",
+                value: 30
+            }];
+
+            $("#output").pivot(data, {
+                "aggregators": [
+                    $.pivotUtilities.aggregators["Sum"](["value"]),
+                    $.pivotUtilities.aggregators["Average"](["value"])
+                ],
+                "aggregatorName": "List Unique",
+                "renderer": $.pivotUtilities.renderers["Table"],
+                "cols": ["color"],
+                "rows": ["shape"]
+            });
+        });
+        </script>
+
+        <p><a href="index.html">&laquo; back to examples</a>
+        </p>
+        <div id="output" style="margin: 10px;"></div>
+
+    </body>
+
+</html>

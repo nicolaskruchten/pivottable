@@ -234,7 +234,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
 
       subopts.aggregatorName = aggregator.val()
       subopts.vals = vals
-      subopts.aggregator = opts.aggregators[aggregator.val()](vals)
+      subopts.aggregators = [opts.aggregators[aggregator.val()](vals)]
       subopts.renderer = opts.renderers[renderer.val()]
 
       #construct filter here

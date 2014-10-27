@@ -113,7 +113,7 @@ Data Model class
 ###
 class PivotData
   constructor: (input, opts) ->
-    @aggregator = opts.aggregator
+    @aggregators = opts.aggregators
     @aggregatorName = opts.aggregatorName
     @colAttrs = opts.cols
     @rowAttrs = opts.rows
@@ -123,7 +123,7 @@ class PivotData
     @colKeys = []
     @rowTotals = {}
     @colTotals = {}
-    @allTotal = @aggregator(this, [], [])
+    @allTotal = @wrapAggregator(this, [], [])
     @sorted = false
 
     # iterate through input, accumulating data for cells
@@ -197,20 +197,20 @@ class PivotData
     if rowKey.length != 0
       if not @rowTotals[flatRowKey]
         @rowKeys.push rowKey
-        @rowTotals[flatRowKey] = @aggregator(this, rowKey, [])
+        @rowTotals[flatRowKey] = @wrapAggregator(this, rowKey, [])
       @rowTotals[flatRowKey].push record
 
     if colKey.length != 0
       if not @colTotals[flatColKey]
         @colKeys.push colKey
-        @colTotals[flatColKey] = @aggregator(this, [], colKey)
+        @colTotals[flatColKey] = @wrapAggregator(this, [], colKey)
       @colTotals[flatColKey].push record
 
     if colKey.length != 0 and rowKey.length != 0
       if not @tree[flatRowKey]
         @tree[flatRowKey] = {}
       if not @tree[flatRowKey][flatColKey]
-        @tree[flatRowKey][flatColKey] = @aggregator(this, rowKey, colKey)
+        @tree[flatRowKey][flatColKey] = @wrapAggregator(this, rowKey, colKey)
       @tree[flatRowKey][flatColKey].push record
 
   getAggregator: (rowKey, colKey) =>
@@ -226,6 +226,12 @@ class PivotData
       agg = @tree[flatRowKey][flatColKey]
     return agg ? {value: (-> null), format: -> ""}
 
+  wrapAggregator: (pivotData, rowKey=[], colKey=[]) =>
+    wrappedAggregators: @aggregators.map (aggregator) -> aggregator(pivotData, rowKey, colKey)
+    value: -> @wrappedAggregators.map (aggregator) -> aggregator.value()
+    format: (value=[]) -> value.map (value, i) => @wrappedAggregators[i].format(value)
+    push: (record) -> @wrappedAggregators.forEach (aggregator) -> aggregator.push(record)
+
 ###
 Pivot Table core: create PivotData object and call Renderer on it
 ###
@@ -234,7 +240,7 @@ $.fn.pivot = (input, opts) ->
     cols : []
     rows: []
     filter: -> true
-    aggregator: ""
+    aggregators: []
     aggregatorName: ""
     derivedAttributes: {},
     renderer: ""
