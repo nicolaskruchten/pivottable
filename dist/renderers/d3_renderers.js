@@ -45,7 +45,7 @@
         rowKey = _ref[_i];
         value = pivotData.getAggregator(rowKey, []).value();
         if (value != null) {
-          addToTree(tree, rowKey, value);
+          addToTree(tree, rowKey, value[0]);
         }
       }
       color = d3.scale.category10();
