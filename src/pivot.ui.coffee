@@ -93,27 +93,29 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
             valueList.find("input").prop "checked", true
           btns.append $("<button>").html(opts.localeStrings.selectNone).bind "click", ->
             valueList.find("input").prop "checked", false
-          btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
-            filter = $(this).val().toLowerCase()
-            $(this).parents(".pvtFilterBox").find('label span').each ->
-              testString = this.innerText.toLowerCase().indexOf(filter)
-              if testString isnt -1
-                $(this).parent().show()
-              else
-                $(this).parent().hide()
+          btns.append $("<input>").addClass("pvtSearch")
+            .attr("placeholder", opts.localeStrings.filterResults)
+            .bind "keyup", ->
+              filter = $(this).val().toLowerCase()
+              $(this).parents(".pvtFilterBox").find('label span').each ->
+                testString = this.innerText.toLowerCase().indexOf(filter)
+                if testString isnt -1
+                  $(this).parent().show()
+                else
+                  $(this).parent().hide()
 
           checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
           for k in keys.sort($.pivotUtilities.naturalSort)
-             v = axisValues[c][k]
-             filterItem = $("<label>")
-             filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
-             hasExcludedItem ||= filterItemExcluded
-             $("<input type='checkbox' class='pvtFilter'>")
+            v = axisValues[c][k]
+            filterItem = $("<label>")
+            filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
+            hasExcludedItem ||= filterItemExcluded
+            $("<input type='checkbox' class='pvtFilter'>")
               .attr("checked", !filterItemExcluded).data("filter", [c,k])
               .appendTo filterItem
-             filterItem.append $("<span>").text "#{k} (#{v})"
-             checkContainer.append $("<p>").append(filterItem)
+            filterItem.append $("<span>").text "#{k} (#{v})"
+            checkContainer.append $("<p>").append(filterItem)
 
         updateFilter = ->
           unselectedCount = $(valueList).find("[type='checkbox']").length -
@@ -266,13 +268,13 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         natSort = $.pivotUtilities.naturalSort
         unusedAttrsContainer = @find("td.pvtUnused.pvtAxisContainer")
         $(unusedAttrsContainer).children("li")
-          .sort((a, b) => natSort($(a).text(), $(b).text()))
+          .sort((a, b) -> natSort($(a).text(), $(b).text()))
           .appendTo unusedAttrsContainer
 
       pivotTable.css("opacity", 1)
       opts.onRefresh(pivotUIOptions) if opts.onRefresh?
 
-    refresh = =>
+    refresh = ->
       pivotTable.css("opacity", 0.5)
       setTimeout refreshDelayed, 10
 
@@ -283,10 +285,10 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
     @data "refresh", refresh
 
     @find(".pvtAxisContainer").sortable
-        update: (e, ui) -> refresh() if not ui.sender?
-        connectWith: @find(".pvtAxisContainer")
-        items: 'li'
-        placeholder: 'pvtPlaceholder'
+      update: (e, ui) -> refresh() if not ui.sender?
+      connectWith: @find(".pvtAxisContainer")
+      items: 'li'
+      placeholder: 'pvtPlaceholder'
   catch e
     console.error(e.stack) if console?
     @html opts.localeStrings.uiRenderError
