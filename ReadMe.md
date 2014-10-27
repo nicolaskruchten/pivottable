@@ -79,7 +79,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple_ui.png)
 
-Note that pivot() and pivotUI() take different parameters in general, even though in the example above we passed the same parameters to both.
+Note that `pivot()` and `pivotUI()` take different parameters in general, even though in the example above we passed the same parameters to both.
 
 See the wiki for [full parameter documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters).
 
