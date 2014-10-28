@@ -108,14 +108,9 @@ naturalSort = (as, bs) => #thanks http://stackoverflow.com/a/4373421/112871
         return (if a1 > b1 then 1 else -1)
   a.length - b.length
 
-#expose these to the outside world
-$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
-  naturalSort, numberFormat, formatterTemplates}
-
 ###
 Data Model class
 ###
-
 class PivotData
   constructor: (input, opts) ->
     @aggregator = opts.aggregator
@@ -234,7 +229,6 @@ class PivotData
 ###
 Pivot Table core: create PivotData object and call Renderer on it
 ###
-
 $.fn.pivot = (input, opts) ->
   defaults =
     cols : []
@@ -264,3 +258,7 @@ $.fn.pivot = (input, opts) ->
   x = this[0]
   x.removeChild(x.lastChild) while x.hasChildNodes()
   return @append result
+
+#expose these to the outside world
+$.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
+  naturalSort, numberFormat, formatterTemplates, PivotData}

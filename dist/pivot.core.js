@@ -211,17 +211,6 @@
     };
   })(this);
 
-  $.pivotUtilities = {
-    aggregatorTemplates: aggregatorTemplates,
-    aggregators: aggregators,
-    renderers: renderers,
-    derivers: derivers,
-    locales: locales,
-    naturalSort: naturalSort,
-    numberFormat: numberFormat,
-    formatterTemplates: formatterTemplates
-  };
-
 
   /*
   Data Model class
@@ -465,6 +454,18 @@
       x.removeChild(x.lastChild);
     }
     return this.append(result);
+  };
+
+  $.pivotUtilities = {
+    aggregatorTemplates: aggregatorTemplates,
+    aggregators: aggregators,
+    renderers: renderers,
+    derivers: derivers,
+    locales: locales,
+    naturalSort: naturalSort,
+    numberFormat: numberFormat,
+    formatterTemplates: formatterTemplates,
+    PivotData: PivotData
   };
 
 }).call(this);
