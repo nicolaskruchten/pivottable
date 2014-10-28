@@ -171,45 +171,43 @@
     }
   };
 
-  naturalSort = (function(_this) {
-    return function(as, bs) {
-      var a, a1, b, b1, rd, rx, rz;
-      rx = /(\d+)|(\D+)/g;
-      rd = /\d/;
-      rz = /^0/;
-      if (typeof as === "number" || typeof bs === "number") {
-        if (isNaN(as)) {
-          return 1;
-        }
-        if (isNaN(bs)) {
-          return -1;
-        }
-        return as - bs;
+  naturalSort = function(as, bs) {
+    var a, a1, b, b1, rd, rx, rz;
+    rx = /(\d+)|(\D+)/g;
+    rd = /\d/;
+    rz = /^0/;
+    if (typeof as === "number" || typeof bs === "number") {
+      if (isNaN(as)) {
+        return 1;
       }
-      a = String(as).toLowerCase();
-      b = String(bs).toLowerCase();
-      if (a === b) {
-        return 0;
+      if (isNaN(bs)) {
+        return -1;
       }
-      if (!(rd.test(a) && rd.test(b))) {
-        return (a > b ? 1 : -1);
-      }
-      a = a.match(rx);
-      b = b.match(rx);
-      while (a.length && b.length) {
-        a1 = a.shift();
-        b1 = b.shift();
-        if (a1 !== b1) {
-          if (rd.test(a1) && rd.test(b1)) {
-            return a1.replace(rz, ".0") - b1.replace(rz, ".0");
-          } else {
-            return (a1 > b1 ? 1 : -1);
-          }
+      return as - bs;
+    }
+    a = String(as).toLowerCase();
+    b = String(bs).toLowerCase();
+    if (a === b) {
+      return 0;
+    }
+    if (!(rd.test(a) && rd.test(b))) {
+      return (a > b ? 1 : -1);
+    }
+    a = a.match(rx);
+    b = b.match(rx);
+    while (a.length && b.length) {
+      a1 = a.shift();
+      b1 = b.shift();
+      if (a1 !== b1) {
+        if (rd.test(a1) && rd.test(b1)) {
+          return a1.replace(rz, ".0") - b1.replace(rz, ".0");
+        } else {
+          return (a1 > b1 ? 1 : -1);
         }
       }
-      return a.length - b.length;
-    };
-  })(this);
+    }
+    return a.length - b.length;
+  };
 
 
   /*
@@ -218,13 +216,13 @@
 
   PivotData = (function() {
     function PivotData(input, opts) {
+      this.wrapAggregator = __bind(this.wrapAggregator, this);
       this.getAggregator = __bind(this.getAggregator, this);
       this.getRowKeys = __bind(this.getRowKeys, this);
       this.getColKeys = __bind(this.getColKeys, this);
       this.sortKeys = __bind(this.sortKeys, this);
       this.arrSort = __bind(this.arrSort, this);
-      this.natSort = __bind(this.natSort, this);
-      this.aggregator = opts.aggregator;
+      this.aggregators = opts.aggregators;
       this.aggregatorName = opts.aggregatorName;
       this.colAttrs = opts.cols;
       this.rowAttrs = opts.rows;
@@ -234,7 +232,7 @@
       this.colKeys = [];
       this.rowTotals = {};
       this.colTotals = {};
-      this.allTotal = this.aggregator(this, [], []);
+      this.allTotal = this.wrapAggregator(this, [], []);
       this.sorted = false;
       PivotData.forEachRecord(input, opts.derivedAttributes, (function(_this) {
         return function(record) {
@@ -360,14 +358,14 @@
       if (rowKey.length !== 0) {
         if (!this.rowTotals[flatRowKey]) {
           this.rowKeys.push(rowKey);
-          this.rowTotals[flatRowKey] = this.aggregator(this, rowKey, []);
+          this.rowTotals[flatRowKey] = this.wrapAggregator(this, rowKey, []);
         }
         this.rowTotals[flatRowKey].push(record);
       }
       if (colKey.length !== 0) {
         if (!this.colTotals[flatColKey]) {
           this.colKeys.push(colKey);
-          this.colTotals[flatColKey] = this.aggregator(this, [], colKey);
+          this.colTotals[flatColKey] = this.wrapAggregator(this, [], colKey);
         }
         this.colTotals[flatColKey].push(record);
       }
@@ -376,7 +374,7 @@
           this.tree[flatRowKey] = {};
         }
         if (!this.tree[flatRowKey][flatColKey]) {
-          this.tree[flatRowKey][flatColKey] = this.aggregator(this, rowKey, colKey);
+          this.tree[flatRowKey][flatColKey] = this.wrapAggregator(this, rowKey, colKey);
         }
         return this.tree[flatRowKey][flatColKey].push(record);
       }
@@ -405,6 +403,40 @@
       };
     };
 
+    PivotData.prototype.wrapAggregator = function(pivotData, rowKey, colKey) {
+      if (rowKey == null) {
+        rowKey = [];
+      }
+      if (colKey == null) {
+        colKey = [];
+      }
+      return {
+        wrappedAggregators: this.aggregators.map(function(aggregator) {
+          return aggregator(pivotData, rowKey, colKey);
+        }),
+        value: function() {
+          return this.wrappedAggregators.map(function(aggregator) {
+            return aggregator.value();
+          });
+        },
+        format: function(value) {
+          if (value == null) {
+            value = [];
+          }
+          return value.map((function(_this) {
+            return function(value, i) {
+              return _this.wrappedAggregators[i].format(value);
+            };
+          })(this));
+        },
+        push: function(record) {
+          return this.wrappedAggregators.forEach(function(aggregator) {
+            return aggregator.push(record);
+          });
+        }
+      };
+    };
+
     return PivotData;
 
   })();
@@ -422,7 +454,7 @@
       filter: function() {
         return true;
       },
-      aggregator: "",
+      aggregators: [],
       aggregatorName: "",
       derivedAttributes: {},
       renderer: "",

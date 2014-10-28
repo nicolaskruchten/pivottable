@@ -174,7 +174,7 @@
           btns.append($("<button>").html(opts.localeStrings.selectNone).bind("click", function() {
             return valueList.find("input").prop("checked", false);
           }));
-          btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
+          btns.append($("<input>").addClass("pvtSearch")).attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
             var filter;
             filter = $(this).val().toLowerCase();
             return $(this).parents(".pvtFilterBox").find('label span').each(function() {
@@ -186,7 +186,7 @@
                 return $(this).parent().hide();
               }
             });
-          }));
+          });
           checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
           _ref2 = keys.sort($.pivotUtilities.naturalSort);
           for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
@@ -325,7 +325,7 @@
           }
           subopts.aggregatorName = aggregator.val();
           subopts.vals = vals;
-          subopts.aggregator = opts.aggregators[aggregator.val()](vals);
+          subopts.aggregators = [opts.aggregators[aggregator.val()](vals)];
           subopts.renderer = opts.renderers[renderer.val()];
           exclusions = {};
           _this.find('input.pvtFilter').not(':checked').each(function() {
@@ -373,12 +373,10 @@
           }
         };
       })(this);
-      refresh = (function(_this) {
-        return function() {
-          pivotTable.css("opacity", 0.5);
-          return setTimeout(refreshDelayed, 10);
-        };
-      })(this);
+      refresh = function() {
+        pivotTable.css("opacity", 0.5);
+        return setTimeout(refreshDelayed, 10);
+      };
       refresh();
       this.data("refresh", refresh);
       this.find(".pvtAxisContainer").sortable({

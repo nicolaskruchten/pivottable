@@ -41,7 +41,7 @@
           rowKey = rowKeys[_j];
           agg = pivotData.getAggregator(rowKey, colKey);
           if (agg.value() != null) {
-            row.push(agg.value());
+            row.push(agg.value()[0]);
           } else {
             row.push(null);
           }
