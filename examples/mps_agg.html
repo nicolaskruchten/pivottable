@@ -19,7 +19,7 @@
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {
                         aggregators: {
-                            "Number of MPs":      function() { return tpl.Count()() },
+                            "Number of MPs":      function() { return tpl.Count()([]) },
                             "Average Age of MPs": function() { return tpl.Average()(["Age"])},
                         },
                         derivedAttributes: {

@@ -26,7 +26,7 @@ $.pivotUtilities.d3_renderers = Treemap: (pivotData, opts) ->
     for rowKey in pivotData.getRowKeys()
         value = pivotData.getAggregator(rowKey, []).value()
         if value?
-            addToTree(tree, rowKey, value)
+            addToTree(tree, rowKey, value[0])
 
     color = d3.scale.category10()
     width = $(window).width() / 1.4

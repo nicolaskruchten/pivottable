@@ -24,7 +24,7 @@ makeGoogleChart = (chartType, extraOptions) -> (pivotData, opts) ->
     for rowKey in rowKeys
       agg = pivotData.getAggregator(rowKey, colKey)
       if agg.value()?
-        row.push agg.value()
+        row.push agg.value()[0] # currently only supports 1 aggregator.
       else row.push null
     dataArray.push row
 
