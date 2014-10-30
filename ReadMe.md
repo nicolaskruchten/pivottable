@@ -64,7 +64,7 @@ appends this table to `$("#output")` (the default, *overridable* behaviour is to
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple.png)
 
-A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
+A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yields the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
 
 	$("#output").pivotUI(
 	    [
