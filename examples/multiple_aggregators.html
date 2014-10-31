@@ -9,6 +9,7 @@
         <script type="text/javascript" src="../dist/pivot.core.js"></script>
         <script type="text/javascript" src="../dist/aggregators/templates/sum.js"></script>
         <script type="text/javascript" src="../dist/aggregators/templates/average.js"></script>
+        <script type="text/javascript" src="../dist/aggregators/sum-as-fraction.js"></script>
         <script type="text/javascript" src="../dist/renderers/table.js"></script>
     </head>
     <style>
@@ -46,7 +47,8 @@
             $("#output").pivot(data, {
                 "aggregators": [
                     $.pivotUtilities.aggregators["Sum"](["value"]),
-                    $.pivotUtilities.aggregators["Average"](["value"])
+                    $.pivotUtilities.aggregators["Average"](["value"]),
+                    $.pivotUtilities.aggregators["Sum as Fraction of Total"](["value"])
                 ],
                 "aggregatorName": "List Unique",
                 "renderer": $.pivotUtilities.renderers["Table"],

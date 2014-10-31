@@ -33,11 +33,12 @@ formatterTemplates =
 #aggregator templates default to US number formatting but this is overrideable
 aggregatorTemplates =
   fractionOf: (wrapped, type="total", formatter=formatterTemplates.percentFormat) -> (x...) -> (data, rowKey, colKey) ->
+    name: "fractionOf"
     selector: {total:[[],[]],row:[rowKey,[]],col:[[],colKey]}[type]
     inner: wrapped(x...)(data, rowKey, colKey)
     push: (record) -> @inner.push record
     format: formatter
-    value: -> @inner.value() / data.getAggregator(@selector...).inner.value()
+    value: -> @inner.value() / data.getAggregator(@selector...).getWrappedAggregator("fractionOf").inner.value()
     numInputs: wrapped(x...)().numInputs
 
 #default aggregators & renderers use US naming and number formatting
@@ -226,11 +227,23 @@ class PivotData
       agg = @tree[flatRowKey][flatColKey]
     return agg ? {value: (-> null), format: -> ""}
 
-  wrapAggregator: (pivotData, rowKey=[], colKey=[]) =>
-    wrappedAggregators: @aggregators.map (aggregator) -> aggregator(pivotData, rowKey, colKey)
+  wrapAggregator: (pivotData, rowKey=[], colKey=[]) ->
+    wrappedAggregators = []
+    aggregatorMap = {}
+
+    # Generate a map between the aggregator name and index in the
+    # wrappedAggregators array
+    @aggregators.forEach (aggregator, index) ->
+      initAgg = aggregator(pivotData, rowKey, colKey)
+      aggregatorMap[initAgg.name] = index if initAgg.name?
+      wrappedAggregators.push initAgg
+
+    wrappedAggregators: wrappedAggregators
+    aggregatorMap: aggregatorMap
     value: -> @wrappedAggregators.map (aggregator) -> aggregator.value()
     format: (value=[]) -> value.map (value, i) => @wrappedAggregators[i].format(value)
     push: (record) -> @wrappedAggregators.forEach (aggregator) -> aggregator.push(record)
+    getWrappedAggregator: (name) -> @wrappedAggregators[@aggregatorMap[name]]
 
 ###
 Pivot Table core: create PivotData object and call Renderer on it
