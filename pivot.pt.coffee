@@ -1,6 +1,7 @@
 nf = $.pivotUtilities.numberFormat
 tpl = $.pivotUtilities.aggregatorTemplates
 r = $.pivotUtilities.renderers
+gcr = $.pivotUtilities.gchart_renderers
 
 frFmt =    nf(thousandsSep: ".", decimalSep: ",")
 frFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: ".", decimalSep: ",")
@@ -20,7 +21,7 @@ $.pivotUtilities.locales.pt =
         vs: "vs"
         by: "por"
 
-    aggregators: 
+    aggregators:
         "Contagem":                                     tpl.count(frFmtInt)
         "Contagem de Valores &uacute;nicos":            tpl.countUnique(frFmtInt)
         "Lista de Valores &uacute;nicos":               tpl.listUnique(", ")
@@ -43,3 +44,9 @@ $.pivotUtilities.locales.pt =
         "Mapa de Calor":             r["Heatmap"]
         "Mapa de Calor por Linhas":  r["Row Heatmap"]
         "Mapa de Calor por Colunas": r["Col Heatmap"]
+	
+    gchart_renderers:
+        "Gr&aacute;fico de Linhas":            gcr["Line Chart"]
+        "Gr&aacute;fico de Barras":            gcr["Bar Chart"]
+        "Gr&aacute;fico de Barras Empilhadas": gcr["Stacked Bar Chart"]
+        "Gr&aacute;fico de &Aacute;rea":       gcr["Area Chart"]
