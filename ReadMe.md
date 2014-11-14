@@ -35,8 +35,7 @@ Finally, here is a demo where you can view your own data from a local CSV file, 
 
 ##How do I use the UI?
 
-PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. If you choose a summary function that takes an argument, like 'average', you'll have to drag a attribute onto the dropdown. 
-There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the Canadian Parliament 2012 dataset.
+PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the [Canadian Parliament 2012 dataset](http://nicolas.kruchten.com/pivottable/examples/mps.csv).
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/animation.gif)
 
@@ -64,7 +63,7 @@ appends this table to `$("#output")` (the default, *overridable* behaviour is to
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple.png)
 
-A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
+A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yields the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
 
 	$("#output").pivotUI(
 	    [
@@ -78,6 +77,8 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yeilds t
 	);
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple_ui.png)
+
+Note that `pivot()` and `pivotUI()` take different parameters in general, even though in the example above we passed the same parameters to both.
 
 See the wiki for [full parameter documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters).
 
