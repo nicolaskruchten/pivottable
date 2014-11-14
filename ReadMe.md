@@ -103,8 +103,7 @@ Pull requests are welcome! Here are some [Contribution Guidelines](https://githu
 
 ## I have a question, how can I get in touch?
 
-Please [create a GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues/new) if the documentation here or in the [FAQ](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions) or elsewhere on the [wiki](https://github.com/nicolaskruchten/pivottable/wiki) doesn't answer your question!
-
+Please first check the [Frequently Asked Questions](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions) and if you can't find what you're looking for there, or in the [wiki](https://github.com/nicolaskruchten/pivottable/wiki), then please [create a GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues/new).
 
 ##Copyright & Licence (MIT License)
 
