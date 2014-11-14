@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+    </head>
+    <style>
+        * {font-family: Verdana;}
+    </style>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+                var derivers = $.pivotUtilities.derivers;
+
+                $.getJSON("mps.json", function(mps) {
+                    $("#output").pivotUI(mps, {
+                        derivedAttributes: {
+                            "Age Bin": derivers.bin("Age", 10),
+                            "Gender Imbalance": function(mp) {
+                                return mp["Gender"] == "Male" ? 1 : -1;
+                            }
+                        },
+                        onRefresh: function(config) {
+                            //delete some bulky default values
+                            delete config["rendererOptions"];
+                            delete config["localeStrings"];
+                            $("#config_json").text(JSON.stringify(config, undefined, 2));
+                        }
+                    });
+                });
+             });
+        </script>
+        <p><a href="index.html">&laquo; back to examples</a></p>
+        <p style="width: 800px">Textarea below will refresh will display the configuration object every time a user interacts, using the "onRefresh" parameter. Instead of showing the configuration in a textarea, one could store the configuration in a cookie or implement a "save configuration" feature.</p>
+        <textarea id="config_json" 
+        style="float: left; width: 250px; height: 500px; margin: 10px;" readonly>
+        </textarea>
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>
