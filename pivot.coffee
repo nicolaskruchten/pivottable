@@ -515,6 +515,7 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         onRefresh: null
         filter: -> true
         localeStrings: locales[locale].localeStrings
+        exportCSV: null
 
     existingOpts = @data "pivotUIOptions"
     if not existingOpts? or overwrite
@@ -540,6 +541,117 @@ $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
 
         #start building the output
         uiTable = $("<table cellpadding='5'>")
+        
+        
+        normalizeTable = ($table) ->
+            # 1. Normalize colspan by creating elements for each
+            $table.find('th[colspan], td[colspan]').each ->
+              cell  = $(this)
+              count = parseInt(cell.attr('colspan')) - 1
+              cell.removeAttr('colspan')
+           
+              while count > 0
+                cell.after(cell.clone())
+                cell = cell
+                count--
+           
+            # 2. Normalize rowspan by creating rows for each
+            $table.find('th[rowspan], td[rowspan]').each ->
+              cell  = $(this)
+              row   = cell.parent()
+              index = cell.get(0).cellIndex
+              count = parseInt(cell.attr('rowspan')) - 1
+              cell.removeAttr('rowspan')
+           
+              while count > 0
+                row   = row.next()
+                row.find("td:nth-child(#{index + 1}), th:nth-child(#{index + 1})").before(cell.clone())
+                count--
+                
+            # 3. Merge headers with same key, so if you have 3 headers b/c of colspan grouping, they will become 1
+            headers     = []
+            separator = " - "
+            removeCount = 0
+            headerPattern = null
+            
+            $table.find('tr').each (i) ->
+              cell = $(this).find('td:nth-child(1), th:nth-child(1)')
+              text = cell.text().trim()
+        
+              if i == 0
+                headerKey = text
+                headerPattern = new RegExp("^#{headerKey}$", 'i')
+                $(this).children().each ->
+                  headers.push([$(this).text().trim()])
+              else
+                # if the next row matches, then we still continue, b/c we want to remove these rows
+                if text.match(headerPattern)
+                  $(this).children().each (i) ->
+                    header  = headers[i]
+                    text    = $(this).text().trim()
+                    header.push(text) if header.indexOf(text) == -1
+        
+                  $(this).remove()
+                else
+                  # otherwise, we don't need to keep iterating b/c we're past the header section
+                  return false
+                  
+              $table.find('tr:first').children().each (i) ->
+                $(this).text(headers[i].join(separator))
+           
+           
+        
+        
+        exportTableToCSV = ($table, filename) ->
+            
+            exportTable = $table.clone()
+            
+            normalizeTable exportTable
+            $rows = exportTable.find("tr:has(td),tr:has(th)")
+            
+            # Temporary delimiter characters unlikely to be typed by keyboard
+            # This is to avoid accidentally splitting the actual contents
+            tmpColDelim = String.fromCharCode(11) # vertical tab character
+            tmpRowDelim = String.fromCharCode(0) # null character
+            
+            # actual delimiter characters for CSV format
+            colDelim = "\",\""
+            rowDelim = "\"\r\n\""
+            
+            # Grab text from table into CSV formatted string
+            # escape double quotes
+            csv = "\"" + $rows.map((i, row) ->
+              $row = $(row)
+         
+              $cols = $row.find("td,th")
+              $cols.map((j, col) ->
+                $col = $(col)
+                text = $col.text()
+                text.replace "\"", "\"\""
+              ).get().join tmpColDelim
+            ).get().join(tmpRowDelim).split(tmpRowDelim).join(rowDelim).split(tmpColDelim).join(colDelim) + "\""
+            
+            # Data URI
+            csvData = "data:application/csv;charset=utf-8," + encodeURIComponent(csv)
+            $(this).attr
+              download: filename
+              href: csvData
+              target: "_blank"
+          
+            return
+            
+        
+        #Add Export Link
+        if opts.exportCSV == true
+            $("<p>").appendTo(uiTable)
+             .append $("<a href='#' target='_blank'>Export to CSV</a>").on "click", (event) ->
+                                                     
+                                                     # CSV
+                                                     exportTableToCSV.apply this, [
+                                                       $(".pvtTable")
+                                                       "export.csv"
+                                                     ]
+                                                     return
 
         #renderer control
         rendererControl = $("<td>")
