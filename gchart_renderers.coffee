@@ -1,4 +1,4 @@
-(callWithJQuery = (pivotModule) ->
+callWithJQuery = (pivotModule) ->
     if typeof exports is "object" and typeof module is "object" # CommonJS
         pivotModule require("jquery")
     else if typeof define is "function" and define.amd # AMD
@@ -6,8 +6,8 @@
     # Plain browser env
     else
         pivotModule jQuery
-) (jQuery) ->
-    $ = jQuery
+        
+callWithJQuery ($) ->
 
     makeGoogleChart = (chartType, extraOptions) -> (pivotData, opts) ->
         defaults =
