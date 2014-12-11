@@ -23,7 +23,7 @@ gulp.task('publish', function (done) {
 });
 
 gulp.task('push', function (done) {
-  git.push('origin', 'master', function (err) {
+  git.push('origin', 'master', {args: '--tags'}, function (err) {
     if (err) throw err;
   });
 });
