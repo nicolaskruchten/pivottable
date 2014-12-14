@@ -13,14 +13,14 @@
     <body>
         <script type="text/javascript">
             $(function(){
-                        $("#output").pivot(
-        [
-            {color: "blue", shape: "circle"},
-            {color: "red", shape: "<span style='color:red;'>triangle</span>"}
-        ],
-        {
-            rows: ["color"],
-            cols: ["shape"]
+                        $("#output").pivotUI(
+        [ 
+            {color: "<span style='color: blue;'>blue</span>", shape: "<span style='font-size:20px'>&bigcirc;</span>"}, 
+            {color: "<span style='color: red;'>red</span>", shape: "<span style='font-size:20px'>&bigtriangleup;</span>"}
+        ], 
+        { 
+            rows: ["color"], 
+            cols: ["shape"] 
         }
     );
              });

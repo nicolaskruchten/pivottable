@@ -514,7 +514,7 @@
           return $("tbody > tr", input).each(function(i) {
             record = {};
             $("td", this).each(function(j) {
-              return record[tblCols[j]] = $(this).text();
+              return record[tblCols[j]] = $(this).html();
             });
             return addRecord(record);
           });
@@ -684,7 +684,7 @@
         }
         th = document.createElement("th");
         th.className = "pvtAxisLabel";
-        th.textContent = c;
+        th.innerHTML = c;
         tr.appendChild(th);
         for (i in colKeys) {
           if (!__hasProp.call(colKeys, i)) continue;
@@ -693,7 +693,7 @@
           if (x !== -1) {
             th = document.createElement("th");
             th.className = "pvtColLabel";
-            th.textContent = colKey[j];
+            th.innerHTML = colKey[j];
             th.setAttribute("colspan", x);
             if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
               th.setAttribute("rowspan", 2);
@@ -717,7 +717,7 @@
           r = rowAttrs[i];
           th = document.createElement("th");
           th.className = "pvtAxisLabel";
-          th.textContent = r;
+          th.innerHTML = r;
           tr.appendChild(th);
         }
         th = document.createElement("th");
@@ -739,7 +739,7 @@
           if (x !== -1) {
             th = document.createElement("th");
             th.className = "pvtRowLabel";
-            th.textContent = txt;
+            th.innerHTML = txt;
             th.setAttribute("rowspan", x);
             if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
               th.setAttribute("colspan", 2);
@@ -925,9 +925,9 @@
           }
           return _results;
         });
-        uiTable = $("<table cellpadding='5'>");
+        uiTable = $("<table>").attr("cellpadding", 5);
         rendererControl = $("<td>");
-        renderer = $("<select class='pvtRenderer'>").appendTo(rendererControl).bind("change", function() {
+        renderer = $("<select>").addClass('pvtRenderer').appendTo(rendererControl).bind("change", function() {
           return refresh();
         });
         _ref1 = opts.renderers;
@@ -935,7 +935,7 @@
           if (!__hasProp.call(_ref1, x)) continue;
           $("<option>").val(x).html(x).appendTo(renderer);
         }
-        colList = $("<td class='pvtAxisContainer pvtUnused'>");
+        colList = $("<td>").addClass('pvtAxisContainer pvtUnused');
         shownAttributes = (function() {
           var _j, _len1, _results;
           _results = [];
@@ -1005,8 +1005,9 @@
               filterItem = $("<label>");
               filterItemExcluded = opts.exclusions[c] ? (__indexOf.call(opts.exclusions[c], k) >= 0) : false;
               hasExcludedItem || (hasExcludedItem = filterItemExcluded);
-              $("<input type='checkbox' class='pvtFilter'>").attr("checked", !filterItemExcluded).data("filter", [c, k]).appendTo(filterItem);
-              filterItem.append($("<span>").text("" + k + " (" + v + ")"));
+              $("<input>").attr("type", "checkbox").addClass('pvtFilter').attr("checked", !filterItemExcluded).data("filter", [c, k]).appendTo(filterItem);
+              filterItem.append($("<span>").html(k));
+              filterItem.append($("<span>").text(" (" + v + ")"));
               checkContainer.append($("<p>").append(filterItem));
             }
           }
@@ -1033,8 +1034,8 @@
             $('.pvtSearch').val('');
             return $('label').show();
           };
-          triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;").bind("click", showFilterList);
-          attrElem = $("<li class='axis_" + i + "'>").append($("<span class='pvtAttr'>").text(c).data("attrName", c).append(triangleLink));
+          triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", showFilterList);
+          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(c).data("attrName", c).append(triangleLink));
           if (hasExcludedItem) {
             attrElem.addClass('pvtFilteredAttribute');
           }
@@ -1046,7 +1047,7 @@
           _fn(c);
         }
         tr1 = $("<tr>").appendTo(uiTable);
-        aggregator = $("<select class='pvtAggregator'>").bind("change", function() {
+        aggregator = $("<select>").addClass('pvtAggregator').bind("change", function() {
           return refresh();
         });
         _ref2 = opts.aggregators;
@@ -1054,11 +1055,11 @@
           if (!__hasProp.call(_ref2, x)) continue;
           aggregator.append($("<option>").val(x).html(x));
         }
-        $("<td class='pvtVals'>").appendTo(tr1).append(aggregator).append($("<br>"));
-        $("<td class='pvtAxisContainer pvtHorizList pvtCols'>").appendTo(tr1);
+        $("<td>").addClass('pvtVals').appendTo(tr1).append(aggregator).append($("<br>"));
+        $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols').appendTo(tr1);
         tr2 = $("<tr>").appendTo(uiTable);
-        tr2.append($("<td valign='top' class='pvtAxisContainer pvtRows'>"));
-        pivotTable = $("<td valign='top' class='pvtRendererArea'>").appendTo(tr2);
+        tr2.append($("<td>").addClass('pvtAxisContainer pvtRows').attr("valign", "top"));
+        pivotTable = $("<td>").attr("valign", "top").addClass('pvtRendererArea').appendTo(tr2);
         if (opts.unusedAttrsVertical === true || unusedAttrsVerticalAutoOverride) {
           uiTable.find('tr:nth-child(1)').prepend(rendererControl);
           uiTable.find('tr:nth-child(2)').prepend(colList);
@@ -1114,7 +1115,7 @@
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
               for (x = _m = 0; 0 <= numInputsToProcess ? _m < numInputsToProcess : _m > numInputsToProcess; x = 0 <= numInputsToProcess ? ++_m : --_m) {
-                newDropdown = $("<select class='pvtAttrDropdown'>").append($("<option>")).bind("change", function() {
+                newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
                 for (_n = 0, _len4 = shownAttributes.length; _n < _len4; _n++) {

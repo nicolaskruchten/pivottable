@@ -252,7 +252,7 @@ callWithJQuery ($) ->
                 $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
                 $("tbody > tr", input).each (i) ->
                     record = {}
-                    $("td", this).each (j) -> record[tblCols[j]] = $(this).text()
+                    $("td", this).each (j) -> record[tblCols[j]] = $(this).html()
                     addRecord(record)
             else
                 throw new Error("unknown input format")
@@ -372,14 +372,14 @@ callWithJQuery ($) ->
                 tr.appendChild th
             th = document.createElement("th")
             th.className = "pvtAxisLabel"
-            th.textContent = c
+            th.innerHTML = c
             tr.appendChild th
             for own i, colKey of colKeys
                 x = spanSize(colKeys, parseInt(i), parseInt(j))
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtColLabel"
-                    th.textContent = colKey[j]
+                    th.innerHTML = colKey[j]
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
@@ -398,7 +398,7 @@ callWithJQuery ($) ->
             for own i, r of rowAttrs
                 th = document.createElement("th")
                 th.className = "pvtAxisLabel"
-                th.textContent = r
+                th.innerHTML = r
                 tr.appendChild th 
             th = document.createElement("th")
             if colAttrs.length ==0
@@ -415,7 +415,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtRowLabel"
-                    th.textContent = txt
+                    th.innerHTML = txt
                     th.setAttribute("rowspan", x)
                     if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                         th.setAttribute("colspan",2)
@@ -548,12 +548,13 @@ callWithJQuery ($) ->
                     axisValues[k][v]++
 
             #start building the output
-            uiTable = $("<table cellpadding='5'>")
+            uiTable = $("<table>").attr("cellpadding", 5)
 
             #renderer control
             rendererControl = $("<td>")
 
-            renderer = $("<select class='pvtRenderer'>")
+            renderer = $("<select>")
+                .addClass('pvtRenderer')
                 .appendTo(rendererControl)
                 .bind "change", -> refresh() #capture reference
             for own x of opts.renderers
@@ -561,7 +562,7 @@ callWithJQuery ($) ->
 
 
             #axis list, including the double-click menu
-            colList = $("<td class='pvtAxisContainer pvtUnused'>")
+            colList = $("<td>").addClass('pvtAxisContainer pvtUnused')
             shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
 
             unusedAttrsVerticalAutoOverride = false
@@ -606,10 +607,12 @@ callWithJQuery ($) ->
                              filterItem = $("<label>")
                              filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
                              hasExcludedItem ||= filterItemExcluded
-                             $("<input type='checkbox' class='pvtFilter'>")
+                             $("<input>")
+                                .attr("type", "checkbox").addClass('pvtFilter')
                                 .attr("checked", !filterItemExcluded).data("filter", [c,k])
                                 .appendTo filterItem
-                             filterItem.append $("<span>").text "#{k} (#{v})"
+                             filterItem.append $("<span>").html k
+                             filterItem.append $("<span>").text " ("+v+")"
                              checkContainer.append $("<p>").append(filterItem)
 
                     updateFilter = ->
@@ -632,11 +635,11 @@ callWithJQuery ($) ->
                         $('.pvtSearch').val('')
                         $('label').show()
 
-                    triangleLink = $("<span class='pvtTriangle'>").html(" &#x25BE;")
+                    triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;")
                         .bind "click", showFilterList
 
-                    attrElem = $("<li class='axis_#{i}'>")
-                        .append $("<span class='pvtAttr'>").text(c).data("attrName", c).append(triangleLink)
+                    attrElem = $("<li>").addClass("axis_#{i}")
+                        .append $("<span>").addClass('pvtAttr').text(c).data("attrName", c).append(triangleLink)
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                     colList.append(attrElem).append(valueList)
 
@@ -646,26 +649,29 @@ callWithJQuery ($) ->
 
             #aggregator menu and value area
 
-            aggregator = $("<select class='pvtAggregator'>")
+            aggregator = $("<select>").addClass('pvtAggregator')
                 .bind "change", -> refresh() #capture reference
             for own x of opts.aggregators
                 aggregator.append $("<option>").val(x).html(x)
 
-            $("<td class='pvtVals'>")
+            $("<td>").addClass('pvtVals')
               .appendTo(tr1)
               .append(aggregator)
               .append($("<br>"))
 
             #column axes
-            $("<td class='pvtAxisContainer pvtHorizList pvtCols'>").appendTo(tr1)
+            $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols').appendTo(tr1)
 
             tr2 = $("<tr>").appendTo(uiTable)
 
             #row axes
-            tr2.append $("<td valign='top' class='pvtAxisContainer pvtRows'>")
+            tr2.append $("<td>").addClass('pvtAxisContainer pvtRows').attr("valign", "top")
 
             #the actual pivot table container
-            pivotTable = $("<td valign='top' class='pvtRendererArea'>").appendTo(tr2)
+            pivotTable = $("<td>")
+                .attr("valign", "top")
+                .addClass('pvtRendererArea')
+                .appendTo(tr2)
 
             #finally the renderer dropdown and unused attribs are inserted at the requested location
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
@@ -712,7 +718,8 @@ callWithJQuery ($) ->
                 if numInputsToProcess != 0
                     pvtVals = @find(".pvtVals")
                     for x in [0...numInputsToProcess]
-                        newDropdown = $("<select class='pvtAttrDropdown'>")
+                        newDropdown = $("<select>")
+                            .addClass('pvtAttrDropdown')
                             .append($("<option>"))
                             .bind "change", -> refresh()
                         for attr in shownAttributes
