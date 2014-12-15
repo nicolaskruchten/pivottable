@@ -686,9 +686,9 @@ callWithJQuery ($) ->
             #set up the UI initial state as requested by moving elements around
 
             for x in opts.cols
-                @find(".pvtCols").append @find(".axis_#{shownAttributes.indexOf(x)}")
+                @find(".pvtCols").append @find(".axis_#{$.inArray(x, shownAttributes)}")
             for x in opts.rows
-                @find(".pvtRows").append @find(".axis_#{shownAttributes.indexOf(x)}")
+                @find(".pvtRows").append @find(".axis_#{$.inArray(x, shownAttributes)}")
             if opts.aggregatorName?
                 @find(".pvtAggregator").val opts.aggregatorName
             if opts.rendererName?

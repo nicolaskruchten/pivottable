@@ -1070,12 +1070,12 @@
         _ref3 = opts.cols;
         for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
           x = _ref3[_k];
-          this.find(".pvtCols").append(this.find(".axis_" + (shownAttributes.indexOf(x))));
+          this.find(".pvtCols").append(this.find(".axis_" + ($.inArray(x, shownAttributes))));
         }
         _ref4 = opts.rows;
         for (_l = 0, _len3 = _ref4.length; _l < _len3; _l++) {
           x = _ref4[_l];
-          this.find(".pvtRows").append(this.find(".axis_" + (shownAttributes.indexOf(x))));
+          this.find(".pvtRows").append(this.find(".axis_" + ($.inArray(x, shownAttributes))));
         }
         if (opts.aggregatorName != null) {
           this.find(".pvtAggregator").val(opts.aggregatorName);
