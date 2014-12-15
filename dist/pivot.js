@@ -978,10 +978,14 @@
             valueList.append($("<p>").html(opts.localeStrings.tooMany));
           } else {
             btns = $("<p>").appendTo(valueList);
-            btns.append($("<button>").html(opts.localeStrings.selectAll).bind("click", function() {
+            btns.append($("<button>", {
+              type: "button"
+            }).html(opts.localeStrings.selectAll).bind("click", function() {
               return valueList.find("input:visible").prop("checked", true);
             }));
-            btns.append($("<button>").html(opts.localeStrings.selectNone).bind("click", function() {
+            btns.append($("<button>", {
+              type: "button"
+            }).html(opts.localeStrings.selectNone).bind("click", function() {
               return valueList.find("input:visible").prop("checked", false);
             }));
             btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
@@ -1024,7 +1028,9 @@
               return valueList.toggle(0, refresh);
             }
           };
-          $("<p>").appendTo(valueList).append($("<button>").text("OK").bind("click", updateFilter));
+          $("<p>").appendTo(valueList).append($("<button>", {
+            type: "button"
+          }).text("OK").bind("click", updateFilter));
           showFilterList = function(e) {
             valueList.css({
               left: e.pageX,
