@@ -14,29 +14,34 @@
         <script type="text/javascript">
             $(function(){
                     var input = $("#input")
-                    $("#output").pivotUI(input);
+                    $("#output").pivotUI(input, 
+                    { 
+                        rows: ["color"], 
+                        cols: ["shape"] 
+                    });
              });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
         <div id="output" style="margin: 10px;"></div>
-        <br /><br /><br />
+        <br />
+        <h3>Input table:</h3>
         <table id="input" border="1">
             <thead>
                 <tr>
-                    <th>attr1</th>
-                    <th>attr2</th>
+                    <th>color</th>
+                    <th>shape</th>
                     <!-- etc... -->
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>value1_attr1</td>
-                    <td>value1_attr2</td>
+                    <td><span style='color: blue;'>blue</span></td>
+                    <td><span style='font-size:20px'>&bigcirc;</span></td>
                 </tr>
                 <tr>
-                    <td>value2_attr1</td>
-                    <td>value2_attr2</td>
+                    <td><span style='color: red;'>red</span></td>
+                    <td><span style='font-size:20px'>&bigtriangleup;</span></td>
                 </tr>
                     <!-- etc... -->
             </tbody>
