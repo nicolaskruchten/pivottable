@@ -991,7 +991,7 @@
             btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
               var filter;
               filter = $(this).val().toLowerCase();
-              return $(this).parents(".pvtFilterBox").find('label span').each(function() {
+              return $(this).parents(".pvtFilterBox").find('label').each(function() {
                 var testString;
                 testString = $(this).text().toLowerCase().indexOf(filter);
                 if (testString !== -1) {
