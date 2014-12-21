@@ -1,7 +1,7 @@
 (function() {
-  var callWithJQuery;
+  var ncallWithJQuery;
 
-  callWithJQuery = function(pivotModule) {
+  ncallWithJQuery = function(pivotModule) {
     if (typeof exports === "object" && typeof module === "object") {
       return pivotModule(require("jquery"));
     } else if (typeof define === "function" && define.amd) {
@@ -19,7 +19,10 @@
           localeStrings: {}
         };
         opts = $.extend(defaults, opts);
-        result = $("<div style='width: 100%; height: 100%;'>");
+        result = $("<div>").css({
+          width: "100%",
+          height: "100%"
+        });
         tree = {
           name: "All",
           children: []

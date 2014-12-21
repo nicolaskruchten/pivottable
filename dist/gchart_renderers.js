@@ -89,7 +89,10 @@
           options[k] = v;
         }
         dataTable = google.visualization.arrayToDataTable(dataArray);
-        result = $("<div style='width: 100%; height: 100%;'>");
+        result = $("<div>").css({
+          width: "100%",
+          height: "100%"
+        });
         wrapper = new google.visualization.ChartWrapper({
           dataTable: dataTable,
           chartType: chartType,

@@ -58,7 +58,7 @@ callWithJQuery ($) ->
 
         dataTable = google.visualization.arrayToDataTable(dataArray)
 
-        result = $("<div style='width: 100%; height: 100%;'>")
+        result = $("<div>").css(width: "100%", height: "100%")
         wrapper = new google.visualization.ChartWrapper {dataTable, chartType, options}
         wrapper.draw(result[0])    
         result.bind "dblclick", -> 

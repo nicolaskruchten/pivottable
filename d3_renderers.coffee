@@ -1,4 +1,4 @@
-callWithJQuery = (pivotModule) ->
+ncallWithJQuery = (pivotModule) ->
     if typeof exports is "object" and typeof module is "object" # CommonJS
         pivotModule require("jquery")
     else if typeof define is "function" and define.amd # AMD
@@ -16,7 +16,7 @@ callWithJQuery ($) ->
         opts = $.extend defaults, opts
 
 
-        result = $("<div style='width: 100%; height: 100%;'>")
+        result = $("<div>").css(width: "100%", height: "100%")
 
         tree = name: "All", children: []
         addToTree = (tree, path, value) ->
