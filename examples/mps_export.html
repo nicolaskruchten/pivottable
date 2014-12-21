@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <script type="text/javascript" src="../dist/export_renderers.js"></script>
+    </head>
+    <style>
+        * {font-family: Verdana;}
+    </style>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+                var derivers = $.pivotUtilities.derivers;
+                var renderers = $.extend($.pivotUtilities.renderers, 
+                    $.pivotUtilities.export_renderers);
+
+                $.getJSON("mps.json", function(mps) {
+                    $("#output").pivotUI(mps, {
+                        renderers: renderers,
+                        cols: ["Gender"], rows: ["Party"],
+                        rendererName: "TSV Export"
+                    });
+                });
+             });
+        </script>
+
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <p style="width: 800px">When using the 'TSV Export' Renderer, you can copy from this textarea straight into Excel.</p>
+        
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>
