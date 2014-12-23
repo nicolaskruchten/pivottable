@@ -593,12 +593,12 @@ callWithJQuery ($) ->
                             valueList.find("input:visible").prop "checked", false
                         btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
                             filter = $(this).val().toLowerCase()
-                            $(this).parents(".pvtFilterBox").find('label').each ->
+                            valueList.find('.pvtCheckContainer p').each ->
                                 testString = $(this).text().toLowerCase().indexOf(filter)
                                 if testString isnt -1
-                                    $(this).parent().show()
+                                    $(this).show()
                                 else
-                                    $(this).parent().hide()
+                                    $(this).hide()
 
                         checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
@@ -616,8 +616,8 @@ callWithJQuery ($) ->
                              checkContainer.append $("<p>").append(filterItem)
 
                     updateFilter = ->
-                        unselectedCount = $(valueList).find("[type='checkbox']").length -
-                                          $(valueList).find("[type='checkbox']:checked").length
+                        unselectedCount = valueList.find("[type='checkbox']").length -
+                                          valueList.find("[type='checkbox']:checked").length
                         if unselectedCount > 0
                             attrElem.addClass "pvtFilteredAttribute"
                         else
@@ -632,8 +632,8 @@ callWithJQuery ($) ->
 
                     showFilterList = (e) ->
                         valueList.css(left: e.pageX, top: e.pageY).toggle()
-                        $('.pvtSearch').val('')
-                        $('label').show()
+                        valueList.find('.pvtSearch').val('')
+                        valueList.find('.pvtCheckContainer p').show()
 
                     triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;")
                         .bind "click", showFilterList

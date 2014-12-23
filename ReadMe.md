@@ -42,6 +42,8 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 
 ##How do I use the code?
 
+You need to load jQuery and the PivotTable.js scripts (`pivot.min.js` and any plugins or source maps), which can be done the normal way (download the files from [dist](https://github.com/nicolaskruchten/pivottable/tree/master/dist) and reference them), or loaded from [CDNJS](https://cdnjs.com/libraries/pivottable), or via [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via Bower with `bower install pivottable`.
+
 There are two main functions defined in `pivot.coffee`: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
 Despite the fact that this is described as a Javascript library, it's actually written in [CoffeeScript](http://coffeescript.org). You can compile `pivot.coffee` into `pivot.js` with `coffee -c pivot.coffee` or you can use the precompiled JS file from the `examples` directory.
