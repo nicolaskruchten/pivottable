@@ -991,13 +991,13 @@
             btns.append($("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind("keyup", function() {
               var filter;
               filter = $(this).val().toLowerCase();
-              return $(this).parents(".pvtFilterBox").find('label').each(function() {
+              return valueList.find('.pvtCheckContainer p').each(function() {
                 var testString;
                 testString = $(this).text().toLowerCase().indexOf(filter);
                 if (testString !== -1) {
-                  return $(this).parent().show();
+                  return $(this).show();
                 } else {
-                  return $(this).parent().hide();
+                  return $(this).hide();
                 }
               });
             }));
@@ -1017,7 +1017,7 @@
           }
           updateFilter = function() {
             var unselectedCount;
-            unselectedCount = $(valueList).find("[type='checkbox']").length - $(valueList).find("[type='checkbox']:checked").length;
+            unselectedCount = valueList.find("[type='checkbox']").length - valueList.find("[type='checkbox']:checked").length;
             if (unselectedCount > 0) {
               attrElem.addClass("pvtFilteredAttribute");
             } else {
@@ -1037,8 +1037,8 @@
               left: e.pageX,
               top: e.pageY
             }).toggle();
-            $('.pvtSearch').val('');
-            return $('label').show();
+            valueList.find('.pvtSearch').val('');
+            return valueList.find('.pvtCheckContainer p').show();
           };
           triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", showFilterList);
           attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(c).data("attrName", c).append(triangleLink));
