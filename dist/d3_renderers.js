@@ -1,7 +1,7 @@
 (function() {
-  var ncallWithJQuery;
+  var callWithJQuery;
 
-  ncallWithJQuery = function(pivotModule) {
+  callWithJQuery = function(pivotModule) {
     if (typeof exports === "object" && typeof module === "object") {
       return pivotModule(require("jquery"));
     } else if (typeof define === "function" && define.amd) {
