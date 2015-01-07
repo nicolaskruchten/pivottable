@@ -591,7 +591,7 @@ callWithJQuery ($) ->
                             valueList.find("input:visible").prop "checked", true
                         btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectNone).bind "click", ->
                             valueList.find("input:visible").prop "checked", false
-                        btns.append $("<input>").addClass("pvtSearch").attr("placeholder", opts.localeStrings.filterResults).bind "keyup", ->
+                        btns.append $("<input>", {type: "text", placeholder: opts.localeStrings.filterResults, class: "pvtSearch"}).bind "keyup", ->
                             filter = $(this).val().toLowerCase()
                             valueList.find('.pvtCheckContainer p').each ->
                                 testString = $(this).text().toLowerCase().indexOf(filter)
