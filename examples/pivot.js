@@ -119,12 +119,16 @@
               var _ref;
               if (_ref = record[attr], __indexOf.call(this.uniq, _ref) < 0) {
                 // NOTE: CUBE19 changes at work
-                var number = record[attr];
-                var decimalPlaces = 2;
-                var _nb = number * Math.pow(10, decimalPlaces);
-                _nb = Math.round(_nb);
-                _nb = _nb / Math.pow(10, decimalPlaces);
-                return this.uniq.push(_nb);
+                if (isNaN(record[attr])) {
+                  return this.uniq.push(record[attr]);
+                } else {
+                  var number = record[attr];
+                  var decimalPlaces = 2;
+                  var _nb = number * Math.pow(10, decimalPlaces);
+                  _nb = Math.round(_nb);
+                  _nb = _nb / Math.pow(10, decimalPlaces);
+                  return this.uniq.push(_nb);
+                }
                 // END: CUBE19
               }
             },
@@ -724,6 +728,7 @@
           }
 
           // END: CUBE19 changes
+
           th.setAttribute("colspan", x);
           if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
             th.setAttribute("rowspan", 2);
@@ -787,7 +792,19 @@
         if (x !== -1) {
           th = document.createElement("th");
           th.className = "pvtRowLabel";
-          th.textContent = txt;
+
+          // NOTE: CUBE19 CHANGES
+          if (isNaN(txt)) {
+            th.textContent = txt;
+          } else {
+            var decimalPlaces = 2;
+            var _nb = txt * Math.pow(10, decimalPlaces);
+            _nb = Math.round(_nb);
+            _nb = _nb / Math.pow(10, decimalPlaces);
+            th.textContent = _nb;
+          }
+          // END: CUBE19 changes
+
           th.setAttribute("rowspan", x);
           if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
             th.setAttribute("colspan", 2);
