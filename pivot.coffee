@@ -176,29 +176,62 @@ callWithJQuery ($) ->
                         when "S" then zeroPad(date.getSeconds())
                         else "%" + p
 
-    naturalSort = (as, bs) => #thanks http://stackoverflow.com/a/4373421/112871
-        rx = /(\d+)|(\D+)/g
-        rd = /\d/
-        rz = /^0/
-        if typeof as is "number" or typeof bs is "number"
-            return 1  if isNaN(as)
-            return -1  if isNaN(bs)
-            return as - bs
-        a = String(as).toLowerCase()
-        b = String(bs).toLowerCase()
-        return 0  if a is b
-        return (if a > b then 1 else -1)  unless rd.test(a) and rd.test(b)
-        a = a.match(rx)
-        b = b.match(rx)
-        while a.length and b.length
-            a1 = a.shift()
-            b1 = b.shift()
-            if a1 isnt b1
-                if rd.test(a1) and rd.test(b1)
-                    return a1.replace(rz, ".0") - b1.replace(rz, ".0")
-                else
-                    return (if a1 > b1 then 1 else -1)
-        a.length - b.length
+    #
+    # * Natural Sort algorithm for Javascript - Version 0.7 - Released under MIT license
+    # * Author: Jim Palmer (based on chunking idea from Dave Koelle)
+    # * http://www.overset.com/2008/09/01/javascript-natural-sort-algorithm-with-unicode-support/
+    # 
+    naturalSort = (a, b) ->
+        re = /(^-?[0-9]+(\.?[0-9]*)[df]?e?[0-9]?$|^0x[0-9a-f]+$|[0-9]+)/g
+        sre = /(^[ ]*|[ ]*$)/g
+        dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/
+        hre = /^0x[0-9a-f]+$/i
+        ore = /^0/
+        i = (s) ->
+            naturalSort.insensitive and ("" + s).toLowerCase() or "" + s
+
+        
+        # convert all to strings strip whitespace
+        x = i(a).replace(sre, "") or ""
+        y = i(b).replace(sre, "") or ""
+        
+        # chunk/tokenize
+        xN = x.replace(re, "\u0000$1\u0000").replace(/\0$/, "").replace(/^\0/, "").split("\u0000")
+        yN = y.replace(re, "\u0000$1\u0000").replace(/\0$/, "").replace(/^\0/, "").split("\u0000")
+        
+        # numeric, hex or date detection
+        xD = parseInt(x.match(hre)) or (xN.length isnt 1 and x.match(dre) and Date.parse(x))
+        yD = parseInt(y.match(hre)) or xD and y.match(dre) and Date.parse(y) or null
+        oFxNcL = undefined
+        oFyNcL = undefined
+        
+        # first try and sort Hex codes or Dates
+        if yD
+            if xD < yD
+                return -1
+            else return 1    if xD > yD
+        
+        # natural sorting through split numeric strings and default strings
+        cLoc = 0
+        numS = Math.max(xN.length, yN.length)
+
+        while cLoc < numS
+            
+            # find floats not starting with '0', string or 0 if not defined (Clint Priest)
+            oFxNcL = not (xN[cLoc] or "").match(ore) and parseFloat(xN[cLoc]) or xN[cLoc] or 0
+            oFyNcL = not (yN[cLoc] or "").match(ore) and parseFloat(yN[cLoc]) or yN[cLoc] or 0
+            
+            # handle numeric vs string comparison - number < string - (Kyle Adams)
+            if isNaN(oFxNcL) isnt isNaN(oFyNcL)
+                return (if (isNaN(oFxNcL)) then 1 else -1)
+            
+            # rely on string comparison if different types - i.e. '02' < 2 != '02' < '2'
+            else if typeof oFxNcL isnt typeof oFyNcL
+                oFxNcL += ""
+                oFyNcL += ""
+            return -1    if oFxNcL < oFyNcL
+            return 1    if oFxNcL > oFyNcL
+            cLoc++
 
     #expose these to the outside world
     $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
