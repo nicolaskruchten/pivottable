@@ -151,6 +151,12 @@ callWithJQuery ($) ->
                 totals: "Totals" #for table renderer
                 vs: "vs" #for gchart renderer
                 by: "by" #for gchart renderer
+                dateOnly: "Date Only"
+                monthOnly: "Month Only"
+                yearOnly: "Year Only"
+                quarterOnly: "Quarter Only"
+                hourOnly: "Hour Only"
+                weekdayOnly: "Week Day Only"
 
     #dateFormat deriver l10n requires month and day names to be passed in directly
     mthNamesEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -174,6 +180,7 @@ callWithJQuery ($) ->
                         when "H" then zeroPad(date.getHours())
                         when "M" then zeroPad(date.getMinutes())
                         when "S" then zeroPad(date.getSeconds())
+                        when "q" then Math.floor((date.getMonth()/3)+1)
                         else "%" + p
 
     #
@@ -255,6 +262,8 @@ callWithJQuery ($) ->
             @colTotals = {}
             @allTotal = @aggregator(this, [], [])
             @sorted = false
+
+            opts.derivedAttributes[k] = derivers.dateFormat(v.src,v.fmt) for k, v of opts.derivedAttributesMacros
 
             # iterate through input, accumulating data for cells
             PivotData.forEachRecord input, opts.derivedAttributes, (record) =>
@@ -515,6 +524,7 @@ callWithJQuery ($) ->
             aggregator: aggregatorTemplates.count()()
             aggregatorName: "Count"
             derivedAttributes: {},
+            derivedAttributesMacros: {}
             renderer: pivotTableRenderer
             rendererOptions: null
             localeStrings: locales.en.localeStrings
@@ -545,6 +555,7 @@ callWithJQuery ($) ->
     $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         defaults =
             derivedAttributes: {}
+            derivedAttributesMacros: {}
             aggregators: locales[locale].aggregators
             renderers: locales[locale].renderers
             hiddenAttributes: []
@@ -558,12 +569,15 @@ callWithJQuery ($) ->
             filter: -> true
             localeStrings: locales[locale].localeStrings
 
+        thisOrig = this
+
         existingOpts = @data "pivotUIOptions"
         if not existingOpts? or overwrite
             opts = $.extend defaults, inputOpts
         else
             opts = existingOpts
 
+        opts.derivedAttributes[k] = derivers.dateFormat(v.src,v.fmt) for k, v of opts.derivedAttributesMacros
         try
             #cache the input in some useful form
             input = PivotData.convertToArray(input)
@@ -616,6 +630,29 @@ callWithJQuery ($) ->
                     valueList = $("<div>").addClass('pvtFilterBox').hide()
 
                     valueList.append $("<h4>").text("#{c} (#{keys.length})")
+                    
+                    date = new Date(Date.parse(keys[0]))  # This is not ideal as the first item could be empty.
+                    if !isNaN(date) 
+                        btns = $("<p>").appendTo(valueList)
+                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.dateOnly).bind "click", ->
+                            opts.derivedAttributesMacros[c+' Date'] = { fmt: "%m/%d/%y", src: c } 
+                            thisOrig.pivotUI(input,opts,true)
+                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.weekdayOnly).bind "click", ->
+                            opts.derivedAttributesMacros[c+' Weekday'] = { fmt: "%x-%w", src: c } 
+                            thisOrig.pivotUI(input,opts,true)
+                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.monthOnly).bind "click", ->
+                            opts.derivedAttributesMacros[c+' Month'] = { fmt: "%m", src: c }
+                            thisOrig.pivotUI(input,opts,true)
+                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.yearOnly).bind "click", ->
+                            opts.derivedAttributesMacros[c+' Year'] = { fmt: "%y", src: c }
+                            thisOrig.pivotUI(input,opts,true)
+                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.quarterOnly).bind "click", ->
+                            opts.derivedAttributesMacros[c+' Quarter'] = { fmt: "%q", src: c }
+                            thisOrig.pivotUI(input,opts,true)
+                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.hourOnly).bind "click", ->
+                            opts.derivedAttributesMacros[c+' Hour'] = { fmt: "%H", src: c }
+                            thisOrig.pivotUI(input,opts,true)
+
                     if keys.length > opts.menuLimit
                         valueList.append $("<p>").html(opts.localeStrings.tooMany)
                     else
@@ -664,7 +701,9 @@ callWithJQuery ($) ->
                         .append $("<button>", {type:"button"}).text("OK").bind "click", updateFilter
 
                     showFilterList = (e) ->
-                        valueList.css(left: e.pageX, top: e.pageY).toggle()
+                        wasvis = valueList.is(":visible")
+                        $('.pvtFilterBox').hide();  # hide all the other filter windows
+                        if (!wasvis) then valueList.css(left: e.pageX, top: e.pageY+8).toggle()  # move to current mouse pos, +8 for extra room
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
@@ -733,6 +772,7 @@ callWithJQuery ($) ->
             refreshDelayed = =>
                 subopts =
                     derivedAttributes: opts.derivedAttributes
+                    derivedAttributesMacros: opts.derivedAttributesMacros
                     localeStrings: opts.localeStrings
                     rendererOptions: opts.rendererOptions
                     cols: [], rows: []
