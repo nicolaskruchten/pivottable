@@ -5,6 +5,7 @@
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
         <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="ext/jquery.csv-0.71.min.js"></script>
         <script type="text/javascript" src="../dist/pivot.js"></script>
         <style>
             * {font-family: Verdana;}
@@ -15,14 +16,21 @@
             $(function(){
                 var derivers = $.pivotUtilities.derivers;
 
-                $.getJSON("mps.json", function(mps) {
+                var makePivot = function(mps) {
                     $("#output").pivotUI(mps, {
                         derivedAttributes: {
-                            "Age Bin": derivers.bin("Age", 10),
-                            "Gender Imbalance": function(mp) {
-                                return mp["Gender"] == "Male" ? 1 : -1;
-                            }
+//                            "Doug": derivers.dateFormat("Create Date", "%y"),
+//                            "Age Bin": derivers.bin("Age", 10),
+//                            "Gender Imbalance": function(mp) {
+//                                return mp["Gender"] == "Male" ? 1 : -1;
+//                            }
                         },
+//  "derivedAttributesMacros": {
+//    "Create Date Month": {
+//      "fmt": "%m",
+//      "src": "Create Date"
+//    }
+//  },
                         onRefresh: function(config) {
                             var config_copy = JSON.parse(JSON.stringify(config));
                             //delete some values which are functions
@@ -35,13 +43,31 @@
                             $("#config_json").text(JSON.stringify(config_copy, undefined, 2));
                         }
                     });
+                };
+
+                $.getJSON("mps.json", makePivot);
+                $("#csv").bind("change", function(event){
+                    var reader = new FileReader();
+                    reader.onload = function(theFile) { 
+                        try {
+                            var input = $.csv.toArrays(theFile.target.result);
+
+                        }
+                        catch(e) { 
+                            alert("CSV Parse error: " +  e.message );
+                            return; 
+                        }
+                        makePivot(input);
+                    }
+                    reader.readAsText(event.target.files[0]);
                 });
-             });
+            })
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>
         <p style="width: 800px">Textarea below will refresh will display the configuration object every time a user interacts, using the "onRefresh" parameter. Instead of showing the configuration in a textarea, one could store the configuration in a cookie or implement a "save configuration" feature.</p>
+        <p>Select a CSV file: <input id="csv" type="file" /></p>
         <textarea id="config_json" 
-        style="float: left; width: 250px; height: 500px; margin: 10px;" readonly>
+        style="float: left; width: 250px; height: 250px; margin: 10px;">
         </textarea>
         <div id="output" style="margin: 30px;"></div>
 
