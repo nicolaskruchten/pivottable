@@ -1053,6 +1053,7 @@
           return attrElem.bind("dblclick", showFilterList);
         };
         for (i in shownAttributes) {
+          if (!__hasProp.call(shownAttributes, i)) continue;
           c = shownAttributes[i];
           _fn(c);
         }

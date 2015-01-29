@@ -576,7 +576,7 @@ callWithJQuery ($) ->
             else
                 colList.addClass('pvtHorizList')
 
-            for i, c of shownAttributes
+            for own i, c of shownAttributes
                 do (c) ->
                     keys = (k for k of axisValues[c])
                     hasExcludedItem = false
