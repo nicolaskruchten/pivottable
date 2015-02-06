@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+            * {font-family: Verdana;}
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+
+                var sum = $.pivotUtilities.aggregatorTemplates.sum;
+                var numberFormat = $.pivotUtilities.numberFormat;
+                var intFormat = numberFormat({digitsAfterDecimal: 0}); 
+
+                $("#output").pivot(
+                    [
+                        {color: "blue", shape: "circle", value: 1},
+                        {color: "red", shape: "triangle", value: 2},
+                        {color: "blue", shape: "circle", value: 3},
+                        {color: "red", shape: "triangle", value: 4}
+                    ],
+                    {
+                        rows: ["color"],
+                        cols: ["shape"],
+                        aggregator: sum(intFormat)(["value"])
+                    }
+                );
+             });
+        </script>
+
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <p style="width: 800px">This example shows pivot() with a sum() aggregator.</p>
+
+        
+        <div id="output" style="margin: 10px;"></div>
+
+    </body>
+</html>
