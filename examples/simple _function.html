@@ -39,7 +39,7 @@
                 { color: 5, shape: "triangle"},
                 ];
             var inputFunction = function (callback) {
-                rawData.each(function (element, index) {
+                rawData.forEach(function (element, index) {
                     callback({
                         color: lookupColour[element.color],
                         shape: element.shape
