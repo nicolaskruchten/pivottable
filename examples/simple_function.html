@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pivot Demo</title>
+    <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+    <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
+    <script type="text/javascript" src="../dist/pivot.js"></script>
+    <style>
+        * {
+            font-family: Verdana;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="text/javascript">
+        $(function () {
+            var lookupColour = ["blue", "yellow", "red", "green", "orange", "purple"];
+                var rawData = [
+                { color: 0, shape: "circle"},
+                { color: 1, shape: "circle"},
+                { color: 1, shape: "circle"},
+                { color: 2, shape: "circle"},
+                { color: 2, shape: "circle"},
+                { color: 2, shape: "circle"},
+                { color: 3, shape: "circle"},
+                { color: 4, shape: "circle"},
+                { color: 5, shape: "circle"},
+                { color: 0, shape: "triangle"},
+                { color: 1, shape: "triangle"},
+                { color: 2, shape: "triangle"},
+                { color: 3, shape: "triangle"},
+                { color: 3, shape: "triangle"},
+                { color: 4, shape: "triangle"},
+                { color: 4, shape: "triangle"},
+                { color: 4, shape: "triangle"},
+                { color: 5, shape: "triangle"},
+                ];
+            var inputFunction = function (callback) {
+                rawData.forEach(function (element, index) {
+                    callback({
+                        color: lookupColour[element.color],
+                        shape: element.shape
+                    });
+                });
+            };
+
+            $("#output").pivot(inputFunction, {
+                rows: ["color"],
+                cols: ["shape"]
+            });
+        });
+    </script>
+
+    <p><a href="index.html">&laquo; back to examples</a>
+    </p>
+
+    <p style="width: 800px">This example uses a function to provide the input values to pivot().</p>
+
+
+    <div id="output" style="margin: 10px;"></div>
+
+</body>
+
+</html>
