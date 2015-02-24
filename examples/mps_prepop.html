@@ -23,6 +23,11 @@
                                 return mp["Gender"] == "Male" ? 1 : -1;
                             }
                         },
+                        sortProvider: function(attr){
+                            if(attr == "Age"){
+                                return function(a,b){return b-a;};
+                            }
+                        },
                         rows: ["Province"],
                         cols: ["Party"],
                         aggregatorName: "Integer Sum",

@@ -200,6 +200,13 @@ callWithJQuery ($) ->
                     return (if a1 > b1 then 1 else -1)
         a.length - b.length
 
+    getSort = (sortProvider, attr) ->
+        sort = sortProvider(attr)
+        if $.isFunction(sort)
+            return sort 
+        else
+            return naturalSort
+
     #expose these to the outside world
     $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
         naturalSort, numberFormat}
@@ -215,6 +222,7 @@ callWithJQuery ($) ->
             @colAttrs = opts.cols
             @rowAttrs = opts.rows
             @valAttrs = opts.vals
+            @sortProvider = opts.sortProvider
             @tree = {}
             @rowKeys = []
             @colKeys = []
@@ -263,15 +271,19 @@ callWithJQuery ($) ->
             PivotData.forEachRecord input, {}, (record) -> result.push record
             return result
 
-        natSort: (as, bs) => naturalSort(as, bs)
-
-        arrSort: (a,b) => @natSort a.join(), b.join()
+        arrSort: (attrs) => 
+            sorters = getSort(@sortProvider, attr) for attr in attrs
+            (a,b) => 
+                for i, sorter of sorters
+                    comparison = sorter(a[i], b[i])
+                    return comparison if comparison != 0
+                return 0
 
         sortKeys: () =>
             if not @sorted
-                @rowKeys.sort @arrSort
-                @colKeys.sort @arrSort
-            @sorted = true
+                @sorted = true
+                @rowKeys.sort @arrSort(@rowAttrs)
+                @colKeys.sort @arrSort(@colAttrs)
 
         getColKeys: () =>
             @sortKeys()
@@ -481,6 +493,7 @@ callWithJQuery ($) ->
             filter: -> true
             aggregator: aggregatorTemplates.count()()
             aggregatorName: "Count"
+            sortProvider: -> 
             derivedAttributes: {},
             renderer: pivotTableRenderer
             rendererOptions: null
@@ -523,6 +536,7 @@ callWithJQuery ($) ->
             rendererOptions: localeStrings: locales[locale].localeStrings
             onRefresh: null
             filter: -> true
+            sortProvider: -> 
             localeStrings: locales[locale].localeStrings
 
         existingOpts = @data "pivotUIOptions"
@@ -602,7 +616,7 @@ callWithJQuery ($) ->
 
                         checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
-                        for k in keys.sort(naturalSort)
+                        for k in keys.sort(getSort(opts.sortProvider, c))
                              v = axisValues[c][k]
                              filterItem = $("<label>")
                              filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
@@ -702,6 +716,7 @@ callWithJQuery ($) ->
                     derivedAttributes: opts.derivedAttributes
                     localeStrings: opts.localeStrings
                     rendererOptions: opts.rendererOptions
+                    sortProvider: opts.sortProvider
                     cols: [], rows: []
 
                 numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0
@@ -767,10 +782,9 @@ callWithJQuery ($) ->
 
                 # if requested make sure unused columns are in alphabetical order
                 if opts.autoSortUnusedAttrs
-                    natSort = $.pivotUtilities.naturalSort
                     unusedAttrsContainer = @find("td.pvtUnused.pvtAxisContainer")
                     $(unusedAttrsContainer).children("li")
-                        .sort((a, b) => natSort($(a).text(), $(b).text()))
+                        .sort((a, b) => naturalSort($(a).text(), $(b).text()))
                         .appendTo unusedAttrsContainer
 
                 pivotTable.css("opacity", 1)
