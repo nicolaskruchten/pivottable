@@ -70,14 +70,18 @@ callWithJQuery ($) ->
 
         min: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             val: null
-            push: (record) -> @val = Math.min(record[attr], @val ? record[attr])
+            push: (record) ->
+                x = parseFloat(record[attr])
+                if not isNaN x then @val = Math.min(x, @val ? x)
             value: -> @val
             format: formatter
             numInputs: if attr? then 0 else 1
 
         max: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             val: null
-            push: (record) -> @val = Math.max(record[attr], @val ? record[attr])
+            push: (record) -> 
+                x = parseFloat(record[attr])
+                if not isNaN x then @val = Math.max(x, @val ? x)
             value: -> @val
             format: formatter
             numInputs: if attr? then 0 else 1
