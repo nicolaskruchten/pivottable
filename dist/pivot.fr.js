@@ -51,6 +51,8 @@
         "Somme": tpl.sum(frFmt),
         "Somme en entiers": tpl.sum(frFmtInt),
         "Moyenne": tpl.average(frFmt),
+        "Minimum": tpl.min(frFmt),
+        "Maximum": tpl.max(frFmt),
         "Ratio de sommes": tpl.sumOverSum(frFmt),
         "Borne sup&eacute;rieure 80%": tpl.sumOverSumBound80(true, frFmt),
         "Borne inf&eacute;rieure 80%": tpl.sumOverSumBound80(false, frFmt),
