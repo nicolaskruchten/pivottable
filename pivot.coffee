@@ -235,8 +235,8 @@ callWithJQuery ($) ->
             else
                 return naturalSort(a,b)
 
-    getSort = (sortProvider, attr) ->
-        sort = sortProvider(attr)
+    getSort = (sorters, attr) ->
+        sort = sorters(attr)
         if $.isFunction(sort)
             return sort 
         else
@@ -257,7 +257,7 @@ callWithJQuery ($) ->
             @colAttrs = opts.cols
             @rowAttrs = opts.rows
             @valAttrs = opts.vals
-            @sortProvider = opts.sortProvider
+            @sorters = opts.sorters
             @tree = {}
             @rowKeys = []
             @colKeys = []
@@ -307,9 +307,9 @@ callWithJQuery ($) ->
             return result
 
         arrSort: (attrs) => 
-            sorters = (getSort(@sortProvider, a) for a in attrs)
+            sortersArr = (getSort(@sorters, a) for a in attrs)
             (a,b) -> 
-                for i, sorter of sorters
+                for i, sorter of sortersArr
                     comparison = sorter(a[i], b[i])
                     return comparison if comparison != 0
                 return 0
@@ -528,7 +528,7 @@ callWithJQuery ($) ->
             filter: -> true
             aggregator: aggregatorTemplates.count()()
             aggregatorName: "Count"
-            sortProvider: -> 
+            sorters: -> 
             derivedAttributes: {},
             renderer: pivotTableRenderer
             rendererOptions: null
@@ -571,7 +571,7 @@ callWithJQuery ($) ->
             rendererOptions: localeStrings: locales[locale].localeStrings
             onRefresh: null
             filter: -> true
-            sortProvider: -> 
+            sorters: -> 
             localeStrings: locales[locale].localeStrings
 
         existingOpts = @data "pivotUIOptions"
@@ -651,7 +651,7 @@ callWithJQuery ($) ->
 
                         checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
-                        for k in keys.sort(getSort(opts.sortProvider, c))
+                        for k in keys.sort(getSort(opts.sorters, c))
                              v = axisValues[c][k]
                              filterItem = $("<label>")
                              filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
@@ -751,7 +751,7 @@ callWithJQuery ($) ->
                     derivedAttributes: opts.derivedAttributes
                     localeStrings: opts.localeStrings
                     rendererOptions: opts.rendererOptions
-                    sortProvider: opts.sortProvider
+                    sorters: opts.sorters
                     cols: [], rows: []
 
                 numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0

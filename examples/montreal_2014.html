@@ -51,7 +51,7 @@
                         "day name":   dateFormat("Date", "%w", true)
                     },
 
-                    sortProvider: function(attr) {
+                    sorters: function(attr) {
                         if(attr == "month name") {
                             return sortAs(["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
                         }
