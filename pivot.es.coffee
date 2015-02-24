@@ -35,6 +35,8 @@ callWithJQuery ($) ->
             "Suma":                              tpl.sum(frFmt)
             "Suma de enteros":                   tpl.sum(frFmtInt)
             "Promedio":                            tpl.average(frFmt)
+            "Mínimo":                                       tpl.min(frFmt)
+            "Máximo":                                       tpl.max(frFmt)
             "Suma de sumas":                    tpl.sumOverSum(frFmt)
             "Cota 80% superior":        tpl.sumOverSumBound80(true, frFmt)
             "Cota 80% inferior":        tpl.sumOverSumBound80(false, frFmt)
