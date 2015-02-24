@@ -68,6 +68,20 @@ callWithJQuery ($) ->
             format: formatter
             numInputs: if attr? then 0 else 1
 
+        min: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
+            val: null
+            push: (record) -> @val = Math.min(record[attr], @val ? record[attr])
+            value: -> @val
+            format: formatter
+            numInputs: if attr? then 0 else 1
+
+        max: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
+            val: null
+            push: (record) -> @val = Math.max(record[attr], @val ? record[attr])
+            value: -> @val
+            format: formatter
+            numInputs: if attr? then 0 else 1
+
         average:  (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             sum: 0
             len: 0
@@ -119,6 +133,8 @@ callWithJQuery ($) ->
         "Sum":                  tpl.sum(usFmt)
         "Integer Sum":          tpl.sum(usFmtInt)
         "Average":              tpl.average(usFmt)
+        "Minimum":              tpl.min(usFmt)
+        "Maximum":              tpl.max(usFmt)
         "Sum over Sum":         tpl.sumOverSum(usFmt)
         "80% Upper Bound":      tpl.sumOverSumBound80(true, usFmt)
         "80% Lower Bound":      tpl.sumOverSumBound80(false, usFmt)
@@ -159,21 +175,22 @@ callWithJQuery ($) ->
 
     derivers =
         bin: (col, binWidth) -> (record) -> record[col] - record[col] % binWidth
-        dateFormat: (col, formatString, mthNames=mthNamesEn, dayNames=dayNamesEn) ->
+        dateFormat: (col, formatString, utcOutput=false, mthNames=mthNamesEn, dayNames=dayNamesEn) ->
+            utc = if utcOutput then "UTC" else ""
             (record) -> #thanks http://stackoverflow.com/a/12213072/112871
                 date = new Date(Date.parse(record[col]))
                 if isNaN(date) then return ""
                 formatString.replace /%(.)/g, (m, p) ->
                     switch p
-                        when "y" then date.getFullYear()
-                        when "m" then zeroPad(date.getMonth()+1)
-                        when "n" then mthNames[date.getMonth()]
-                        when "d" then zeroPad(date.getDate())
-                        when "w" then dayNames[date.getDay()]
-                        when "x" then date.getDay()
-                        when "H" then zeroPad(date.getHours())
-                        when "M" then zeroPad(date.getMinutes())
-                        when "S" then zeroPad(date.getSeconds())
+                        when "y" then date["get#{utc}FullYear"]()
+                        when "m" then zeroPad(date["get#{utc}Month"]()+1)
+                        when "n" then mthNames[date["get#{utc}Month"]()]
+                        when "d" then zeroPad(date["get#{utc}Date"]())
+                        when "w" then dayNames[date["get#{utc}Day"]()]
+                        when "x" then date["get#{utc}Day"]()
+                        when "H" then zeroPad(date["get#{utc}Hours"]())
+                        when "M" then zeroPad(date["get#{utc}Minutes"]())
+                        when "S" then zeroPad(date["get#{utc}Seconds"]())
                         else "%" + p
 
     naturalSort = (as, bs) => #thanks http://stackoverflow.com/a/4373421/112871
@@ -200,6 +217,20 @@ callWithJQuery ($) ->
                     return (if a1 > b1 then 1 else -1)
         a.length - b.length
 
+    sortAs = (order) -> 
+        mapping = {}
+        for i, x of order
+            mapping[x] = i
+        (a, b) ->
+            if mapping[a]? and mapping[b]?
+                return mapping[a] - mapping[b]
+            else if mapping[a]?
+                return -1
+            else if mapping[b]?
+                return 1
+            else
+                return naturalSort(a,b)
+
     getSort = (sortProvider, attr) ->
         sort = sortProvider(attr)
         if $.isFunction(sort)
@@ -209,7 +240,7 @@ callWithJQuery ($) ->
 
     #expose these to the outside world
     $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
-        naturalSort, numberFormat}
+        naturalSort, numberFormat, sortAs}
 
     ###
     Data Model class

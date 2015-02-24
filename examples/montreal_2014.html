@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pivot Demo</title>
+    <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="ext/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="ext/jquery-ui-1.9.2.custom.min.js"></script>
+    <script type="text/javascript" src="ext/jquery.csv-0.71.min.js"></script>
+    <script type="text/javascript" src="../dist/pivot.js"></script>
+    <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
+    <style>
+        * {
+            font-family: Verdana;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="text/javascript">
+        google.load("visualization", "1", {packages:["corechart", "charteditor"]});
+        $(function () {
+
+            var dateFormat =       $.pivotUtilities.derivers.dateFormat;
+            var sortAs =           $.pivotUtilities.sortAs;
+            var tpl =              $.pivotUtilities.aggregatorTemplates;
+            var renderers =        $.pivotUtilities.renderers;
+            var gchart_renderers = $.pivotUtilities.gchart_renderers
+
+            $.get("montreal_2014.csv", function(montreal_2014) {
+                $("#output").pivotUI($.csv.toArrays(montreal_2014), {
+
+                    aggregators: {
+                        "Mean Temp (Celcius)":  
+                            function() { return tpl.average()(["Mean Temp (C)"])},
+                        "Max Temp (Celcius)":   
+                            function() { return tpl.max()(["Max Temp (C)"]) },
+                        "Min Temp (Celcius)":   
+                            function() { return tpl.min()(["Min Temp (C)"]) },
+                        "Total Rain (mm)": 
+                            function() { return tpl.sum()(["Total Rain (mm)"]) },
+                        "Total Snow (cm)": 
+                            function() { return tpl.sum()(["Total Snow (cm)"]) }
+                    },
+                    derivedAttributes: {
+                        "year":       dateFormat("Date", "%y", true),
+                        "month":      dateFormat("Date", "%m", true),
+                        "day":        dateFormat("Date", "%d", true),
+                        "month name": dateFormat("Date", "%n", true),
+                        "day name":   dateFormat("Date", "%w", true)
+                    },
+
+                    sortProvider: function(attr) {
+                        if(attr == "month name") {
+                            return sortAs(["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
+                        }
+                        if(attr == "day name") {
+                            return sortAs(["Mon","Tue","Wed", "Thu","Fri","Sat","Sun"]);
+                        }
+                    },
+
+                    hiddenAttributes: ["Date","Max Temp (C)","Mean Temp (C)","Min Temp (C)" ,"Total Rain (mm)","Total Snow (cm)"],
+
+                    renderers: $.extend(renderers, gchart_renderers),
+
+                    rows: ["year", "month name"],
+                    cols: ["day name"]
+
+
+                });
+            });
+        });
+    </script>
+
+    <p><a href="index.html">&laquo; back to examples</a>
+    </p>
+
+    <p style="width: 800px">This example loads data from a CSV and shows date handling with derivers and sort overriding. This example also features custom aggregators, Google Charts and hidden attributes.</p>
+
+
+    <div id="output" style="margin: 10px;"></div>
+
+</body>
+
+</html>
