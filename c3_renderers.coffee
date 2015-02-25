@@ -9,7 +9,7 @@ callWithJQuery = (pivotModule) ->
         
 callWithJQuery ($) ->
 
-    makeGoogleChart = (chartType, extraOptions) -> (pivotData, opts) ->
+    makeC3Chart = (chartType) -> (pivotData, opts) ->
         defaults =
             localeStrings:
                 vs: "vs"
@@ -22,37 +22,35 @@ callWithJQuery ($) ->
         colKeys = pivotData.getColKeys()
         colKeys.push [] if colKeys.length == 0
 
-        headers = (h.join("-") for h in rowKeys)
-        headers.unshift ""
+        headers = (h.join("-") for h in colKeys)
 
-        numCharsInHAxis = 0
-        dataArray = [headers]
-        for colKey in colKeys
-            row = [colKey.join("-")]
-            numCharsInHAxis += row[0].length
-            for rowKey in rowKeys
+        columns = []
+        for rowKey in rowKeys
+            rowHeader = rowKey.join("-")
+            row = [if rowHeader == "" then pivotData.aggregatorName else rowHeader]
+            for colKey in colKeys
                 agg = pivotData.getAggregator(rowKey, colKey)
                 if agg.value()?
                     row.push agg.value()
                 else row.push null
-            dataArray.push row
-        console.log dataArray
+            columns.push row
 
         result = $("<div>")
-        c3.generate
-            title: "blah"
+        params = 
             bindto: result[0]
             size:
                 height: ($(window).height() / 1.4),
                 width: ($(window).width() / 1.4)
             axis: x: 
                 type: 'category',
-                categories: dataArray.pop()
-            data: columns: dataArray
+                categories: headers
+            data: 
+                columns: columns
+        if chartType?
+            params.data.type = chartType
+        c3.generate params
         return result
 
     $.pivotUtilities.c3_renderers = 
-        "Line Chart": makeGoogleChart("LineChart")
-        "Bar Chart": makeGoogleChart("ColumnChart")
-        "Stacked Bar Chart": makeGoogleChart("ColumnChart", isStacked: true)
-        "Area Chart": makeGoogleChart("AreaChart", isStacked: true)
+        "Line Chart C3": makeC3Chart()
+        "Bar Chart C3": makeC3Chart("bar")
