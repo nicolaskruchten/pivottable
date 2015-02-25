@@ -20,7 +20,7 @@
     /*
     Utilities
      */
-    var PivotData, addSeparators, aggregatorTemplates, aggregators, dayNamesEn, derivers, locales, mthNamesEn, naturalSort, numberFormat, pivotTableRenderer, renderers, usFmt, usFmtInt, usFmtPct, zeroPad;
+    var PivotData, addSeparators, aggregatorTemplates, aggregators, dayNamesEn, derivers, getSort, locales, mthNamesEn, naturalSort, numberFormat, pivotTableRenderer, renderers, sortAs, usFmt, usFmtInt, usFmtPct, zeroPad;
     addSeparators = function(nStr, thousandsSep, decimalSep) {
       var rgx, x, x1, x2;
       nStr += '';
@@ -159,6 +159,58 @@
           };
         };
       },
+      min: function(formatter) {
+        if (formatter == null) {
+          formatter = usFmt;
+        }
+        return function(_arg) {
+          var attr;
+          attr = _arg[0];
+          return function(data, rowKey, colKey) {
+            return {
+              val: null,
+              push: function(record) {
+                var x, _ref;
+                x = parseFloat(record[attr]);
+                if (!isNaN(x)) {
+                  return this.val = Math.min(x, (_ref = this.val) != null ? _ref : x);
+                }
+              },
+              value: function() {
+                return this.val;
+              },
+              format: formatter,
+              numInputs: attr != null ? 0 : 1
+            };
+          };
+        };
+      },
+      max: function(formatter) {
+        if (formatter == null) {
+          formatter = usFmt;
+        }
+        return function(_arg) {
+          var attr;
+          attr = _arg[0];
+          return function(data, rowKey, colKey) {
+            return {
+              val: null,
+              push: function(record) {
+                var x, _ref;
+                x = parseFloat(record[attr]);
+                if (!isNaN(x)) {
+                  return this.val = Math.max(x, (_ref = this.val) != null ? _ref : x);
+                }
+              },
+              value: function() {
+                return this.val;
+              },
+              format: formatter,
+              numInputs: attr != null ? 0 : 1
+            };
+          };
+        };
+      },
       average: function(formatter) {
         if (formatter == null) {
           formatter = usFmt;
@@ -285,6 +337,8 @@
         "Sum": tpl.sum(usFmt),
         "Integer Sum": tpl.sum(usFmtInt),
         "Average": tpl.average(usFmt),
+        "Minimum": tpl.min(usFmt),
+        "Maximum": tpl.max(usFmt),
         "Sum over Sum": tpl.sumOverSum(usFmt),
         "80% Upper Bound": tpl.sumOverSumBound80(true, usFmt),
         "80% Lower Bound": tpl.sumOverSumBound80(false, usFmt),
@@ -342,13 +396,18 @@
           return record[col] - record[col] % binWidth;
         };
       },
-      dateFormat: function(col, formatString, mthNames, dayNames) {
+      dateFormat: function(col, formatString, utcOutput, mthNames, dayNames) {
+        var utc;
+        if (utcOutput == null) {
+          utcOutput = false;
+        }
         if (mthNames == null) {
           mthNames = mthNamesEn;
         }
         if (dayNames == null) {
           dayNames = dayNamesEn;
         }
+        utc = utcOutput ? "UTC" : "";
         return function(record) {
           var date;
           date = new Date(Date.parse(record[col]));
@@ -358,23 +417,23 @@
           return formatString.replace(/%(.)/g, function(m, p) {
             switch (p) {
               case "y":
-                return date.getFullYear();
+                return date["get" + utc + "FullYear"]();
               case "m":
-                return zeroPad(date.getMonth() + 1);
+                return zeroPad(date["get" + utc + "Month"]() + 1);
               case "n":
-                return mthNames[date.getMonth()];
+                return mthNames[date["get" + utc + "Month"]()];
               case "d":
-                return zeroPad(date.getDate());
+                return zeroPad(date["get" + utc + "Date"]());
               case "w":
-                return dayNames[date.getDay()];
+                return dayNames[date["get" + utc + "Day"]()];
               case "x":
-                return date.getDay();
+                return date["get" + utc + "Day"]();
               case "H":
-                return zeroPad(date.getHours());
+                return zeroPad(date["get" + utc + "Hours"]());
               case "M":
-                return zeroPad(date.getMinutes());
+                return zeroPad(date["get" + utc + "Minutes"]());
               case "S":
-                return zeroPad(date.getSeconds());
+                return zeroPad(date["get" + utc + "Seconds"]());
               default:
                 return "%" + p;
             }
@@ -421,6 +480,34 @@
         return a.length - b.length;
       };
     })(this);
+    sortAs = function(order) {
+      var i, mapping, x;
+      mapping = {};
+      for (i in order) {
+        x = order[i];
+        mapping[x] = i;
+      }
+      return function(a, b) {
+        if ((mapping[a] != null) && (mapping[b] != null)) {
+          return mapping[a] - mapping[b];
+        } else if (mapping[a] != null) {
+          return -1;
+        } else if (mapping[b] != null) {
+          return 1;
+        } else {
+          return naturalSort(a, b);
+        }
+      };
+    };
+    getSort = function(sorters, attr) {
+      var sort;
+      sort = sorters(attr);
+      if ($.isFunction(sort)) {
+        return sort;
+      } else {
+        return naturalSort;
+      }
+    };
     $.pivotUtilities = {
       aggregatorTemplates: aggregatorTemplates,
       aggregators: aggregators,
@@ -428,7 +515,8 @@
       derivers: derivers,
       locales: locales,
       naturalSort: naturalSort,
-      numberFormat: numberFormat
+      numberFormat: numberFormat,
+      sortAs: sortAs
     };
 
     /*
@@ -441,12 +529,12 @@
         this.getColKeys = __bind(this.getColKeys, this);
         this.sortKeys = __bind(this.sortKeys, this);
         this.arrSort = __bind(this.arrSort, this);
-        this.natSort = __bind(this.natSort, this);
         this.aggregator = opts.aggregator;
         this.aggregatorName = opts.aggregatorName;
         this.colAttrs = opts.cols;
         this.rowAttrs = opts.rows;
         this.valAttrs = opts.vals;
+        this.sorters = opts.sorters;
         this.tree = {};
         this.rowKeys = [];
         this.colKeys = [];
@@ -532,20 +620,36 @@
         return result;
       };
 
-      PivotData.prototype.natSort = function(as, bs) {
-        return naturalSort(as, bs);
-      };
-
-      PivotData.prototype.arrSort = function(a, b) {
-        return this.natSort(a.join(), b.join());
+      PivotData.prototype.arrSort = function(attrs) {
+        var a, sortersArr;
+        sortersArr = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = attrs.length; _i < _len; _i++) {
+            a = attrs[_i];
+            _results.push(getSort(this.sorters, a));
+          }
+          return _results;
+        }).call(this);
+        return function(a, b) {
+          var comparison, i, sorter;
+          for (i in sortersArr) {
+            sorter = sortersArr[i];
+            comparison = sorter(a[i], b[i]);
+            if (comparison !== 0) {
+              return comparison;
+            }
+          }
+          return 0;
+        };
       };
 
       PivotData.prototype.sortKeys = function() {
         if (!this.sorted) {
-          this.rowKeys.sort(this.arrSort);
-          this.colKeys.sort(this.arrSort);
+          this.sorted = true;
+          this.rowKeys.sort(this.arrSort(this.rowAttrs));
+          return this.colKeys.sort(this.arrSort(this.colAttrs));
         }
-        return this.sorted = true;
       };
 
       PivotData.prototype.getColKeys = function() {
@@ -812,6 +916,7 @@
         },
         aggregator: aggregatorTemplates.count()(),
         aggregatorName: "Count",
+        sorters: function() {},
         derivedAttributes: {},
         renderer: pivotTableRenderer,
         rendererOptions: null,
@@ -874,6 +979,7 @@
         filter: function() {
           return true;
         },
+        sorters: function() {},
         localeStrings: locales[locale].localeStrings
       };
       existingOpts = this.data("pivotUIOptions");
@@ -1006,7 +1112,7 @@
               });
             }));
             checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
-            _ref2 = keys.sort(naturalSort);
+            _ref2 = keys.sort(getSort(opts.sorters, c));
             for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
               k = _ref2[_k];
               v = axisValues[c][k];
@@ -1097,11 +1203,12 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var attr, exclusions, natSort, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, subopts, unusedAttrsContainer, vals, _len4, _m, _n, _ref5;
+            var attr, exclusions, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, subopts, unusedAttrsContainer, vals, _len4, _m, _n, _ref5;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
               rendererOptions: opts.rendererOptions,
+              sorters: opts.sorters,
               cols: [],
               rows: []
             };
@@ -1183,10 +1290,9 @@
             });
             _this.data("pivotUIOptions", pivotUIOptions);
             if (opts.autoSortUnusedAttrs) {
-              natSort = $.pivotUtilities.naturalSort;
               unusedAttrsContainer = _this.find("td.pvtUnused.pvtAxisContainer");
               $(unusedAttrsContainer).children("li").sort(function(a, b) {
-                return natSort($(a).text(), $(b).text());
+                return naturalSort($(a).text(), $(b).text());
               }).appendTo(unusedAttrsContainer);
             }
             pivotTable.css("opacity", 1);

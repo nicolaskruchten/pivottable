@@ -68,6 +68,24 @@ callWithJQuery ($) ->
             format: formatter
             numInputs: if attr? then 0 else 1
 
+        min: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
+            val: null
+            push: (record) ->
+                x = parseFloat(record[attr])
+                if not isNaN x then @val = Math.min(x, @val ? x)
+            value: -> @val
+            format: formatter
+            numInputs: if attr? then 0 else 1
+
+        max: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
+            val: null
+            push: (record) -> 
+                x = parseFloat(record[attr])
+                if not isNaN x then @val = Math.max(x, @val ? x)
+            value: -> @val
+            format: formatter
+            numInputs: if attr? then 0 else 1
+
         average:  (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             sum: 0
             len: 0
@@ -119,6 +137,8 @@ callWithJQuery ($) ->
         "Sum":                  tpl.sum(usFmt)
         "Integer Sum":          tpl.sum(usFmtInt)
         "Average":              tpl.average(usFmt)
+        "Minimum":              tpl.min(usFmt)
+        "Maximum":              tpl.max(usFmt)
         "Sum over Sum":         tpl.sumOverSum(usFmt)
         "80% Upper Bound":      tpl.sumOverSumBound80(true, usFmt)
         "80% Lower Bound":      tpl.sumOverSumBound80(false, usFmt)
@@ -159,21 +179,22 @@ callWithJQuery ($) ->
 
     derivers =
         bin: (col, binWidth) -> (record) -> record[col] - record[col] % binWidth
-        dateFormat: (col, formatString, mthNames=mthNamesEn, dayNames=dayNamesEn) ->
+        dateFormat: (col, formatString, utcOutput=false, mthNames=mthNamesEn, dayNames=dayNamesEn) ->
+            utc = if utcOutput then "UTC" else ""
             (record) -> #thanks http://stackoverflow.com/a/12213072/112871
                 date = new Date(Date.parse(record[col]))
                 if isNaN(date) then return ""
                 formatString.replace /%(.)/g, (m, p) ->
                     switch p
-                        when "y" then date.getFullYear()
-                        when "m" then zeroPad(date.getMonth()+1)
-                        when "n" then mthNames[date.getMonth()]
-                        when "d" then zeroPad(date.getDate())
-                        when "w" then dayNames[date.getDay()]
-                        when "x" then date.getDay()
-                        when "H" then zeroPad(date.getHours())
-                        when "M" then zeroPad(date.getMinutes())
-                        when "S" then zeroPad(date.getSeconds())
+                        when "y" then date["get#{utc}FullYear"]()
+                        when "m" then zeroPad(date["get#{utc}Month"]()+1)
+                        when "n" then mthNames[date["get#{utc}Month"]()]
+                        when "d" then zeroPad(date["get#{utc}Date"]())
+                        when "w" then dayNames[date["get#{utc}Day"]()]
+                        when "x" then date["get#{utc}Day"]()
+                        when "H" then zeroPad(date["get#{utc}Hours"]())
+                        when "M" then zeroPad(date["get#{utc}Minutes"]())
+                        when "S" then zeroPad(date["get#{utc}Seconds"]())
                         else "%" + p
 
     naturalSort = (as, bs) => #thanks http://stackoverflow.com/a/4373421/112871
@@ -200,9 +221,30 @@ callWithJQuery ($) ->
                     return (if a1 > b1 then 1 else -1)
         a.length - b.length
 
+    sortAs = (order) -> 
+        mapping = {}
+        for i, x of order
+            mapping[x] = i
+        (a, b) ->
+            if mapping[a]? and mapping[b]?
+                return mapping[a] - mapping[b]
+            else if mapping[a]?
+                return -1
+            else if mapping[b]?
+                return 1
+            else
+                return naturalSort(a,b)
+
+    getSort = (sorters, attr) ->
+        sort = sorters(attr)
+        if $.isFunction(sort)
+            return sort 
+        else
+            return naturalSort
+
     #expose these to the outside world
     $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
-        naturalSort, numberFormat}
+        naturalSort, numberFormat, sortAs}
 
     ###
     Data Model class
@@ -215,6 +257,7 @@ callWithJQuery ($) ->
             @colAttrs = opts.cols
             @rowAttrs = opts.rows
             @valAttrs = opts.vals
+            @sorters = opts.sorters
             @tree = {}
             @rowKeys = []
             @colKeys = []
@@ -263,15 +306,19 @@ callWithJQuery ($) ->
             PivotData.forEachRecord input, {}, (record) -> result.push record
             return result
 
-        natSort: (as, bs) => naturalSort(as, bs)
-
-        arrSort: (a,b) => @natSort a.join(), b.join()
+        arrSort: (attrs) => 
+            sortersArr = (getSort(@sorters, a) for a in attrs)
+            (a,b) -> 
+                for i, sorter of sortersArr
+                    comparison = sorter(a[i], b[i])
+                    return comparison if comparison != 0
+                return 0
 
         sortKeys: () =>
             if not @sorted
-                @rowKeys.sort @arrSort
-                @colKeys.sort @arrSort
-            @sorted = true
+                @sorted = true
+                @rowKeys.sort @arrSort(@rowAttrs)
+                @colKeys.sort @arrSort(@colAttrs)
 
         getColKeys: () =>
             @sortKeys()
@@ -481,6 +528,7 @@ callWithJQuery ($) ->
             filter: -> true
             aggregator: aggregatorTemplates.count()()
             aggregatorName: "Count"
+            sorters: -> 
             derivedAttributes: {},
             renderer: pivotTableRenderer
             rendererOptions: null
@@ -523,6 +571,7 @@ callWithJQuery ($) ->
             rendererOptions: localeStrings: locales[locale].localeStrings
             onRefresh: null
             filter: -> true
+            sorters: -> 
             localeStrings: locales[locale].localeStrings
 
         existingOpts = @data "pivotUIOptions"
@@ -602,7 +651,7 @@ callWithJQuery ($) ->
 
                         checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
-                        for k in keys.sort(naturalSort)
+                        for k in keys.sort(getSort(opts.sorters, c))
                              v = axisValues[c][k]
                              filterItem = $("<label>")
                              filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
@@ -702,6 +751,7 @@ callWithJQuery ($) ->
                     derivedAttributes: opts.derivedAttributes
                     localeStrings: opts.localeStrings
                     rendererOptions: opts.rendererOptions
+                    sorters: opts.sorters
                     cols: [], rows: []
 
                 numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0
@@ -767,10 +817,9 @@ callWithJQuery ($) ->
 
                 # if requested make sure unused columns are in alphabetical order
                 if opts.autoSortUnusedAttrs
-                    natSort = $.pivotUtilities.naturalSort
                     unusedAttrsContainer = @find("td.pvtUnused.pvtAxisContainer")
                     $(unusedAttrsContainer).children("li")
-                        .sort((a, b) => natSort($(a).text(), $(b).text()))
+                        .sort((a, b) => naturalSort($(a).text(), $(b).text()))
                         .appendTo unusedAttrsContainer
 
                 pivotTable.css("opacity", 1)
