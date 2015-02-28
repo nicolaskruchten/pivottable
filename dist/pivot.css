@@ -69,12 +69,18 @@ table.pvtTable tr td {
 
 .pvtFilteredAttribute { font-style: italic }
 
+.pvtFilterBoxCtr {
+    position: relative;
+    display: inline-block;
+}
 .pvtFilterBox{
     z-index: 100;
     width: 280px;
     border: 1px solid gray;
     background-color: #fff;
     position: absolute;
+    left: 2px;
+    top: 0px;
     padding: 20px;
     text-align: center;
 }
@@ -88,3 +94,9 @@ table.pvtTable tr td {
     max-height: 200px;
 }
 .pvtCheckContainer p{ margin: 5px; }
+
+.pvtSearch {
+  display: block;
+  width: 150px;
+  margin: 5px auto 0px;
+}
