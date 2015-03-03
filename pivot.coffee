@@ -379,6 +379,8 @@ callWithJQuery ($) ->
         defaults =
             localeStrings:
                 totals: "Totals"
+            formatHeaders:
+                (attr, val) -> val
 
         opts = $.extend defaults, opts
 
@@ -426,7 +428,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtColLabel"
-                    th.innerHTML = colKey[j]
+                    th.innerHTML = opts.formatHeaders(c, colKey[j])
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
@@ -462,7 +464,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtRowLabel"
-                    th.innerHTML = txt
+                    th.innerHTML = opts.formatHeaders(rowAttrs[j], txt)
                     th.setAttribute("rowspan", x)
                     if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                         th.setAttribute("colspan",2)
