@@ -56,9 +56,12 @@ callWithJQuery ($) ->
             "Mapa de Calor":             r["Heatmap"]
             "Mapa de Calor por Linhas":  r["Row Heatmap"]
             "Mapa de Calor por Colunas": r["Col Heatmap"]
-        
-        gchart_renderers:
+
+    if gcr
+        $.pivotUtilities.locales.pt.gchart_renderers =
             "Gr&aacute;fico de Linhas":            gcr["Line Chart"]
             "Gr&aacute;fico de Barras":            gcr["Bar Chart"]
             "Gr&aacute;fico de Barras Empilhadas": gcr["Stacked Bar Chart"]
             "Gr&aacute;fico de &Aacute;rea":       gcr["Area Chart"]
+
+    return $.pivotUtilities.locales.pt
