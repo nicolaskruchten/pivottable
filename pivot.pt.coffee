@@ -12,6 +12,8 @@ callWithJQuery ($) ->
     tpl = $.pivotUtilities.aggregatorTemplates
     r = $.pivotUtilities.renderers
     gcr = $.pivotUtilities.gchart_renderers
+    d3r = $.pivotUtilities.d3_renderers
+    c3r = $.pivotUtilities.c3_renderers
 
     frFmt =    nf(thousandsSep: ".", decimalSep: ",")
     frFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: ".", decimalSep: ",")
@@ -63,5 +65,14 @@ callWithJQuery ($) ->
             "Gr&aacute;fico de Barras":            gcr["Bar Chart"]
             "Gr&aacute;fico de Barras Empilhadas": gcr["Stacked Bar Chart"]
             "Gr&aacute;fico de &Aacute;rea":       gcr["Area Chart"]
+
+    if d3r
+        $.pivotUtilities.locales.pt.d3_renderers =
+            "Mapa de Árvore": d3r["Treemap"]
+
+    if c3r
+      $.pivotUtilities.locales.pt.c3_renderers =
+        "Gr&aacute;fico de Linhas": c3r["Line Chart C3"]
+        "Gr&aacute;fico de Barras": c3r["Bar Chart C3"]
 
     return $.pivotUtilities.locales.pt
