@@ -797,6 +797,15 @@ callWithJQuery ($) ->
                         exclusions[filter[0]].push( filter[1] )
                     else
                         exclusions[filter[0]] = [ filter[1] ]
+                #include inclusions when exclusions present
+                inclusions = {}
+                @find('input.pvtFilter:checked').each ->
+                    filter = $(this).data("filter")
+                    if exclusions[filter[0]]?
+                        if inclusions[filter[0]]?
+                            inclusions[filter[0]].push( filter[1] )
+                        else
+                            inclusions[filter[0]] = [ filter[1] ]
 
                 subopts.filter = (record) ->
                     return false if not opts.filter(record)
@@ -810,6 +819,8 @@ callWithJQuery ($) ->
                     rows: subopts.rows
                     vals: vals
                     exclusions: exclusions
+                    #to indicate inclusions are informational only
+                    inclusionsInfo: inclusions
                     aggregatorName: aggregator.val()
                     rendererName: renderer.val()
 
