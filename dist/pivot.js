@@ -1203,7 +1203,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var attr, exclusions, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, subopts, unusedAttrsContainer, vals, _len4, _m, _n, _ref5;
+            var attr, exclusions, inclusions, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, subopts, unusedAttrsContainer, vals, _len4, _m, _n, _ref5;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1266,6 +1266,18 @@
                 return exclusions[filter[0]] = [filter[1]];
               }
             });
+            inclusions = {};
+            _this.find('input.pvtFilter:checked').each(function() {
+              var filter;
+              filter = $(this).data("filter");
+              if (exclusions[filter[0]] != null) {
+                if (inclusions[filter[0]] != null) {
+                  return inclusions[filter[0]].push(filter[1]);
+                } else {
+                  return inclusions[filter[0]] = [filter[1]];
+                }
+              }
+            });
             subopts.filter = function(record) {
               var excludedItems, _ref6;
               if (!opts.filter(record)) {
@@ -1285,6 +1297,7 @@
               rows: subopts.rows,
               vals: vals,
               exclusions: exclusions,
+              inclusionsInfo: inclusions,
               aggregatorName: aggregator.val(),
               rendererName: renderer.val()
             });
