@@ -911,6 +911,7 @@
       defaults = {
         cols: [],
         rows: [],
+        vals: [],
         filter: function() {
           return true;
         },
