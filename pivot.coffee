@@ -525,6 +525,7 @@ callWithJQuery ($) ->
         defaults =
             cols : []
             rows: []
+            vals: []
             filter: -> true
             aggregator: aggregatorTemplates.count()()
             aggregatorName: "Count"
