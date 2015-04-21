@@ -15,7 +15,7 @@
     var makeGoogleChart;
     makeGoogleChart = function(chartType, extraOptions) {
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, dataArray, dataTable, defaults, groupByTitle, h, hAxisTitle, headers, i, j, k, len, len1, numCharsInHAxis, options, result, row, rowKey, rowKeys, title, v, vAxisTitle, wrapper;
+        var agg, colKey, colKeys, dataArray, dataTable, defaults, groupByTitle, h, hAxisTitle, headers, k, numCharsInHAxis, options, result, row, rowKey, rowKeys, title, v, vAxisTitle, wrapper, _i, _j, _len, _len1;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -32,23 +32,23 @@
           colKeys.push([]);
         }
         headers = (function() {
-          var i, len, results;
-          results = [];
-          for (i = 0, len = rowKeys.length; i < len; i++) {
-            h = rowKeys[i];
-            results.push(h.join("-"));
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = rowKeys.length; _i < _len; _i++) {
+            h = rowKeys[_i];
+            _results.push(h.join("-"));
           }
-          return results;
+          return _results;
         })();
         headers.unshift("");
         numCharsInHAxis = 0;
         dataArray = [headers];
-        for (i = 0, len = colKeys.length; i < len; i++) {
-          colKey = colKeys[i];
+        for (_i = 0, _len = colKeys.length; _i < _len; _i++) {
+          colKey = colKeys[_i];
           row = [colKey.join("-")];
           numCharsInHAxis += row[0].length;
-          for (j = 0, len1 = rowKeys.length; j < len1; j++) {
-            rowKey = rowKeys[j];
+          for (_j = 0, _len1 = rowKeys.length; _j < _len1; _j++) {
+            rowKey = rowKeys[_j];
             agg = pivotData.getAggregator(rowKey, colKey);
             if (agg.value() != null) {
               row.push(agg.value());
