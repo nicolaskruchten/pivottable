@@ -15,7 +15,7 @@
     var makeC3Chart;
     makeC3Chart = function(chartType) {
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, columns, defaults, h, headers, params, result, row, rowHeader, rowKey, rowKeys, _i, _j, _len, _len1;
+        var agg, colKey, colKeys, columns, defaults, h, headers, i, j, len, len1, params, result, row, rowHeader, rowKey, rowKeys;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -32,21 +32,21 @@
           colKeys.push([]);
         }
         headers = (function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = colKeys.length; _i < _len; _i++) {
-            h = colKeys[_i];
-            _results.push(h.join("-"));
+          var i, len, results;
+          results = [];
+          for (i = 0, len = colKeys.length; i < len; i++) {
+            h = colKeys[i];
+            results.push(h.join("-"));
           }
-          return _results;
+          return results;
         })();
         columns = [];
-        for (_i = 0, _len = rowKeys.length; _i < _len; _i++) {
-          rowKey = rowKeys[_i];
+        for (i = 0, len = rowKeys.length; i < len; i++) {
+          rowKey = rowKeys[i];
           rowHeader = rowKey.join("-");
           row = [rowHeader === "" ? pivotData.aggregatorName : rowHeader];
-          for (_j = 0, _len1 = colKeys.length; _j < _len1; _j++) {
-            colKey = colKeys[_j];
+          for (j = 0, len1 = colKeys.length; j < len1; j++) {
+            colKey = colKeys[j];
             agg = pivotData.getAggregator(rowKey, colKey);
             if (agg.value() != null) {
               row.push(agg.value());
