@@ -12,9 +12,13 @@
   };
 
   callWithJQuery(function($) {
-    var frFmt, frFmtInt, frFmtPct, nf, tpl;
+    var c3r, d3r, frFmt, frFmtInt, frFmtPct, gcr, nf, r, tpl;
     nf = $.pivotUtilities.numberFormat;
     tpl = $.pivotUtilities.aggregatorTemplates;
+    r = $.pivotUtilities.renderers;
+    gcr = $.pivotUtilities.gchart_renderers;
+    d3r = $.pivotUtilities.d3_renderers;
+    c3r = $.pivotUtilities.c3_renderers;
     frFmt = nf({
       thousandsSep: ".",
       decimalSep: ","
@@ -25,13 +29,13 @@
       decimalSep: ","
     });
     frFmtPct = nf({
-      digitsAfterDecimal: 1,
+      digitsAfterDecimal: 2,
       scaler: 100,
       suffix: "%",
       thousandsSep: ".",
       decimalSep: ","
     });
-    return $.pivotUtilities.locales.tr = {
+    $.pivotUtilities.locales.tr = {
       localeStrings: {
         renderError: "PivotTable sonu&ccedil;lar&#305;n&#305; olu&#351;tuturken hata olu&#351;tu",
         computeError: "PivotTable sonu&ccedil;lar&#305;n&#305; i&#351;lerken hata olu&#351;tu",
@@ -64,13 +68,33 @@
         "S&uuml;tunun oran&#305; (say&#305;)": tpl.fractionOf(tpl.count(), "col", frFmtPct)
       },
       renderers: {
-        "Tablo": $.pivotUtilities.renderers["Table"],
-        "Tablo (&Ccedil;ubuklar)": $.pivotUtilities.renderers["Table Barchart"],
-        "&#304;lgi haritas&#305;": $.pivotUtilities.renderers["Heatmap"],
-        "Sat&#305;r ilgi haritas&#305;": $.pivotUtilities.renderers["Row Heatmap"],
-        "S&uuml;tun ilgi haritas&#305;": $.pivotUtilities.renderers["Col Heatmap"]
+        "Tablo": r["Table"],
+        "Tablo (&Ccedil;ubuklar)": r["Table Barchart"],
+        "&#304;lgi haritas&#305;": r["Heatmap"],
+        "Sat&#305;r ilgi haritas&#305;": r["Row Heatmap"],
+        "S&uuml;tun ilgi haritas&#305;": r["Col Heatmap"]
       }
     };
+    if (gcr) {
+      $.pivotUtilities.locales.pt.gchart_renderers = {
+        "&Ccedil;izgi Grafi&#287;i (gchart)": gcr["Line Chart"],
+        "Bar Grafi&#287;i (gchart)": gcr["Bar Chart"],
+        "Y&#305;&#287;&#305;lm&#305;&#351; &Ccedil;ubuk Grafik (gchart)": gcr["Stacked Bar Chart"],
+        "Alan Grafi&#287;i (gchart)": gcr["Area Chart"]
+      };
+    }
+    if (d3r) {
+      $.pivotUtilities.locales.pt.d3_renderers = {
+        "Hiyerar&#351;ik Alan Grafi&#287;i (Treemap)": d3r["Treemap"]
+      };
+    }
+    if (c3r) {
+      $.pivotUtilities.locales.pt.c3_renderers = {
+        "&Ccedil;izgi Grafi&#287;i (C3)": c3r["Line Chart C3"],
+        "Bar Grafi&#287;i (C3)": c3r["Bar Chart C3"]
+      };
+    }
+    return $.pivotUtilities.locales.tr;
   });
 
 }).call(this);
