@@ -76,7 +76,7 @@
       }
     };
     if (gcr) {
-      $.pivotUtilities.locales.pt.gchart_renderers = {
+      $.pivotUtilities.locales.tr.gchart_renderers = {
         "&Ccedil;izgi Grafi&#287;i (gchart)": gcr["Line Chart"],
         "Bar Grafi&#287;i (gchart)": gcr["Bar Chart"],
         "Y&#305;&#287;&#305;lm&#305;&#351; &Ccedil;ubuk Grafik (gchart)": gcr["Stacked Bar Chart"],
@@ -84,12 +84,12 @@
       };
     }
     if (d3r) {
-      $.pivotUtilities.locales.pt.d3_renderers = {
+      $.pivotUtilities.locales.tr.d3_renderers = {
         "Hiyerar&#351;ik Alan Grafi&#287;i (Treemap)": d3r["Treemap"]
       };
     }
     if (c3r) {
-      $.pivotUtilities.locales.pt.c3_renderers = {
+      $.pivotUtilities.locales.tr.c3_renderers = {
         "&Ccedil;izgi Grafi&#287;i (C3)": c3r["Line Chart C3"],
         "Bar Grafi&#287;i (C3)": c3r["Bar Chart C3"]
       };
