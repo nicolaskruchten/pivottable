@@ -13,9 +13,12 @@
 
   callWithJQuery(function($) {
     var makeC3Chart;
-    makeC3Chart = function(chartType) {
+    makeC3Chart = function(chartOpts) {
+      if (chartOpts == null) {
+        chartOpts = {};
+      }
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, columns, defaults, h, headers, params, result, row, rowHeader, rowKey, rowKeys, _i, _j, _len, _len1;
+        var agg, colKey, colKeys, columns, defaults, h, headers, params, renderArea, result, row, rowHeader, rowKey, rowKeys, x, _i, _j, _len, _len1;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -56,9 +59,7 @@
           }
           columns.push(row);
         }
-        result = $("<div>");
         params = {
-          bindto: result[0],
           size: {
             height: $(window).height() / 1.4,
             width: $(window).width() / 1.4
@@ -73,16 +74,46 @@
             columns: columns
           }
         };
-        if (chartType != null) {
-          params.data.type = chartType;
+        if (chartOpts.type != null) {
+          params.data.type = chartOpts.type;
         }
+        if (chartOpts.stacked != null) {
+          params.data.groups = [
+            (function() {
+              var _k, _len2, _results;
+              _results = [];
+              for (_k = 0, _len2 = rowKeys.length; _k < _len2; _k++) {
+                x = rowKeys[_k];
+                _results.push(x.join("-"));
+              }
+              return _results;
+            })()
+          ];
+        }
+        renderArea = $("<div>", {
+          style: "display:none;"
+        }).appendTo($("body"));
+        result = $("<div>").appendTo(renderArea);
+        params.bindto = result[0];
         c3.generate(params);
+        result.detach();
+        renderArea.remove();
         return result;
       };
     };
     return $.pivotUtilities.c3_renderers = {
       "Line Chart C3": makeC3Chart(),
-      "Bar Chart C3": makeC3Chart("bar")
+      "Bar Chart C3": makeC3Chart({
+        type: "bar"
+      }),
+      "Area Chart C3": makeC3Chart({
+        type: "area",
+        stacked: true
+      }),
+      "Stacked Bar Chart C3": makeC3Chart({
+        type: "bar",
+        stacked: true
+      })
     };
   });
 
