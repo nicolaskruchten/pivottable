@@ -9,7 +9,7 @@ callWithJQuery = (pivotModule) ->
         
 callWithJQuery ($) ->
 
-    makeC3Chart = (chartType) -> (pivotData, opts) ->
+    makeC3Chart = (chartOpts = {}) -> (pivotData, opts) ->
         defaults =
             localeStrings:
                 vs: "vs"
@@ -34,10 +34,7 @@ callWithJQuery ($) ->
                     row.push agg.value()
                 else row.push null
             columns.push row
-
-        result = $("<div>")
         params = 
-            bindto: result[0]
             size:
                 height: ($(window).height() / 1.4),
                 width: ($(window).width() / 1.4)
@@ -46,11 +43,21 @@ callWithJQuery ($) ->
                 categories: headers
             data: 
                 columns: columns
-        if chartType?
-            params.data.type = chartType
+        if chartOpts.type?
+            params.data.type = chartOpts.type
+        if chartOpts.stacked?
+            params.data.groups = [x.join("-") for x in rowKeys]
+
+        renderArea = $("<div>", style: "display:none;").appendTo $("body")
+        result = $("<div>").appendTo renderArea
+        params.bindto = result[0]
         c3.generate params
+        result.detach()
+        renderArea.remove()
         return result
 
     $.pivotUtilities.c3_renderers = 
         "Line Chart C3": makeC3Chart()
-        "Bar Chart C3": makeC3Chart("bar")
+        "Bar Chart C3": makeC3Chart(type: "bar")
+        "Area Chart C3": makeC3Chart(type: "area", stacked: true)
+        "Stacked Bar Chart C3": makeC3Chart(type: "bar", stacked: true)
