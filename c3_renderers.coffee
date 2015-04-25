@@ -34,13 +34,22 @@ callWithJQuery ($) ->
                     row.push agg.value()
                 else row.push null
             columns.push row
+
+        vAxisTitle = pivotData.aggregatorName+ 
+            if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
+        hAxisTitle = pivotData.colAttrs.join("-")
+
         params = 
             size:
                 height: ($(window).height() / 1.4),
                 width: ($(window).width() / 1.4)
-            axis: x: 
-                type: 'category',
-                categories: headers
+            axis: 
+                y: 
+                    label: vAxisTitle
+                x: 
+                    label: hAxisTitle
+                    type: 'category',
+                    categories: headers
             data: 
                 columns: columns
         if chartOpts.type?
@@ -57,7 +66,7 @@ callWithJQuery ($) ->
         return result
 
     $.pivotUtilities.c3_renderers = 
-        "Line Chart C3": makeC3Chart()
-        "Bar Chart C3": makeC3Chart(type: "bar")
-        "Area Chart C3": makeC3Chart(type: "area", stacked: true)
-        "Stacked Bar Chart C3": makeC3Chart(type: "bar", stacked: true)
+        "Line Chart": makeC3Chart()
+        "Bar Chart": makeC3Chart(type: "bar")
+        "Stacked Bar Chart": makeC3Chart(type: "bar", stacked: true)
+        "Area Chart": makeC3Chart(type: "area", stacked: true)

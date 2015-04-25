@@ -18,7 +18,7 @@
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, columns, defaults, h, headers, params, renderArea, result, row, rowHeader, rowKey, rowKeys, x, _i, _j, _len, _len1;
+        var agg, colKey, colKeys, columns, defaults, h, hAxisTitle, headers, params, renderArea, result, row, rowHeader, rowKey, rowKeys, vAxisTitle, x, _i, _j, _len, _len1;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -59,13 +59,19 @@
           }
           columns.push(row);
         }
+        vAxisTitle = pivotData.aggregatorName + (pivotData.valAttrs.length ? "(" + (pivotData.valAttrs.join(", ")) + ")" : "");
+        hAxisTitle = pivotData.colAttrs.join("-");
         params = {
           size: {
             height: $(window).height() / 1.4,
             width: $(window).width() / 1.4
           },
           axis: {
+            y: {
+              label: vAxisTitle
+            },
             x: {
+              label: hAxisTitle,
               type: 'category',
               categories: headers
             }
@@ -102,16 +108,16 @@
       };
     };
     return $.pivotUtilities.c3_renderers = {
-      "Line Chart C3": makeC3Chart(),
-      "Bar Chart C3": makeC3Chart({
+      "Line Chart": makeC3Chart(),
+      "Bar Chart": makeC3Chart({
         type: "bar"
       }),
-      "Area Chart C3": makeC3Chart({
-        type: "area",
+      "Stacked Bar Chart": makeC3Chart({
+        type: "bar",
         stacked: true
       }),
-      "Stacked Bar Chart C3": makeC3Chart({
-        type: "bar",
+      "Area Chart": makeC3Chart({
+        type: "area",
         stacked: true
       })
     };
