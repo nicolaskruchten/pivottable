@@ -37,11 +37,11 @@
                 $("#output").pivotUI($.csv.toArrays(montreal_2014), {
 
                     aggregators: {
-                        "Mean Temp (Celcius)":  
+                        "Mean Temp (Celsius)":  
                             function() { return tpl.average()(["Mean Temp (C)"])},
-                        "Max Temp (Celcius)":   
+                        "Max Temp (Celsius)":   
                             function() { return tpl.max()(["Max Temp (C)"]) },
-                        "Min Temp (Celcius)":   
+                        "Min Temp (Celsius)":   
                             function() { return tpl.min()(["Min Temp (C)"]) },
                         "Total Rain (mm)": 
                             function() { return tpl.sum()(["Total Rain (mm)"]) },
