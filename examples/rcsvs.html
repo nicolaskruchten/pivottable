@@ -35,7 +35,7 @@
         <script type="text/javascript">
             google.load("visualization", "1", {packages:["corechart", "charteditor"]});
             $(function(){
-                $.get("/RDatasets/datasets.csv", function(csvlist){
+                $.get("/Rdatasets/datasets.csv", function(csvlist){
                         var pkg = $("<optgroup>", {label: ""});
                         var csvlist_arr =$.csv.toObjects(csvlist);
                         for(var i in csvlist_arr)
@@ -49,7 +49,7 @@
                         }
                         $("#csv").chosen();
                         $("#csv").bind("change", function(event){
-                            $.get("/RDatasets/csv/"+$(this).val()+".csv", function(csvtext){
+                            $.get("/Rdatasets/csv/"+$(this).val()+".csv", function(csvtext){
                             var input = $.csv.toArrays(csvtext);
                             input[0][0] = "Row";
                             $("#output").pivotUI(input, {
