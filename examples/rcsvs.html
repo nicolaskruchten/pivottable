@@ -49,7 +49,11 @@
                         }
                         $("#csv").chosen();
                         $("#csv").bind("change", function(event){
-                            $.get("/Rdatasets/csv/"+$(this).val()+".csv", function(csvtext){
+                            var val = $(this).val();
+                            $.get("/Rdatasets/csv/"+val+".csv", function(csvtext){
+                                $("#doc").append(
+                                    $("<a>",{target:"_blank", href:"/Rdatasets/doc/"+val+".html"}).html("Dataset documentation &raquo;")
+                                );
                             var input = $.csv.toArrays(csvtext);
                             input[0][0] = "Row";
                             $("#output").pivotUI(input, {
@@ -66,7 +70,7 @@
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>
         <p><a href="https://github.com/vincentarelbundock/Rdatasets">Rdatasets</a> is a collection of 758 datasets that were originally distributed alongside the statistical software environment R and some of its add-on packages.</p>
-        <p>R Dataset: <select id="csv"  data-placeholder="Choose a dataset..."><option></select></p>
+        <p>R Dataset: <select id="csv"  data-placeholder="Choose a dataset..."><option></select> &nbsp; &nbsp; <span id="doc"></span></p>
         <div id="output" style="margin: 10px;"></div>
 
     </body>
