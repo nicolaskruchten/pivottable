@@ -49,6 +49,7 @@
                         }
                         $("#csv").chosen();
                         $("#csv").bind("change", function(event){
+                            $("#output").empty().text("Loading...")
                             var val = $(this).val();
                             $.get("/Rdatasets/csv/"+val+".csv", function(csvtext){
                                 $("#doc").empty().append(
