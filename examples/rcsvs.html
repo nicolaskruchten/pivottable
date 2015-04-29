@@ -51,7 +51,7 @@
                         $("#csv").bind("change", function(event){
                             var val = $(this).val();
                             $.get("/Rdatasets/csv/"+val+".csv", function(csvtext){
-                                $("#doc").append(
+                                $("#doc").empty().append(
                                     $("<a>",{target:"_blank", href:"/Rdatasets/doc/"+val+".html"}).html("Dataset documentation &raquo;")
                                 );
                             var input = $.csv.toArrays(csvtext);
