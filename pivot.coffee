@@ -619,7 +619,7 @@ callWithJQuery ($) ->
             if opts.unusedAttrsVertical == "auto"
                 attrLength = 0
                 attrLength += a.length for a in shownAttributes
-                unusedAttrsVerticalAutoOverride = attrLength > 120
+                unusedAttrsVerticalAutoOverride = attrLength > 85
 
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
                 colList.addClass('pvtVertList')
