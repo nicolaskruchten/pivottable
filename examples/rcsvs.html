@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo with R Datasets</title>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.min.css">
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
+        <script type="text/javascript" src="../dist/d3_renderers.js"></script>
+        
+        <style>
+            * {font-family: Verdana;}
+            .node {
+              border: solid 1px white;
+              font: 10px sans-serif;
+              line-height: 12px;
+              overflow: hidden;
+              position: absolute;
+              text-indent: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            google.load("visualization", "1", {packages:["corechart", "charteditor"]});
+            $(function(){
+                $.get("/RDatasets/datasets.csv", function(csvlist){
+                        var pkg = $("<optgroup>", {label: ""});
+                        var csvlist_arr =$.csv.toObjects(csvlist);
+                        for(var i in csvlist_arr)
+                        {
+                            var dataset = csvlist_arr[i];
+                            if(dataset.Package != pkg.attr("label"))
+                            {
+                                pkg = $("<optgroup>", {label: dataset.Package}).appendTo($("#csv"));
+                            }
+                            pkg.append($("<option>", {value: dataset.Package+"/"+dataset.Item}).text(dataset.Item +":" +dataset.Title));
+                        }
+                        $("#csv").chosen();
+                        $("#csv").bind("change", function(event){
+                            $.get("/RDatasets/csv/"+$(this).val()+".csv", function(csvtext){
+                            var input = $.csv.toArrays(csvtext);
+                            input[0][0] = "Row";
+                            $("#output").pivotUI(input, {
+                                renderers: $.extend(
+                                $.pivotUtilities.renderers, 
+                                $.pivotUtilities.gchart_renderers, 
+                                $.pivotUtilities.d3_renderers
+                                )
+                            }, true);
+                        });
+                    });
+                });  
+            });
+        </script>
+        <p><a href="index.html">&laquo; back to examples</a></p>
+        <p><a href="https://github.com/vincentarelbundock/Rdatasets">Rdatasets</a> is a collection of 758 datasets that were originally distributed alongside the statistical software environment R and some of its add-on packages.</p>
+        <p>R Dataset: <select id="csv"  data-placeholder="Choose a dataset..."><option></select></p>
+        <div id="output" style="margin: 10px;"></div>
+
+    </body>
+</html>
