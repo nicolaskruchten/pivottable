@@ -1061,7 +1061,7 @@
             a = shownAttributes[_j];
             attrLength += a.length;
           }
-          unusedAttrsVerticalAutoOverride = attrLength > 120;
+          unusedAttrsVerticalAutoOverride = attrLength > 85;
         }
         if (opts.unusedAttrsVertical === true || unusedAttrsVerticalAutoOverride) {
           colList.addClass('pvtVertList');
