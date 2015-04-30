@@ -21,8 +21,9 @@ callWithJQuery ($) ->
         rowKeys.push [] if rowKeys.length == 0
         colKeys = pivotData.getColKeys()
         colKeys.push [] if colKeys.length == 0
-        fullAggName = pivotData.aggregatorName+ 
-                if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
+        fullAggName = pivotData.aggregatorName 
+        if pivotData.valAttrs.length
+            fullAggName += "(#{pivotData.valAttrs.join(", ")})"
         headers = (h.join("-") for h in rowKeys)
         headers.unshift ""
 

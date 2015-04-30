@@ -25,6 +25,10 @@ callWithJQuery ($) ->
 
         headers = (h.join("-") for h in colKeys)
 
+        fullAggName = pivotData.aggregatorName 
+        if pivotData.valAttrs.length
+            fullAggName += "(#{pivotData.valAttrs.join(", ")})"
+
         if chartOpts.type == "scatter"
             dataArray = []
             hAxisTitle = pivotData.colAttrs.join("-")
@@ -36,7 +40,6 @@ callWithJQuery ($) ->
                     datum[vAxisTitle] = parseFloat(y)
                     datum["tooltip"] = agg.format(agg.value())
                     dataArray.push datum
-            console.log dataArray
         else
             columns = []
             for rowKey in rowKeys
@@ -63,15 +66,19 @@ callWithJQuery ($) ->
                 x: label: hAxisTitle
             data: 
                 type: chartOpts.type
+            tooltip:
+                grouped: false
 
         if chartOpts.type == "scatter"
             params.data.x = hAxisTitle
             params.axis.x.tick = fit: false
             params.data.json = dataArray
             params.data.keys = value: [hAxisTitle,vAxisTitle]
-            params.tooltip = contents: (d) ->
-                console.log d
-                return "x"
+            params.legend = show: false 
+            params.tooltip.format =  
+                title: -> fullAggName
+                name: -> ""
+                value: (a,b,c,d) -> dataArray[d].tooltip
         else
             params.axis.x.type= 'category'
             params.axis.x.categories = headers
@@ -80,7 +87,6 @@ callWithJQuery ($) ->
 
         if chartOpts.stacked?
             params.data.groups = [x.join("-") for x in rowKeys]
-        console.log params
         renderArea = $("<div>", style: "display:none;").appendTo $("body")
         result = $("<div>").appendTo renderArea
         params.bindto = result[0]
