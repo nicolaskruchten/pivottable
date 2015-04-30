@@ -95,6 +95,6 @@ callWithJQuery ($) ->
     $.pivotUtilities.gchart_renderers = 
         "Line Chart": makeGoogleChart("LineChart")
         "Bar Chart": makeGoogleChart("ColumnChart")
-        "Scatter Chart": makeGoogleChart("ScatterChart")
         "Stacked Bar Chart": makeGoogleChart("ColumnChart", isStacked: true)
         "Area Chart": makeGoogleChart("AreaChart", isStacked: true)
+        "Scatter Chart": makeGoogleChart("ScatterChart")
