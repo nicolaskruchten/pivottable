@@ -1095,6 +1095,7 @@
             }).html(opts.localeStrings.selectNone).bind("click", function() {
               return valueList.find("input:visible").prop("checked", false);
             }));
+            btns.append($("<br>"));
             btns.append($("<input>", {
               type: "text",
               placeholder: opts.localeStrings.filterResults,

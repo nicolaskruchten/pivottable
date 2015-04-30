@@ -16,6 +16,7 @@ callWithJQuery ($) ->
                 by: "by"
 
         opts = $.extend defaults, opts
+        chartOpts.type ?= "line"
 
         rowKeys = pivotData.getRowKeys()
         rowKeys.push [] if rowKeys.length == 0
@@ -24,39 +25,68 @@ callWithJQuery ($) ->
 
         headers = (h.join("-") for h in colKeys)
 
-        columns = []
-        for rowKey in rowKeys
-            rowHeader = rowKey.join("-")
-            row = [if rowHeader == "" then pivotData.aggregatorName else rowHeader]
-            for colKey in colKeys
-                agg = pivotData.getAggregator(rowKey, colKey)
-                if agg.value()?
-                    row.push agg.value()
-                else row.push null
-            columns.push row
+        fullAggName = pivotData.aggregatorName 
+        if pivotData.valAttrs.length
+            fullAggName += "(#{pivotData.valAttrs.join(", ")})"
 
-        vAxisTitle = pivotData.aggregatorName+ 
-            if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
-        hAxisTitle = pivotData.colAttrs.join("-")
+        if chartOpts.type == "scatter"
+            dataArray = []
+            hAxisTitle = pivotData.colAttrs.join("-")
+            vAxisTitle = pivotData.rowAttrs.join("-")
+            for y, tree2 of pivotData.tree
+                for x, agg of tree2
+                    datum = {}
+                    datum[hAxisTitle] = parseFloat(x)
+                    datum[vAxisTitle] = parseFloat(y)
+                    datum["tooltip"] = agg.format(agg.value())
+                    dataArray.push datum
+        else
+            columns = []
+            for rowKey in rowKeys
+                rowHeader = rowKey.join("-")
+                row = [if rowHeader == "" then pivotData.aggregatorName else rowHeader]
+                for colKey in colKeys
+                    agg = pivotData.getAggregator(rowKey, colKey)
+                    if agg.value()?
+                        row.push agg.value()
+                    else row.push null
+                columns.push row
+
+
+            vAxisTitle = pivotData.aggregatorName+ 
+                if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
+            hAxisTitle = pivotData.colAttrs.join("-")
 
         params = 
             size:
                 height: ($(window).height() / 1.4),
                 width: ($(window).width() / 1.4)
             axis: 
-                y: 
-                    label: vAxisTitle
-                x: 
-                    label: hAxisTitle
-                    type: 'category',
-                    categories: headers
+                y: label: vAxisTitle
+                x: label: hAxisTitle
             data: 
-                columns: columns
-        if chartOpts.type?
-            params.data.type = chartOpts.type
+                type: chartOpts.type
+            tooltip:
+                grouped: false
+
+        if chartOpts.type == "scatter"
+            params.data.x = hAxisTitle
+            params.axis.x.tick = fit: false
+            params.data.json = dataArray
+            params.data.keys = value: [hAxisTitle,vAxisTitle]
+            params.legend = show: false 
+            params.tooltip.format =  
+                title: -> fullAggName
+                name: -> ""
+                value: (a,b,c,d) -> dataArray[d].tooltip
+        else
+            params.axis.x.type= 'category'
+            params.axis.x.categories = headers
+            params.data.columns = columns
+
+
         if chartOpts.stacked?
             params.data.groups = [x.join("-") for x in rowKeys]
-
         renderArea = $("<div>", style: "display:none;").appendTo $("body")
         result = $("<div>").appendTo renderArea
         params.bindto = result[0]
@@ -70,3 +100,4 @@ callWithJQuery ($) ->
         "Bar Chart": makeC3Chart(type: "bar")
         "Stacked Bar Chart": makeC3Chart(type: "bar", stacked: true)
         "Area Chart": makeC3Chart(type: "area", stacked: true)
+        "Scatter Chart": makeC3Chart(type: "scatter")
