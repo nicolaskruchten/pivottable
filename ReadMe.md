@@ -101,7 +101,7 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 
 ## How can I contribute?
 
-Pull requests are welcome! Here are some [Contribution Guidelines](https://github.com/nicolaskruchten/pivottable/wiki/Contribution-Guidelines).
+Pull requests are welcome! Here are some [Contribution Guidelines](https://github.com/nicolaskruchten/pivottable/blob/master/CONTRIBUTING.md).
 
 ## I have a question, how can I get in touch?
 
