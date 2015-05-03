@@ -25,13 +25,13 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 
 There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/examples/index.html) but here are some good entry points:
 
-* [a simple demo running on the "Canadian Members of Parliament as of 2012" dataset](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html)
+* [a simple demo running on the "Canadian Parliament 2012" dataset](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html)
 * [fully-loaded demo running on the 700+ datasets that ship with R](http://nicolas.kruchten.com/pivottable/examples/rcsvs.html)
 * [fully-loaded demo where you provide a CSV file for input](http://nicolaskruchten.github.io/pivottable/examples/fully_loaded.html)
 
 ##How do I use the UI?
 
-PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the [Canadian Parliament 2012 dataset](http://nicolas.kruchten.com/pivottable/examples/mps.csv).
+PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the [Canadian Parliament 2012 dataset](https://github.com/nicolaskruchten/pivottable/blob/master/examples/mps.csv).
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/animation.gif)
 
@@ -40,9 +40,9 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 
 You first need to load jQuery and the PivotTable.js scripts (`pivot.min.js` and any plugins or source maps), which can be done the normal way (download the files from the [`dist`](https://github.com/nicolaskruchten/pivottable/tree/master/dist) directory and reference them), or loaded from [CDNJS](https://cdnjs.com/libraries/pivottable), or via [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`.
 
-There are two main functions defined in `pivot.coffee`: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
+There are two main functions provided by PivotTable.js: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
-Despite the fact that this is described as a Javascript library, it's actually written in [CoffeeScript](http://coffeescript.org). You can compile `pivot.coffee` into `pivot.js` with `coffee -c pivot.coffee` or you can use the precompiled JS file from the `dist` directory.
+### `pivot()`
 
 Once you've loaded jQuery and pivot.js, this code ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple.html)):
 
@@ -61,6 +61,8 @@ appends this table to `$("#output")` (the default, *overridable* behaviour is to
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple.png)
 
+### `pivotUI()`
+
 A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yields the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
 
 	$("#output").pivotUI(
@@ -76,7 +78,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yields t
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple_ui.png)
 
-Note that `pivot()` and `pivotUI()` take different parameters in general, even though in the example above we passed the same parameters to both.
+Note that **`pivot()` and `pivotUI()` take different parameters in general**, even though in the example above we passed the same parameters to both.
 
 See the wiki for [full parameter documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters).
 
