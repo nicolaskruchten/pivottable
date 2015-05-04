@@ -954,7 +954,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, existingOpts, i, initialRender, k, opts, pivotTable, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoOverride, x, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4;
+      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, existingOpts, i, initialRender, k, opts, pivotTable, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -971,7 +971,7 @@
         rows: [],
         vals: [],
         exclusions: {},
-        unusedAttrsVertical: "auto",
+        unusedAttrsVertical: 85,
         autoSortUnusedAttrs: false,
         rendererOptions: {
           localeStrings: locales[locale].localeStrings
@@ -1056,12 +1056,18 @@
         })();
         unusedAttrsVerticalAutoOverride = false;
         if (opts.unusedAttrsVertical === "auto") {
+          unusedAttrsVerticalAutoCutoff = 120;
+        } else {
+          unusedAttrsVerticalAutoCutoff = parseInt(opts.unusedAttrsVertical);
+        }
+        console.log(unusedAttrsVerticalAutoCutoff);
+        if (!isNaN(unusedAttrsVerticalAutoCutoff)) {
           attrLength = 0;
           for (_j = 0, _len1 = shownAttributes.length; _j < _len1; _j++) {
             a = shownAttributes[_j];
             attrLength += a.length;
           }
-          unusedAttrsVerticalAutoOverride = attrLength > 85;
+          unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff;
         }
         if (opts.unusedAttrsVertical === true || unusedAttrsVerticalAutoOverride) {
           colList.addClass('pvtVertList');
