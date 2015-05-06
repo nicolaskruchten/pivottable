@@ -33,7 +33,7 @@ There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/exa
 
 PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the [Canadian Parliament 2012 dataset](https://github.com/nicolaskruchten/pivottable/blob/master/examples/mps.csv).
 
-![image](http://nicolaskruchten.github.io/pivottable/images/animation.gif)
+![image](http://nicolas.kruchten.com/pivottable/images/animation.gif)
 
 
 ##How do I use the code?
