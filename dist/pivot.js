@@ -1060,7 +1060,6 @@
         } else {
           unusedAttrsVerticalAutoCutoff = parseInt(opts.unusedAttrsVertical);
         }
-        console.log(unusedAttrsVerticalAutoCutoff);
         if (!isNaN(unusedAttrsVerticalAutoCutoff)) {
           attrLength = 0;
           for (_j = 0, _len1 = shownAttributes.length; _j < _len1; _j++) {

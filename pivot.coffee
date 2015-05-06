@@ -620,7 +620,7 @@ callWithJQuery ($) ->
                 unusedAttrsVerticalAutoCutoff = 120 # legacy support
             else
                 unusedAttrsVerticalAutoCutoff = parseInt opts.unusedAttrsVertical
-            console.log unusedAttrsVerticalAutoCutoff
+
             if not isNaN(unusedAttrsVerticalAutoCutoff)
                 attrLength = 0
                 attrLength += a.length for a in shownAttributes
