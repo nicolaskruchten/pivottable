@@ -114,6 +114,9 @@
             }
           }
         };
+        if (chartType === "ColumnChart") {
+          options.vAxis.minValue = 0;
+        }
         if (chartType === "ScatterChart") {
           options.legend = {
             position: "none"
