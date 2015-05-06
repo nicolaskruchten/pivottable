@@ -687,7 +687,7 @@ callWithJQuery ($) ->
                         .append $("<button>", {type:"button"}).text("OK").bind "click", updateFilter
 
                     showFilterList = (e) ->
-                        valueList.css(left: e.pageX, top: e.pageY).toggle()
+                        valueList.toggle()
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
@@ -697,7 +697,9 @@ callWithJQuery ($) ->
                     attrElem = $("<li>").addClass("axis_#{i}")
                         .append $("<span>").addClass('pvtAttr').text(c).data("attrName", c).append(triangleLink)
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
-                    colList.append(attrElem).append(valueList)
+                    colList.append(attrElem)
+                    valueListCtr = $("<div class='pvtFilterBoxCtr'>").append(valueList)
+                    attrElem.append(valueListCtr)
 
                     attrElem.bind "dblclick", showFilterList
 
