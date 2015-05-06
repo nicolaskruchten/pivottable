@@ -567,7 +567,7 @@ callWithJQuery ($) ->
             menuLimit: 200
             cols: [], rows: [], vals: []
             exclusions: {}
-            unusedAttrsVertical: "auto"
+            unusedAttrsVertical: 85
             autoSortUnusedAttrs: false
             rendererOptions: localeStrings: locales[locale].localeStrings
             onRefresh: null
@@ -617,9 +617,14 @@ callWithJQuery ($) ->
 
             unusedAttrsVerticalAutoOverride = false
             if opts.unusedAttrsVertical == "auto"
+                unusedAttrsVerticalAutoCutoff = 120 # legacy support
+            else
+                unusedAttrsVerticalAutoCutoff = parseInt opts.unusedAttrsVertical
+            console.log unusedAttrsVerticalAutoCutoff
+            if not isNaN(unusedAttrsVerticalAutoCutoff)
                 attrLength = 0
                 attrLength += a.length for a in shownAttributes
-                unusedAttrsVerticalAutoOverride = attrLength > 85
+                unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff
 
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
                 colList.addClass('pvtVertList')

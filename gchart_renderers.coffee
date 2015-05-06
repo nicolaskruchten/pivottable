@@ -74,6 +74,9 @@ callWithJQuery ($) ->
             vAxis: {title: vAxisTitle}
             tooltip: { textStyle: { fontName: 'Arial', fontSize: 12 } }
 
+        if chartType == "ColumnChart"
+            options.vAxis.minValue = 0
+
         if chartType == "ScatterChart"
             options.legend = position: "none"
             options.chartArea = {'width': '80%', 'height': '80%'}

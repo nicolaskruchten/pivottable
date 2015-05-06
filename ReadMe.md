@@ -4,13 +4,11 @@ PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality
 
 ##What does it do?
 
-PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. 
-
-With an optional add-on, the summary table can be rendered as a Google Chart, turning the pivot table into a pivot chart. A d3-based Treemap add-on is also included.
+PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. With optional add-ons, the summary table can be rendered various kinds of charts, turning the pivot table into a pivot chart.
 
 ##Why is it good?
 
-* lightweight: the core (without Google Charts or D3 support) is a single file with less than 1000 LOC of CoffeeScript, compiles down to 6.3kb of Javascript minified and gzipped, depends only on jQuery and jQueryUI's 'sortable'
+* lightweight: the core (without chart support) is a single file with less than 1000 LOC of CoffeeScript, compiles down to 6.3kb of Javascript minified and gzipped, depends only on jQuery and jQueryUI's 'sortable'
 * works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
 * works acceptably fast in Chrome on commodity hardware up to around a hundred thousand records, depending on the cardinality of the attributes.
 * UI is [localizable](https://github.com/nicolaskruchten/pivottable/wiki/Localization)
@@ -18,35 +16,33 @@ With an optional add-on, the summary table can be rendered as a Google Chart, tu
 * works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
 * [derived attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes) can be created on the fly based on the whole input record by passing in a function
 * complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (e.g. weighted averages)
-* built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional support for [Google Charts](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-support)
+* built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional extra renderers that add [charting or TSV export support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
 * works on mobile devices with jQuery UI Touch Punch
 
 
 ##Where's the demo?
 
-A demo of PivotTable.js loaded up with a sample dataset of Canadian Members of Parliament as of 2012 can be found here: [PivotTable.js demo](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html). 
+There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/examples/index.html) but here are some good entry points:
 
-A version of this demo which include Google Chart renderers can be found here: [Google Charts demo](http://nicolaskruchten.github.io/pivottable/examples/gchart.html).
-
-A fully-loaded version with all renderers and jQuery UI Touch Punch for mobile compatibility is here: [Fully Loaded demo](http://nicolaskruchten.github.io/pivottable/examples/fully_loaded.html).
-
-Finally, here is a demo where you can view your own data from a local CSV file, all in-browser with no server support: [Local CSV demo](http://nicolaskruchten.github.io/pivottable/examples/local.html).
+* [a simple demo running on the "Canadian Parliament 2012" dataset](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html)
+* [fully-loaded demo running on the 700+ datasets that ship with R](http://nicolas.kruchten.com/pivottable/examples/rcsvs.html)
+* [fully-loaded demo where you provide a CSV file for input](http://nicolaskruchten.github.io/pivottable/examples/fully_loaded.html)
 
 ##How do I use the UI?
 
-PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the [Canadian Parliament 2012 dataset](http://nicolas.kruchten.com/pivottable/examples/mps.csv).
+PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the [Canadian Parliament 2012 dataset](https://github.com/nicolaskruchten/pivottable/blob/master/examples/mps.csv).
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/animation.gif)
 
 
 ##How do I use the code?
 
-You need to load jQuery and the PivotTable.js scripts (`pivot.min.js` and any plugins or source maps), which can be done the normal way (download the files from [dist](https://github.com/nicolaskruchten/pivottable/tree/master/dist) and reference them), or loaded from [CDNJS](https://cdnjs.com/libraries/pivottable), or via [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via Bower with `bower install pivottable`.
+You first need to load jQuery and the PivotTable.js scripts (`pivot.min.js` and any plugins or source maps), which can be done the normal way (download the files from the [`dist`](https://github.com/nicolaskruchten/pivottable/tree/master/dist) directory and reference them), or loaded from [CDNJS](https://cdnjs.com/libraries/pivottable), or via [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`.
 
-There are two main functions defined in `pivot.coffee`: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
+There are two main functions provided by PivotTable.js: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
-Despite the fact that this is described as a Javascript library, it's actually written in [CoffeeScript](http://coffeescript.org). You can compile `pivot.coffee` into `pivot.js` with `coffee -c pivot.coffee` or you can use the precompiled JS file from the `examples` directory.
+### `pivot()`
 
 Once you've loaded jQuery and pivot.js, this code ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple.html)):
 
@@ -65,6 +61,8 @@ appends this table to `$("#output")` (the default, *overridable* behaviour is to
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple.png)
 
+### `pivotUI()`
+
 A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yields the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
 
 	$("#output").pivotUI(
@@ -80,7 +78,7 @@ A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yields t
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple_ui.png)
 
-Note that `pivot()` and `pivotUI()` take different parameters in general, even though in the example above we passed the same parameters to both.
+Note that **`pivot()` and `pivotUI()` take different parameters in general**, even though in the example above we passed the same parameters to both.
 
 See the wiki for [full parameter documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters).
 
@@ -96,12 +94,12 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 * [Renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers)
 * [Derived Attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes)
 * [Localization](https://github.com/nicolaskruchten/pivottable/wiki/Localization)
-* [Google Charts and D3 Support](https://github.com/nicolaskruchten/pivottable/wiki/Google-Chart-and-D3-Support)
+* [Optional Extra Renderers: Google Charts and D3/C3 Support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
 * [Used By](https://github.com/nicolaskruchten/pivottable/wiki/Used-By)
 
 ## How can I contribute?
 
-Pull requests are welcome! Here are some [Contribution Guidelines](https://github.com/nicolaskruchten/pivottable/wiki/Contribution-Guidelines).
+Pull requests are welcome! Here are some [Contribution Guidelines](https://github.com/nicolaskruchten/pivottable/blob/master/CONTRIBUTING.md).
 
 ## I have a question, how can I get in touch?
 
