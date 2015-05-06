@@ -5,16 +5,23 @@
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         
         <!-- external libs from cdnjs -->
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.min.css">
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
 
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
         <script type="text/javascript" src="../dist/pivot.js"></script>
         <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
         <script type="text/javascript" src="../dist/d3_renderers.js"></script>
+        <script type="text/javascript" src="../dist/c3_renderers.js"></script>
+
         <style>
             body {font-family: Verdana;}
             .node {
@@ -33,13 +40,17 @@
             $(function(){
                 var derivers = $.pivotUtilities.derivers;
 
+                var renderers = $.extend(
+                    $.pivotUtilities.renderers, 
+                    $.pivotUtilities.d3_renderers
+                    );
+                for(var k in $.pivotUtilities.gchart_renderers)
+                    renderers["Google " + k] = $.pivotUtilities.gchart_renderers[k];
+                for(var k in $.pivotUtilities.c3_renderers)
+                    renderers["C3 "+k] = $.pivotUtilities.c3_renderers[k];
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {
-                        renderers: $.extend(
-                            $.pivotUtilities.renderers, 
-                            $.pivotUtilities.gchart_renderers, 
-                            $.pivotUtilities.d3_renderers
-                            ),
+                        renderers: renderers,
                         derivedAttributes: {
                             "Age Bin": derivers.bin("Age", 10),
                             "Gender Imbalance": function(mp) {
@@ -47,7 +58,7 @@
                             }
                         },
                         cols: ["Age Bin"], rows: ["Gender"],
-                        rendererName: "Area Chart"
+                        rendererName: "Table Barchart"
                     });
                 });
              });
