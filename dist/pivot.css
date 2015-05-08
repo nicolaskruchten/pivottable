@@ -1,3 +1,5 @@
+.pvtUi { color: #333; }
+
 
 table.pvtTable {
     font-size: 8pt;
@@ -79,6 +81,9 @@ table.pvtTable tr td {
 }
 
 .pvtFilterBox h4{ margin:0; }
+.pvtFilterBox p { margin: 1em auto; }
+.pvtFilterBox label { font-weight: normal; }
+.pvtFilterBox input[type='checkbox'] { margin-right: 5px; }
 
 .pvtCheckContainer{
     text-align: left;
@@ -87,3 +92,5 @@ table.pvtTable tr td {
     max-height: 200px;
 }
 .pvtCheckContainer p{ margin: 5px; }
+
+.pvtRendererArea { padding: 5px;}
