@@ -15,7 +15,7 @@
     var makeGoogleChart;
     makeGoogleChart = function(chartType, extraOptions) {
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, dataArray, dataTable, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, len, len1, numCharsInHAxis, options, ref, result, row, rowKey, rowKeys, title, tree2, v, vAxisTitle, wrapper, x, y;
+        var agg, colKey, colKeys, dataArray, dataTable, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, len, len1, numCharsInHAxis, options, ref, result, row, rowKey, rowKeys, title, tree2, v, vAxisTitle, val, wrapper, x, y;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -85,7 +85,16 @@
               rowKey = rowKeys[j];
               agg = pivotData.getAggregator(rowKey, colKey);
               if (agg.value() != null) {
-                row.push(agg.value());
+                val = agg.value();
+                if ($.isNumeric(val)) {
+                  if (val < 0) {
+                    row.push(parseFloat(val.toPrecision(3)));
+                  } else {
+                    row.push(parseFloat(val.toFixed(3)));
+                  }
+                } else {
+                  row.push(val);
+                }
               } else {
                 row.push(null);
               }
