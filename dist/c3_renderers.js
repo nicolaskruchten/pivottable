@@ -18,7 +18,7 @@
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, columns, dataArray, datum, defaults, fullAggName, h, hAxisTitle, headers, i, j, len, len1, params, ref, renderArea, result, row, rowHeader, rowKey, rowKeys, tree2, vAxisTitle, x, y;
+        var agg, colKey, colKeys, columns, dataArray, datum, defaults, fullAggName, h, hAxisTitle, headers, i, j, len, len1, params, ref, renderArea, result, row, rowHeader, rowKey, rowKeys, tree2, vAxisTitle, val, x, y;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -84,7 +84,16 @@
               colKey = colKeys[j];
               agg = pivotData.getAggregator(rowKey, colKey);
               if (agg.value() != null) {
-                row.push(agg.value());
+                val = agg.value();
+                if ($.isNumeric(val)) {
+                  if (val < 0) {
+                    row.push(parseFloat(val.toPrecision(3)));
+                  } else {
+                    row.push(parseFloat(val.toFixed(3)));
+                  }
+                } else {
+                  row.push(val);
+                }
               } else {
                 row.push(null);
               }

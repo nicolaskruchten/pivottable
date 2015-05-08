@@ -56,7 +56,14 @@ callWithJQuery ($) ->
                 for rowKey in rowKeys
                     agg = pivotData.getAggregator(rowKey, colKey)
                     if agg.value()?
-                        row.push agg.value()
+                        val = agg.value()
+                        if $.isNumeric val
+                            if val < 0
+                                row.push parseFloat(val.toPrecision(3))
+                            else
+                                row.push parseFloat(val.toFixed(3))
+                        else
+                            row.push val
                     else row.push null
                 dataArray.push row
 
