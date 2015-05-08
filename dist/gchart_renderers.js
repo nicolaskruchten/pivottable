@@ -20,6 +20,14 @@
           localeStrings: {
             vs: "vs",
             by: "by"
+          },
+          gchart: {
+            width: function() {
+              return $(window).width() / 1.4;
+            },
+            height: function() {
+              return $(window).height() / 1.4;
+            }
           }
         };
         opts = $.extend(defaults, opts);
@@ -97,8 +105,8 @@
           }
         }
         options = {
-          width: $(window).width() / 1.4,
-          height: $(window).height() / 1.4,
+          width: opts.gchart.width(),
+          height: opts.gchart.height(),
           title: title,
           hAxis: {
             title: hAxisTitle,

@@ -23,6 +23,14 @@
           localeStrings: {
             vs: "vs",
             by: "by"
+          },
+          c3: {
+            width: function() {
+              return $(window).width() / 1.4;
+            },
+            height: function() {
+              return $(window).height() / 1.4;
+            }
           }
         };
         opts = $.extend(defaults, opts);
@@ -88,8 +96,8 @@
         }
         params = {
           size: {
-            height: $(window).height() / 1.4,
-            width: $(window).width() / 1.4
+            height: opts.c3.height(),
+            width: opts.c3.width()
           },
           axis: {
             y: {
