@@ -15,7 +15,7 @@
     var makeGoogleChart;
     makeGoogleChart = function(chartType, extraOptions) {
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, dataArray, dataTable, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, k, numCharsInHAxis, options, result, row, rowKey, rowKeys, title, tree2, v, vAxisTitle, wrapper, x, y, _i, _j, _len, _len1, _ref;
+        var agg, colKey, colKeys, dataArray, dataTable, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, len, len1, numCharsInHAxis, options, ref, result, row, rowKey, rowKeys, title, tree2, v, vAxisTitle, wrapper, x, y;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -44,27 +44,26 @@
           fullAggName += "(" + (pivotData.valAttrs.join(", ")) + ")";
         }
         headers = (function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = rowKeys.length; _i < _len; _i++) {
-            h = rowKeys[_i];
-            _results.push(h.join("-"));
+          var i, len, results;
+          results = [];
+          for (i = 0, len = rowKeys.length; i < len; i++) {
+            h = rowKeys[i];
+            results.push(h.join("-"));
           }
-          return _results;
+          return results;
         })();
         headers.unshift("");
         numCharsInHAxis = 0;
         if (chartType === "ScatterChart") {
           dataArray = [];
-          _ref = pivotData.tree;
-          for (y in _ref) {
-            tree2 = _ref[y];
+          ref = pivotData.tree;
+          for (y in ref) {
+            tree2 = ref[y];
             for (x in tree2) {
               agg = tree2[x];
               dataArray.push([parseFloat(x), parseFloat(y), fullAggName + ": \n" + agg.format(agg.value())]);
             }
           }
-          console.log(dataArray);
           dataTable = new google.visualization.DataTable();
           dataTable.addColumn('number', pivotData.colAttrs.join("-"));
           dataTable.addColumn('number', pivotData.rowAttrs.join("-"));
@@ -78,12 +77,12 @@
           title = "";
         } else {
           dataArray = [headers];
-          for (_i = 0, _len = colKeys.length; _i < _len; _i++) {
-            colKey = colKeys[_i];
+          for (i = 0, len = colKeys.length; i < len; i++) {
+            colKey = colKeys[i];
             row = [colKey.join("-")];
             numCharsInHAxis += row[0].length;
-            for (_j = 0, _len1 = rowKeys.length; _j < _len1; _j++) {
-              rowKey = rowKeys[_j];
+            for (j = 0, len1 = rowKeys.length; j < len1; j++) {
+              rowKey = rowKeys[j];
               agg = pivotData.getAggregator(rowKey, colKey);
               if (agg.value() != null) {
                 row.push(agg.value());

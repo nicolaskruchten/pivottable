@@ -40,7 +40,6 @@ callWithJQuery ($) ->
                         parseFloat(y),
                         fullAggName+": \n"+agg.format(agg.value())
                         ]
-            console.log dataArray
             dataTable = new google.visualization.DataTable()
             dataTable.addColumn 'number', pivotData.colAttrs.join("-")
             dataTable.addColumn 'number', pivotData.rowAttrs.join("-") 
