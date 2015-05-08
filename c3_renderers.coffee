@@ -14,6 +14,9 @@ callWithJQuery ($) ->
             localeStrings:
                 vs: "vs"
                 by: "by"
+            c3:
+                width: -> $(window).width() / 1.4
+                height: -> $(window).height() / 1.4
 
         opts = $.extend defaults, opts
         chartOpts.type ?= "line"
@@ -59,8 +62,8 @@ callWithJQuery ($) ->
 
         params = 
             size:
-                height: ($(window).height() / 1.4),
-                width: ($(window).width() / 1.4)
+                height: opts.c3.height()
+                width: opts.c3.width()
             axis: 
                 y: label: vAxisTitle
                 x: label: hAxisTitle

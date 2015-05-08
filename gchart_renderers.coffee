@@ -14,6 +14,9 @@ callWithJQuery ($) ->
             localeStrings:
                 vs: "vs"
                 by: "by"
+            gchart:
+                width: -> $(window).width() / 1.4
+                height: -> $(window).height() / 1.4
 
         opts = $.extend defaults, opts
 
@@ -67,8 +70,8 @@ callWithJQuery ($) ->
             title += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
 
         options = 
-            width: $(window).width() / 1.4
-            height: $(window).height() / 1.4
+            width: opts.gchart.width()
+            height: opts.gchart.height()
             title: title
             hAxis: {title: hAxisTitle, slantedText: numCharsInHAxis > 50}
             vAxis: {title: vAxisTitle}

@@ -14,9 +14,17 @@
   callWithJQuery(function($) {
     return $.pivotUtilities.d3_renderers = {
       Treemap: function(pivotData, opts) {
-        var addToTree, color, defaults, height, margin, result, rowKey, tree, treemap, value, width, _i, _len, _ref;
+        var addToTree, color, defaults, height, result, rowKey, tree, treemap, value, width, _i, _len, _ref;
         defaults = {
-          localeStrings: {}
+          localeStrings: {},
+          d3: {
+            width: function() {
+              return $(window).width() / 1.4;
+            },
+            height: function() {
+              return $(window).height() / 1.4;
+            }
+          }
         };
         opts = $.extend(defaults, opts);
         result = $("<div>").css({
@@ -61,13 +69,12 @@
           }
         }
         color = d3.scale.category10();
-        width = $(window).width() / 1.4;
-        height = $(window).height() / 1.4;
-        margin = 10;
+        width = opts.d3.width();
+        height = opts.d3.height();
         treemap = d3.layout.treemap().size([width, height]).sticky(true).value(function(d) {
           return d.size;
         });
-        d3.select(result[0]).append("div").style("position", "relative").style("width", (width + margin * 2) + "px").style("height", (height + margin * 2) + "px").style("left", margin + "px").style("top", margin + "px").datum(tree).selectAll(".node").data(treemap.padding([15, 0, 0, 0]).value(function(d) {
+        d3.select(result[0]).append("div").style("position", "relative").style("width", width + "px").style("height", height + "px").datum(tree).selectAll(".node").data(treemap.padding([15, 0, 0, 0]).value(function(d) {
           return d.value;
         }).nodes).enter().append("div").attr("class", "node").style("background", function(d) {
           if (d.children != null) {
