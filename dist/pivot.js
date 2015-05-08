@@ -1032,7 +1032,9 @@
           }
           return _results;
         });
-        uiTable = $("<table>").attr("cellpadding", 5);
+        uiTable = $("<table>", {
+          "class": "pvtUi"
+        }).attr("cellpadding", 5);
         rendererControl = $("<td>");
         renderer = $("<select>").addClass('pvtRenderer').appendTo(rendererControl).bind("change", function() {
           return refresh();
