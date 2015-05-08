@@ -1,9 +1,9 @@
 (function() {
   var callWithJQuery,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-    __slice = [].slice,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty;
+    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    slice = [].slice,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    hasProp = {}.hasOwnProperty;
 
   callWithJQuery = function(pivotModule) {
     if (typeof exports === "object" && typeof module === "object") {
@@ -90,15 +90,15 @@
         if (formatter == null) {
           formatter = usFmtInt;
         }
-        return function(_arg) {
+        return function(arg) {
           var attr;
-          attr = _arg[0];
+          attr = arg[0];
           return function(data, rowKey, colKey) {
             return {
               uniq: [],
               push: function(record) {
-                var _ref;
-                if (_ref = record[attr], __indexOf.call(this.uniq, _ref) < 0) {
+                var ref;
+                if (ref = record[attr], indexOf.call(this.uniq, ref) < 0) {
                   return this.uniq.push(record[attr]);
                 }
               },
@@ -112,15 +112,15 @@
         };
       },
       listUnique: function(sep) {
-        return function(_arg) {
+        return function(arg) {
           var attr;
-          attr = _arg[0];
+          attr = arg[0];
           return function(data, rowKey, colKey) {
             return {
               uniq: [],
               push: function(record) {
-                var _ref;
-                if (_ref = record[attr], __indexOf.call(this.uniq, _ref) < 0) {
+                var ref;
+                if (ref = record[attr], indexOf.call(this.uniq, ref) < 0) {
                   return this.uniq.push(record[attr]);
                 }
               },
@@ -139,9 +139,9 @@
         if (formatter == null) {
           formatter = usFmt;
         }
-        return function(_arg) {
+        return function(arg) {
           var attr;
-          attr = _arg[0];
+          attr = arg[0];
           return function(data, rowKey, colKey) {
             return {
               sum: 0,
@@ -163,17 +163,17 @@
         if (formatter == null) {
           formatter = usFmt;
         }
-        return function(_arg) {
+        return function(arg) {
           var attr;
-          attr = _arg[0];
+          attr = arg[0];
           return function(data, rowKey, colKey) {
             return {
               val: null,
               push: function(record) {
-                var x, _ref;
+                var ref, x;
                 x = parseFloat(record[attr]);
                 if (!isNaN(x)) {
-                  return this.val = Math.min(x, (_ref = this.val) != null ? _ref : x);
+                  return this.val = Math.min(x, (ref = this.val) != null ? ref : x);
                 }
               },
               value: function() {
@@ -189,17 +189,17 @@
         if (formatter == null) {
           formatter = usFmt;
         }
-        return function(_arg) {
+        return function(arg) {
           var attr;
-          attr = _arg[0];
+          attr = arg[0];
           return function(data, rowKey, colKey) {
             return {
               val: null,
               push: function(record) {
-                var x, _ref;
+                var ref, x;
                 x = parseFloat(record[attr]);
                 if (!isNaN(x)) {
-                  return this.val = Math.max(x, (_ref = this.val) != null ? _ref : x);
+                  return this.val = Math.max(x, (ref = this.val) != null ? ref : x);
                 }
               },
               value: function() {
@@ -215,9 +215,9 @@
         if (formatter == null) {
           formatter = usFmt;
         }
-        return function(_arg) {
+        return function(arg) {
           var attr;
-          attr = _arg[0];
+          attr = arg[0];
           return function(data, rowKey, colKey) {
             return {
               sum: 0,
@@ -241,9 +241,9 @@
         if (formatter == null) {
           formatter = usFmt;
         }
-        return function(_arg) {
+        return function(arg) {
           var denom, num;
-          num = _arg[0], denom = _arg[1];
+          num = arg[0], denom = arg[1];
           return function(data, rowKey, colKey) {
             return {
               sumNum: 0,
@@ -272,9 +272,9 @@
         if (formatter == null) {
           formatter = usFmt;
         }
-        return function(_arg) {
+        return function(arg) {
           var denom, num;
-          num = _arg[0], denom = _arg[1];
+          num = arg[0], denom = arg[1];
           return function(data, rowKey, colKey) {
             return {
               sumNum: 0,
@@ -307,7 +307,7 @@
         }
         return function() {
           var x;
-          x = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+          x = 1 <= arguments.length ? slice.call(arguments, 0) : [];
           return function(data, rowKey, colKey) {
             return {
               selector: {
@@ -524,11 +524,11 @@
      */
     PivotData = (function() {
       function PivotData(input, opts) {
-        this.getAggregator = __bind(this.getAggregator, this);
-        this.getRowKeys = __bind(this.getRowKeys, this);
-        this.getColKeys = __bind(this.getColKeys, this);
-        this.sortKeys = __bind(this.sortKeys, this);
-        this.arrSort = __bind(this.arrSort, this);
+        this.getAggregator = bind(this.getAggregator, this);
+        this.getRowKeys = bind(this.getRowKeys, this);
+        this.getColKeys = bind(this.getColKeys, this);
+        this.sortKeys = bind(this.sortKeys, this);
+        this.arrSort = bind(this.arrSort, this);
         this.aggregator = opts.aggregator;
         this.aggregatorName = opts.aggregatorName;
         this.colAttrs = opts.cols;
@@ -552,15 +552,15 @@
       }
 
       PivotData.forEachRecord = function(input, derivedAttributes, f) {
-        var addRecord, compactRecord, i, j, k, record, tblCols, _i, _len, _ref, _results, _results1;
+        var addRecord, compactRecord, i, j, k, l, len1, record, ref, results, results1, tblCols;
         if ($.isEmptyObject(derivedAttributes)) {
           addRecord = f;
         } else {
           addRecord = function(record) {
-            var k, v, _ref;
+            var k, ref, v;
             for (k in derivedAttributes) {
               v = derivedAttributes[k];
-              record[k] = (_ref = v(record)) != null ? _ref : record[k];
+              record[k] = (ref = v(record)) != null ? ref : record[k];
             }
             return f(record);
           };
@@ -569,30 +569,30 @@
           return input(addRecord);
         } else if ($.isArray(input)) {
           if ($.isArray(input[0])) {
-            _results = [];
+            results = [];
             for (i in input) {
-              if (!__hasProp.call(input, i)) continue;
+              if (!hasProp.call(input, i)) continue;
               compactRecord = input[i];
               if (!(i > 0)) {
                 continue;
               }
               record = {};
-              _ref = input[0];
-              for (j in _ref) {
-                if (!__hasProp.call(_ref, j)) continue;
-                k = _ref[j];
+              ref = input[0];
+              for (j in ref) {
+                if (!hasProp.call(ref, j)) continue;
+                k = ref[j];
                 record[k] = compactRecord[j];
               }
-              _results.push(addRecord(record));
+              results.push(addRecord(record));
             }
-            return _results;
+            return results;
           } else {
-            _results1 = [];
-            for (_i = 0, _len = input.length; _i < _len; _i++) {
-              record = input[_i];
-              _results1.push(addRecord(record));
+            results1 = [];
+            for (l = 0, len1 = input.length; l < len1; l++) {
+              record = input[l];
+              results1.push(addRecord(record));
             }
-            return _results1;
+            return results1;
           }
         } else if (input instanceof jQuery) {
           tblCols = [];
@@ -623,13 +623,13 @@
       PivotData.prototype.arrSort = function(attrs) {
         var a, sortersArr;
         sortersArr = (function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = attrs.length; _i < _len; _i++) {
-            a = attrs[_i];
-            _results.push(getSort(this.sorters, a));
+          var l, len1, results;
+          results = [];
+          for (l = 0, len1 = attrs.length; l < len1; l++) {
+            a = attrs[l];
+            results.push(getSort(this.sorters, a));
           }
-          return _results;
+          return results;
         }).call(this);
         return function(a, b) {
           var comparison, i, sorter;
@@ -663,18 +663,18 @@
       };
 
       PivotData.prototype.processRecord = function(record) {
-        var colKey, flatColKey, flatRowKey, rowKey, x, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
+        var colKey, flatColKey, flatRowKey, l, len1, len2, n, ref, ref1, ref2, ref3, rowKey, x;
         colKey = [];
         rowKey = [];
-        _ref = this.colAttrs;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          x = _ref[_i];
-          colKey.push((_ref1 = record[x]) != null ? _ref1 : "null");
+        ref = this.colAttrs;
+        for (l = 0, len1 = ref.length; l < len1; l++) {
+          x = ref[l];
+          colKey.push((ref1 = record[x]) != null ? ref1 : "null");
         }
-        _ref2 = this.rowAttrs;
-        for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-          x = _ref2[_j];
-          rowKey.push((_ref3 = record[x]) != null ? _ref3 : "null");
+        ref2 = this.rowAttrs;
+        for (n = 0, len2 = ref2.length; n < len2; n++) {
+          x = ref2[n];
+          rowKey.push((ref3 = record[x]) != null ? ref3 : "null");
         }
         flatRowKey = rowKey.join(String.fromCharCode(0));
         flatColKey = colKey.join(String.fromCharCode(0));
@@ -749,10 +749,10 @@
       result = document.createElement("table");
       result.className = "pvtTable";
       spanSize = function(arr, i, j) {
-        var len, noDraw, stop, x, _i, _j;
+        var l, len, n, noDraw, ref, ref1, stop, x;
         if (i !== 0) {
           noDraw = true;
-          for (x = _i = 0; 0 <= j ? _i <= j : _i >= j; x = 0 <= j ? ++_i : --_i) {
+          for (x = l = 0, ref = j; 0 <= ref ? l <= ref : l >= ref; x = 0 <= ref ? ++l : --l) {
             if (arr[i - 1][x] !== arr[i][x]) {
               noDraw = false;
             }
@@ -764,7 +764,7 @@
         len = 0;
         while (i + len < arr.length) {
           stop = false;
-          for (x = _j = 0; 0 <= j ? _j <= j : _j >= j; x = 0 <= j ? ++_j : --_j) {
+          for (x = n = 0, ref1 = j; 0 <= ref1 ? n <= ref1 : n >= ref1; x = 0 <= ref1 ? ++n : --n) {
             if (arr[i][x] !== arr[i + len][x]) {
               stop = true;
             }
@@ -777,7 +777,7 @@
         return len;
       };
       for (j in colAttrs) {
-        if (!__hasProp.call(colAttrs, j)) continue;
+        if (!hasProp.call(colAttrs, j)) continue;
         c = colAttrs[j];
         tr = document.createElement("tr");
         if (parseInt(j) === 0 && rowAttrs.length !== 0) {
@@ -791,7 +791,7 @@
         th.innerHTML = c;
         tr.appendChild(th);
         for (i in colKeys) {
-          if (!__hasProp.call(colKeys, i)) continue;
+          if (!hasProp.call(colKeys, i)) continue;
           colKey = colKeys[i];
           x = spanSize(colKeys, parseInt(i), parseInt(j));
           if (x !== -1) {
@@ -817,7 +817,7 @@
       if (rowAttrs.length !== 0) {
         tr = document.createElement("tr");
         for (i in rowAttrs) {
-          if (!__hasProp.call(rowAttrs, i)) continue;
+          if (!hasProp.call(rowAttrs, i)) continue;
           r = rowAttrs[i];
           th = document.createElement("th");
           th.className = "pvtAxisLabel";
@@ -833,11 +833,11 @@
         result.appendChild(tr);
       }
       for (i in rowKeys) {
-        if (!__hasProp.call(rowKeys, i)) continue;
+        if (!hasProp.call(rowKeys, i)) continue;
         rowKey = rowKeys[i];
         tr = document.createElement("tr");
         for (j in rowKey) {
-          if (!__hasProp.call(rowKey, j)) continue;
+          if (!hasProp.call(rowKey, j)) continue;
           txt = rowKey[j];
           x = spanSize(rowKeys, parseInt(i), parseInt(j));
           if (x !== -1) {
@@ -852,7 +852,7 @@
           }
         }
         for (j in colKeys) {
-          if (!__hasProp.call(colKeys, j)) continue;
+          if (!hasProp.call(colKeys, j)) continue;
           colKey = colKeys[j];
           aggregator = pivotData.getAggregator(rowKey, colKey);
           val = aggregator.value();
@@ -879,7 +879,7 @@
       th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
       tr.appendChild(th);
       for (j in colKeys) {
-        if (!__hasProp.call(colKeys, j)) continue;
+        if (!hasProp.call(colKeys, j)) continue;
         colKey = colKeys[j];
         totalAggregator = pivotData.getAggregator([], colKey);
         val = totalAggregator.value();
@@ -954,7 +954,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, existingOpts, i, initialRender, k, opts, pivotTable, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4;
+      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, existingOpts, fn, i, initialRender, k, l, len1, len2, len3, len4, n, o, opts, pivotTable, q, ref, ref1, ref2, ref3, ref4, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -992,32 +992,32 @@
       try {
         input = PivotData.convertToArray(input);
         tblCols = (function() {
-          var _ref, _results;
-          _ref = input[0];
-          _results = [];
-          for (k in _ref) {
-            if (!__hasProp.call(_ref, k)) continue;
-            _results.push(k);
+          var ref, results;
+          ref = input[0];
+          results = [];
+          for (k in ref) {
+            if (!hasProp.call(ref, k)) continue;
+            results.push(k);
           }
-          return _results;
+          return results;
         })();
-        _ref = opts.derivedAttributes;
-        for (c in _ref) {
-          if (!__hasProp.call(_ref, c)) continue;
-          if ((__indexOf.call(tblCols, c) < 0)) {
+        ref = opts.derivedAttributes;
+        for (c in ref) {
+          if (!hasProp.call(ref, c)) continue;
+          if ((indexOf.call(tblCols, c) < 0)) {
             tblCols.push(c);
           }
         }
         axisValues = {};
-        for (_i = 0, _len = tblCols.length; _i < _len; _i++) {
-          x = tblCols[_i];
+        for (l = 0, len1 = tblCols.length; l < len1; l++) {
+          x = tblCols[l];
           axisValues[x] = {};
         }
         PivotData.forEachRecord(input, opts.derivedAttributes, function(record) {
-          var v, _base, _results;
-          _results = [];
+          var base, results, v;
+          results = [];
           for (k in record) {
-            if (!__hasProp.call(record, k)) continue;
+            if (!hasProp.call(record, k)) continue;
             v = record[k];
             if (!(opts.filter(record))) {
               continue;
@@ -1025,12 +1025,12 @@
             if (v == null) {
               v = "null";
             }
-            if ((_base = axisValues[k])[v] == null) {
-              _base[v] = 0;
+            if ((base = axisValues[k])[v] == null) {
+              base[v] = 0;
             }
-            _results.push(axisValues[k][v]++);
+            results.push(axisValues[k][v]++);
           }
-          return _results;
+          return results;
         });
         uiTable = $("<table>", {
           "class": "pvtUi"
@@ -1039,22 +1039,22 @@
         renderer = $("<select>").addClass('pvtRenderer').appendTo(rendererControl).bind("change", function() {
           return refresh();
         });
-        _ref1 = opts.renderers;
-        for (x in _ref1) {
-          if (!__hasProp.call(_ref1, x)) continue;
+        ref1 = opts.renderers;
+        for (x in ref1) {
+          if (!hasProp.call(ref1, x)) continue;
           $("<option>").val(x).html(x).appendTo(renderer);
         }
         colList = $("<td>").addClass('pvtAxisContainer pvtUnused');
         shownAttributes = (function() {
-          var _j, _len1, _results;
-          _results = [];
-          for (_j = 0, _len1 = tblCols.length; _j < _len1; _j++) {
-            c = tblCols[_j];
-            if (__indexOf.call(opts.hiddenAttributes, c) < 0) {
-              _results.push(c);
+          var len2, n, results;
+          results = [];
+          for (n = 0, len2 = tblCols.length; n < len2; n++) {
+            c = tblCols[n];
+            if (indexOf.call(opts.hiddenAttributes, c) < 0) {
+              results.push(c);
             }
           }
-          return _results;
+          return results;
         })();
         unusedAttrsVerticalAutoOverride = false;
         if (opts.unusedAttrsVertical === "auto") {
@@ -1062,11 +1062,10 @@
         } else {
           unusedAttrsVerticalAutoCutoff = parseInt(opts.unusedAttrsVertical);
         }
-        console.log(unusedAttrsVerticalAutoCutoff);
         if (!isNaN(unusedAttrsVerticalAutoCutoff)) {
           attrLength = 0;
-          for (_j = 0, _len1 = shownAttributes.length; _j < _len1; _j++) {
-            a = shownAttributes[_j];
+          for (n = 0, len2 = shownAttributes.length; n < len2; n++) {
+            a = shownAttributes[n];
             attrLength += a.length;
           }
           unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff;
@@ -1076,19 +1075,19 @@
         } else {
           colList.addClass('pvtHorizList');
         }
-        _fn = function(c) {
-          var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, showFilterList, triangleLink, updateFilter, v, valueList, _k, _len2, _ref2;
+        fn = function(c) {
+          var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, len3, o, ref2, showFilterList, triangleLink, updateFilter, v, valueList;
           keys = (function() {
-            var _results;
-            _results = [];
+            var results;
+            results = [];
             for (k in axisValues[c]) {
-              _results.push(k);
+              results.push(k);
             }
-            return _results;
+            return results;
           })();
           hasExcludedItem = false;
           valueList = $("<div>").addClass('pvtFilterBox').hide();
-          valueList.append($("<h4>").text("" + c + " (" + keys.length + ")"));
+          valueList.append($("<h4>").text(c + " (" + keys.length + ")"));
           if (keys.length > opts.menuLimit) {
             valueList.append($("<p>").html(opts.localeStrings.tooMany));
           } else {
@@ -1122,12 +1121,12 @@
               });
             }));
             checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
-            _ref2 = keys.sort(getSort(opts.sorters, c));
-            for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-              k = _ref2[_k];
+            ref2 = keys.sort(getSort(opts.sorters, c));
+            for (o = 0, len3 = ref2.length; o < len3; o++) {
+              k = ref2[o];
               v = axisValues[c][k];
               filterItem = $("<label>");
-              filterItemExcluded = opts.exclusions[c] ? (__indexOf.call(opts.exclusions[c], k) >= 0) : false;
+              filterItemExcluded = opts.exclusions[c] ? (indexOf.call(opts.exclusions[c], k) >= 0) : false;
               hasExcludedItem || (hasExcludedItem = filterItemExcluded);
               $("<input>").attr("type", "checkbox").addClass('pvtFilter').attr("checked", !filterItemExcluded).data("filter", [c, k]).appendTo(filterItem);
               filterItem.append($("<span>").html(k));
@@ -1169,17 +1168,17 @@
           return attrElem.bind("dblclick", showFilterList);
         };
         for (i in shownAttributes) {
-          if (!__hasProp.call(shownAttributes, i)) continue;
+          if (!hasProp.call(shownAttributes, i)) continue;
           c = shownAttributes[i];
-          _fn(c);
+          fn(c);
         }
         tr1 = $("<tr>").appendTo(uiTable);
         aggregator = $("<select>").addClass('pvtAggregator').bind("change", function() {
           return refresh();
         });
-        _ref2 = opts.aggregators;
-        for (x in _ref2) {
-          if (!__hasProp.call(_ref2, x)) continue;
+        ref2 = opts.aggregators;
+        for (x in ref2) {
+          if (!hasProp.call(ref2, x)) continue;
           aggregator.append($("<option>").val(x).html(x));
         }
         $("<td>").addClass('pvtVals').appendTo(tr1).append(aggregator).append($("<br>"));
@@ -1194,14 +1193,14 @@
           uiTable.prepend($("<tr>").append(rendererControl).append(colList));
         }
         this.html(uiTable);
-        _ref3 = opts.cols;
-        for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
-          x = _ref3[_k];
+        ref3 = opts.cols;
+        for (o = 0, len3 = ref3.length; o < len3; o++) {
+          x = ref3[o];
           this.find(".pvtCols").append(this.find(".axis_" + ($.inArray(x, shownAttributes))));
         }
-        _ref4 = opts.rows;
-        for (_l = 0, _len3 = _ref4.length; _l < _len3; _l++) {
-          x = _ref4[_l];
+        ref4 = opts.rows;
+        for (q = 0, len4 = ref4.length; q < len4; q++) {
+          x = ref4[q];
           this.find(".pvtRows").append(this.find(".axis_" + ($.inArray(x, shownAttributes))));
         }
         if (opts.aggregatorName != null) {
@@ -1213,7 +1212,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var attr, exclusions, inclusions, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, subopts, unusedAttrsContainer, vals, _len4, _m, _n, _ref5;
+            var attr, exclusions, inclusions, len5, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref5, ref6, s, subopts, t, unusedAttrsContainer, vals;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1222,7 +1221,7 @@
               cols: [],
               rows: []
             };
-            numInputsToProcess = (_ref5 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? _ref5 : 0;
+            numInputsToProcess = (ref5 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? ref5 : 0;
             vals = [];
             _this.find(".pvtRows li span.pvtAttr").each(function() {
               return subopts.rows.push($(this).data("attrName"));
@@ -1242,12 +1241,12 @@
             });
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
-              for (x = _m = 0; 0 <= numInputsToProcess ? _m < numInputsToProcess : _m > numInputsToProcess; x = 0 <= numInputsToProcess ? ++_m : --_m) {
+              for (x = s = 0, ref6 = numInputsToProcess; 0 <= ref6 ? s < ref6 : s > ref6; x = 0 <= ref6 ? ++s : --s) {
                 newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
-                for (_n = 0, _len4 = shownAttributes.length; _n < _len4; _n++) {
-                  attr = shownAttributes[_n];
+                for (t = 0, len5 = shownAttributes.length; t < len5; t++) {
+                  attr = shownAttributes[t];
                   newDropdown.append($("<option>").val(attr).text(attr));
                 }
                 pvtVals.append(newDropdown);
@@ -1289,13 +1288,13 @@
               }
             });
             subopts.filter = function(record) {
-              var excludedItems, _ref6;
+              var excludedItems, ref7;
               if (!opts.filter(record)) {
                 return false;
               }
               for (k in exclusions) {
                 excludedItems = exclusions[k];
-                if (_ref6 = "" + record[k], __indexOf.call(excludedItems, _ref6) >= 0) {
+                if (ref7 = "" + record[k], indexOf.call(excludedItems, ref7) >= 0) {
                   return false;
                 }
               }
@@ -1355,7 +1354,7 @@
     Heatmap post-processing
      */
     $.fn.heatmap = function(scope) {
-      var colorGen, heatmapper, i, j, numCols, numRows, _i, _j;
+      var colorGen, heatmapper, i, j, l, n, numCols, numRows, ref, ref1;
       if (scope == null) {
         scope = "heatmap";
       }
@@ -1371,7 +1370,7 @@
               };
             case "green":
               return function(hex) {
-                return "" + hex + "ff" + hex;
+                return hex + "ff" + hex;
               };
             case "blue":
               return function(hex) {
@@ -1416,12 +1415,12 @@
           heatmapper(".pvtVal", "red");
           break;
         case "rowheatmap":
-          for (i = _i = 0; 0 <= numRows ? _i < numRows : _i > numRows; i = 0 <= numRows ? ++_i : --_i) {
+          for (i = l = 0, ref = numRows; 0 <= ref ? l < ref : l > ref; i = 0 <= ref ? ++l : --l) {
             heatmapper(".pvtVal.row" + i, "red");
           }
           break;
         case "colheatmap":
-          for (j = _j = 0; 0 <= numCols ? _j < numCols : _j > numCols; j = 0 <= numCols ? ++_j : --_j) {
+          for (j = n = 0, ref1 = numCols; 0 <= ref1 ? n < ref1 : n > ref1; j = 0 <= ref1 ? ++n : --n) {
             heatmapper(".pvtVal.col" + j, "red");
           }
       }
@@ -1434,7 +1433,7 @@
     Barchart post-processing
      */
     return $.fn.barchart = function() {
-      var barcharter, i, numCols, numRows, _i;
+      var barcharter, i, l, numCols, numRows, ref;
       numRows = this.data("numrows");
       numCols = this.data("numcols");
       barcharter = (function(_this) {
@@ -1485,7 +1484,7 @@
           });
         };
       })(this);
-      for (i = _i = 0; 0 <= numRows ? _i < numRows : _i > numRows; i = 0 <= numRows ? ++_i : --_i) {
+      for (i = l = 0, ref = numRows; 0 <= ref ? l < ref : l > ref; i = 0 <= ref ? ++l : --l) {
         barcharter(".pvtVal.row" + i);
       }
       barcharter(".pvtTotal.colTotal");

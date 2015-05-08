@@ -14,7 +14,7 @@
   callWithJQuery(function($) {
     return $.pivotUtilities.export_renderers = {
       "TSV Export": function(pivotData, opts) {
-        var agg, colAttrs, colKey, colKeys, defaults, r, result, row, rowAttr, rowAttrs, rowKey, rowKeys, text, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n;
+        var agg, colAttrs, colKey, colKeys, defaults, i, j, k, l, len, len1, len2, len3, len4, len5, m, n, r, result, row, rowAttr, rowAttrs, rowKey, rowKeys, text;
         defaults = {
           localeStrings: {}
         };
@@ -31,28 +31,28 @@
         colAttrs = pivotData.colAttrs;
         result = [];
         row = [];
-        for (_i = 0, _len = rowAttrs.length; _i < _len; _i++) {
-          rowAttr = rowAttrs[_i];
+        for (i = 0, len = rowAttrs.length; i < len; i++) {
+          rowAttr = rowAttrs[i];
           row.push(rowAttr);
         }
         if (colKeys.length === 1 && colKeys[0].length === 0) {
           row.push(pivotData.aggregatorName);
         } else {
-          for (_j = 0, _len1 = colKeys.length; _j < _len1; _j++) {
-            colKey = colKeys[_j];
+          for (j = 0, len1 = colKeys.length; j < len1; j++) {
+            colKey = colKeys[j];
             row.push(colKey.join("-"));
           }
         }
         result.push(row);
-        for (_k = 0, _len2 = rowKeys.length; _k < _len2; _k++) {
-          rowKey = rowKeys[_k];
+        for (k = 0, len2 = rowKeys.length; k < len2; k++) {
+          rowKey = rowKeys[k];
           row = [];
-          for (_l = 0, _len3 = rowKey.length; _l < _len3; _l++) {
-            r = rowKey[_l];
+          for (l = 0, len3 = rowKey.length; l < len3; l++) {
+            r = rowKey[l];
             row.push(r);
           }
-          for (_m = 0, _len4 = colKeys.length; _m < _len4; _m++) {
-            colKey = colKeys[_m];
+          for (m = 0, len4 = colKeys.length; m < len4; m++) {
+            colKey = colKeys[m];
             agg = pivotData.getAggregator(rowKey, colKey);
             if (agg.value() != null) {
               row.push(agg.value());
@@ -63,8 +63,8 @@
           result.push(row);
         }
         text = "";
-        for (_n = 0, _len5 = result.length; _n < _len5; _n++) {
-          r = result[_n];
+        for (n = 0, len5 = result.length; n < len5; n++) {
+          r = result[n];
           text += r.join("\t") + "\n";
         }
         return $("<textarea>").text(text).css({

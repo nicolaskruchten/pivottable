@@ -14,7 +14,7 @@
   callWithJQuery(function($) {
     return $.pivotUtilities.d3_renderers = {
       Treemap: function(pivotData, opts) {
-        var addToTree, color, defaults, height, result, rowKey, tree, treemap, value, width, _i, _len, _ref;
+        var addToTree, color, defaults, height, i, len, ref, result, rowKey, tree, treemap, value, width;
         defaults = {
           localeStrings: {},
           d3: {
@@ -36,7 +36,7 @@
           children: []
         };
         addToTree = function(tree, path, value) {
-          var child, newChild, x, _i, _len, _ref;
+          var child, i, len, newChild, ref, x;
           if (path.length === 0) {
             tree.value = value;
             return;
@@ -45,9 +45,9 @@
             tree.children = [];
           }
           x = path.shift();
-          _ref = tree.children;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            child = _ref[_i];
+          ref = tree.children;
+          for (i = 0, len = ref.length; i < len; i++) {
+            child = ref[i];
             if (!(child.name === x)) {
               continue;
             }
@@ -60,9 +60,9 @@
           addToTree(newChild, path, value);
           return tree.children.push(newChild);
         };
-        _ref = pivotData.getRowKeys();
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          rowKey = _ref[_i];
+        ref = pivotData.getRowKeys();
+        for (i = 0, len = ref.length; i < len; i++) {
+          rowKey = ref[i];
           value = pivotData.getAggregator(rowKey, []).value();
           if (value != null) {
             addToTree(tree, rowKey, value);
