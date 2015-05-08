@@ -598,7 +598,7 @@ callWithJQuery ($) ->
                     axisValues[k][v]++
 
             #start building the output
-            uiTable = $("<table>").attr("cellpadding", 5)
+            uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
 
             #renderer control
             rendererControl = $("<td>")
