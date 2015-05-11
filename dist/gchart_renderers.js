@@ -23,10 +23,10 @@
           },
           gchart: {
             width: function() {
-              return $(window).width() / 1.4;
+              return window.innerWidth / 1.4;
             },
             height: function() {
-              return $(window).height() / 1.4;
+              return window.innerHeight / 1.4;
             }
           }
         };
@@ -87,7 +87,7 @@
               if (agg.value() != null) {
                 val = agg.value();
                 if ($.isNumeric(val)) {
-                  if (val < 0) {
+                  if (val < 1) {
                     row.push(parseFloat(val.toPrecision(3)));
                   } else {
                     row.push(parseFloat(val.toFixed(3)));

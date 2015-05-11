@@ -15,8 +15,8 @@ callWithJQuery ($) ->
                 vs: "vs"
                 by: "by"
             gchart:
-                width: -> $(window).width() / 1.4
-                height: -> $(window).height() / 1.4
+                width: -> window.innerWidth / 1.4
+                height: -> window.innerHeight / 1.4
 
         opts = $.extend defaults, opts
 
@@ -58,7 +58,7 @@ callWithJQuery ($) ->
                     if agg.value()?
                         val = agg.value()
                         if $.isNumeric val
-                            if val < 0
+                            if val < 1
                                 row.push parseFloat(val.toPrecision(3))
                             else
                                 row.push parseFloat(val.toFixed(3))
