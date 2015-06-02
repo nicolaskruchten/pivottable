@@ -20,7 +20,8 @@
         <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
         <script type="text/javascript" src="../dist/d3_renderers.js"></script>
         <script type="text/javascript" src="../dist/c3_renderers.js"></script>
-        
+        <script type="text/javascript" src="../dist/export_renderers.js"></script>
+
         <style>
             body {font-family: Verdana;}
             .node {
@@ -51,7 +52,8 @@
 
                         var renderers = $.extend(
                             $.pivotUtilities.renderers, 
-                            $.pivotUtilities.d3_renderers
+                            $.pivotUtilities.d3_renderers, 
+                            $.pivotUtilities.export_renderers
                             );
                         for(var k in $.pivotUtilities.gchart_renderers)
                             renderers["Google " + k] = $.pivotUtilities.gchart_renderers[k];
