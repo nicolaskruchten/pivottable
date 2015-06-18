@@ -567,6 +567,7 @@ callWithJQuery ($) ->
             menuLimit: 200
             cols: [], rows: [], vals: []
             exclusions: {}
+            inclusions: {}
             unusedAttrsVertical: 85
             autoSortUnusedAttrs: false
             rendererOptions: localeStrings: locales[locale].localeStrings
@@ -661,7 +662,11 @@ callWithJQuery ($) ->
                         for k in keys.sort(getSort(opts.sorters, c))
                              v = axisValues[c][k]
                              filterItem = $("<label>")
-                             filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
+                             filterItemExcluded = false
+                             if opts.inclusions[c]
+                                filterItemExcluded = (k not in opts.inclusions[c])
+                             else if opts.exclusions[c]
+                                filterItemExcluded = (k in opts.exclusions[c])
                              hasExcludedItem ||= filterItemExcluded
                              $("<input>")
                                 .attr("type", "checkbox").addClass('pvtFilter')
@@ -826,8 +831,8 @@ callWithJQuery ($) ->
                     rows: subopts.rows
                     vals: vals
                     exclusions: exclusions
-                    #to indicate inclusions are informational only
-                    inclusionsInfo: inclusions
+                    inclusions: inclusions
+                    inclusionsInfo: inclusions #duplicated for backwards-compatibility
                     aggregatorName: aggregator.val()
                     rendererName: renderer.val()
 
