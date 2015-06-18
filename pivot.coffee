@@ -559,6 +559,8 @@ callWithJQuery ($) ->
     ###
 
     $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
+        if not locales[locale]?
+            locale = "en"
         defaults =
             derivedAttributes: {}
             aggregators: locales[locale].aggregators
