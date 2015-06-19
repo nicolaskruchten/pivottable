@@ -694,7 +694,8 @@ callWithJQuery ($) ->
                         .append $("<button>", {type:"button"}).text("OK").bind "click", updateFilter
 
                     showFilterList = (e) ->
-                        valueList.css(left: e.pageX, top: e.pageY).toggle()
+                        {left: clickLeft, top: clickTop, } = $(e.currentTarget).position()
+                        valueList.css(left: clickLeft+10, top: clickTop+10).toggle()
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
