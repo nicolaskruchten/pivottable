@@ -559,6 +559,8 @@ callWithJQuery ($) ->
     ###
 
     $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
+        if not locales[locale]?
+            locale = "en"
         defaults =
             derivedAttributes: {}
             aggregators: locales[locale].aggregators
@@ -567,6 +569,7 @@ callWithJQuery ($) ->
             menuLimit: 200
             cols: [], rows: [], vals: []
             exclusions: {}
+            inclusions: {}
             unusedAttrsVertical: 85
             autoSortUnusedAttrs: false
             rendererOptions: localeStrings: locales[locale].localeStrings
@@ -661,7 +664,11 @@ callWithJQuery ($) ->
                         for k in keys.sort(getSort(opts.sorters, c))
                              v = axisValues[c][k]
                              filterItem = $("<label>")
-                             filterItemExcluded = if opts.exclusions[c] then (k in opts.exclusions[c]) else false
+                             filterItemExcluded = false
+                             if opts.inclusions[c]
+                                filterItemExcluded = (k not in opts.inclusions[c])
+                             else if opts.exclusions[c]
+                                filterItemExcluded = (k in opts.exclusions[c])
                              hasExcludedItem ||= filterItemExcluded
                              $("<input>")
                                 .attr("type", "checkbox").addClass('pvtFilter')
@@ -687,7 +694,8 @@ callWithJQuery ($) ->
                         .append $("<button>", {type:"button"}).text("OK").bind "click", updateFilter
 
                     showFilterList = (e) ->
-                        valueList.css(left: e.pageX, top: e.pageY).toggle()
+                        {left: clickLeft, top: clickTop, } = $(e.currentTarget).position()
+                        valueList.css(left: clickLeft+10, top: clickTop+10).toggle()
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
@@ -826,8 +834,8 @@ callWithJQuery ($) ->
                     rows: subopts.rows
                     vals: vals
                     exclusions: exclusions
-                    #to indicate inclusions are informational only
-                    inclusionsInfo: inclusions
+                    inclusions: inclusions
+                    inclusionsInfo: inclusions #duplicated for backwards-compatibility
                     aggregatorName: aggregator.val()
                     rendererName: renderer.val()
 

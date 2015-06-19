@@ -14,11 +14,12 @@ callWithJQuery ($) ->
             localeStrings:
                 vs: "vs"
                 by: "by"
-            c3:
-                width: -> window.innerWidth / 1.4
-                height: -> window.innerHeight / 1.4
+            c3: {}
 
         opts = $.extend defaults, opts
+        opts.c3.size ?= {}
+        opts.c3.size.width ?= window.innerWidth / 1.4
+        opts.c3.size.height ?= window.innerHeight / 1.4 - 50
         chartOpts.type ?= "line"
 
         rowKeys = pivotData.getRowKeys()
@@ -27,6 +28,7 @@ callWithJQuery ($) ->
         colKeys.push [] if colKeys.length == 0
 
         headers = (h.join("-") for h in colKeys)
+        rotationAngle = 0
 
         fullAggName = pivotData.aggregatorName 
         if pivotData.valAttrs.length
@@ -44,6 +46,12 @@ callWithJQuery ($) ->
                     datum["tooltip"] = agg.format(agg.value())
                     dataArray.push datum
         else
+            numCharsInHAxis = 0
+            for x in headers
+                numCharsInHAxis += x.length
+            if numCharsInHAxis > 50
+                rotationAngle = 45
+
             columns = []
             for rowKey in rowKeys
                 rowHeader = rowKey.join("-")
@@ -63,22 +71,32 @@ callWithJQuery ($) ->
                     else row.push null
                 columns.push row
 
-
             vAxisTitle = pivotData.aggregatorName+ 
                 if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
             hAxisTitle = pivotData.colAttrs.join("-")
 
+        titleText = vAxisTitle = fullAggName
+        titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
+        groupByTitle = pivotData.rowAttrs.join("-")
+        titleText += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
+        title = $("<p>", {style: "text-align: center; font-weight: bold"})
+        title.text(titleText)
+
         params = 
-            size:
-                height: opts.c3.height()
-                width: opts.c3.width()
             axis: 
-                y: label: vAxisTitle
-                x: label: hAxisTitle
+                y:
+                    label: vAxisTitle
+                x:
+                    label: hAxisTitle
+                    tick:
+                        rotate: rotationAngle
+                        multiline: false
             data: 
                 type: chartOpts.type
             tooltip:
                 grouped: false
+
+        $.extend params, opts.c3
 
         if chartOpts.type == "scatter"
             params.data.x = hAxisTitle
@@ -104,7 +122,7 @@ callWithJQuery ($) ->
         c3.generate params
         result.detach()
         renderArea.remove()
-        return result
+        return $("<div>").append title, result
 
     $.pivotUtilities.c3_renderers = 
         "Line Chart": makeC3Chart()

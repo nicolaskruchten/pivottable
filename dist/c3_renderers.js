@@ -18,22 +18,24 @@
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, columns, dataArray, datum, defaults, fullAggName, h, hAxisTitle, headers, i, j, len, len1, params, ref, renderArea, result, row, rowHeader, rowKey, rowKeys, tree2, vAxisTitle, val, x, y;
+        var agg, base, base1, base2, colKey, colKeys, columns, dataArray, datum, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, len, len1, len2, numCharsInHAxis, params, ref, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, title, titleText, tree2, vAxisTitle, val, x, y;
         defaults = {
           localeStrings: {
             vs: "vs",
             by: "by"
           },
-          c3: {
-            width: function() {
-              return window.innerWidth / 1.4;
-            },
-            height: function() {
-              return window.innerHeight / 1.4;
-            }
-          }
+          c3: {}
         };
         opts = $.extend(defaults, opts);
+        if ((base = opts.c3).size == null) {
+          base.size = {};
+        }
+        if ((base1 = opts.c3.size).width == null) {
+          base1.width = window.innerWidth / 1.4;
+        }
+        if ((base2 = opts.c3.size).height == null) {
+          base2.height = window.innerHeight / 1.4 - 50;
+        }
         if (chartOpts.type == null) {
           chartOpts.type = "line";
         }
@@ -54,6 +56,7 @@
           }
           return results;
         })();
+        rotationAngle = 0;
         fullAggName = pivotData.aggregatorName;
         if (pivotData.valAttrs.length) {
           fullAggName += "(" + (pivotData.valAttrs.join(", ")) + ")";
@@ -75,13 +78,21 @@
             }
           }
         } else {
+          numCharsInHAxis = 0;
+          for (i = 0, len = headers.length; i < len; i++) {
+            x = headers[i];
+            numCharsInHAxis += x.length;
+          }
+          if (numCharsInHAxis > 50) {
+            rotationAngle = 45;
+          }
           columns = [];
-          for (i = 0, len = rowKeys.length; i < len; i++) {
-            rowKey = rowKeys[i];
+          for (j = 0, len1 = rowKeys.length; j < len1; j++) {
+            rowKey = rowKeys[j];
             rowHeader = rowKey.join("-");
             row = [rowHeader === "" ? pivotData.aggregatorName : rowHeader];
-            for (j = 0, len1 = colKeys.length; j < len1; j++) {
-              colKey = colKeys[j];
+            for (k = 0, len2 = colKeys.length; k < len2; k++) {
+              colKey = colKeys[k];
               agg = pivotData.getAggregator(rowKey, colKey);
               if (agg.value() != null) {
                 val = agg.value();
@@ -103,17 +114,29 @@
           vAxisTitle = pivotData.aggregatorName + (pivotData.valAttrs.length ? "(" + (pivotData.valAttrs.join(", ")) + ")" : "");
           hAxisTitle = pivotData.colAttrs.join("-");
         }
+        titleText = vAxisTitle = fullAggName;
+        if (hAxisTitle !== "") {
+          titleText += " " + opts.localeStrings.vs + " " + hAxisTitle;
+        }
+        groupByTitle = pivotData.rowAttrs.join("-");
+        if (groupByTitle !== "") {
+          titleText += " " + opts.localeStrings.by + " " + groupByTitle;
+        }
+        title = $("<p>", {
+          style: "text-align: center; font-weight: bold"
+        });
+        title.text(titleText);
         params = {
-          size: {
-            height: opts.c3.height(),
-            width: opts.c3.width()
-          },
           axis: {
             y: {
               label: vAxisTitle
             },
             x: {
-              label: hAxisTitle
+              label: hAxisTitle,
+              tick: {
+                rotate: rotationAngle,
+                multiline: false
+              }
             }
           },
           data: {
@@ -123,6 +146,7 @@
             grouped: false
           }
         };
+        $.extend(params, opts.c3);
         if (chartOpts.type === "scatter") {
           params.data.x = hAxisTitle;
           params.axis.x.tick = {
@@ -154,10 +178,10 @@
         if (chartOpts.stacked != null) {
           params.data.groups = [
             (function() {
-              var k, len2, results;
+              var l, len3, results;
               results = [];
-              for (k = 0, len2 = rowKeys.length; k < len2; k++) {
-                x = rowKeys[k];
+              for (l = 0, len3 = rowKeys.length; l < len3; l++) {
+                x = rowKeys[l];
                 results.push(x.join("-"));
               }
               return results;
@@ -172,7 +196,7 @@
         c3.generate(params);
         result.detach();
         renderArea.remove();
-        return result;
+        return $("<div>").append(title, result);
       };
     };
     return $.pivotUtilities.c3_renderers = {

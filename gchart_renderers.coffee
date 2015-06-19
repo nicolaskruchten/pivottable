@@ -14,11 +14,11 @@ callWithJQuery ($) ->
             localeStrings:
                 vs: "vs"
                 by: "by"
-            gchart:
-                width: -> window.innerWidth / 1.4
-                height: -> window.innerHeight / 1.4
+            gchart: {}
 
         opts = $.extend defaults, opts
+        opts.gchart.width ?= window.innerWidth / 1.4
+        opts.gchart.height ?= window.innerHeight / 1.4
 
         rowKeys = pivotData.getRowKeys()
         rowKeys.push [] if rowKeys.length == 0
@@ -76,8 +76,6 @@ callWithJQuery ($) ->
             title += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
 
         options = 
-            width: opts.gchart.width()
-            height: opts.gchart.height()
             title: title
             hAxis: {title: hAxisTitle, slantedText: numCharsInHAxis > 50}
             vAxis: {title: vAxisTitle}
@@ -92,8 +90,8 @@ callWithJQuery ($) ->
 
         else if dataArray[0].length == 2 and dataArray[0][1] ==  ""
             options.legend = position: "none"
-
-        options[k] = v for k, v of extraOptions
+        
+        $.extend options, opts.gchart, extraOptions
 
         result = $("<div>").css(width: "100%", height: "100%")
         wrapper = new google.visualization.ChartWrapper {dataTable, chartType, options}
