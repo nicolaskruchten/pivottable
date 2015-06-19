@@ -15,22 +15,21 @@
     var makeGoogleChart;
     makeGoogleChart = function(chartType, extraOptions) {
       return function(pivotData, opts) {
-        var agg, colKey, colKeys, dataArray, dataTable, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, len, len1, numCharsInHAxis, options, ref, result, row, rowKey, rowKeys, title, tree2, v, vAxisTitle, val, wrapper, x, y;
+        var agg, base, base1, colKey, colKeys, dataArray, dataTable, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, len, len1, numCharsInHAxis, options, ref, result, row, rowKey, rowKeys, title, tree2, vAxisTitle, val, wrapper, x, y;
         defaults = {
           localeStrings: {
             vs: "vs",
             by: "by"
           },
-          gchart: {
-            width: function() {
-              return window.innerWidth / 1.4;
-            },
-            height: function() {
-              return window.innerHeight / 1.4;
-            }
-          }
+          gchart: {}
         };
         opts = $.extend(defaults, opts);
+        if ((base = opts.gchart).width == null) {
+          base.width = window.innerWidth / 1.4;
+        }
+        if ((base1 = opts.gchart).height == null) {
+          base1.height = window.innerHeight / 1.4;
+        }
         rowKeys = pivotData.getRowKeys();
         if (rowKeys.length === 0) {
           rowKeys.push([]);
@@ -113,8 +112,6 @@
           }
         }
         options = {
-          width: opts.gchart.width(),
-          height: opts.gchart.height(),
           title: title,
           hAxis: {
             title: hAxisTitle,
@@ -146,10 +143,7 @@
             position: "none"
           };
         }
-        for (k in extraOptions) {
-          v = extraOptions[k];
-          options[k] = v;
-        }
+        $.extend(options, opts.gchart, extraOptions);
         result = $("<div>").css({
           width: "100%",
           height: "100%"

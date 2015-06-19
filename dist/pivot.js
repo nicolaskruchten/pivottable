@@ -961,6 +961,9 @@
       if (locale == null) {
         locale = "en";
       }
+      if (locales[locale] == null) {
+        locale = "en";
+      }
       defaults = {
         derivedAttributes: {},
         aggregators: locales[locale].aggregators,
@@ -971,6 +974,7 @@
         rows: [],
         vals: [],
         exclusions: {},
+        inclusions: {},
         unusedAttrsVertical: 85,
         autoSortUnusedAttrs: false,
         rendererOptions: {
@@ -1126,7 +1130,12 @@
               k = ref2[o];
               v = axisValues[c][k];
               filterItem = $("<label>");
-              filterItemExcluded = opts.exclusions[c] ? (indexOf.call(opts.exclusions[c], k) >= 0) : false;
+              filterItemExcluded = false;
+              if (opts.inclusions[c]) {
+                filterItemExcluded = (indexOf.call(opts.inclusions[c], k) < 0);
+              } else if (opts.exclusions[c]) {
+                filterItemExcluded = (indexOf.call(opts.exclusions[c], k) >= 0);
+              }
               hasExcludedItem || (hasExcludedItem = filterItemExcluded);
               $("<input>").attr("type", "checkbox").addClass('pvtFilter').attr("checked", !filterItemExcluded).data("filter", [c, k]).appendTo(filterItem);
               filterItem.append($("<span>").html(k));
@@ -1152,9 +1161,11 @@
             type: "button"
           }).text("OK").bind("click", updateFilter));
           showFilterList = function(e) {
+            var clickLeft, clickTop, ref3;
+            ref3 = $(e.currentTarget).position(), clickLeft = ref3.left, clickTop = ref3.top;
             valueList.css({
-              left: e.pageX,
-              top: e.pageY
+              left: clickLeft + 10,
+              top: clickTop + 10
             }).toggle();
             valueList.find('.pvtSearch').val('');
             return valueList.find('.pvtCheckContainer p').show();
@@ -1306,6 +1317,7 @@
               rows: subopts.rows,
               vals: vals,
               exclusions: exclusions,
+              inclusions: inclusions,
               inclusionsInfo: inclusions,
               aggregatorName: aggregator.val(),
               rendererName: renderer.val()
