@@ -26,7 +26,7 @@
           },
           c3: {}
         };
-        opts = $.extend(defaults, opts);
+        opts = $.extend(true, defaults, opts);
         if ((base = opts.c3).size == null) {
           base.size = {};
         }
