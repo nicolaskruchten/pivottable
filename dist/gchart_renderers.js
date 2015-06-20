@@ -23,7 +23,7 @@
           },
           gchart: {}
         };
-        opts = $.extend(defaults, opts);
+        opts = $.extend(true, defaults, opts);
         if ((base = opts.gchart).width == null) {
           base.width = window.innerWidth / 1.4;
         }

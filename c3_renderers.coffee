@@ -16,7 +16,7 @@ callWithJQuery ($) ->
                 by: "by"
             c3: {}
 
-        opts = $.extend defaults, opts
+        opts = $.extend true, defaults, opts
         opts.c3.size ?= {}
         opts.c3.size.width ?= window.innerWidth / 1.4
         opts.c3.size.height ?= window.innerHeight / 1.4 - 50
