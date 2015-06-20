@@ -16,7 +16,7 @@ callWithJQuery ($) ->
                 by: "by"
             gchart: {}
 
-        opts = $.extend defaults, opts
+        opts = $.extend true, defaults, opts
         opts.gchart.width ?= window.innerWidth / 1.4
         opts.gchart.height ?= window.innerHeight / 1.4
 
