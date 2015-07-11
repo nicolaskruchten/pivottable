@@ -114,7 +114,7 @@
           vAxisTitle = pivotData.aggregatorName + (pivotData.valAttrs.length ? "(" + (pivotData.valAttrs.join(", ")) + ")" : "");
           hAxisTitle = pivotData.colAttrs.join("-");
         }
-        titleText = vAxisTitle = fullAggName;
+        titleText = fullAggName;
         if (hAxisTitle !== "") {
           titleText += " " + opts.localeStrings.vs + " " + hAxisTitle;
         }

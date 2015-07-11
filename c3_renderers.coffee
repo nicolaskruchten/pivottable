@@ -75,7 +75,7 @@ callWithJQuery ($) ->
                 if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
             hAxisTitle = pivotData.colAttrs.join("-")
 
-        titleText = vAxisTitle = fullAggName
+        titleText = fullAggName
         titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
         groupByTitle = pivotData.rowAttrs.join("-")
         titleText += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
