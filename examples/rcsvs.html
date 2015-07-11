@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Pivot Demo with R Datasets</title>
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         
         <!-- external libs from cdnjs -->
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
@@ -18,9 +17,9 @@
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
         <script type="text/javascript" src="../dist/pivot.js"></script>
-        <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
         <script type="text/javascript" src="../dist/d3_renderers.js"></script>
         <script type="text/javascript" src="../dist/c3_renderers.js"></script>
+        <script type="text/javascript" src="../dist/export_renderers.js"></script>
         
         <style>
             body {font-family: Verdana;}
@@ -31,12 +30,16 @@
               overflow: hidden;
               position: absolute;
               text-indent: 2px;
-            }
+            }        
+            .c3-line, .c3-focused {stroke-width: 3px !important;}
+            .c3-bar {stroke: white !important; stroke-width: 1;}
+            .c3 text { font-size: 12px; color: grey;}
+            .tick line {stroke: white;}
+            .c3-axis path {stroke: grey;}
         </style>
     </head>
     <body>
         <script type="text/javascript">
-            google.load("visualization", "1", {packages:["corechart", "charteditor"]});
             $(function(){
                 $.get("/Rdatasets/datasets.csv", function(csvlist){
                         var pkg = $("<optgroup>", {label: ""});
@@ -63,12 +66,10 @@
                             input[0][0] = "Row";
                             var renderers = $.extend(
                                 $.pivotUtilities.renderers, 
-                                $.pivotUtilities.d3_renderers
+                                $.pivotUtilities.c3_renderers, 
+                                $.pivotUtilities.d3_renderers, 
+                                $.pivotUtilities.export_renderers
                                 );
-                            for(var k in $.pivotUtilities.gchart_renderers)
-                                renderers["Google " + k] = $.pivotUtilities.gchart_renderers[k];
-                            for(var k in $.pivotUtilities.c3_renderers)
-                                renderers["C3 "+k] = $.pivotUtilities.c3_renderers[k];
 
                             $("#output").pivotUI(input, {renderers: renderers}, true);
                         });
