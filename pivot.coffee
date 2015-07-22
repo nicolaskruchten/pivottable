@@ -27,12 +27,26 @@ callWithJQuery ($) ->
             digitsAfterDecimal: 2, scaler: 1, 
             thousandsSep: ",", decimalSep: "."
             prefix: "", suffix: ""
-            showZero: false
+            showZero: false, minSignificantFigures: 0
         opts = $.extend defaults, opts
         (x) ->
             return "" if isNaN(x) or not isFinite(x)
+            x *= opts.scaler
             return "" if x == 0 and not opts.showZero
-            result = addSeparators (opts.scaler*x).toFixed(opts.digitsAfterDecimal), opts.thousandsSep, opts.decimalSep
+            digitsAfterDecimal = opts.digitsAfterDecimal
+            # if our number is small, we might need more than
+            # `digitsAfterDecimal` digits after the decimal
+            if -1 < x < 1 and x != 0 and (opts.minSignificantFigures ? 0) != 0
+                nbZerosAfterDecimal = -Math.floor(Math.log10(Math.abs(x))) - 1
+                digitsAfterDecimal = Math.max(
+                    digitsAfterDecimal,
+                    nbZerosAfterDecimal + opts.minSignificantFigures)
+                # don't go further than toFixed's limit
+                digitsAfterDecimal = Math.min(digitsAfterDecimal, 20)
+            # round to closest
+            mult = Math.pow(10, digitsAfterDecimal)
+            x = Math.round(x * mult) / mult
+            result = addSeparators (x).toFixed(digitsAfterDecimal), opts.thousandsSep, opts.decimalSep
             return ""+opts.prefix+result+opts.suffix
 
     #aggregator templates default to US number formatting but this is overrideable
