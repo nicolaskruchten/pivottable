@@ -1,13 +1,13 @@
 callWithJQuery = (pivotModule) ->
     if typeof exports is "object" and typeof module is "object" # CommonJS
-        pivotModule require("jquery")
+        pivotModule require("jquery"), require("d3")
     else if typeof define is "function" and define.amd # AMD
-        define ["jquery"], pivotModule
+        define ["jquery", "d3"], pivotModule
     # Plain browser env
     else
-        pivotModule jQuery
+        pivotModule jQuery, d3
         
-callWithJQuery ($) ->
+callWithJQuery ($, d3) ->
 
     $.pivotUtilities.d3_renderers = Treemap: (pivotData, opts) ->
         defaults =
