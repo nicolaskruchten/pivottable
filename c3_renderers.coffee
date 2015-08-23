@@ -1,11 +1,11 @@
 callWithJQuery = (pivotModule) ->
     if typeof exports is "object" and typeof module is "object" # CommonJS
-        pivotModule require("jquery")
+        pivotModule require("jquery"), require("c3")
     else if typeof define is "function" and define.amd # AMD
         define ["jquery", "c3"], pivotModule
     # Plain browser env
     else
-        pivotModule jQuery
+        pivotModule jQuery, c3
         
 callWithJQuery ($, c3) ->
 

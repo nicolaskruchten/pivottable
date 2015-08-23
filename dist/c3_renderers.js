@@ -3,11 +3,11 @@
 
   callWithJQuery = function(pivotModule) {
     if (typeof exports === "object" && typeof module === "object") {
-      return pivotModule(require("jquery"));
+      return pivotModule(require("jquery"), require("c3"));
     } else if (typeof define === "function" && define.amd) {
       return define(["jquery", "c3"], pivotModule);
     } else {
-      return pivotModule(jQuery);
+      return pivotModule(jQuery, c3);
     }
   };
 
