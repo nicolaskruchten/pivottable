@@ -5,13 +5,13 @@
     if (typeof exports === "object" && typeof module === "object") {
       return pivotModule(require("jquery"));
     } else if (typeof define === "function" && define.amd) {
-      return define(["jquery"], pivotModule);
+      return define(["jquery", "c3"], pivotModule);
     } else {
       return pivotModule(jQuery);
     }
   };
 
-  callWithJQuery(function($) {
+  callWithJQuery(function($, c3) {
     var makeC3Chart;
     makeC3Chart = function(chartOpts) {
       if (chartOpts == null) {
