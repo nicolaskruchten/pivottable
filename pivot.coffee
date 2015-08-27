@@ -390,6 +390,9 @@ callWithJQuery ($) ->
         #now actually build the output
         result = document.createElement("table")
         result.className = "pvtTable"
+        thead = document.createElement("thead");
+        tbody = document.createElement("tbody");
+        tfoot = document.createElement("tfoot");
 
         #helper function for setting row/col-span in pivotTableRenderer
         spanSize = (arr, i, j) ->
@@ -437,7 +440,7 @@ callWithJQuery ($) ->
                 th.innerHTML = opts.localeStrings.totals
                 th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
                 tr.appendChild th
-            result.appendChild tr
+            thead.appendChild tr
 
         #then a row for row header headers
         if rowAttrs.length !=0
@@ -452,21 +455,29 @@ callWithJQuery ($) ->
                 th.className = "pvtTotalLabel"
                 th.innerHTML = opts.localeStrings.totals
             tr.appendChild th
-            result.appendChild tr
+            thead.appendChild tr
 
         #now the actual data rows, with their row headers and totals
         for own i, rowKey of rowKeys
             tr = document.createElement("tr")
             for own j, txt of rowKey
-                x = spanSize(rowKeys, parseInt(i), parseInt(j))
-                if x != -1
-                    th = document.createElement("th")
-                    th.className = "pvtRowLabel"
+                if opts.datatablesEnabled
+                    th = document.createElement('th')
+                    th.className = 'pvtRowLabel'
                     th.innerHTML = txt
-                    th.setAttribute("rowspan", x)
-                    if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
-                        th.setAttribute("colspan",2)
                     tr.appendChild th
+                    if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
+                        tr.appendChild document.createElement('th')
+                    else
+                        x = spanSize(rowKeys, parseInt(i), parseInt(j))
+                        if x != -1
+                            th = document.createElement("th")
+                            th.className = "pvtRowLabel"
+                            th.innerHTML = txt
+                            th.setAttribute("rowspan", x)
+                            if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
+                                th.setAttribute("colspan",2)
+                                tr.appendChild th
             for own j, colKey of colKeys #this is the tight loop
                 aggregator = pivotData.getAggregator(rowKey, colKey)
                 val = aggregator.value()
@@ -484,7 +495,7 @@ callWithJQuery ($) ->
             td.setAttribute("data-value", val)
             td.setAttribute("data-for", "row"+i)
             tr.appendChild td
-            result.appendChild tr
+            tbody.appendChild tr
 
         #finally, the row for col totals, and a grand total
         tr = document.createElement("tr")
@@ -504,12 +515,15 @@ callWithJQuery ($) ->
             tr.appendChild td
         totalAggregator = pivotData.getAggregator([], [])
         val = totalAggregator.value()
-        td = document.createElement("td")
-        td.className = "pvtGrandTotal"
+        td = document.createElement('td')
+        td.className = 'pvtGrandTotal'
         td.innerHTML = totalAggregator.format(val)
         td.setAttribute("data-value", val)
         tr.appendChild td
-        result.appendChild tr
+        result.appendChild thead
+        result.appendChild tbody
+        tfoot.appendChild tr
+        result.appendChild tfoot
 
         #squirrel this away for later
         result.setAttribute("data-numrows", rowKeys.length)
@@ -532,7 +546,8 @@ callWithJQuery ($) ->
             sorters: -> 
             derivedAttributes: {},
             renderer: pivotTableRenderer
-            rendererOptions: null
+            rendererOptions: null,
+            datatablesEnabled: false,
             localeStrings: locales.en.localeStrings
 
         opts = $.extend defaults, opts

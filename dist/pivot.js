@@ -735,7 +735,7 @@
     Default Renderer for hierarchical table layout
      */
     pivotTableRenderer = function(pivotData, opts) {
-      var aggregator, c, colAttrs, colKey, colKeys, defaults, i, j, r, result, rowAttrs, rowKey, rowKeys, spanSize, td, th, totalAggregator, tr, txt, val, x;
+      var aggregator, c, colAttrs, colKey, colKeys, defaults, i, j, r, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, tfoot, th, thead, totalAggregator, tr, txt, val, x;
       defaults = {
         localeStrings: {
           totals: "Totals"
@@ -748,6 +748,9 @@
       colKeys = pivotData.getColKeys();
       result = document.createElement("table");
       result.className = "pvtTable";
+      thead = document.createElement("thead");
+      tbody = document.createElement("tbody");
+      tfoot = document.createElement("tfoot");
       spanSize = function(arr, i, j) {
         var l, len, n, noDraw, ref, ref1, stop, x;
         if (i !== 0) {
@@ -812,7 +815,7 @@
           th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
           tr.appendChild(th);
         }
-        result.appendChild(tr);
+        thead.appendChild(tr);
       }
       if (rowAttrs.length !== 0) {
         tr = document.createElement("tr");
@@ -830,7 +833,7 @@
           th.innerHTML = opts.localeStrings.totals;
         }
         tr.appendChild(th);
-        result.appendChild(tr);
+        thead.appendChild(tr);
       }
       for (i in rowKeys) {
         if (!hasProp.call(rowKeys, i)) continue;
@@ -839,16 +842,26 @@
         for (j in rowKey) {
           if (!hasProp.call(rowKey, j)) continue;
           txt = rowKey[j];
-          x = spanSize(rowKeys, parseInt(i), parseInt(j));
-          if (x !== -1) {
-            th = document.createElement("th");
-            th.className = "pvtRowLabel";
+          if (opts.datatablesEnabled) {
+            th = document.createElement('th');
+            th.className = 'pvtRowLabel';
             th.innerHTML = txt;
-            th.setAttribute("rowspan", x);
-            if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
-              th.setAttribute("colspan", 2);
-            }
             tr.appendChild(th);
+            if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
+              tr.appendChild(document.createElement('th'));
+            } else {
+              x = spanSize(rowKeys, parseInt(i), parseInt(j));
+              if (x !== -1) {
+                th = document.createElement("th");
+                th.className = "pvtRowLabel";
+                th.innerHTML = txt;
+                th.setAttribute("rowspan", x);
+                if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
+                  th.setAttribute("colspan", 2);
+                  tr.appendChild(th);
+                }
+              }
+            }
           }
         }
         for (j in colKeys) {
@@ -870,7 +883,7 @@
         td.setAttribute("data-value", val);
         td.setAttribute("data-for", "row" + i);
         tr.appendChild(td);
-        result.appendChild(tr);
+        tbody.appendChild(tr);
       }
       tr = document.createElement("tr");
       th = document.createElement("th");
@@ -892,12 +905,15 @@
       }
       totalAggregator = pivotData.getAggregator([], []);
       val = totalAggregator.value();
-      td = document.createElement("td");
-      td.className = "pvtGrandTotal";
+      td = document.createElement('td');
+      td.className = 'pvtGrandTotal';
       td.innerHTML = totalAggregator.format(val);
       td.setAttribute("data-value", val);
       tr.appendChild(td);
-      result.appendChild(tr);
+      result.appendChild(thead);
+      result.appendChild(tbody);
+      tfoot.appendChild(tr);
+      result.appendChild(tfoot);
       result.setAttribute("data-numrows", rowKeys.length);
       result.setAttribute("data-numcols", colKeys.length);
       return result;
@@ -921,6 +937,7 @@
         derivedAttributes: {},
         renderer: pivotTableRenderer,
         rendererOptions: null,
+        datatablesEnabled: false,
         localeStrings: locales.en.localeStrings
       };
       opts = $.extend(defaults, opts);
