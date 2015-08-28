@@ -1,13 +1,13 @@
 callWithJQuery = (pivotModule) ->
     if typeof exports is "object" and typeof module is "object" # CommonJS
-        pivotModule require("jquery")
+        pivotModule require("jquery"), require("c3")
     else if typeof define is "function" and define.amd # AMD
-        define ["jquery"], pivotModule
+        define ["jquery", "c3"], pivotModule
     # Plain browser env
     else
-        pivotModule jQuery
+        pivotModule jQuery, c3
         
-callWithJQuery ($) ->
+callWithJQuery ($, c3) ->
 
     makeC3Chart = (chartOpts = {}) -> (pivotData, opts) ->
         defaults =

@@ -3,15 +3,15 @@
 
   callWithJQuery = function(pivotModule) {
     if (typeof exports === "object" && typeof module === "object") {
-      return pivotModule(require("jquery"));
+      return pivotModule(require("jquery"), require("d3"));
     } else if (typeof define === "function" && define.amd) {
-      return define(["jquery"], pivotModule);
+      return define(["jquery", "d3"], pivotModule);
     } else {
-      return pivotModule(jQuery);
+      return pivotModule(jQuery, d3);
     }
   };
 
-  callWithJQuery(function($) {
+  callWithJQuery(function($, d3) {
     return $.pivotUtilities.d3_renderers = {
       Treemap: function(pivotData, opts) {
         var addToTree, color, defaults, height, i, len, ref, result, rowKey, tree, treemap, value, width;
