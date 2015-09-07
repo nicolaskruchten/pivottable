@@ -35,16 +35,27 @@ callWithJQuery ($) ->
             fullAggName += "(#{pivotData.valAttrs.join(", ")})"
 
         if chartOpts.type == "scatter"
-            dataArray = []
-            hAxisTitle = pivotData.colAttrs.join("-")
-            vAxisTitle = pivotData.rowAttrs.join("-")
-            for y, tree2 of pivotData.tree
-                for x, agg of tree2
-                    datum = {}
-                    datum[hAxisTitle] = parseFloat(x)
-                    datum[vAxisTitle] = parseFloat(y)
-                    datum["tooltip"] = agg.format(agg.value())
-                    dataArray.push datum
+            scatterData = x:{}, y:{}, t:{}
+            attrs = pivotData.rowAttrs.concat(pivotData.colAttrs)
+            vAxisTitle = attrs[0] ? ""
+            hAxisTitle = attrs[1] ? "" 
+            groupByTitle = attrs.slice(2).join("-")
+            titleText = vAxisTitle
+            titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
+            titleText += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
+            for rowKey in rowKeys
+                for colKey in colKeys
+                    agg = pivotData.getAggregator(rowKey, colKey)
+                    if agg.value()?
+                        vals = rowKey.concat(colKey)
+                        series = vals.slice(2).join("-")
+                        if series == "" then series = "series"
+                        scatterData.x[series] ?= []
+                        scatterData.y[series] ?= []
+                        scatterData.t[series] ?= []
+                        scatterData.y[series].push vals[0] ? 0
+                        scatterData.x[series].push vals[1] ? 0
+                        scatterData.t[series].push agg.format(agg.value())
         else
             numCharsInHAxis = 0
             for x in headers
@@ -75,10 +86,11 @@ callWithJQuery ($) ->
                 if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
             hAxisTitle = pivotData.colAttrs.join("-")
 
-        titleText = fullAggName
-        titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
-        groupByTitle = pivotData.rowAttrs.join("-")
-        titleText += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
+            titleText = fullAggName
+            titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
+            groupByTitle = pivotData.rowAttrs.join("-")
+            titleText += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
+            
         title = $("<p>", {style: "text-align: center; font-weight: bold"})
         title.text(titleText)
 
@@ -106,15 +118,23 @@ callWithJQuery ($) ->
         $.extend params, opts.c3
 
         if chartOpts.type == "scatter"
-            params.data.x = hAxisTitle
+            xs = {}
+            numSeries = 0
+            dataColumns = []
+            for s of scatterData.x
+                numSeries += 1
+                xs[s] = s+"_x"
+                dataColumns.push [s+"_x"].concat(scatterData.x[s])
+                dataColumns.push [s].concat(scatterData.y[s])
+            params.data.xs = xs
+            params.data.columns = dataColumns
             params.axis.x.tick = fit: false
-            params.data.json = dataArray
-            params.data.keys = value: [hAxisTitle,vAxisTitle]
-            params.legend = show: false 
+            if numSeries == 1
+                params.legend = show: false 
             params.tooltip.format =  
                 title: -> fullAggName
                 name: -> ""
-                value: (a,b,c,d) -> dataArray[d].tooltip
+                value: (a,b,c,d) -> scatterData.t[c][d]
         else
             params.axis.x.type= 'category'
             params.axis.x.categories = headers
