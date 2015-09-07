@@ -3,22 +3,22 @@
 
   callWithJQuery = function(pivotModule) {
     if (typeof exports === "object" && typeof module === "object") {
-      return pivotModule(require("jquery"), require("c3"));
+      return pivotModule(require("jquery"));
     } else if (typeof define === "function" && define.amd) {
-      return define(["jquery", "c3"], pivotModule);
+      return define(["jquery"], pivotModule);
     } else {
-      return pivotModule(jQuery, c3);
+      return pivotModule(jQuery);
     }
   };
 
-  callWithJQuery(function($, c3) {
+  callWithJQuery(function($) {
     var makeC3Chart;
     makeC3Chart = function(chartOpts) {
       if (chartOpts == null) {
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, base, base1, base2, colKey, colKeys, columns, dataArray, datum, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, len, len1, len2, numCharsInHAxis, params, ref, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, title, titleText, tree2, vAxisTitle, val, x, y;
+        var agg, attrs, base, base1, base2, base3, base4, base5, colKey, colKeys, columns, dataColumns, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -62,37 +62,64 @@
           fullAggName += "(" + (pivotData.valAttrs.join(", ")) + ")";
         }
         if (chartOpts.type === "scatter") {
-          dataArray = [];
-          hAxisTitle = pivotData.colAttrs.join("-");
-          vAxisTitle = pivotData.rowAttrs.join("-");
-          ref = pivotData.tree;
-          for (y in ref) {
-            tree2 = ref[y];
-            for (x in tree2) {
-              agg = tree2[x];
-              datum = {};
-              datum[hAxisTitle] = parseFloat(x);
-              datum[vAxisTitle] = parseFloat(y);
-              datum["tooltip"] = agg.format(agg.value());
-              dataArray.push(datum);
+          scatterData = {
+            x: {},
+            y: {},
+            t: {}
+          };
+          attrs = pivotData.rowAttrs.concat(pivotData.colAttrs);
+          vAxisTitle = (ref = attrs[0]) != null ? ref : "";
+          hAxisTitle = (ref1 = attrs[1]) != null ? ref1 : "";
+          groupByTitle = attrs.slice(2).join("-");
+          titleText = vAxisTitle;
+          if (hAxisTitle !== "") {
+            titleText += " " + opts.localeStrings.vs + " " + hAxisTitle;
+          }
+          if (groupByTitle !== "") {
+            titleText += " " + opts.localeStrings.by + " " + groupByTitle;
+          }
+          for (i = 0, len = rowKeys.length; i < len; i++) {
+            rowKey = rowKeys[i];
+            for (j = 0, len1 = colKeys.length; j < len1; j++) {
+              colKey = colKeys[j];
+              agg = pivotData.getAggregator(rowKey, colKey);
+              if (agg.value() != null) {
+                vals = rowKey.concat(colKey);
+                series = vals.slice(2).join("-");
+                if (series === "") {
+                  series = "series";
+                }
+                if ((base3 = scatterData.x)[series] == null) {
+                  base3[series] = [];
+                }
+                if ((base4 = scatterData.y)[series] == null) {
+                  base4[series] = [];
+                }
+                if ((base5 = scatterData.t)[series] == null) {
+                  base5[series] = [];
+                }
+                scatterData.y[series].push((ref2 = vals[0]) != null ? ref2 : 0);
+                scatterData.x[series].push((ref3 = vals[1]) != null ? ref3 : 0);
+                scatterData.t[series].push(agg.format(agg.value()));
+              }
             }
           }
         } else {
           numCharsInHAxis = 0;
-          for (i = 0, len = headers.length; i < len; i++) {
-            x = headers[i];
+          for (k = 0, len2 = headers.length; k < len2; k++) {
+            x = headers[k];
             numCharsInHAxis += x.length;
           }
           if (numCharsInHAxis > 50) {
             rotationAngle = 45;
           }
           columns = [];
-          for (j = 0, len1 = rowKeys.length; j < len1; j++) {
-            rowKey = rowKeys[j];
+          for (l = 0, len3 = rowKeys.length; l < len3; l++) {
+            rowKey = rowKeys[l];
             rowHeader = rowKey.join("-");
             row = [rowHeader === "" ? pivotData.aggregatorName : rowHeader];
-            for (k = 0, len2 = colKeys.length; k < len2; k++) {
-              colKey = colKeys[k];
+            for (m = 0, len4 = colKeys.length; m < len4; m++) {
+              colKey = colKeys[m];
               agg = pivotData.getAggregator(rowKey, colKey);
               if (agg.value() != null) {
                 val = agg.value();
@@ -113,14 +140,14 @@
           }
           vAxisTitle = pivotData.aggregatorName + (pivotData.valAttrs.length ? "(" + (pivotData.valAttrs.join(", ")) + ")" : "");
           hAxisTitle = pivotData.colAttrs.join("-");
-        }
-        titleText = fullAggName;
-        if (hAxisTitle !== "") {
-          titleText += " " + opts.localeStrings.vs + " " + hAxisTitle;
-        }
-        groupByTitle = pivotData.rowAttrs.join("-");
-        if (groupByTitle !== "") {
-          titleText += " " + opts.localeStrings.by + " " + groupByTitle;
+          titleText = fullAggName;
+          if (hAxisTitle !== "") {
+            titleText += " " + opts.localeStrings.vs + " " + hAxisTitle;
+          }
+          groupByTitle = pivotData.rowAttrs.join("-");
+          if (groupByTitle !== "") {
+            titleText += " " + opts.localeStrings.by + " " + groupByTitle;
+          }
         }
         title = $("<p>", {
           style: "text-align: center; font-weight: bold"
@@ -151,17 +178,25 @@
         };
         $.extend(params, opts.c3);
         if (chartOpts.type === "scatter") {
-          params.data.x = hAxisTitle;
+          xs = {};
+          numSeries = 0;
+          dataColumns = [];
+          for (s in scatterData.x) {
+            numSeries += 1;
+            xs[s] = s + "_x";
+            dataColumns.push([s + "_x"].concat(scatterData.x[s]));
+            dataColumns.push([s].concat(scatterData.y[s]));
+          }
+          params.data.xs = xs;
+          params.data.columns = dataColumns;
           params.axis.x.tick = {
             fit: false
           };
-          params.data.json = dataArray;
-          params.data.keys = {
-            value: [hAxisTitle, vAxisTitle]
-          };
-          params.legend = {
-            show: false
-          };
+          if (numSeries === 1) {
+            params.legend = {
+              show: false
+            };
+          }
           params.tooltip.format = {
             title: function() {
               return fullAggName;
@@ -170,7 +205,7 @@
               return "";
             },
             value: function(a, b, c, d) {
-              return dataArray[d].tooltip;
+              return scatterData.t[c][d];
             }
           };
         } else {
@@ -181,10 +216,10 @@
         if (chartOpts.stacked != null) {
           params.data.groups = [
             (function() {
-              var l, len3, results;
+              var len5, n, results;
               results = [];
-              for (l = 0, len3 = rowKeys.length; l < len3; l++) {
-                x = rowKeys[l];
+              for (n = 0, len5 = rowKeys.length; n < len5; n++) {
+                x = rowKeys[n];
                 results.push(x.join("-"));
               }
               return results;
