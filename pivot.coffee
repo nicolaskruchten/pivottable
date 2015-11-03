@@ -419,14 +419,14 @@ callWithJQuery ($) ->
                 tr.appendChild th
             th = document.createElement("th")
             th.className = "pvtAxisLabel"
-            th.innerHTML = c
+            th.textContent = c
             tr.appendChild th
             for own i, colKey of colKeys
                 x = spanSize(colKeys, parseInt(i), parseInt(j))
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtColLabel"
-                    th.innerHTML = colKey[j]
+                    th.textContent = colKey[j]
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
@@ -434,7 +434,7 @@ callWithJQuery ($) ->
             if parseInt(j) == 0
                 th = document.createElement("th")
                 th.className = "pvtTotalLabel"
-                th.innerHTML = opts.localeStrings.totals
+                th.textContent = opts.localeStrings.totals
                 th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
                 tr.appendChild th
             result.appendChild tr
@@ -445,12 +445,12 @@ callWithJQuery ($) ->
             for own i, r of rowAttrs
                 th = document.createElement("th")
                 th.className = "pvtAxisLabel"
-                th.innerHTML = r
-                tr.appendChild th 
+                th.textContent = r
+                tr.appendChild th
             th = document.createElement("th")
             if colAttrs.length ==0
                 th.className = "pvtTotalLabel"
-                th.innerHTML = opts.localeStrings.totals
+                th.textContent = opts.localeStrings.totals
             tr.appendChild th
             result.appendChild tr
 
@@ -462,7 +462,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtRowLabel"
-                    th.innerHTML = txt
+                    th.textContent = txt
                     th.setAttribute("rowspan", x)
                     if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                         th.setAttribute("colspan",2)
@@ -472,7 +472,7 @@ callWithJQuery ($) ->
                 val = aggregator.value()
                 td = document.createElement("td")
                 td.className = "pvtVal row#{i} col#{j}"
-                td.innerHTML = aggregator.format(val)
+                td.textContent = aggregator.format(val)
                 td.setAttribute("data-value", val)
                 tr.appendChild td
 
@@ -480,7 +480,7 @@ callWithJQuery ($) ->
             val = totalAggregator.value()
             td = document.createElement("td")
             td.className = "pvtTotal rowTotal"
-            td.innerHTML = totalAggregator.format(val)
+            td.textContent = totalAggregator.format(val)
             td.setAttribute("data-value", val)
             td.setAttribute("data-for", "row"+i)
             tr.appendChild td
@@ -490,7 +490,7 @@ callWithJQuery ($) ->
         tr = document.createElement("tr")
         th = document.createElement("th")
         th.className = "pvtTotalLabel"
-        th.innerHTML = opts.localeStrings.totals
+        th.textContent = opts.localeStrings.totals
         th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
         tr.appendChild th
         for own j, colKey of colKeys
@@ -498,7 +498,7 @@ callWithJQuery ($) ->
             val = totalAggregator.value()
             td = document.createElement("td")
             td.className = "pvtTotal colTotal"
-            td.innerHTML = totalAggregator.format(val)
+            td.textContent = totalAggregator.format(val)
             td.setAttribute("data-value", val)
             td.setAttribute("data-for", "col"+j)
             tr.appendChild td
@@ -506,7 +506,7 @@ callWithJQuery ($) ->
         val = totalAggregator.value()
         td = document.createElement("td")
         td.className = "pvtGrandTotal"
-        td.innerHTML = totalAggregator.format(val)
+        td.textContent = totalAggregator.format(val)
         td.setAttribute("data-value", val)
         tr.appendChild td
         result.appendChild tr
@@ -544,11 +544,11 @@ callWithJQuery ($) ->
                 result = opts.renderer(pivotData, opts.rendererOptions)
             catch e
                 console.error(e.stack) if console?
-                result = $("<span>").html opts.localeStrings.renderError
+                result = $("<span>").text opts.localeStrings.renderError
         catch e
             console.error(e.stack) if console?
-            result = $("<span>").html opts.localeStrings.computeError
-        
+            result = $("<span>").text opts.localeStrings.computeError
+
         x = this[0]
         x.removeChild(x.lastChild) while x.hasChildNodes()
         return @append result
@@ -611,7 +611,7 @@ callWithJQuery ($) ->
                 .appendTo(rendererControl)
                 .bind "change", -> refresh() #capture reference
             for own x of opts.renderers
-                $("<option>").val(x).html(x).appendTo(renderer)
+                $("<option>").val(x).text(x).appendTo(renderer)
 
 
             #axis list, including the double-click menu
@@ -642,12 +642,12 @@ callWithJQuery ($) ->
 
                     valueList.append $("<h4>").text("#{c} (#{keys.length})")
                     if keys.length > opts.menuLimit
-                        valueList.append $("<p>").html(opts.localeStrings.tooMany)
+                        valueList.append $("<p>").text(opts.localeStrings.tooMany)
                     else
                         btns = $("<p>").appendTo(valueList)
-                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectAll).bind "click", ->
+                        btns.append $("<button>", {type:"button"}).text(opts.localeStrings.selectAll).bind "click", ->
                             valueList.find("input:visible").prop "checked", true
-                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectNone).bind "click", ->
+                        btns.append $("<button>", {type:"button"}).text(opts.localeStrings.selectNone).bind "click", ->
                             valueList.find("input:visible").prop "checked", false
                         btns.append $("<br>")
                         btns.append $("<input>", {type: "text", placeholder: opts.localeStrings.filterResults, class: "pvtSearch"}).bind "keyup", ->
@@ -674,7 +674,7 @@ callWithJQuery ($) ->
                                 .attr("type", "checkbox").addClass('pvtFilter')
                                 .attr("checked", !filterItemExcluded).data("filter", [c,k])
                                 .appendTo filterItem
-                             filterItem.append $("<span>").html k
+                             filterItem.append $("<span>").text k
                              filterItem.append $("<span>").text " ("+v+")"
                              checkContainer.append $("<p>").append(filterItem)
 
@@ -716,7 +716,7 @@ callWithJQuery ($) ->
             aggregator = $("<select>").addClass('pvtAggregator')
                 .bind "change", -> refresh() #capture reference
             for own x of opts.aggregators
-                aggregator.append $("<option>").val(x).html(x)
+                aggregator.append $("<option>").val(x).text(x)
 
             $("<td>").addClass('pvtVals')
               .appendTo(tr1)
