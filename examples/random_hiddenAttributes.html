@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+            body {font-family: Verdana;}
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+                var derivers = $.pivotUtilities.derivers;
+
+                $.get("random.csv", function(mps) {
+                    $("#output").pivotUI($.csv.toArrays(mps), {
+                        rows: ["A"],
+                        cols: ["B"],
+                        aggregatorName: "Average",
+                        vals: ["x"],
+                        hiddenAttributes: ["E"],
+                        hiddenFromAggregators: ["A", "B", "C", "D"],
+                        hiddenFromDragDrop: ["x", "y", "e"]
+                    });
+                });
+             });
+        </script>
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <p style="width: 800px">This example loads a <a href="random.csv">csv</a> file with randomly generated data. It contains following columns:
+        <ul>
+        <li> A, B, C, D which are only available in the 'DragDrop' area of the UI,</li>
+        <li> E which is entirely hidden,</li>
+        <li> x,y,e which are only available as arguments to aggregators,</li>
+        <li> z which is available as an argument for aggregator functions as well as within the 'DragDrop' area.</li>
+        </ul>
+        </p>
+
+        
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>
