@@ -295,7 +295,7 @@ callWithJQuery ($) ->
                 $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
                 $("tbody > tr", input).each (i) ->
                     record = {}
-                    $("td", this).each (j) -> record[tblCols[j]] = $(this).html()
+                    $("td", this).each (j) -> record[tblCols[j]] = $(this).text()
                     addRecord(record)
             else
                 throw new Error("unknown input format")
@@ -419,14 +419,14 @@ callWithJQuery ($) ->
                 tr.appendChild th
             th = document.createElement("th")
             th.className = "pvtAxisLabel"
-            th.innerHTML = c
+            th.textContent = c
             tr.appendChild th
             for own i, colKey of colKeys
                 x = spanSize(colKeys, parseInt(i), parseInt(j))
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtColLabel"
-                    th.innerHTML = colKey[j]
+                    th.textContent = colKey[j]
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
@@ -445,7 +445,7 @@ callWithJQuery ($) ->
             for own i, r of rowAttrs
                 th = document.createElement("th")
                 th.className = "pvtAxisLabel"
-                th.innerHTML = r
+                th.textContent = r
                 tr.appendChild th 
             th = document.createElement("th")
             if colAttrs.length ==0
@@ -462,7 +462,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtRowLabel"
-                    th.innerHTML = txt
+                    th.textContent = txt
                     th.setAttribute("rowspan", x)
                     if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                         th.setAttribute("colspan",2)
@@ -472,7 +472,7 @@ callWithJQuery ($) ->
                 val = aggregator.value()
                 td = document.createElement("td")
                 td.className = "pvtVal row#{i} col#{j}"
-                td.innerHTML = aggregator.format(val)
+                td.textContent = aggregator.format(val)
                 td.setAttribute("data-value", val)
                 tr.appendChild td
 
@@ -480,7 +480,7 @@ callWithJQuery ($) ->
             val = totalAggregator.value()
             td = document.createElement("td")
             td.className = "pvtTotal rowTotal"
-            td.innerHTML = totalAggregator.format(val)
+            td.textContent = totalAggregator.format(val)
             td.setAttribute("data-value", val)
             td.setAttribute("data-for", "row"+i)
             tr.appendChild td
@@ -498,7 +498,7 @@ callWithJQuery ($) ->
             val = totalAggregator.value()
             td = document.createElement("td")
             td.className = "pvtTotal colTotal"
-            td.innerHTML = totalAggregator.format(val)
+            td.textContent = totalAggregator.format(val)
             td.setAttribute("data-value", val)
             td.setAttribute("data-for", "col"+j)
             tr.appendChild td
@@ -506,7 +506,7 @@ callWithJQuery ($) ->
         val = totalAggregator.value()
         td = document.createElement("td")
         td.className = "pvtGrandTotal"
-        td.innerHTML = totalAggregator.format(val)
+        td.textContent = totalAggregator.format(val)
         td.setAttribute("data-value", val)
         tr.appendChild td
         result.appendChild tr
@@ -674,7 +674,7 @@ callWithJQuery ($) ->
                                 .attr("type", "checkbox").addClass('pvtFilter')
                                 .attr("checked", !filterItemExcluded).data("filter", [c,k])
                                 .appendTo filterItem
-                             filterItem.append $("<span>").html k
+                             filterItem.append $("<span>").text k
                              filterItem.append $("<span>").text " ("+v+")"
                              checkContainer.append $("<p>").append(filterItem)
 
