@@ -632,8 +632,8 @@
           return results;
         }).call(this);
         return function(a, b) {
-          var comparison, i, sorter;
-          for (i in sortersArr) {
+          var comparison, i, len, sorter;
+          for (i = 0, len = sortersArr.length;i < len;i++) {
             sorter = sortersArr[i];
             comparison = sorter(a[i], b[i]);
             if (comparison !== 0) {
