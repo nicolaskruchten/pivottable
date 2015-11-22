@@ -309,7 +309,7 @@ callWithJQuery ($) ->
         arrSort: (attrs) => 
             sortersArr = (getSort(@sorters, a) for a in attrs)
             (a,b) -> 
-                for i, sorter of sortersArr
+                for own i, sorter of sortersArr
                     comparison = sorter(a[i], b[i])
                     return comparison if comparison != 0
                 return 0
