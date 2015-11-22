@@ -11,7 +11,8 @@
     "pivottable",
     "pivotgrid",
     "pivotchart",
-    "jquery"
+    "jquery",
+    "jquery-plugin"
   ],
   "repository": {
     "type": "git",
@@ -23,6 +24,9 @@
     "url": "https://github.com/nicolaskruchten/pivottable/issues"
   },
   "homepage": "https://github.com/nicolaskruchten/pivottable",
+  "dependencies" : {
+    "jquery" : ">=1.9.0"
+  },
   "devDependencies": {
     "require-dir": "^0.1.0",
     "gulp-coffee": "^2.2.0",

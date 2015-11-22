@@ -26,7 +26,6 @@
     "url": "git://github.com/nicolaskruchten/pivottable.git"
   },
   "dependencies": {
-    "jquery": "*",
-    "jqueryui": "*"
+    "jquery": ">=1.9.0"
   }
 }
