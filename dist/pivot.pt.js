@@ -90,8 +90,10 @@
     }
     if (c3r) {
       $.pivotUtilities.locales.pt.c3_renderers = {
-        "Gr&aacute;fico de Linhas": c3r["Line Chart C3"],
-        "Gr&aacute;fico de Barras": c3r["Bar Chart C3"]
+        "Gr&aacute;fico de Linhas": c3r["Line Chart"],
+        "Gr&aacute;fico de Barras": c3r["Bar Chart"],
+        "Gr&aacute;fico de Barras Empilhadas": c3r["Stacked Bar Chart"],
+        "Gr&aacute;fico de &Aacute;rea": c3r["Area Chart"]
       };
     }
     return $.pivotUtilities.locales.pt;

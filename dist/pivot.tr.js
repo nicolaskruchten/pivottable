@@ -77,10 +77,10 @@
     };
     if (gcr) {
       $.pivotUtilities.locales.tr.gchart_renderers = {
-        "&Ccedil;izgi Grafi&#287;i (gchart)": gcr["Line Chart"],
-        "Bar Grafi&#287;i (gchart)": gcr["Bar Chart"],
-        "Y&#305;&#287;&#305;lm&#305;&#351; &Ccedil;ubuk Grafik (gchart)": gcr["Stacked Bar Chart"],
-        "Alan Grafi&#287;i (gchart)": gcr["Area Chart"]
+        "&Ccedil;izgi Grafi&#287;i": gcr["Line Chart"],
+        "Bar Grafi&#287;i": gcr["Bar Chart"],
+        "Y&#305;&#287;&#305;lm&#305;&#351; &Ccedil;ubuk Grafik ": gcr["Stacked Bar Chart"],
+        "Alan Grafi&#287;i": gcr["Area Chart"]
       };
     }
     if (d3r) {
@@ -90,8 +90,10 @@
     }
     if (c3r) {
       $.pivotUtilities.locales.tr.c3_renderers = {
-        "&Ccedil;izgi Grafi&#287;i (C3)": c3r["Line Chart C3"],
-        "Bar Grafi&#287;i (C3)": c3r["Bar Chart C3"]
+        "&Ccedil;izgi Grafi&#287;i": c3r["Line Chart"],
+        "Bar Grafi&#287;i": c3r["Bar Chart"],
+        "Y&#305;&#287;&#305;lm&#305;&#351; &Ccedil;ubuk Grafik ": c3r["Stacked Bar Chart"],
+        "Alan Grafi&#287;i": c3r["Area Chart"]
       };
     }
     return $.pivotUtilities.locales.tr;
