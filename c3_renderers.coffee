@@ -77,7 +77,7 @@ callWithJQuery ($, c3) ->
                             else
                                 row.push parseFloat(val.toFixed(3))
                         else
-                            row.push val
+                            row.push val if val != 1/0 else null 
 
                     else row.push null
                 columns.push row
