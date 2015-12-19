@@ -1,3 +1,5 @@
+[<img align="right" src="https://nodei.co/npm/pivottable.png?compact=true"/>](https://www.npmjs.com/package/pivottable)
+
 # PivotTable.js
 
 PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com). It is available under an MIT license (see bottom of this document).
@@ -38,7 +40,9 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 
 ## How do I use the code?
 
-You first need to load jQuery and the PivotTable.js scripts (`pivot.min.js` and any plugins or source maps), which can be done the normal way (download the files from the [`dist`](https://github.com/nicolaskruchten/pivottable/tree/master/dist) directory and reference them), or loaded from [CDNJS](https://cdnjs.com/libraries/pivottable), or via [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`.
+You first need to load jQuery and the PivotTable.js scripts (i.e. `pivot.min.js` and any plugins or source maps), which can be done the normal way (download the files from the [`dist`](https://github.com/nicolaskruchten/pivottable/tree/master/dist) directory and reference them), or loaded from [CDNJS](https://cdnjs.com/libraries/pivottable), or via [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`. 
+
+PivotTable.js can be loaded directly but is also compatible with RequireJS (Asynchronous Module Definition) and CommonJS. Please open a Github issue if it can be made compatible with other packaging systems!
 
 There are two main functions provided by PivotTable.js: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
