@@ -40,9 +40,17 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 
 ## How do I use the code?
 
-You first need to load jQuery and the PivotTable.js scripts (i.e. `pivot.min.js` and any plugins or source maps), which can be done the normal way (download the files from the [`dist`](https://github.com/nicolaskruchten/pivottable/tree/master/dist) directory and reference them), or loaded from [CDNJS](https://cdnjs.com/libraries/pivottable), or via [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`. 
+PivotTable.js implements the [Universal Module Definition (UMD)](https://github.com/umdjs/umd) pattern and so should be compatible with most approaches to script loading and dependency management: direct script loading, [RequireJS](http://requirejs.org/), [Browserify](http://browserify.org/) etc. For the latter options, you can grab it from [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`. 
 
-PivotTable.js can be loaded directly but is also compatible with RequireJS (Asynchronous Module Definition) and CommonJS. Please open a Github issue if it can be made compatible with other packaging systems!
+If you are loading the scripts directly (as in the [examples](http://nicolas.kruchten.com/pivottable)), you need to:
+
+1. load dependencies:
+  1. jQuery in all cases
+  2. jQueryUI for the interactive `pivotUI()` function (see below)
+  3. D3.js, C3.js and/or Google Charts if you use charting plugins
+2. load the PivotTable.js files: `pivot.min.js` plus any plugins or source maps
+  1. the conventional way (copy the files from the [`dist`](https://github.com/nicolaskruchten/pivottable/tree/master/dist) directory and add them to your project)
+  2. from [CDNJS](https://cdnjs.com/libraries/pivottable)
 
 There are two main functions provided by PivotTable.js: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
