@@ -5,28 +5,28 @@ PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality
 
 ## What does it do?
 
+PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. With [optional add-ons](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers), the summary table can be rendered various kinds of charts, turning the pivot table into a pivot chart.
+
 ![image](http://nicolas.kruchten.com/pivottable/images/animation.gif)
 
 The animation above is based on the [Canadian Parliament 2012 dataset example](http://nicolas.kruchten.com/pivottable/examples/fully_loaded.html).
 
-PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. With [optional add-ons](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers), the summary table can be rendered various kinds of charts, turning the pivot table into a pivot chart.
-
 ## Why is it good?
 
-* lightweight: the core (without chart support) is a single file with less than 1000 LOC of CoffeeScript, compiles down to 6.3kb of Javascript minified and gzipped, depends only on jQuery and jQueryUI's 'sortable'
-* works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
-* works acceptably fast in Chrome on commodity hardware up to around a hundred thousand records, depending on the cardinality of the attributes.
-* UI is [localizable](https://github.com/nicolaskruchten/pivottable/wiki/Localization)
-* layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
-* works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
-* [derived attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes) can be created on the fly based on the whole input record by passing in a function
-* complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (e.g. weighted averages)
-* built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and [optional extra renderers that add charting or TSV export support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
-* extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
-* works on mobile devices with jQuery UI Touch Punch
+* it's lightweight: the core (without chart support) is a single file with less than 1000 LOC of CoffeeScript, compiles down to 6.3kb of Javascript minified and gzipped, depends only on jQuery and jQueryUI's 'sortable'
+* it works wherever jQuery and jQueryUI work (tested with jQuery 1.8.3 and jQueryUI 1.9.2)
+* it works acceptably fast in Chrome on commodity hardware up to around a hundred thousand records, depending on the cardinality of the attributes.
+* its UI is [localizable](https://github.com/nicolaskruchten/pivottable/wiki/Localization)
+* its layered architecture allows for summary table generation with or without the pivot table UI around it (if you don't use the UI, then there is no dependency on jQueryUI)
+* it works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
+* its [derived attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes) can be created on the fly based on the whole input record by passing in a function
+* its complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (e.g. weighted averages)
+* it has built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and [optional extra renderers that add charting or TSV export support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
+* its extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
+* it works on mobile devices with jQuery UI Touch Punch
 
 
-## Where are the demos?
+## Where are the demos/examples?
 
 There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/examples/index.html) but here are some good entry points:
 
