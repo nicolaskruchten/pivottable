@@ -1,10 +1,13 @@
-[<img align="right" src="https://nodei.co/npm/pivottable.png?compact=true"/>](https://www.npmjs.com/package/pivottable)
 
 # PivotTable.js
 
-PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com). It is available under an MIT license (see bottom of this document).
+PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com). It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`.
+
+![image](http://nicolas.kruchten.com/pivottable/images/animation.gif)
 
 ## What does it do?
+
+The animation above is based on the [Canadian Parliament 2012 dataset example](http://nicolas.kruchten.com/pivottable/examples/fully_loaded.html).
 
 PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. With [optional add-ons](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers), the summary table can be rendered various kinds of charts, turning the pivot table into a pivot chart.
 
@@ -23,7 +26,7 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 * works on mobile devices with jQuery UI Touch Punch
 
 
-## Where's the demo?
+## Where are the demos?
 
 There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/examples/index.html) but here are some good entry points:
 
@@ -36,7 +39,6 @@ There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/exa
 PivotTable.js implements a pivot table drag'n'drop UI similar to that found in popular spreadsheet programs. You can drag attributes into/out of the row/column areas, and choose a summary function. There is a [step-by-step tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial) in the wiki but the following animation gives you a taste of the interaction. It's based on the [Canadian Parliament 2012 dataset](https://github.com/nicolaskruchten/pivottable/blob/master/examples/mps.csv).
 
 ![image](http://nicolas.kruchten.com/pivottable/images/animation.gif)
-
 
 ## How do I load the code?
 
