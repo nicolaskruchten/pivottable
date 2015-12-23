@@ -3,9 +3,9 @@
 
 PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com). It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`.
 
-![image](http://nicolas.kruchten.com/pivottable/images/animation.gif)
-
 ## What does it do?
+
+![image](http://nicolas.kruchten.com/pivottable/images/animation.gif)
 
 The animation above is based on the [Canadian Parliament 2012 dataset example](http://nicolas.kruchten.com/pivottable/examples/fully_loaded.html).
 
