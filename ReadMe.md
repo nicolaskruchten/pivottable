@@ -6,7 +6,7 @@ PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality
 
 ## What does it do?
 
-PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. With optional add-ons, the summary table can be rendered various kinds of charts, turning the pivot table into a pivot chart.
+PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. With [optional add-ons](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers), the summary table can be rendered various kinds of charts, turning the pivot table into a pivot chart.
 
 ## Why is it good?
 
@@ -18,7 +18,7 @@ PivotTable.js' basic function is to turn a data set into a summary table and the
 * works with common [input formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
 * [derived attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes) can be created on the fly based on the whole input record by passing in a function
 * complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (e.g. weighted averages)
-* built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and optional extra renderers that add [charting or TSV export support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
+* built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and [optional extra renderers that add charting or TSV export support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
 * extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
 * works on mobile devices with jQuery UI Touch Punch
 
@@ -38,7 +38,7 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 ![image](http://nicolas.kruchten.com/pivottable/images/animation.gif)
 
 
-## How do I use the code?
+## How do I load the code?
 
 PivotTable.js implements the [Universal Module Definition (UMD)](https://github.com/umdjs/umd) pattern and so should be compatible with most approaches to script loading and dependency management: direct script loading, [RequireJS](http://requirejs.org/), [Browserify](http://browserify.org/) etc. For the latter options, you can grab it from [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`. 
 
@@ -47,10 +47,19 @@ If you are loading the scripts directly (as in the [examples](http://nicolas.kru
 1. load dependencies:
   1. jQuery in all cases
   2. jQueryUI for the interactive `pivotUI()` function (see below)
-  3. D3.js, C3.js and/or Google Charts if you use charting plugins
-2. load the PivotTable.js files: `pivot.min.js` plus any plugins or source maps
-  1. the conventional way (copy the files from the [`dist`](https://github.com/nicolaskruchten/pivottable/tree/master/dist) directory and add them to your project)
-  2. from [CDNJS](https://cdnjs.com/libraries/pivottable)
+  3. D3.js, C3.js and/or Google Charts if you use [charting plugins](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
+2. load the PivotTable.js files:
+  1. `pivot.min.js`
+  2. any [plugins](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers) you wish to use
+
+The dependencies and PivotTable.js files can be loaded:
+
+  1. By copying the files from their official distributions to your project and loading them locally (the [`dist`](https://github.com/nicolaskruchten/pivottable/tree/master/dist) directory is where you will find the PivotTable.js files)
+  2. From a Content Distribution Network (CDN) like [CDNJS](https://cdnjs.com/libraries/pivottable)
+
+(The [examples](http://nicolas.kruchten.com/pivottable) load dependencies from CDNJS and PivotTable.js locally)
+
+## How do I use the code?
 
 There are two main functions provided by PivotTable.js: `pivot()` and `pivotUI()`, both implemented as jQuery plugins, as well as a bunch of helpers and templates.
 
