@@ -1,3 +1,5 @@
+[![npm](https://img.shields.io/badge/npm-pivottable-red.svg)](https://www.npmjs.com/package/pivottable) [![cdnjs](https://img.shields.io/badge/cdnjs-pivottable-orange.svg)](https://cdnjs.com/libraries/pivottable) [![tests](https://img.shields.io/badge/tests-jasmine-green.svg)](http://nicolas.kruchten.com/pivottable/tests/) [![license](https://img.shields.io/badge/license-mit-blue.svg)](https://github.com/nicolaskruchten/pivottable/blob/master/LICENSE.md)
+
 
 # PivotTable.js
 
