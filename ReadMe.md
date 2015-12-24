@@ -24,7 +24,7 @@ The animation above is based on the [Canadian Parliament 2012 dataset example](h
 * it has built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and [optional extra renderers that add charting or TSV export support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
 * its extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
 * it works on mobile devices with [jQuery UI Touch Punch](http://touchpunch.furf.com/)
-
+* it has a [test suite](http://nicolas.kruchten.com/pivottable/tests)
 
 ## Where are the demos/examples?
 
@@ -117,6 +117,14 @@ More extensive documentation can be found in the [wiki](https://github.com/nicol
 * [Localization](https://github.com/nicolaskruchten/pivottable/wiki/Localization)
 * [Optional Extra Renderers: Google Charts and D3/C3 Support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
 * [Used By](https://github.com/nicolaskruchten/pivottable/wiki/Used-By)
+
+## How can I build the code and run the tests?
+
+To install the development dependencies, just run `npm install`, which will create a `node_modules` directory with the files required to run the [Gulp](http://gulpjs.com/) build system.
+
+After modifying any of the `.coffee` files at the top of the repo, you can compile/minify the files into the `dist` directory by running `node_modules/gulp/bin/gulp.js`
+
+Once that's done, you can point your browser to `tests/index.html` to run the [Jasmine](http://jasmine.github.io/) test suite. You can view the [current test results here](http://nicolas.kruchten.com/pivottable/tests).
 
 ## How can I contribute?
 
