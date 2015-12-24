@@ -69,16 +69,18 @@ There are two main functions provided by PivotTable.js: `pivot()` and `pivotUI()
 
 Once you've loaded jQuery and pivot.js, this code ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple.html)):
 
-	$("#output").pivot(
-	    [
-	        {color: "blue", shape: "circle"},
-	        {color: "red", shape: "triangle"}
-	    ],
-	    {
-	        rows: ["color"],
-	        cols: ["shape"]
-	    }
-	);
+```javascript
+$("#output").pivot(
+    [
+        {color: "blue", shape: "circle"},
+        {color: "red", shape: "triangle"}
+    ],
+    {
+        rows: ["color"],
+        cols: ["shape"]
+    }
+);
+```
 
 appends this table to `$("#output")` (the default, *overridable* behaviour is to populate the table cells with counts):
 
@@ -88,16 +90,18 @@ appends this table to `$("#output")` (the default, *overridable* behaviour is to
 
 A slight change to the code (calling `pivotUI()` instead of `pivot()` ) yields the same table with a drag'n'drop UI around it, so long as you've imported jQueryUI ([demo](http://nicolaskruchten.github.io/pivottable/examples/simple_ui.html)):
 
-	$("#output").pivotUI(
-	    [
-	        {color: "blue", shape: "circle"},
-	        {color: "red", shape: "triangle"}
-	    ],
-	    {
-	        rows: ["color"],
-	        cols: ["shape"]
-	    }
-	);
+```javascript
+$("#output").pivotUI(
+    [
+        {color: "blue", shape: "circle"},
+        {color: "red", shape: "triangle"}
+    ],
+    {
+        rows: ["color"],
+        cols: ["shape"]
+    }
+);
+```
 
 ![image](http://nicolaskruchten.github.io/pivottable/images/simple_ui.png)
 
