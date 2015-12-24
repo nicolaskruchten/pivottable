@@ -23,7 +23,7 @@ The animation above is based on the [Canadian Parliament 2012 dataset example](h
 * its complex [aggregation functions](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators) can compute values based on the whole input record (e.g. weighted averages)
 * it has built-in support for basic heatmap and bar chart [renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers), and [optional extra renderers that add charting or TSV export support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
 * its extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
-* it works on mobile devices with jQuery UI Touch Punch
+* it works on mobile devices with [jQuery UI Touch Punch](http://touchpunch.furf.com/)
 
 
 ## Where are the demos/examples?
