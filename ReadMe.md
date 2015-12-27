@@ -7,7 +7,7 @@ PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality
 
 It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`.
 
-PivotTable.js plugins also exist for data exploration and analysis in [Python/Jupyter][https://pypi.python.org/pypi/pivottablejs] and [R/RStudio][https://github.com/smartinsightsfromdata/rpivotTable].
+PivotTable.js plugins also exist for data exploration and analysis in [Python/Jupyter](https://pypi.python.org/pypi/pivottablejs) and [R/RStudio](https://github.com/smartinsightsfromdata/rpivotTable).
 
 ## What does it do?
 
