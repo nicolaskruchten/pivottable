@@ -3,11 +3,15 @@
 
 # PivotTable.js
 
-PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com). It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`.
+PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com). 
+
+It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`.
+
+PivotTable.js plugins also exist for data exploration and analysis in [Python/Jupyter][https://pypi.python.org/pypi/pivottablejs] and [R/RStudio][https://github.com/smartinsightsfromdata/rpivotTable].
 
 ## What does it do?
 
-PivotTable.js' basic function is to turn a data set into a summary table and then optionally add a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. With [optional add-ons](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers), the summary table can be rendered as various kinds of charts, turning the pivot table into a pivot chart.
+PivotTable.js' basic function is to enable data exploration and analysis by turning a data set into a summary table and then optionally adding a true 2-d drag'n'drop UI to allow a user to manipulate this summary table, turning it into a pivot table, very similar to the one found in older versions of Microsoft Excel with a bunch of extra developer-oriented features and some visualization effects. With [optional add-ons](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers), the summary table can be rendered as various kinds of charts, turning the pivot table into a pivot chart.
 
 ![image](http://nicolas.kruchten.com/pivottable/images/animation.gif)
 
