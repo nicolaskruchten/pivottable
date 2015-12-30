@@ -6,30 +6,30 @@ fixtureData = [
     ["Carol",   "female",   "yellow",    "1983-12-08",   102,        14]
 ]
 
-describe "pivot() with no rows/cols, default count aggregator, default TableRenderer",  ->
+describe "$.pivot() with no rows/cols, default count aggregator, default TableRenderer",  ->
     table = $("<div>").pivot fixtureData
 
-    it "loads a table", ->
+    it "renders a table", ->
         expect table.find("table.pvtTable").length
         .toBe  1 
 
-    it "has a correct grand total with data value", ->
-        expect table.find("td.pvtGrandTotal").text()
-        .toBe  "4"
-        expect table.find("td.pvtGrandTotal").data("value")
-        .toBe  4
+    describe "its renderer output", ->
 
-describe "pivotUI() with no rows/cols, default count aggregator, default TableRenderer",  ->
+        it "has the correct textual representation", ->
+            expect table.find("table.pvtTable").text()
+            .toBe ["Totals", "4"].join("")
+
+        it "has a correct grand total with data value", ->
+            expect table.find("td.pvtGrandTotal").text()
+            .toBe  "4"
+            expect table.find("td.pvtGrandTotal").data("value")
+            .toBe  4
+
+describe "$.pivotUI() with no rows/cols, default count aggregator, default TableRenderer",  ->
     table = null
 
     beforeEach (done) ->
         table = $("<div>").pivotUI fixtureData, onRefresh: done
-
-    it "loads a table", (done) ->
-        expect table.find("table.pvtTable").length
-        .toBe  1 
-        done()
-
     it "has all the basic UI elements", (done) ->
         expect table.find("td.pvtAxisContainer").length
         .toBe  3
@@ -54,12 +54,23 @@ describe "pivotUI() with no rows/cols, default count aggregator, default TableRe
         .toBe  "Count"
         done()
 
+    it "renders a table", (done) ->
+        expect table.find("table.pvtTable").length
+        .toBe  1 
+        done()
+
+
     describe "its renderer output", ->
         it "has the correct type and number of cells", (done) ->
             expect table.find("th.pvtTotalLabel").length
             .toBe  1 
             expect table.find("td.pvtGrandTotal").length
             .toBe  1 
+            done()
+
+        it "has the correct textual representation", (done) ->
+            expect table.find("table.pvtTable").text()
+            .toBe ["Totals", "4"].join("")
             done()
 
         it "has a correct grand total with data value", (done) ->
@@ -69,23 +80,16 @@ describe "pivotUI() with no rows/cols, default count aggregator, default TableRe
             .toBe  4
             done()
 
-describe "pivotUI() with specified rows/cols, sum-over-sum aggregator, Heatmap renderer",  ->
+describe "$.pivotUI() with specified rows/cols, sum-over-sum aggregator, Heatmap renderer",  ->
     table = null
 
     beforeEach (done) ->
-        pivotOptions = 
+        table = $("<div>").pivotUI fixtureData, 
             rows: ["gender"], cols: ["colour"]
             aggregatorName: "Sum over Sum"
             vals: ["successes", "trials"]
             rendererName: "Heatmap"
             onRefresh: done
-        table = $("<div>").pivotUI fixtureData, pivotOptions
-
-    it "loads a table", (done) ->
-        expect table.find("table.pvtTable").length
-        .toBe  1 
-        done()
-
 
     it "has all the basic UI elements", (done) ->
         expect table.find("td.pvtAxisContainer").length
@@ -115,6 +119,11 @@ describe "pivotUI() with specified rows/cols, sum-over-sum aggregator, Heatmap r
         .toBe  "Sum over Sum"
         done()
 
+    it "renders a table", (done) ->
+        expect table.find("table.pvtTable").length
+        .toBe  1 
+        done()
+
     describe "its renderer output", ->
         it "has the correct type and number of cells", (done) ->
             expect table.find("th.pvtAxisLabel").length
@@ -133,17 +142,66 @@ describe "pivotUI() with specified rows/cols, sum-over-sum aggregator, Heatmap r
             .toBe  1 
             done()
 
-        it "has a correct grand total with data value", (done) ->
-            expect table.find("td.pvtGrandTotal").text()
-            .toBe  "0.20"
-            expect table.find("td.pvtGrandTotal").data("value")
-            .toBe  (12+25+30+14)/(103+95+112+102)
+        it "has the correct textual representation", (done) ->
+            expect table.find("table.pvtTable").text()
+            .toBe [
+                "colour",   "blue", "red",  "yellow",   "Totals",
+                "gender",
+                "female",           "0.26", "0.14",     "0.20",
+                "male",     "0.20",                     "0.20",
+                "Totals",   "0.20", "0.26", "0.14",     "0.20"
+                ].join("")
             done()
 
-describe "custom renderer passed to pivot() with no rows/cols, custom aggregator",  ->
+        it "has a correct spot-checked cell with data value", (done) ->
+            expect table.find("td.col0.row1").text()
+            .toBe  "0.20"
+            expect table.find("td.col0.row1").data("value")
+            .toBe  (12+30)/(103+112)
+            done()
+
+describe "$.pivot() with rows/cols, sum aggregator, derivedAttributes, filter and sorters",  ->
+    {sortAs, derivers, aggregators} = $.pivotUtilities
+    table = $("<div>").pivot fixtureData,
+        rows: ["gender"], cols: ["birthyear"], aggregator: aggregators["Sum"](["trialbins"])
+        filter: (record) -> record.name != "Nick"
+        derivedAttributes:
+            birthyear: derivers.dateFormat "birthday", "%y"
+            trialbins: derivers.bin "trials", 10
+        sorters: (attr) ->
+            if attr == "gender" then return sortAs(["male", "female"])
+
+    it "renders a table with the correct textual representation", ->
+        expect table.find("table.pvtTable").text()
+        .toBe [
+            "birthyear",    "1982",     "1983",     "Totals"
+            "gender",  
+            "male",         "110.00",               "110.00"
+            "female",       "90.00",    "100.00",   "190.00"
+            "Totals",       "200.00",   "100.00",   "300.00"
+            ].join("")
+
+describe "$.pivot() with rows/cols, fraction-of aggregator",  ->
+    {aggregators} = $.pivotUtilities
+    table = $("<div>").pivot fixtureData,
+        rows: ["gender"]
+        aggregator: aggregators["Sum as Fraction of Total"](["trials"])
+
+    it "renders a table with the correct textual representation", ->
+        expect table.find("table.pvtTable").text()
+        .toBe [
+            "gender",  "Totals"
+            "female",  "47.8%"
+            "male",    "52.2%"
+            "Totals",  "100.0%"
+            ].join("")
+
+describe "$.pivot() with rows/cols, custom aggregator, custom renderer with options",  ->
     received_PivotData = null
     received_rendererOptions = null
-    pivotOptions =
+
+    table = $("<div>").pivot fixtureData, 
+        rows: ["name", "colour"], cols: ["trials", "successes"]
         aggregator: -> 
             count2x: 0
             push: -> @count2x +=2 
@@ -153,19 +211,20 @@ describe "custom renderer passed to pivot() with no rows/cols, custom aggregator
         renderer: (a,b) -> 
             received_PivotData = a
             received_rendererOptions = b
-            return $("<div>").addClass("hello").text("world")
-        rendererOptions: {a:1}
-    table = $("<div>").pivot fixtureData, pivotOptions
+            return $("<div>").addClass(b.greeting).text("world")
+        rendererOptions: {greeting:"hithere"}
 
-    it "is rendered", ->
-        expect table.find("div.hello").length
+    it "renders the custom renderer as per options", ->
+        expect table.find("div.hithere").length
         .toBe  1 
 
-    it "receives a PivotData object and options", ->
-        expect(received_PivotData).not.toBe  null 
-        expect(received_rendererOptions).toEqual {a: 1} 
+    describe "its received PivotData object", ->
+        it "has correctly-ordered row and column keys", ->
+            expect received_PivotData.getRowKeys()
+            .toEqual [ [ 'Carol', 'yellow' ], [ 'Jane', 'red' ], [ 'John', 'blue' ], [ 'Nick', 'blue' ] ]
+            expect received_PivotData.getColKeys()
+            .toEqual [ [ 95, 25 ], [ 102, 14 ], [ 103, 12 ], [ 112, 30 ] ]
 
-    describe "its PivotData object", ->
         it "has a correct grand total value and format for custom aggregator", ->
             agg = received_PivotData.getAggregator([],[])
             val = agg.value()
@@ -173,11 +232,135 @@ describe "custom renderer passed to pivot() with no rows/cols, custom aggregator
             expect(val).toBe 8 
             expect(agg.format(val)).toBe "formatted 8"
 
+describe "$.pivotUtilities", ->
+    describe ".naturalSort()", ->
+        naturalSort = $.pivotUtilities.naturalSort
+
+        it "sorts numbers", ->
+            expect [2,1,3,4,0].sort naturalSort
+            .toEqual [0,1,2,3,4]
+
+        it "sorts strings", ->
+            expect ['b','a','c','d'].sort naturalSort
+            .toEqual ['a','b','c','d']
+
+        it "sorts numbers in strings", ->
+            expect ['1','12','2','10','11','112'].sort naturalSort
+            .toEqual ['1','2','10','11','12','112']
+
+        it "sorts 0-padded numbers", ->
+            expect ['02','01','10','11'].sort naturalSort
+            .toEqual ['01','02','10','11']
+
+    describe ".sortAs()", ->
+        sortAs = $.pivotUtilities.sortAs
+
+        it "sorts with unknown values sorted at the end", ->
+            expect [5,2,3,4,1].sort sortAs([4,3,2])
+            .toEqual [4,3,2,1,5]
+
+    describe ".numberFormat()", ->
+        numberFormat = $.pivotUtilities.numberFormat
+
+        it "formats numbers", ->
+            nf = numberFormat()
+            expect nf 1234567.89123456
+            .toEqual "1,234,567.89"
+
+        it "formats booleans", ->
+            nf = numberFormat()
+            expect nf true
+            .toEqual "1.00"
+
+        it "formats numbers in strings", ->
+            nf = numberFormat()
+            expect nf "1234567.89123456"
+            .toEqual "1,234,567.89"
+
+        it "doesn't formats strings", ->
+            nf = numberFormat()
+            expect nf "hi there"
+            .toEqual ""
+
+        it "doesn't formats objects", ->
+            nf = numberFormat()
+            expect nf {a:1}
+            .toEqual ""
+
+        it "formats percentages", ->
+            nf = numberFormat(scaler: 100, suffix: "%")
+            expect nf 0.12345
+            .toEqual "12.35%"
+
+        it "adds separators", ->
+            nf = numberFormat(thousandsSep: "a", decimalSep: "b")
+            expect nf 1234567.89123456
+            .toEqual "1a234a567b89"
+
+        it "adds prefixes and suffixes", ->
+            nf = numberFormat(prefix: "a", suffix: "b")
+            expect nf 1234567.89123456
+            .toEqual "a1,234,567.89b"
+
+        it "scales and rounds", ->
+            nf = numberFormat(digitsAfterDecimal: 3, scaler: 1000)
+            expect nf 1234567.89123456
+            .toEqual "1,234,567,891.235"
+
+        it "shows and hides zero", ->
+            nf = numberFormat(showZero: true)
+            expect nf 0
+            .toEqual "0.00"
+
+            nf = numberFormat(showZero: false)
+            expect nf 0
+            .toEqual ""
+
+    describe ".derivers", ->
+        describe ".dateFormat()", ->
+            df = $.pivotUtilities.derivers.dateFormat "x", "abc % %% %%% %a %y %m %n %d %w %x %H %M %S", true
+
+            it "formats date objects", ->
+                expect df {x: new Date("2015-01-02T23:43:11Z")}
+                .toBe 'abc % %% %%% %a 2015 01 Jan 02 Fri 5 23 43 11'
+
+            it "formats input parsed by Date.parse()", ->
+                expect df {x: "2015-01-02T23:43:11Z"}
+                .toBe 'abc % %% %%% %a 2015 01 Jan 02 Fri 5 23 43 11'
+
+                expect df {x: "bla"}
+                .toBe ''
+
+        describe ".bin()", ->
+            binner = $.pivotUtilities.derivers.bin "x", 10
+
+            it "bins numbers", ->
+                expect binner {x: 11}
+                .toBe 10
+
+                expect binner {x: 9}
+                .toBe 0
+
+                expect binner {x: 111}
+                .toBe 110
+
+            it "bins booleans", ->
+                expect binner {x: true}
+                .toBe 0
+
+            it "bins negative numbers", ->
+                expect binner {x: -12}
+                .toBe -10
+
+            it "doesn't bin strings", ->
+                expect binner {x: "a"}
+                .toBeNaN()
+
+            it "doesn't bin objects", ->
+                expect binner {x: {a:1}}
+                .toBeNaN()
+
 # TODO
-# natural sort
-# number format
-# derivers: binning and date formatting
-# locales
-# sorters
-# filters
-# input types
+# full test of all aggregator templates?
+# locales?
+# input types?
