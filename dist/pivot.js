@@ -907,7 +907,7 @@
     /*
     Pivot Table core: create PivotData object and call Renderer on it
      */
-    $.fn.pivot = function(input, opts) {
+    $.fn.pivot = function(input, opts, overwrite, locale) {
       var defaults, e, pivotData, result, x;
       defaults = {
         cols: [],
@@ -916,6 +916,7 @@
         filter: function() {
           return true;
         },
+	aggregators: locales[locale].aggregators,
         aggregator: aggregatorTemplates.count()(),
         aggregatorName: "Count",
         sorters: function() {},
@@ -925,6 +926,7 @@
         localeStrings: locales.en.localeStrings
       };
       opts = $.extend(defaults, opts);
+      opts.aggregator = opts.aggregators[opts.aggregatorName](opts.vals);
       result = null;
       try {
         pivotData = new PivotData(input, opts);
@@ -1312,7 +1314,7 @@
               }
               return true;
             };
-            pivotTable.pivot(input, subopts);
+            pivotTable.pivot(input, subopts, overwrite, locale);
             pivotUIOptions = $.extend(opts, {
               cols: subopts.cols,
               rows: subopts.rows,
