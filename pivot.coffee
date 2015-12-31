@@ -242,10 +242,6 @@ callWithJQuery ($) ->
         else
             return naturalSort
 
-    #expose these to the outside world
-    $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
-        naturalSort, numberFormat, sortAs}
-
     ###
     Data Model class
     ###
@@ -369,6 +365,10 @@ callWithJQuery ($) ->
             else
                 agg = @tree[flatRowKey][flatColKey]
             return agg ? {value: (-> null), format: -> ""}
+
+    #expose these to the outside world
+    $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
+        naturalSort, numberFormat, sortAs, PivotData}
 
     ###
     Default Renderer for hierarchical table layout
