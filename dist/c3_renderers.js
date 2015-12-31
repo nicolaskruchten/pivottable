@@ -120,17 +120,12 @@
             row = [rowHeader === "" ? pivotData.aggregatorName : rowHeader];
             for (m = 0, len4 = colKeys.length; m < len4; m++) {
               colKey = colKeys[m];
-              agg = pivotData.getAggregator(rowKey, colKey);
-              if (agg.value() != null) {
-                val = agg.value();
-                if ($.isNumeric(val)) {
-                  if (val < 1) {
-                    row.push(parseFloat(val.toPrecision(3)));
-                  } else {
-                    row.push(parseFloat(val.toFixed(3)));
-                  }
+              val = parseFloat(pivotData.getAggregator(rowKey, colKey).value());
+              if (isFinite(val)) {
+                if (val < 1) {
+                  row.push(val.toPrecision(3));
                 } else {
-                  row.push(val);
+                  row.push(val.toFixed(3));
                 }
               } else {
                 row.push(null);
