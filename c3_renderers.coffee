@@ -68,18 +68,14 @@ callWithJQuery ($, c3) ->
                 rowHeader = rowKey.join("-")
                 row = [if rowHeader == "" then pivotData.aggregatorName else rowHeader]
                 for colKey in colKeys
-                    agg = pivotData.getAggregator(rowKey, colKey)
-                    if agg.value()?
-                        val = agg.value()
-                        if $.isNumeric val
-                            if val < 1
-                                row.push parseFloat(val.toPrecision(3))
-                            else
-                                row.push parseFloat(val.toFixed(3))
+                    val = parseFloat  pivotData.getAggregator(rowKey, colKey).value()
+                    if isFinite(val)
+                        if val < 1
+                            row.push val.toPrecision(3)
                         else
-                            row.push val
-
-                    else row.push null
+                            row.push val.toFixed(3)
+                    else
+                        row.push null
                 columns.push row
 
             vAxisTitle = pivotData.aggregatorName+ 
