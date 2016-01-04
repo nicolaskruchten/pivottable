@@ -6,233 +6,325 @@ fixtureData = [
     ["Carol",   "female",   "yellow",    "1983-12-08",   102,        14]
 ]
 
-describe "$.pivot() with no rows/cols, default count aggregator, default TableRenderer",  ->
-    table = $("<div>").pivot fixtureData
 
-    it "renders a table", ->
-        expect table.find("table.pvtTable").length
-        .toBe  1 
+describe "$.pivotUI()", ->
+    describe "with no rows/cols, default count aggregator, default TableRenderer",  ->
+        table = null
 
-    describe "its renderer output", ->
+        beforeEach (done) ->
+            table = $("<div>").pivotUI fixtureData, onRefresh: done
+        it "has all the basic UI elements", (done) ->
+            expect table.find("td.pvtAxisContainer").length
+            .toBe  3
+            expect table.find("td.pvtRendererArea").length
+            .toBe  1
+            expect table.find("td.pvtVals").length
+            .toBe  1
+            expect table.find("select.pvtRenderer").length
+            .toBe  1
+            expect table.find("select.pvtAggregator").length
+            .toBe  1
+            expect table.find("span.pvtAttr").length
+            .toBe  6
+            done()
 
-        it "has the correct textual representation", ->
-            expect table.find("table.pvtTable").text()
-            .toBe ["Totals", "4"].join("")
+        it "reflects its inputs", (done) ->
+            expect table.find("td.pvtUnused span.pvtAttr").length
+            .toBe  6
+            expect table.find("select.pvtRenderer").val()
+            .toBe  "Table"
+            expect table.find("select.pvtAggregator").val()
+            .toBe  "Count"
+            done()
 
-        it "has a correct grand total with data value", ->
-            expect table.find("td.pvtGrandTotal").text()
-            .toBe  "4"
-            expect table.find("td.pvtGrandTotal").data("value")
+        it "renders a table", (done) ->
+            expect table.find("table.pvtTable").length
+            .toBe  1 
+            done()
+
+
+        describe "its renderer output", ->
+            it "has the correct type and number of cells", (done) ->
+                expect table.find("th.pvtTotalLabel").length
+                .toBe  1 
+                expect table.find("td.pvtGrandTotal").length
+                .toBe  1 
+                done()
+
+            it "has the correct textual representation", (done) ->
+                expect table.find("table.pvtTable").text()
+                .toBe ["Totals", "4"].join("")
+                done()
+
+            it "has a correct grand total with data value", (done) ->
+                expect table.find("td.pvtGrandTotal").text()
+                .toBe  "4"
+                expect table.find("td.pvtGrandTotal").data("value")
+                .toBe  4
+                done()
+
+    describe "with rows/cols, sum-over-sum aggregator, Heatmap renderer",  ->
+        table = null
+
+        beforeEach (done) ->
+            table = $("<div>").pivotUI fixtureData, 
+                rows: ["gender"], cols: ["colour"]
+                aggregatorName: "Sum over Sum"
+                vals: ["successes", "trials"]
+                rendererName: "Heatmap"
+                onRefresh: done
+
+        it "has all the basic UI elements", (done) ->
+            expect table.find("td.pvtAxisContainer").length
+            .toBe  3
+            expect table.find("td.pvtRendererArea").length
+            .toBe  1
+            expect table.find("td.pvtVals").length
+            .toBe  1
+            expect table.find("select.pvtRenderer").length
+            .toBe  1
+            expect table.find("select.pvtAggregator").length
+            .toBe  1
+            expect table.find("span.pvtAttr").length
+            .toBe  6
+            done()
+
+        it "reflects its inputs", (done) ->
+            expect table.find("td.pvtUnused span.pvtAttr").length
             .toBe  4
+            expect table.find("td.pvtRows span.pvtAttr").length
+            .toBe  1
+            expect table.find("td.pvtCols span.pvtAttr").length
+            .toBe  1
+            expect table.find("select.pvtRenderer").val()
+            .toBe  "Heatmap"
+            expect table.find("select.pvtAggregator").val()
+            .toBe  "Sum over Sum"
+            done()
 
-describe "$.pivotUI() with no rows/cols, default count aggregator, default TableRenderer",  ->
-    table = null
-
-    beforeEach (done) ->
-        table = $("<div>").pivotUI fixtureData, onRefresh: done
-    it "has all the basic UI elements", (done) ->
-        expect table.find("td.pvtAxisContainer").length
-        .toBe  3
-        expect table.find("td.pvtRendererArea").length
-        .toBe  1
-        expect table.find("td.pvtVals").length
-        .toBe  1
-        expect table.find("select.pvtRenderer").length
-        .toBe  1
-        expect table.find("select.pvtAggregator").length
-        .toBe  1
-        expect table.find("span.pvtAttr").length
-        .toBe  6
-        done()
-
-    it "reflects its inputs", (done) ->
-        expect table.find("td.pvtUnused span.pvtAttr").length
-        .toBe  6
-        expect table.find("select.pvtRenderer").val()
-        .toBe  "Table"
-        expect table.find("select.pvtAggregator").val()
-        .toBe  "Count"
-        done()
-
-    it "renders a table", (done) ->
-        expect table.find("table.pvtTable").length
-        .toBe  1 
-        done()
-
-
-    describe "its renderer output", ->
-        it "has the correct type and number of cells", (done) ->
-            expect table.find("th.pvtTotalLabel").length
-            .toBe  1 
-            expect table.find("td.pvtGrandTotal").length
+        it "renders a table", (done) ->
+            expect table.find("table.pvtTable").length
             .toBe  1 
             done()
 
-        it "has the correct textual representation", (done) ->
-            expect table.find("table.pvtTable").text()
-            .toBe ["Totals", "4"].join("")
-            done()
+        describe "its renderer output", ->
+            it "has the correct type and number of cells", (done) ->
+                expect table.find("th.pvtAxisLabel").length
+                .toBe  2 
+                expect table.find("th.pvtRowLabel").length
+                .toBe  2 
+                expect table.find("th.pvtColLabel").length
+                .toBe  3 
+                expect table.find("th.pvtTotalLabel").length
+                .toBe  2 
+                expect table.find("td.pvtVal").length
+                .toBe  6 
+                expect table.find("td.pvtTotal").length
+                .toBe  5 
+                expect table.find("td.pvtGrandTotal").length
+                .toBe  1 
+                done()
 
-        it "has a correct grand total with data value", (done) ->
-            expect table.find("td.pvtGrandTotal").text()
-            .toBe  "4"
-            expect table.find("td.pvtGrandTotal").data("value")
-            .toBe  4
-            done()
+            it "has the correct textual representation", (done) ->
+                expect table.find("table.pvtTable").text()
+                .toBe [
+                    "colour",   "blue", "red",  "yellow",   "Totals",
+                    "gender",
+                    "female",           "0.26", "0.14",     "0.20",
+                    "male",     "0.20",                     "0.20",
+                    "Totals",   "0.20", "0.26", "0.14",     "0.20"
+                    ].join("")
+                done()
 
-describe "$.pivotUI() with specified rows/cols, sum-over-sum aggregator, Heatmap renderer",  ->
-    table = null
+            it "has a correct spot-checked cell with data value", (done) ->
+                expect table.find("td.col0.row1").text()
+                .toBe  "0.20"
+                expect table.find("td.col0.row1").data("value")
+                .toBe  (12+30)/(103+112)
+                done()
 
-    beforeEach (done) ->
-        table = $("<div>").pivotUI fixtureData, 
-            rows: ["gender"], cols: ["colour"]
-            aggregatorName: "Sum over Sum"
-            vals: ["successes", "trials"]
-            rendererName: "Heatmap"
-            onRefresh: done
+describe "$.pivot()", ->
 
-    it "has all the basic UI elements", (done) ->
-        expect table.find("td.pvtAxisContainer").length
-        .toBe  3
-        expect table.find("td.pvtRendererArea").length
-        .toBe  1
-        expect table.find("td.pvtVals").length
-        .toBe  1
-        expect table.find("select.pvtRenderer").length
-        .toBe  1
-        expect table.find("select.pvtAggregator").length
-        .toBe  1
-        expect table.find("span.pvtAttr").length
-        .toBe  6
-        done()
+    describe "with no rows/cols, default count aggregator, default TableRenderer",  ->
+        table = $("<div>").pivot fixtureData
 
-    it "reflects its inputs", (done) ->
-        expect table.find("td.pvtUnused span.pvtAttr").length
-        .toBe  4
-        expect table.find("td.pvtRows span.pvtAttr").length
-        .toBe  1
-        expect table.find("td.pvtCols span.pvtAttr").length
-        .toBe  1
-        expect table.find("select.pvtRenderer").val()
-        .toBe  "Heatmap"
-        expect table.find("select.pvtAggregator").val()
-        .toBe  "Sum over Sum"
-        done()
-
-    it "renders a table", (done) ->
-        expect table.find("table.pvtTable").length
-        .toBe  1 
-        done()
-
-    describe "its renderer output", ->
-        it "has the correct type and number of cells", (done) ->
-            expect table.find("th.pvtAxisLabel").length
-            .toBe  2 
-            expect table.find("th.pvtRowLabel").length
-            .toBe  2 
-            expect table.find("th.pvtColLabel").length
-            .toBe  3 
-            expect table.find("th.pvtTotalLabel").length
-            .toBe  2 
-            expect table.find("td.pvtVal").length
-            .toBe  6 
-            expect table.find("td.pvtTotal").length
-            .toBe  5 
-            expect table.find("td.pvtGrandTotal").length
+        it "renders a table", ->
+            expect table.find("table.pvtTable").length
             .toBe  1 
-            done()
 
-        it "has the correct textual representation", (done) ->
+        describe "its renderer output", ->
+
+            it "has the correct textual representation", ->
+                expect table.find("table.pvtTable").text()
+                .toBe ["Totals", "4"].join("")
+
+            it "has a correct grand total with data value", ->
+                expect table.find("td.pvtGrandTotal").text()
+                .toBe  "4"
+                expect table.find("td.pvtGrandTotal").data("value")
+                .toBe  4
+
+    describe "with rows/cols, sum aggregator, derivedAttributes, filter and sorters",  ->
+        {sortAs, derivers, aggregators} = $.pivotUtilities
+        table = $("<div>").pivot fixtureData,
+            rows: ["gender"], cols: ["birthyear"], aggregator: aggregators["Sum"](["trialbins"])
+            filter: (record) -> record.name != "Nick"
+            derivedAttributes:
+                birthyear: derivers.dateFormat "birthday", "%y"
+                trialbins: derivers.bin "trials", 10
+            sorters: (attr) ->
+                if attr == "gender" then return sortAs(["male", "female"])
+
+        it "renders a table with the correct textual representation", ->
             expect table.find("table.pvtTable").text()
             .toBe [
-                "colour",   "blue", "red",  "yellow",   "Totals",
-                "gender",
-                "female",           "0.26", "0.14",     "0.20",
-                "male",     "0.20",                     "0.20",
-                "Totals",   "0.20", "0.26", "0.14",     "0.20"
+                "birthyear",    "1982",     "1983",     "Totals"
+                "gender",  
+                "male",         "110.00",               "110.00"
+                "female",       "90.00",    "100.00",   "190.00"
+                "Totals",       "200.00",   "100.00",   "300.00"
                 ].join("")
-            done()
 
-        it "has a correct spot-checked cell with data value", (done) ->
-            expect table.find("td.col0.row1").text()
-            .toBe  "0.20"
-            expect table.find("td.col0.row1").data("value")
-            .toBe  (12+30)/(103+112)
-            done()
+    describe "with rows/cols, fraction-of aggregator",  ->
+        {aggregators} = $.pivotUtilities
+        table = $("<div>").pivot fixtureData,
+            rows: ["gender"]
+            aggregator: aggregators["Sum as Fraction of Total"](["trials"])
 
-describe "$.pivot() with rows/cols, sum aggregator, derivedAttributes, filter and sorters",  ->
-    {sortAs, derivers, aggregators} = $.pivotUtilities
-    table = $("<div>").pivot fixtureData,
-        rows: ["gender"], cols: ["birthyear"], aggregator: aggregators["Sum"](["trialbins"])
-        filter: (record) -> record.name != "Nick"
-        derivedAttributes:
-            birthyear: derivers.dateFormat "birthday", "%y"
-            trialbins: derivers.bin "trials", 10
-        sorters: (attr) ->
-            if attr == "gender" then return sortAs(["male", "female"])
+        it "renders a table with the correct textual representation", ->
+            expect table.find("table.pvtTable").text()
+            .toBe [
+                "gender",  "Totals"
+                "female",  "47.8%"
+                "male",    "52.2%"
+                "Totals",  "100.0%"
+                ].join("")
 
-    it "renders a table with the correct textual representation", ->
-        expect table.find("table.pvtTable").text()
-        .toBe [
-            "birthyear",    "1982",     "1983",     "Totals"
-            "gender",  
-            "male",         "110.00",               "110.00"
-            "female",       "90.00",    "100.00",   "190.00"
-            "Totals",       "200.00",   "100.00",   "300.00"
-            ].join("")
+    describe "with rows/cols, custom aggregator, custom renderer with options",  ->
+        received_PivotData = null
+        received_rendererOptions = null
 
-describe "$.pivot() with rows/cols, fraction-of aggregator",  ->
-    {aggregators} = $.pivotUtilities
-    table = $("<div>").pivot fixtureData,
-        rows: ["gender"]
-        aggregator: aggregators["Sum as Fraction of Total"](["trials"])
+        table = $("<div>").pivot fixtureData, 
+            rows: ["name", "colour"], cols: ["trials", "successes"]
+            aggregator: -> 
+                count2x: 0
+                push: -> @count2x +=2 
+                value: -> @count2x
+                format: (x) -> "formatted " + x
+            renderer: (a,b) -> 
+                received_PivotData = a
+                received_rendererOptions = b
+                return $("<div>").addClass(b.greeting).text("world")
+            rendererOptions: {greeting:"hithere"}
 
-    it "renders a table with the correct textual representation", ->
-        expect table.find("table.pvtTable").text()
-        .toBe [
-            "gender",  "Totals"
-            "female",  "47.8%"
-            "male",    "52.2%"
-            "Totals",  "100.0%"
-            ].join("")
+        it "renders the custom renderer as per options", ->
+            expect table.find("div.hithere").length
+            .toBe  1 
 
-describe "$.pivot() with rows/cols, custom aggregator, custom renderer with options",  ->
-    received_PivotData = null
-    received_rendererOptions = null
-
-    table = $("<div>").pivot fixtureData, 
-        rows: ["name", "colour"], cols: ["trials", "successes"]
-        aggregator: -> 
-            count2x: 0
-            push: -> @count2x +=2 
-            value: -> @count2x
-            format: (x) -> "formatted " + x
-            label: "Count 2x"
-        renderer: (a,b) -> 
-            received_PivotData = a
-            received_rendererOptions = b
-            return $("<div>").addClass(b.greeting).text("world")
-        rendererOptions: {greeting:"hithere"}
-
-    it "renders the custom renderer as per options", ->
-        expect table.find("div.hithere").length
-        .toBe  1 
-
-    describe "its received PivotData object", ->
-        it "has correctly-ordered row and column keys", ->
-            expect received_PivotData.getRowKeys()
-            .toEqual [ [ 'Carol', 'yellow' ], [ 'Jane', 'red' ], [ 'John', 'blue' ], [ 'Nick', 'blue' ] ]
-            expect received_PivotData.getColKeys()
-            .toEqual [ [ 95, 25 ], [ 102, 14 ], [ 103, 12 ], [ 112, 30 ] ]
-
-        it "has a correct grand total value and format for custom aggregator", ->
-            agg = received_PivotData.getAggregator([],[])
-            val = agg.value()
-            expect(agg.label).toBe "Count 2x" 
-            expect(val).toBe 8 
-            expect(agg.format(val)).toBe "formatted 8"
+        describe "its received PivotData object", ->
+            it "has a correct grand total value and format for custom aggregator", ->
+                agg = received_PivotData.getAggregator([],[])
+                val = agg.value()
+                expect(val).toBe 8 
+                expect(agg.format(val)).toBe "formatted 8"
 
 describe "$.pivotUtilities", ->
+
+    describe ".PivotData()", ->
+        sumOverSumOpts = 
+            rows: [], cols: []
+            aggregator: $.pivotUtilities.aggregators["Sum over Sum"](["a","b"])
+            filter: -> true
+            sorters: ->
+
+        describe "with array-of-array input", ->
+            aoaInput =  [ ["a","b"], [1,2], [3,4] ]
+            pd = new $.pivotUtilities.PivotData aoaInput, sumOverSumOpts
+
+            it "has the correct grand total value", ->
+                expect pd.getAggregator([],[]).value()
+                .toBe (1+3)/(2+4)
+
+        describe "with array-of-object input", ->
+            aosInput =  [ {a:1, b:2}, {a:3, b:4} ]
+            pd = new $.pivotUtilities.PivotData aosInput, sumOverSumOpts
+
+            it "has the correct grand total value", ->
+                expect pd.getAggregator([],[]).value()
+                .toBe (1+3)/(2+4)
+
+        describe "with function input", ->
+            functionInput = (record) ->
+                record a:1, b:2
+                record a:3, b:4
+            pd = new $.pivotUtilities.PivotData functionInput, sumOverSumOpts
+
+            it "has the correct grand total value", ->
+                expect pd.getAggregator([],[]).value()
+                .toBe (1+3)/(2+4)
+
+        describe "with jQuery table element input", ->
+            tableInput = $ """
+                <table>
+                    <thead> 
+                        <tr> <th>a</th><th>b</th> </tr>
+                    </thead> 
+                    <tbody>
+                        <tr> <td>1</td> <td>2</td> </tr>
+                        <tr> <td>3</td> <td>4</td> </tr>
+                    </tbody>
+                </table>
+                """
+
+            pd = new $.pivotUtilities.PivotData tableInput, sumOverSumOpts
+
+            it "has the correct grand total value", ->
+                expect pd.getAggregator([],[]).value()
+                .toBe (1+3)/(2+4)
+
+
+        describe "with rows/cols, no filters/sorters, count aggregator", ->
+            pd = new $.pivotUtilities.PivotData fixtureData, 
+                rows: ["name", "colour"], 
+                cols: ["trials", "successes"],
+                aggregator: $.pivotUtilities.aggregators["Count"](),
+                filter: -> true
+                sorters: ->
+
+            it "has correctly-ordered row keys", ->
+                expect pd.getRowKeys()
+                .toEqual [ [ 'Carol', 'yellow' ], [ 'Jane', 'red' ], [ 'John', 'blue' ], [ 'Nick', 'blue' ] ]
+               
+            it "has correctly-ordered col keys", ->
+                expect pd.getColKeys()
+                .toEqual [ [ 95, 25 ], [ 102, 14 ], [ 103, 12 ], [ 112, 30 ] ]
+
+            it "can be iterated over", ->
+                numNotNull = 0
+                numNull = 0
+                for r in pd.getRowKeys()
+                    for c in pd.getColKeys()
+                        if pd.getAggregator(r, c).value()?
+                            numNotNull++ 
+                        else
+                            numNull++
+                expect numNotNull
+                .toBe 4
+                expect numNull
+                .toBe 12
+
+            it "has a correct spot-checked aggregator", ->
+                agg = pd.getAggregator([ 'Carol', 'yellow' ],[ 102, 14 ])
+                val = agg.value()
+                expect(val).toBe 1 
+                expect(agg.format(val)).toBe "1"
+
+            it "has a correct grand total aggregator", ->
+                agg = pd.getAggregator([],[])
+                val = agg.value()
+                expect(val).toBe 4 
+                expect(agg.format(val)).toBe "4"
+
     describe ".naturalSort()", ->
         naturalSort = $.pivotUtilities.naturalSort
 
@@ -360,7 +452,7 @@ describe "$.pivotUtilities", ->
                 expect binner {x: {a:1}}
                 .toBeNaN()
 
-# TODO
-# full test of all aggregator templates?
-# locales?
-# input types?
+# todo
+# agg templates
+# date.parse -> date() ?
+# default options for PivotData, including filter
