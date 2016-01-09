@@ -19,19 +19,20 @@
     </head>
     <body>
         <script type="text/javascript">
-            $(function(){
-                var derivers = $.pivotUtilities.derivers;
+            // This example shows French localization
+            // using the "Canadian Parliament 2012" dataset.
 
+            $(function(){
                 $.getJSON("mps.json", function(mps) {
-                    $("#output").pivotUI(mps, {}, false, "fr");
+                    $("#output").pivotUI(mps, 
+                        { rows: ["Province"], cols: ["Party"] }, 
+                        false, "fr"
+                    );
                 });
              });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
-
-        <p style="width: 800px">This example shows French localization using the "Canadian Parliament 2012" dataset.</p>
-
         
         <div id="output" style="margin: 30px;"></div>
 

@@ -30,6 +30,9 @@
     </head>
     <body>
         <script type="text/javascript">
+            // This example shows off the C3 Scatterplot renderer
+            // with CSV input.
+
             $(function(){
                 $.get("/Rdatasets/csv/datasets/iris.csv", function(iris) {
                     var input = $.csv.toArrays(iris);
@@ -43,8 +46,6 @@
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
-
-        <p style="width: 800px">This example shows off the C3 Scatterplot renderer.</p>
 
         <div id="output" style="margin: 30px; display: inline-block"></div>
 

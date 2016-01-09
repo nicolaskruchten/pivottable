@@ -19,24 +19,21 @@
     </head>
     <body>
         <script type="text/javascript">
-            $(function(){
-                var derivers = $.pivotUtilities.derivers;
+            // This example loads the "Canadian Parliament 2012" 
+            // dataset from a CSV instead of from JSON.
 
+            $(function(){
                 $.get("mps.csv", function(mps) {
-                    $("#output").pivotUI($.csv.toArrays(mps), {
-                        derivedAttributes: {
-                            "Age Bin": derivers.bin("Age", 10),
-                            "Gender Imbalance": function(mp) {
-                                return mp["Gender"] == "Male" ? 1 : -1;
-                            }
-                        }
+                    var input = $.csv.toArrays(mps);
+                    $("#output").pivotUI(input, {
+                        rows: ["Province"], cols: ["Party"]
                     });
                 });
              });
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>
 
-        <p style="width: 800px">This example loads the "Canadian Parliament 2012" dataset from a CSV instead of from JSON.</p>
+        <p style="width: 800px"></p>
 
         
         <div id="output" style="margin: 30px;"></div>

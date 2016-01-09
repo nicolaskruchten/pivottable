@@ -19,8 +19,10 @@
     </head>
     <body>
         <script type="text/javascript">
+            // When using the 'TSV Export' Renderer, you can 
+            // copy from this textarea straight into Excel.
+
             $(function(){
-                var derivers = $.pivotUtilities.derivers;
                 var renderers = $.extend($.pivotUtilities.renderers, 
                     $.pivotUtilities.export_renderers);
 
@@ -35,8 +37,6 @@
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
-
-        <p style="width: 800px">When using the 'TSV Export' Renderer, you can copy from this textarea straight into Excel.</p>
         
         <div id="output" style="margin: 30px;"></div>
 

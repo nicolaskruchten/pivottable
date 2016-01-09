@@ -18,23 +18,20 @@
     </head>
     <body>
         <script type="text/javascript">
-            $(function(){
-                var derivers = $.pivotUtilities.derivers;
+            // Textarea below will refresh will display the configuration 
+            // object every time a user interacts, using the "onRefresh" 
+            // parameter. Instead of showing the configuration in a textarea, 
+            // one could store the configuration in a cookie or implement a 
+            // "save configuration" feature.
 
+            $(function(){
                 $.getJSON("mps.json", function(mps) {
                     $("#output2").pivotUI(mps, {
-                        derivedAttributes: {
-                            "Age Bin": derivers.bin("Age", 10),
-                            "Gender Imbalance": function(mp) {
-                                return mp["Gender"] == "Male" ? 1 : -1;
-                            }
-                        },
                         onRefresh: function(config) {
                             var config_copy = JSON.parse(JSON.stringify(config));
                             //delete some values which are functions
                             delete config_copy["aggregators"];
                             delete config_copy["renderers"];
-                            delete config_copy["derivedAttributes"];
                             //delete some bulky default values
                             delete config_copy["rendererOptions"];
                             delete config_copy["localeStrings"];
@@ -45,7 +42,7 @@
              });
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>
-        <p style="width: 800px">Textarea below will refresh will display the configuration object every time a user interacts, using the "onRefresh" parameter. Instead of showing the configuration in a textarea, one could store the configuration in a cookie or implement a "save configuration" feature.</p>
+        <p style="width: 800px"></p>
         <textarea id="output" 
         style="float: left; width: 250px; height: 500px; margin: 10px;" readonly>
         </textarea>

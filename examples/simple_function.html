@@ -1,59 +1,57 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <title>Pivot Demo</title>
-        <!-- external libs from cdnjs -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <head>
+        <title>Pivot Demo</title>
+            <!-- external libs from cdnjs -->
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 
-        <!-- PivotTable.js libs from ../dist -->
-        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
-        <script type="text/javascript" src="../dist/pivot.js"></script>
-    <style>
-            body {font-family: Verdana;}
-    </style>
-        
-        <!-- for examples only! script to show code to user -->
-        <script type="text/javascript" src="show_code.js"></script>
-</head>
+            <!-- PivotTable.js libs from ../dist -->
+            <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+            <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+                body {font-family: Verdana;}
+        </style>
+            
+            <!-- for examples only! script to show code to user -->
+            <script type="text/javascript" src="show_code.js"></script>
+    </head>
 
-<body>
-    <script type="text/javascript">
-        $(function () {
-            var lookupColour = ["blue", "yellow"];
-                var rawData = [
-                { color: 0, shape: "circle"},
-                { color: 1, shape: "circle"},
-                { color: 1, shape: "circle"},
-                { color: 0, shape: "triangle"},
-                { color: 0, shape: "triangle"},
-                { color: 1, shape: "triangle"}
-                ];
-            var inputFunction = function (callback) {
-                rawData.forEach(function (element, index) {
-                    callback({
-                        color: lookupColour[element.color],
-                        shape: element.shape
+    <body>
+        <script type="text/javascript">
+            // This example uses a function to provide the input values to pivot()
+            
+            $(function () {
+                var lookupColour = ["blue", "yellow"];
+                    var rawData = [
+                    { color: 0, shape: "circle"},
+                    { color: 1, shape: "circle"},
+                    { color: 1, shape: "circle"},
+                    { color: 0, shape: "triangle"},
+                    { color: 0, shape: "triangle"},
+                    { color: 1, shape: "triangle"}
+                    ];
+                var inputFunction = function (callback) {
+                    rawData.forEach(function (element, index) {
+                        callback({
+                            color: lookupColour[element.color],
+                            shape: element.shape
+                        });
                     });
+                };
+
+                $("#output").pivot(inputFunction, {
+                    rows: ["color"],
+                    cols: ["shape"]
                 });
-            };
-
-            $("#output").pivot(inputFunction, {
-                rows: ["color"],
-                cols: ["shape"]
             });
-        });
-    </script>
+        </script>
 
-    <p><a href="index.html">&laquo; back to examples</a>
-    </p>
+        <p><a href="index.html">&laquo; back to examples</a></p>
 
-    <p style="width: 800px">This example uses a function to provide the input values to pivot().</p>
+        <div id="output" style="margin: 10px;"></div>
 
-
-    <div id="output" style="margin: 10px;"></div>
-
-</body>
+    </body>
 
 </html>

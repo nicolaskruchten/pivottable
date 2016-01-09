@@ -18,21 +18,18 @@
     </head>
     <body>
         <script type="text/javascript">
+            // This example shows custom aggregators using 
+            // the "Canadian Parliament 2012" dataset.
+
             $(function(){
-                var derivers =     $.pivotUtilities.derivers;
-                var tpl =          $.pivotUtilities.aggregatorTemplates;
+                var tpl = $.pivotUtilities.aggregatorTemplates;
 
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {
+                        rows: ["Province"], cols: ["Party"],
                         aggregators: {
                             "Number of MPs":      function() { return tpl.count()() },
                             "Average Age of MPs": function() { return tpl.average()(["Age"])},
-                        },
-                        derivedAttributes: {
-                            "Age Bin": derivers.bin("Age", 10),
-                            "Gender Imbalance": function(mp) {
-                                return mp["Gender"] == "Male" ? 1 : -1;
-                            }
                         }
                     });
                 });
@@ -40,9 +37,6 @@
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
-
-        <p style="width: 800px">This example shows custom aggregators using the "Canadian Parliament 2012" dataset.</p>
-
         
         <div id="output" style="margin: 30px;"></div>
 
