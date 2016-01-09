@@ -28,18 +28,18 @@
     </head>
     <body>
         <script type="text/javascript">
-            // This example of a D3 renderer shows a treemap.
+    // This example of a D3 renderer shows a treemap.
 
-            $(function(){
-                $.getJSON("mps.json", function(mps) {
-                    $("#output").pivotUI(mps, {
-                        renderers: $.pivotUtilities.d3_renderers,
-                        cols: [], rows: ["Province", "Party"],
-                        rendererName: "Treemap"
-                    });
-                });
-             });
-        </script>
+    $(function(){
+        $.getJSON("mps.json", function(mps) {
+            $("#output").pivotUI(mps, {
+                renderers: $.pivotUtilities.d3_renderers,
+                cols: [], rows: ["Province", "Party"],
+                rendererName: "Treemap"
+            });
+        });
+     });
+</script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
 

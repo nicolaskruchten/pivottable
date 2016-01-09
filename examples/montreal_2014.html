@@ -34,67 +34,67 @@
 
     <body>
         <script type="text/javascript">
-            // This example loads the "Montreal Weather 2014" dataset
-            // from a CSV and shows date handling with derivers and
-            // sort overriding. This example also features custom
-            // aggregators, C3 Charts and hidden attributes.
-            
-            $(function () {
+    // This example loads the "Montreal Weather 2014" dataset
+    // from a CSV and shows date handling with derivers and
+    // sort overriding. This example also features custom
+    // aggregators, C3 Charts and hidden attributes.
+    
+    $(function () {
 
-                var dateFormat =       $.pivotUtilities.derivers.dateFormat;
-                var sortAs =           $.pivotUtilities.sortAs;
-                var tpl =              $.pivotUtilities.aggregatorTemplates;
+        var dateFormat =       $.pivotUtilities.derivers.dateFormat;
+        var sortAs =           $.pivotUtilities.sortAs;
+        var tpl =              $.pivotUtilities.aggregatorTemplates;
 
-                $.get("montreal_2014.csv", function(montreal_2014) {
-                    $("#output").pivotUI($.csv.toArrays(montreal_2014), {
+        $.get("montreal_2014.csv", function(montreal_2014) {
+            $("#output").pivotUI($.csv.toArrays(montreal_2014), {
 
-                        aggregators: {
-                            "Mean Temp (Celsius)":  
-                                function() { return tpl.average()(["Mean Temp (C)"])},
-                            "Max Temp (Celsius)":   
-                                function() { return tpl.max()(["Max Temp (C)"]) },
-                            "Min Temp (Celsius)":   
-                                function() { return tpl.min()(["Min Temp (C)"]) },
-                            "Total Rain (mm)": 
-                                function() { return tpl.sum()(["Total Rain (mm)"]) },
-                            "Total Snow (cm)": 
-                                function() { return tpl.sum()(["Total Snow (cm)"]) }
-                        },
-                        derivedAttributes: {
-                            "year":       dateFormat("Date", "%y", true),
-                            "month":      dateFormat("Date", "%m", true),
-                            "day":        dateFormat("Date", "%d", true),
-                            "month name": dateFormat("Date", "%n", true),
-                            "day name":   dateFormat("Date", "%w", true)
-                        },
+                aggregators: {
+                    "Mean Temp (Celsius)":  
+                        function() { return tpl.average()(["Mean Temp (C)"])},
+                    "Max Temp (Celsius)":   
+                        function() { return tpl.max()(["Max Temp (C)"]) },
+                    "Min Temp (Celsius)":   
+                        function() { return tpl.min()(["Min Temp (C)"]) },
+                    "Total Rain (mm)": 
+                        function() { return tpl.sum()(["Total Rain (mm)"]) },
+                    "Total Snow (cm)": 
+                        function() { return tpl.sum()(["Total Snow (cm)"]) }
+                },
+                derivedAttributes: {
+                    "year":       dateFormat("Date", "%y", true),
+                    "month":      dateFormat("Date", "%m", true),
+                    "day":        dateFormat("Date", "%d", true),
+                    "month name": dateFormat("Date", "%n", true),
+                    "day name":   dateFormat("Date", "%w", true)
+                },
 
-                        sorters: function(attr) {
-                            if(attr == "month name") {
-                                return sortAs(["Jan","Feb","Mar","Apr", "May",
-                                    "Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
-                            }
-                            if(attr == "day name") {
-                                return sortAs(["Mon","Tue","Wed", "Thu","Fri",
-                                    "Sat","Sun"]);
-                            }
-                        },
+                sorters: function(attr) {
+                    if(attr == "month name") {
+                        return sortAs(["Jan","Feb","Mar","Apr", "May",
+                            "Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
+                    }
+                    if(attr == "day name") {
+                        return sortAs(["Mon","Tue","Wed", "Thu","Fri",
+                            "Sat","Sun"]);
+                    }
+                },
 
-                        hiddenAttributes: ["Date","Max Temp (C)","Mean Temp (C)",
-                            "Min Temp (C)" ,"Total Rain (mm)","Total Snow (cm)"],
+                hiddenAttributes: ["Date","Max Temp (C)","Mean Temp (C)",
+                    "Min Temp (C)" ,"Total Rain (mm)","Total Snow (cm)"],
 
-                        renderers: $.extend(
-                            $.pivotUtilities.renderers,
-                            $.pivotUtilities.c3_renderers,
-                            $.pivotUtilities.export_renderers
-                            ),
+                renderers: $.extend(
+                    $.pivotUtilities.renderers,
+                    $.pivotUtilities.c3_renderers,
+                    $.pivotUtilities.export_renderers
+                    ),
 
-                        rows: ["year", "month name"],
-                        cols: ["day name"]
+                rows: ["year", "month name"],
+                cols: ["day name"]
 
 
-                    });
-                });
             });
+        });
+    });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>

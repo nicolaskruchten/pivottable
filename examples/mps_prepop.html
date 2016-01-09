@@ -18,20 +18,20 @@
     </head>
     <body>
         <script type="text/javascript">
-            // This example shows how to prepopulate the UI on 
-            // load using the "Canadian Parliament 2012" dataset.
+    // This example shows how to prepopulate the UI on 
+    // load using the "Canadian Parliament 2012" dataset.
 
-            $(function(){
-                $.getJSON("mps.json", function(mps) {
-                    $("#output").pivotUI(mps, {
-                        rows: ["Province"],
-                        cols: ["Party"],
-                        aggregatorName: "Integer Sum",
-                        vals: ["Age"],
-                        rendererName: "Heatmap"
-                    });
-                });
-             });
+    $(function(){
+        $.getJSON("mps.json", function(mps) {
+            $("#output").pivotUI(mps, {
+                rows: ["Province"],
+                cols: ["Party"],
+                aggregatorName: "Integer Sum",
+                vals: ["Age"],
+                rendererName: "Heatmap"
+            });
+        });
+     });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>

@@ -19,21 +19,21 @@
     </head>
     <body>
         <script type="text/javascript">
-            // When using the 'TSV Export' Renderer, you can 
-            // copy from this textarea straight into Excel.
+    // When using the 'TSV Export' Renderer, you can 
+    // copy from this textarea straight into Excel.
 
-            $(function(){
-                var renderers = $.extend($.pivotUtilities.renderers, 
-                    $.pivotUtilities.export_renderers);
+    $(function(){
+        var renderers = $.extend($.pivotUtilities.renderers, 
+            $.pivotUtilities.export_renderers);
 
-                $.getJSON("mps.json", function(mps) {
-                    $("#output").pivotUI(mps, {
-                        renderers: renderers,
-                        cols: ["Party"], rows: ["Province"],
-                        rendererName: "TSV Export"
-                    });
-                });
-             });
+        $.getJSON("mps.json", function(mps) {
+            $("#output").pivotUI(mps, {
+                renderers: renderers,
+                cols: ["Party"], rows: ["Province"],
+                rendererName: "TSV Export"
+            });
+        });
+     });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>

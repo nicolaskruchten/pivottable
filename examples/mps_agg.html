@@ -18,22 +18,22 @@
     </head>
     <body>
         <script type="text/javascript">
-            // This example shows custom aggregators using 
-            // the "Canadian Parliament 2012" dataset.
+    // This example shows custom aggregators using 
+    // the "Canadian Parliament 2012" dataset.
 
-            $(function(){
-                var tpl = $.pivotUtilities.aggregatorTemplates;
+    $(function(){
+        var tpl = $.pivotUtilities.aggregatorTemplates;
 
-                $.getJSON("mps.json", function(mps) {
-                    $("#output").pivotUI(mps, {
-                        rows: ["Province"], cols: ["Party"],
-                        aggregators: {
-                            "Number of MPs":      function() { return tpl.count()() },
-                            "Average Age of MPs": function() { return tpl.average()(["Age"])},
-                        }
-                    });
-                });
-             });
+        $.getJSON("mps.json", function(mps) {
+            $("#output").pivotUI(mps, {
+                rows: ["Province"], cols: ["Party"],
+                aggregators: {
+                    "Number of MPs":      function() { return tpl.count()() },
+                    "Average Age of MPs": function() { return tpl.average()(["Age"])},
+                }
+            });
+        });
+     });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>

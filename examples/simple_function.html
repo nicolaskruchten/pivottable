@@ -20,32 +20,32 @@
 
     <body>
         <script type="text/javascript">
-            // This example uses a function to provide the input values to pivot()
-            
-            $(function () {
-                var lookupColour = ["blue", "yellow"];
-                    var rawData = [
-                    { color: 0, shape: "circle"},
-                    { color: 1, shape: "circle"},
-                    { color: 1, shape: "circle"},
-                    { color: 0, shape: "triangle"},
-                    { color: 0, shape: "triangle"},
-                    { color: 1, shape: "triangle"}
-                    ];
-                var inputFunction = function (callback) {
-                    rawData.forEach(function (element, index) {
-                        callback({
-                            color: lookupColour[element.color],
-                            shape: element.shape
-                        });
-                    });
-                };
-
-                $("#output").pivot(inputFunction, {
-                    rows: ["color"],
-                    cols: ["shape"]
+    // This example uses a function to provide the input values to pivot()
+    
+    $(function () {
+        var lookupColour = ["blue", "yellow"];
+            var rawData = [
+            { color: 0, shape: "circle"},
+            { color: 1, shape: "circle"},
+            { color: 1, shape: "circle"},
+            { color: 0, shape: "triangle"},
+            { color: 0, shape: "triangle"},
+            { color: 1, shape: "triangle"}
+            ];
+        var inputFunction = function (callback) {
+            rawData.forEach(function (element, index) {
+                callback({
+                    color: lookupColour[element.color],
+                    shape: element.shape
                 });
             });
+        };
+
+        $("#output").pivot(inputFunction, {
+            rows: ["color"],
+            cols: ["shape"]
+        });
+    });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>

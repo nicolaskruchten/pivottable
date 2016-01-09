@@ -19,17 +19,17 @@
     </head>
     <body>
         <script type="text/javascript">
-            // This example loads the "Canadian Parliament 2012" 
-            // dataset from a CSV instead of from JSON.
+    // This example loads the "Canadian Parliament 2012" 
+    // dataset from a CSV instead of from JSON.
 
-            $(function(){
-                $.get("mps.csv", function(mps) {
-                    var input = $.csv.toArrays(mps);
-                    $("#output").pivotUI(input, {
-                        rows: ["Province"], cols: ["Party"]
-                    });
-                });
-             });
+    $(function(){
+        $.get("mps.csv", function(mps) {
+            var input = $.csv.toArrays(mps);
+            $("#output").pivotUI(input, {
+                rows: ["Province"], cols: ["Party"]
+            });
+        });
+     });
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>
 

@@ -18,29 +18,29 @@
     </head>
     <body>
         <script type="text/javascript">
-            // This example shows pivot() with a sum() aggregator
-            // with custom formatting (no digits after decimal)
+    // This example shows pivot() with a sum() aggregator
+    // with custom formatting (no digits after decimal)
 
-            $(function(){
+    $(function(){
 
-                var sum = $.pivotUtilities.aggregatorTemplates.sum;
-                var numberFormat = $.pivotUtilities.numberFormat;
-                var intFormat = numberFormat({digitsAfterDecimal: 0}); 
+        var sum = $.pivotUtilities.aggregatorTemplates.sum;
+        var numberFormat = $.pivotUtilities.numberFormat;
+        var intFormat = numberFormat({digitsAfterDecimal: 0}); 
 
-                $("#output").pivot(
-                    [
-                        {color: "blue", shape: "circle", value: 1},
-                        {color: "red", shape: "triangle", value: 2},
-                        {color: "blue", shape: "circle", value: 3},
-                        {color: "red", shape: "triangle", value: 4}
-                    ],
-                    {
-                        rows: ["color"],
-                        cols: ["shape"],
-                        aggregator: sum(intFormat)(["value"])
-                    }
-                );
-             });
+        $("#output").pivot(
+            [
+                {color: "blue", shape: "circle", value: 1},
+                {color: "red", shape: "triangle", value: 2},
+                {color: "blue", shape: "circle", value: 3},
+                {color: "red", shape: "triangle", value: 4}
+            ],
+            {
+                rows: ["color"],
+                cols: ["shape"],
+                aggregator: sum(intFormat)(["value"])
+            }
+        );
+     });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>

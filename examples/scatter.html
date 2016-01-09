@@ -30,19 +30,19 @@
     </head>
     <body>
         <script type="text/javascript">
-            // This example shows off the C3 Scatterplot renderer
-            // with CSV input.
+    // This example shows off the C3 Scatterplot renderer
+    // with CSV input.
 
-            $(function(){
-                $.get("/Rdatasets/csv/datasets/iris.csv", function(iris) {
-                    var input = $.csv.toArrays(iris);
-                    input[0][0] = "Row";
-                    $("#output").pivot(input, {
-                        cols: ["Petal.Width", "Species"], rows: ["Petal.Length"],
-                        renderer: $.pivotUtilities.c3_renderers["Scatter Chart"]
-                    });
-                });
-             });
+    $(function(){
+        $.get("/Rdatasets/csv/datasets/iris.csv", function(iris) {
+            var input = $.csv.toArrays(iris);
+            input[0][0] = "Row";
+            $("#output").pivot(input, {
+                cols: ["Petal.Width", "Species"], rows: ["Petal.Length"],
+                renderer: $.pivotUtilities.c3_renderers["Scatter Chart"]
+            });
+        });
+     });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
