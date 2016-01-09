@@ -29,7 +29,7 @@
                 $.getJSON("mps.json", function(mps) {
                     $("#output").pivotUI(mps, {
                         renderers: renderers,
-                        cols: ["Gender"], rows: ["Party"],
+                        cols: ["Party"], rows: ["Province"],
                         rendererName: "TSV Export"
                     });
                 });
