@@ -12,6 +12,9 @@
         <style>
             body {font-family: Verdana;}
         </style>
+        
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
     </head>
     <body>
         <script type="text/javascript">
@@ -19,7 +22,7 @@
                 var derivers = $.pivotUtilities.derivers;
 
                 $.getJSON("mps.json", function(mps) {
-                    $("#output").pivotUI(mps, {
+                    $("#output2").pivotUI(mps, {
                         derivedAttributes: {
                             "Age Bin": derivers.bin("Age", 10),
                             "Gender Imbalance": function(mp) {
@@ -35,7 +38,7 @@
                             //delete some bulky default values
                             delete config_copy["rendererOptions"];
                             delete config_copy["localeStrings"];
-                            $("#config_json").text(JSON.stringify(config_copy, undefined, 2));
+                            $("#output").text(JSON.stringify(config_copy, undefined, 2));
                         }
                     });
                 });
@@ -43,10 +46,10 @@
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>
         <p style="width: 800px">Textarea below will refresh will display the configuration object every time a user interacts, using the "onRefresh" parameter. Instead of showing the configuration in a textarea, one could store the configuration in a cookie or implement a "save configuration" feature.</p>
-        <textarea id="config_json" 
+        <textarea id="output" 
         style="float: left; width: 250px; height: 500px; margin: 10px;" readonly>
         </textarea>
-        <div id="output" style="margin: 30px;"></div>
+        <div id="output2" style="margin: 30px;"></div>
 
     </body>
 </html>

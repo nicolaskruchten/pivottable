@@ -12,16 +12,18 @@
         <style>
             body {font-family: Verdana;}
         </style>
+        
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
     </head>
     <body>
         <script type="text/javascript">
             $(function(){
-                    var input = $("#input")
-                    $("#output").pivotUI(input, 
-                    { 
-                        rows: ["color"], 
-                        cols: ["shape"] 
-                    });
+                $("#output").pivotUI($("#input"), 
+                { 
+                    rows: ["color"], 
+                    cols: ["shape"] 
+                });
              });
         </script>
 

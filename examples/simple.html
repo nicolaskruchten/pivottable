@@ -11,20 +11,23 @@
         <style>
             body {font-family: Verdana;}
         </style>
+        
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
     </head>
     <body>
         <script type="text/javascript">
             $(function(){
-                        $("#output").pivot(
-        [
-            {color: "blue", shape: "circle"},
-            {color: "red", shape: "triangle"}
-        ],
-        {
-            rows: ["color"],
-            cols: ["shape"]
-        }
-    );
+                $("#output").pivot(
+                    [
+                        {color: "blue", shape: "circle"},
+                        {color: "red", shape: "triangle"}
+                    ],
+                    {
+                        rows: ["color"],
+                        cols: ["shape"]
+                    }
+                );
              });
         </script>
 

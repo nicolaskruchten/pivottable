@@ -24,22 +24,19 @@
         .c3-axis path {stroke: grey;}
         .c3-circle { opacity: 1 !important; }
         </style>
+        
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
     </head>
     <body>
         <script type="text/javascript">
             $(function(){
-
-                var derivers = $.pivotUtilities.derivers;
-                var renderers = $.extend($.pivotUtilities.renderers, 
-                    $.pivotUtilities.c3_renderers);
-
-                $.get("../Rdatasets/csv/datasets/iris.csv", function(iris) {
+                $.get("/Rdatasets/csv/datasets/iris.csv", function(iris) {
                     var input = $.csv.toArrays(iris);
                     input[0][0] = "Row";
-                    $("#output").pivotUI(input, {
-                        renderers: renderers,
-                        cols: ["Petal.Width"], rows: ["Petal.Length"],
-                        rendererName: "Scatter Chart"
+                    $("#output").pivot(input, {
+                        cols: ["Petal.Width", "Species"], rows: ["Petal.Length"],
+                        renderer: $.pivotUtilities.c3_renderers["Scatter Chart"]
                     });
                 });
              });
@@ -49,7 +46,7 @@
 
         <p style="width: 800px">This example shows off the C3 Scatterplot renderer.</p>
 
-        <div id="output" style="margin: 30px;"></div>
+        <div id="output" style="margin: 30px; display: inline-block"></div>
 
     </body>
 </html>

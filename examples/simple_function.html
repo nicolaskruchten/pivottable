@@ -13,31 +13,22 @@
     <style>
             body {font-family: Verdana;}
     </style>
+        
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
 </head>
 
 <body>
     <script type="text/javascript">
         $(function () {
-            var lookupColour = ["blue", "yellow", "red", "green", "orange", "purple"];
+            var lookupColour = ["blue", "yellow"];
                 var rawData = [
                 { color: 0, shape: "circle"},
                 { color: 1, shape: "circle"},
                 { color: 1, shape: "circle"},
-                { color: 2, shape: "circle"},
-                { color: 2, shape: "circle"},
-                { color: 2, shape: "circle"},
-                { color: 3, shape: "circle"},
-                { color: 4, shape: "circle"},
-                { color: 5, shape: "circle"},
                 { color: 0, shape: "triangle"},
-                { color: 1, shape: "triangle"},
-                { color: 2, shape: "triangle"},
-                { color: 3, shape: "triangle"},
-                { color: 3, shape: "triangle"},
-                { color: 4, shape: "triangle"},
-                { color: 4, shape: "triangle"},
-                { color: 4, shape: "triangle"},
-                { color: 5, shape: "triangle"},
+                { color: 0, shape: "triangle"},
+                { color: 1, shape: "triangle"}
                 ];
             var inputFunction = function (callback) {
                 rawData.forEach(function (element, index) {
