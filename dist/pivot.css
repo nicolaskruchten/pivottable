@@ -51,6 +51,7 @@ table.pvtTable tr td {
 }
 
 .pvtAxisContainer li span.pvtAttr {
+    -webkit-text-size-adjust: 100%;
     background: #F3F3F3;
     border: 1px solid #DEDEDE;
     padding: 2px 5px;
