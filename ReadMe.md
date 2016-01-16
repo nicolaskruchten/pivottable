@@ -17,6 +17,15 @@ PivotTable.js' basic function is to enable data exploration and analysis by turn
 
 The animation above is based on the [Canadian Parliament 2012 dataset example](http://nicolas.kruchten.com/pivottable/examples/fully_loaded.html).
 
+## Where are the demos/examples?
+
+There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/examples/index.html) but here are some good entry points:
+
+* [a JSFiddle where you can play with the code](https://jsfiddle.net/nicolaskruchten/kn381h7s/)
+* [a simple demo running on the "Canadian Parliament 2012" dataset](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html)
+* [fully-loaded demo running on the 700+ datasets that ship with R](http://nicolas.kruchten.com/pivottable/examples/rcsvs.html)
+* [fully-loaded demo where you provide your own CSV file for input](http://nicolaskruchten.github.io/pivottable/examples/fully_loaded.html)
+
 ## Why is it good?
 
 * it's lightweight: the core (without chart support) is a single file with less than 1000 LOC of CoffeeScript, compiles down to 6.3kb of Javascript minified and gzipped, and depends only on jQuery and jQueryUI's 'sortable'
@@ -31,14 +40,6 @@ The animation above is based on the [Canadian Parliament 2012 dataset example](h
 * its extension points allow aggregation functions, table output, UI and visualizations to be tailored to specific applications
 * it works on mobile devices with [jQuery UI Touch Punch](http://touchpunch.furf.com/)
 * it has a [test suite](http://nicolas.kruchten.com/pivottable/tests)
-
-## Where are the demos/examples?
-
-There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/examples/index.html) but here are some good entry points:
-
-* [a simple demo running on the "Canadian Parliament 2012" dataset](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html)
-* [fully-loaded demo running on the 700+ datasets that ship with R](http://nicolas.kruchten.com/pivottable/examples/rcsvs.html)
-* [fully-loaded demo where you provide a CSV file for input](http://nicolaskruchten.github.io/pivottable/examples/fully_loaded.html)
 
 ## How do I use the UI?
 
