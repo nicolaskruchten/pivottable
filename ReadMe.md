@@ -24,7 +24,7 @@ There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/exa
 * [a JSFiddle where you can play with the code](https://jsfiddle.net/nicolaskruchten/kn381h7s/)
 * [a simple demo running on the "Canadian Parliament 2012" dataset](http://nicolaskruchten.github.io/pivottable/examples/mps_prepop.html)
 * [fully-loaded demo running on the 700+ datasets that ship with R](http://nicolas.kruchten.com/pivottable/examples/rcsvs.html)
-* [fully-loaded demo where you provide your own CSV file for input](http://nicolaskruchten.github.io/pivottable/examples/fully_loaded.html)
+* [fully-loaded demo where you provide your own CSV file for input](http://nicolas.kruchten.com/pivottable/examples/local.html)
 
 ## Why is it good?
 
