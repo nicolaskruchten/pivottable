@@ -99,8 +99,7 @@ callWithJQuery ($, c3) ->
                     tick:
                         rotate: rotationAngle
                         multiline: false
-            data: 
-                type: chartOpts.type
+            data: {}
             tooltip:
                 grouped: false
             color: 
@@ -112,6 +111,10 @@ callWithJQuery ($, c3) ->
 
 
         $.extend params, opts.c3
+
+        # allow user code to provide custom params for c3.data.someUserOption
+        # overwrite data.type as it is dynamic
+        params.data.type = chartOpts.type
 
         if chartOpts.type == "scatter"
             xs = {}
