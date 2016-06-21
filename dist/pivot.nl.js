@@ -33,7 +33,7 @@
     });
     return $.pivotUtilities.locales.fr = {
       localeStrings: {
-        renderError: "Er is een fout opgetreden bij het renderen van de kruistabel..",
+        renderError: "Er is een fout opgetreden bij het renderen van de kruistabel.",
         computeError: "Er is een fout opgetreden bij het berekenen van de kruistabel.",
         uiRenderError: "Er is een fout opgetreden bij het tekenen van de interface van de kruistabel.",
         selectAll: "Alles selecteren",
