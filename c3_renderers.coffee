@@ -111,7 +111,7 @@ callWithJQuery ($, c3) ->
                            "#651067", "#329262", "#5574a6", "#3b3eac" ]
 
 
-        $.extend params, opts.c3
+        $.extend true, params, opts.c3
 
         if chartOpts.type == "scatter"
             xs = {}
