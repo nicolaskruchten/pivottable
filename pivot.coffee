@@ -872,7 +872,7 @@ callWithJQuery ($) ->
     Heatmap post-processing
     ###
 
-    $.fn.heatmap = (scope = "heatmap") ->
+    $.fn.heatmap = (scope = "heatmap", color = "red") ->
         numRows = @data "numrows"
         numCols = @data "numcols"
 
@@ -901,14 +901,14 @@ callWithJQuery ($) ->
 
         switch scope
             when "heatmap"
-                heatmapper ".pvtVal", "red"
+                heatmapper ".pvtVal", color
             when "rowheatmap"
-                heatmapper ".pvtVal.row#{i}", "red" for i in [0...numRows]
+                heatmapper ".pvtVal.row#{i}", color for i in [0...numRows]
             when "colheatmap"
-                heatmapper ".pvtVal.col#{j}", "red" for j in [0...numCols]
+                heatmapper ".pvtVal.col#{j}", color for j in [0...numCols]
 
-        heatmapper ".pvtTotal.rowTotal", "red"
-        heatmapper ".pvtTotal.colTotal", "red"
+        heatmapper ".pvtTotal.rowTotal", color
+        heatmapper ".pvtTotal.colTotal", color
 
         return this
 
