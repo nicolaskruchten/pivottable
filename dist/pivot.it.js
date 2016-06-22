@@ -33,8 +33,8 @@
     });
     return $.pivotUtilities.locales.fr = {
       localeStrings: {
-        renderError: "Si &egrave; verificato un errore durante la creazione della tabella.",
-        computeError: "Si &egrave; verificato un errore di calcolo nella tabella.",
+        renderError: "Si è verificato un errore durante la creazione della tabella.",
+        computeError: "Si è verificato un errore di calcolo nella tabella.",
         uiRenderError: "Si è verificato un errore durante il disegno di interfaccia della tabella pivot.",
         selectAll: "Seleziona tutto",
         selectNone: "Deseleziona tutto",

@@ -33,9 +33,9 @@
     });
     return $.pivotUtilities.locales.es = {
       localeStrings: {
-        renderError: "Ocurri&oacute; un error durante la interpretaci&oacute;n de la tabla din&acute;mica.",
-        computeError: "Ocurri&oacute; un error durante el c&acute;lculo de la tabla din&acute;mica.",
-        uiRenderError: "Ocurri&oacute; un error durante el dibujado de la tabla din&acute;mica.",
+        renderError: "Ocurrió un error durante la interpretación de la tabla dinámica.",
+        computeError: "Ocurrió un error durante el cálculo de la tabla dinámica.",
+        uiRenderError: "Ocurrió un error durante el dibujado de la tabla dinámica.",
         selectAll: "Seleccionar todo",
         selectNone: "Deseleccionar todo",
         tooMany: "(demasiados valores)",
@@ -46,8 +46,8 @@
       },
       aggregators: {
         "Cuenta": tpl.count(frFmtInt),
-        "Cuenta de valores &uacute;nicos": tpl.countUnique(frFmtInt),
-        "Lista de valores &uacute;nicos": tpl.listUnique(", "),
+        "Cuenta de valores únicos": tpl.countUnique(frFmtInt),
+        "Lista de valores únicos": tpl.listUnique(", "),
         "Suma": tpl.sum(frFmt),
         "Suma de enteros": tpl.sum(frFmtInt),
         "Promedio": tpl.average(frFmt),
@@ -56,12 +56,12 @@
         "Suma de sumas": tpl.sumOverSum(frFmt),
         "Cota 80% superior": tpl.sumOverSumBound80(true, frFmt),
         "Cota 80% inferior": tpl.sumOverSumBound80(false, frFmt),
-        "Proporci&oacute;n del total (suma)": tpl.fractionOf(tpl.sum(), "total", frFmtPct),
-        "Proporci&oacute;n de la fila (suma)": tpl.fractionOf(tpl.sum(), "row", frFmtPct),
-        "Proporci&oacute;n de la columna (suma)": tpl.fractionOf(tpl.sum(), "col", frFmtPct),
-        "Proporci&oacute;n del total (cuenta)": tpl.fractionOf(tpl.count(), "total", frFmtPct),
-        "Proporci&oacute;n de la fila (cuenta)": tpl.fractionOf(tpl.count(), "row", frFmtPct),
-        "Proporci&oacute;n de la columna (cuenta)": tpl.fractionOf(tpl.count(), "col", frFmtPct)
+        "Proporción del total (suma)": tpl.fractionOf(tpl.sum(), "total", frFmtPct),
+        "Proporción de la fila (suma)": tpl.fractionOf(tpl.sum(), "row", frFmtPct),
+        "Proporción de la columna (suma)": tpl.fractionOf(tpl.sum(), "col", frFmtPct),
+        "Proporción del total (cuenta)": tpl.fractionOf(tpl.count(), "total", frFmtPct),
+        "Proporción de la fila (cuenta)": tpl.fractionOf(tpl.count(), "row", frFmtPct),
+        "Proporción de la columna (cuenta)": tpl.fractionOf(tpl.count(), "col", frFmtPct)
       },
       renderers: {
         "Tabla": $.pivotUtilities.renderers["Table"],

@@ -37,9 +37,9 @@
     });
     $.pivotUtilities.locales.pt = {
       localeStrings: {
-        renderError: "Ocorreu um error ao renderizar os resultados da Tabela Din&atilde;mica.",
-        computeError: "Ocorreu um error ao computar os resultados da Tabela Din&atilde;mica.",
-        uiRenderError: "Ocorreu um error ao renderizar a interface da Tabela Din&atilde;mica.",
+        renderError: "Ocorreu um error ao renderizar os resultados da Tabela Dinãmica.",
+        computeError: "Ocorreu um error ao computar os resultados da Tabela Dinãmica.",
+        uiRenderError: "Ocorreu um error ao renderizar a interface da Tabela Dinãmica.",
         selectAll: "Selecionar Tudo",
         selectNone: "Selecionar Nenhum",
         tooMany: "(demais para listar)",
@@ -50,8 +50,8 @@
       },
       aggregators: {
         "Contagem": tpl.count(frFmtInt),
-        "Contagem de Valores &uacute;nicos": tpl.countUnique(frFmtInt),
-        "Lista de Valores &uacute;nicos": tpl.listUnique(", "),
+        "Contagem de Valores únicos": tpl.countUnique(frFmtInt),
+        "Lista de Valores únicos": tpl.listUnique(", "),
         "Soma": tpl.sum(frFmt),
         "Soma de Inteiros": tpl.sum(frFmtInt),
         "Média": tpl.average(frFmt),
@@ -60,12 +60,12 @@
         "Soma sobre Soma": tpl.sumOverSum(frFmt),
         "Limite Superior a 80%": tpl.sumOverSumBound80(true, frFmt),
         "Limite Inferior a 80%": tpl.sumOverSumBound80(false, frFmt),
-        "Soma como Fra&ccedil;&atilde;o do Total": tpl.fractionOf(tpl.sum(), "total", frFmtPct),
-        "Soma como Fra&ccedil;&atilde;o da Linha": tpl.fractionOf(tpl.sum(), "row", frFmtPct),
-        "Soma como Fra&ccedil;&atilde;o da Coluna": tpl.fractionOf(tpl.sum(), "col", frFmtPct),
-        "Contagem como Fra&ccedil;&atilde;o do Total": tpl.fractionOf(tpl.count(), "total", frFmtPct),
-        "Contagem como Fra&ccedil;&atilde;o da Linha": tpl.fractionOf(tpl.count(), "row", frFmtPct),
-        "Contagem como Fra&ccedil;&atilde;o da Coluna": tpl.fractionOf(tpl.count(), "col", frFmtPct)
+        "Soma como Fração do Total": tpl.fractionOf(tpl.sum(), "total", frFmtPct),
+        "Soma como Fração da Linha": tpl.fractionOf(tpl.sum(), "row", frFmtPct),
+        "Soma como Fração da Coluna": tpl.fractionOf(tpl.sum(), "col", frFmtPct),
+        "Contagem como Fração do Total": tpl.fractionOf(tpl.count(), "total", frFmtPct),
+        "Contagem como Fração da Linha": tpl.fractionOf(tpl.count(), "row", frFmtPct),
+        "Contagem como Fração da Coluna": tpl.fractionOf(tpl.count(), "col", frFmtPct)
       },
       renderers: {
         "Tabela": r["Table"],
@@ -77,10 +77,10 @@
     };
     if (gcr) {
       $.pivotUtilities.locales.pt.gchart_renderers = {
-        "Gr&aacute;fico de Linhas": gcr["Line Chart"],
-        "Gr&aacute;fico de Barras": gcr["Bar Chart"],
-        "Gr&aacute;fico de Barras Empilhadas": gcr["Stacked Bar Chart"],
-        "Gr&aacute;fico de &Aacute;rea": gcr["Area Chart"]
+        "Gráfico de Linhas": gcr["Line Chart"],
+        "Gráfico de Barras": gcr["Bar Chart"],
+        "Gráfico de Barras Empilhadas": gcr["Stacked Bar Chart"],
+        "Gráfico de Área": gcr["Area Chart"]
       };
     }
     if (d3r) {
@@ -90,10 +90,10 @@
     }
     if (c3r) {
       $.pivotUtilities.locales.pt.c3_renderers = {
-        "Gr&aacute;fico de Linhas": c3r["Line Chart"],
-        "Gr&aacute;fico de Barras": c3r["Bar Chart"],
-        "Gr&aacute;fico de Barras Empilhadas": c3r["Stacked Bar Chart"],
-        "Gr&aacute;fico de &Aacute;rea": c3r["Area Chart"]
+        "Gráfico de Linhas": c3r["Line Chart"],
+        "Gráfico de Barras": c3r["Bar Chart"],
+        "Gráfico de Barras Empilhadas": c3r["Stacked Bar Chart"],
+        "Gráfico de Área": c3r["Area Chart"]
       };
     }
     return $.pivotUtilities.locales.pt;

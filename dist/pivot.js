@@ -1172,7 +1172,7 @@
             valueList.find('.pvtSearch').val('');
             return valueList.find('.pvtCheckContainer p').show();
           };
-          triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", showFilterList);
+          triangleLink = $("<span>").addClass('pvtTriangle').html(" ▾").bind("click", showFilterList);
           attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(c).data("attrName", c).append(triangleLink));
           if (hasExcludedItem) {
             attrElem.addClass('pvtFilteredAttribute');
