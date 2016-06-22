@@ -1367,10 +1367,13 @@
     /*
     Heatmap post-processing
      */
-    $.fn.heatmap = function(scope) {
+    $.fn.heatmap = function(scope, color) {
       var colorGen, heatmapper, i, j, l, n, numCols, numRows, ref, ref1;
       if (scope == null) {
         scope = "heatmap";
+      }
+      if (color == null) {
+        color = "red";
       }
       numRows = this.data("numrows");
       numCols = this.data("numcols");
@@ -1426,20 +1429,20 @@
       })(this);
       switch (scope) {
         case "heatmap":
-          heatmapper(".pvtVal", "red");
+          heatmapper(".pvtVal", color);
           break;
         case "rowheatmap":
           for (i = l = 0, ref = numRows; 0 <= ref ? l < ref : l > ref; i = 0 <= ref ? ++l : --l) {
-            heatmapper(".pvtVal.row" + i, "red");
+            heatmapper(".pvtVal.row" + i, color);
           }
           break;
         case "colheatmap":
           for (j = n = 0, ref1 = numCols; 0 <= ref1 ? n < ref1 : n > ref1; j = 0 <= ref1 ? ++n : --n) {
-            heatmapper(".pvtVal.col" + j, "red");
+            heatmapper(".pvtVal.col" + j, color);
           }
       }
-      heatmapper(".pvtTotal.rowTotal", "red");
-      heatmapper(".pvtTotal.colTotal", "red");
+      heatmapper(".pvtTotal.rowTotal", color);
+      heatmapper(".pvtTotal.colTotal", color);
       return this;
     };
 
