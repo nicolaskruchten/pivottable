@@ -24,7 +24,7 @@ gulp.task('makeCss', function() {
 
 gulp.task('makeJs', function() {
     
-    gulp.src('./*.coffee')
+    gulp.src(['./*.coffee', './locales/*.coffee'])
         //compile to js (and create map files)
         .pipe(sourcemaps.init())
         .pipe(coffee()).on('error', gutil.log)
