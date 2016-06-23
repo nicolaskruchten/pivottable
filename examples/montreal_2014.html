@@ -50,26 +50,16 @@
 
         $.get("montreal_2014.csv", function(montreal_2014) {
             $("#output").pivotUI($.csv.toArrays(montreal_2014), {
+                hiddenAttributes: ["Date","Max Temp (C)","Mean Temp (C)",
+                    "Min Temp (C)" ,"Total Rain (mm)","Total Snow (cm)"],
 
-                aggregators: {
-                    "Mean Temp (Celsius)":  
-                        function() { return tpl.average()(["Mean Temp (C)"])},
-                    "Max Temp (Celsius)":   
-                        function() { return tpl.max()(["Max Temp (C)"]) },
-                    "Min Temp (Celsius)":   
-                        function() { return tpl.min()(["Min Temp (C)"]) },
-                    "Total Rain (mm)": 
-                        function() { return tpl.sum()(["Total Rain (mm)"]) },
-                    "Total Snow (cm)": 
-                        function() { return tpl.sum()(["Total Snow (cm)"]) }
-                },
                 derivedAttributes: {
-                    "year":       dateFormat("Date", "%y", true),
-                    "month":      dateFormat("Date", "%m", true),
-                    "day":        dateFormat("Date", "%d", true),
                     "month name": dateFormat("Date", "%n", true),
                     "day name":   dateFormat("Date", "%w", true)
                 },
+
+                rows: ["day name"], 
+                cols: ["month name"],
 
                 sorters: function(attr) {
                     if(attr == "month name") {
@@ -82,8 +72,14 @@
                     }
                 },
 
-                hiddenAttributes: ["Date","Max Temp (C)","Mean Temp (C)",
-                    "Min Temp (C)" ,"Total Rain (mm)","Total Snow (cm)"],
+                aggregators: {
+                    "Mean Temp (Celsius)":  
+                        function() { return tpl.average()(["Mean Temp (C)"])},
+                    "Max Temp (Celsius)":   
+                        function() { return tpl.max()(["Max Temp (C)"]) },
+                    "Min Temp (Celsius)":   
+                        function() { return tpl.min()(["Min Temp (C)"]) }
+                },
 
                 renderers: $.extend(
                     $.pivotUtilities.renderers,
@@ -91,10 +87,17 @@
                     $.pivotUtilities.export_renderers
                     ),
 
-                rows: ["year", "month name"],
-                cols: ["day name"]
-
-
+                rendererName: "Heatmap",
+                
+                rendererOptions: {
+                    heatmap: {
+                        colorScaleGenerator: function(values) {
+                            return d3.scale.linear()
+                                .domain([d3.min(values), 0, d3.max(values)])
+                                .range(["blue", "white", "red"])
+                        }
+                    }
+                }
             });
         });
     });

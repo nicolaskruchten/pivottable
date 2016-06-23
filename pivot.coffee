@@ -150,11 +150,11 @@ callWithJQuery ($) ->
         "Count as Fraction of Columns": tpl.fractionOf(tpl.count(), "col",   usFmtPct)
 
     renderers =
-        "Table":          (pvtData, opts) ->   pivotTableRenderer(pvtData, opts)
-        "Table Barchart": (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).barchart()
-        "Heatmap":        (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap()
-        "Row Heatmap":    (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("rowheatmap")
-        "Col Heatmap":    (pvtData, opts) -> $(pivotTableRenderer(pvtData, opts)).heatmap("colheatmap")
+        "Table":          (data, opts) ->   pivotTableRenderer(data, opts)
+        "Table Barchart": (data, opts) -> $(pivotTableRenderer(data, opts)).barchart()
+        "Heatmap":        (data, opts) -> $(pivotTableRenderer(data, opts)).heatmap("heatmap",    opts)
+        "Row Heatmap":    (data, opts) -> $(pivotTableRenderer(data, opts)).heatmap("rowheatmap", opts)
+        "Col Heatmap":    (data, opts) -> $(pivotTableRenderer(data, opts)).heatmap("colheatmap", opts)
 
     locales = 
         en: 
@@ -872,23 +872,21 @@ callWithJQuery ($) ->
     Heatmap post-processing
     ###
 
-    $.fn.heatmap = (scope = "heatmap", color = "red") ->
+    $.fn.heatmap = (scope = "heatmap", opts) ->
         numRows = @data "numrows"
         numCols = @data "numcols"
 
-        colorGen = (color, min, max) ->
-            hexGen = switch color
-                when "red"   then (hex) -> "ff#{hex}#{hex}"
-                when "green" then (hex) -> "#{hex}ff#{hex}"
-                when "blue"  then (hex) -> "#{hex}#{hex}ff"
-
+        # given a series of values
+        # must return a function to map a given value to a CSS color
+        colorScaleGenerator = opts?.heatmap?.colorScaleGenerator
+        colorScaleGenerator ?= (values) ->
+            min = Math.min(values...)
+            max = Math.max(values...)
             return (x) ->
-                intensity = 255 - Math.round 255*(x-min)/(max-min)
-                hex = intensity.toString(16).split(".")[0]
-                hex = 0+hex if hex.length == 1
-                return hexGen(hex)
+                nonRed = 255 - Math.round 255*(x-min)/(max-min)
+                return "rgb(255,#{nonRed},#{nonRed})"
 
-        heatmapper = (scope, color) =>
+        heatmapper = (scope) =>
             forEachCell = (f) =>
                 @find(scope).each ->
                     x = $(this).data("value")
@@ -896,19 +894,16 @@ callWithJQuery ($) ->
 
             values = []
             forEachCell (x) -> values.push x
-            colorFor = colorGen color, Math.min(values...), Math.max(values...)
-            forEachCell (x, elem) -> elem.css "background-color", "#" + colorFor(x)
+            colorScale = colorScaleGenerator(values)
+            forEachCell (x, elem) -> elem.css "background-color", colorScale(x)
 
         switch scope
-            when "heatmap"
-                heatmapper ".pvtVal", color
-            when "rowheatmap"
-                heatmapper ".pvtVal.row#{i}", color for i in [0...numRows]
-            when "colheatmap"
-                heatmapper ".pvtVal.col#{j}", color for j in [0...numCols]
+            when "heatmap"    then heatmapper ".pvtVal"
+            when "rowheatmap" then heatmapper ".pvtVal.row#{i}" for i in [0...numRows]
+            when "colheatmap" then heatmapper ".pvtVal.col#{j}" for j in [0...numCols]
 
-        heatmapper ".pvtTotal.rowTotal", color
-        heatmapper ".pvtTotal.colTotal", color
+        heatmapper ".pvtTotal.rowTotal"
+        heatmapper ".pvtTotal.colTotal"
 
         return this
 
