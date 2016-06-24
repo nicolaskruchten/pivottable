@@ -527,6 +527,7 @@ callWithJQuery ($) ->
             rows: []
             vals: []
             filter: -> true
+            dataClass: PivotData
             aggregator: aggregatorTemplates.count()()
             aggregatorName: "Count"
             sorters: -> 
@@ -539,7 +540,7 @@ callWithJQuery ($) ->
 
         result = null
         try
-            pivotData = new PivotData(input, opts)
+            pivotData = new opts.dataClass(input, opts)
             try
                 result = opts.renderer(pivotData, opts.rendererOptions)
             catch e
@@ -567,6 +568,7 @@ callWithJQuery ($) ->
             renderers: locales[locale].renderers
             hiddenAttributes: []
             menuLimit: 200
+            dataClass: PivotData
             cols: [], rows: [], vals: []
             exclusions: {}
             inclusions: {}
@@ -767,6 +769,7 @@ callWithJQuery ($) ->
                     localeStrings: opts.localeStrings
                     rendererOptions: opts.rendererOptions
                     sorters: opts.sorters
+                    dataClass: opts.dataClass
                     cols: [], rows: []
 
                 numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0

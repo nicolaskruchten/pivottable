@@ -917,6 +917,7 @@
         filter: function() {
           return true;
         },
+        dataClass: PivotData,
         aggregator: aggregatorTemplates.count()(),
         aggregatorName: "Count",
         sorters: function() {},
@@ -928,7 +929,7 @@
       opts = $.extend(defaults, opts);
       result = null;
       try {
-        pivotData = new PivotData(input, opts);
+        pivotData = new opts.dataClass(input, opts);
         try {
           result = opts.renderer(pivotData, opts.rendererOptions);
         } catch (error) {
@@ -972,6 +973,7 @@
         renderers: locales[locale].renderers,
         hiddenAttributes: [],
         menuLimit: 200,
+        dataClass: PivotData,
         cols: [],
         rows: [],
         vals: [],
