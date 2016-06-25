@@ -1233,6 +1233,7 @@
               localeStrings: opts.localeStrings,
               rendererOptions: opts.rendererOptions,
               sorters: opts.sorters,
+              dataClass: opts.dataClass,
               cols: [],
               rows: []
             };

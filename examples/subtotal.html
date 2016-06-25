@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <script type="text/javascript" src="../dist/subtotal_pivotdata.js"></script>
+        <script type="text/javascript" src="../dist/subtotal_renderers.js"></script>
+       
+        <style>
+            body {font-family: Verdana;}
+        </style>
+        
+        <!-- optional: mobile support with jqueryui-touch-punch -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+    // This example loads the "Canadian Parliament 2012" dataset 
+    // and adds derived attributes: "Age Bin" and "Gender Imbalance".
+
+    $(function(){
+        var dataClass = $.pivotUtilities.SubtotalPivotData
+        var derivers = $.pivotUtilities.derivers;
+        var renderers = $.pivotUtilities.subtotal_renderers;
+        
+        $.getJSON("mps.json", function(mps) {
+            $("#output").pivotUI(mps, {
+                dataClass: dataClass,
+                rows: ["Gender", "Province", "Party"],
+                cols: ["Age Bin"],
+                renderers: renderers,
+                derivedAttributes: {
+                    "Age Bin": derivers.bin("Age", 10),
+                    "Gender Imbalance": function(mp) {
+                        return mp["Gender"] == "Male" ? 1 : -1;
+                    }
+                },
+                rendererName: "Table With Subtotal",
+                rendererOptions: {
+                    collapseRowsAt: "Province"
+                }
+            });
+        });
+     });
+        </script>
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>
