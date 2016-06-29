@@ -410,6 +410,7 @@ callWithJQuery ($) ->
             return len
 
         #the first few rows are for col headers
+        thead = document.createElement("thead")
         for own j, c of colAttrs
             tr = document.createElement("tr")
             if parseInt(j) == 0 and rowAttrs.length != 0
@@ -437,7 +438,7 @@ callWithJQuery ($) ->
                 th.innerHTML = opts.localeStrings.totals
                 th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
                 tr.appendChild th
-            result.appendChild tr
+            thead.appendChild tr
 
         #then a row for row header headers
         if rowAttrs.length !=0
@@ -452,9 +453,11 @@ callWithJQuery ($) ->
                 th.className = "pvtTotalLabel"
                 th.innerHTML = opts.localeStrings.totals
             tr.appendChild th
-            result.appendChild tr
+            thead.appendChild tr
+        result.appendChild thead
 
         #now the actual data rows, with their row headers and totals
+        tbody = document.createElement("tbody")
         for own i, rowKey of rowKeys
             tr = document.createElement("tr")
             for own j, txt of rowKey
@@ -484,7 +487,7 @@ callWithJQuery ($) ->
             td.setAttribute("data-value", val)
             td.setAttribute("data-for", "row"+i)
             tr.appendChild td
-            result.appendChild tr
+            tbody.appendChild tr
 
         #finally, the row for col totals, and a grand total
         tr = document.createElement("tr")
@@ -509,7 +512,8 @@ callWithJQuery ($) ->
         td.textContent = totalAggregator.format(val)
         td.setAttribute("data-value", val)
         tr.appendChild td
-        result.appendChild tr
+        tbody.appendChild tr
+        result.appendChild tbody
 
         #squirrel this away for later
         result.setAttribute("data-numrows", rowKeys.length)
