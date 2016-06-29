@@ -6,7 +6,7 @@ table.pvtTable {
     text-align: left;
     border-collapse: collapse;
 }
-table.pvtTable tr th, table.pvtTable tr th {
+table.pvtTable thead tr th, table.pvtTable tbody tr th {
     background-color: #e6EEEE;
     border: 1px solid #CDCDCD;
     font-size: 8pt;
@@ -16,7 +16,7 @@ table.pvtTable tr th, table.pvtTable tr th {
 table.pvtTable .pvtColLabel {text-align: center;}
 table.pvtTable .pvtTotalLabel {text-align: right;}
 
-table.pvtTable tr td {
+table.pvtTable tbody tr td {
     color: #3D3D3D;
     padding: 5px;
     background-color: #FFF;

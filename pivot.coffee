@@ -703,7 +703,7 @@ callWithJQuery ($) ->
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
-                    triangleLink = $("<span>").addClass('pvtTriangle').html(" ▾")
+                    triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;")
                         .bind "click", showFilterList
 
                     attrElem = $("<li>").addClass("axis_#{i}")
