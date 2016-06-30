@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/benchmark/2.1.0/benchmark.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <script type="text/javascript" src="../dist/subtotal_pivotdata.js"></script>
+        <style>
+            body {font-family: Verdana;}
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+    $(function(){
+        $.getJSON("mps.json", function(mps) {
+            var suite = new Benchmark.Suite;
+            suite
+            .add('PD: 1-cell', function() {
+                new $.pivotUtilities.PivotData(mps, 
+                    {
+                        rows: [], cols: [],
+                        aggregator: $.pivotUtilities.aggregators.Count(),
+                        filter: function(){return true;},
+                        sorters: function(){}
+                    }
+                );
+            })
+            .add('PD: Party, Province', function() {
+                new $.pivotUtilities.PivotData(mps, 
+                    {
+                        rows: ['Party', 'Province'], cols: [],
+                        aggregator: $.pivotUtilities.aggregators.Count(),
+                        filter: function(){return true;},
+                        sorters: function(){}
+                    }
+                );
+            })
+            .add('PD: Party vs Province', function() {
+                new $.pivotUtilities.PivotData(mps, 
+                    {
+                        rows: ['Party'], cols: ['Province'],
+                        aggregator: $.pivotUtilities.aggregators.Count(),
+                        filter: function(){return true;},
+                        sorters: function(){}
+                    }
+                );
+            })
+            .add('PD: Party, Province vs Gender, Age', function() {
+                new $.pivotUtilities.PivotData(mps, 
+                    {
+                        rows: ['Party', 'Province'], cols: ['Gender', 'Age'],
+                        aggregator: $.pivotUtilities.aggregators.Count(),
+                        filter: function(){return true;},
+                        sorters: function(){}
+                    }
+                );
+            })
+            .on('cycle', function(event) {
+              $("#output").append(String(event.target)+"\n"+"\n");
+            }).run();
+        });
+     });
+        </script>
+
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <pre id="output"></pre>
+
+    </body>
+</html>
