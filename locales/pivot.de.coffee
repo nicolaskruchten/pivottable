@@ -19,10 +19,10 @@ callWithJQuery ($) ->
         localeStrings:
             renderError: "Bei der Darstellung der Pivot-Tabelle ist ein Fehler aufgetreten."
             computeError: "Bei der Berechnung der Pivot-Tabelle ist ein Fehler aufgetreten."
-            uiRenderError: "Bei der Darstellung Oberfläche der Pivot-Tabelle ist ein Fehler aufgetreten."
-            selectAll: "Alles auswählen"
-            selectNone: "Nichts auswählen"
-            tooMany: "(zu viele für Liste)"
+            uiRenderError: "Bei der Darstellung OberflÃ¤che der Pivot-Tabelle ist ein Fehler aufgetreten."
+            selectAll: "Alles auswÃ¤hlen"
+            selectNone: "Nichts auswÃ¤hlen"
+            tooMany: "(zu viele fÃ¼r Liste)"
             filterResults: "Ergebnisse filtern"
             totals: "Gesamt"
             vs: "gegen"
@@ -37,7 +37,7 @@ callWithJQuery ($) ->
             "Durchschnitt":                 tpl.average(frFmt)
             "Minimum":                      tpl.min(frFmt)
             "Maximum":                      tpl.max(frFmt)
-            "Summe über Summe":             tpl.sumOverSum(frFmt)
+            "Summe Ã¼ber Summe":             tpl.sumOverSum(frFmt)
             "80% Obergrenze":               tpl.sumOverSumBound80(true, frFmt)
             "80% Untergrenze":        		tpl.sumOverSumBound80(false, frFmt)
             "Summe als Anteil von Gesamt":  tpl.fractionOf(tpl.sum(),   "total", frFmtPct)
@@ -48,7 +48,7 @@ callWithJQuery ($) ->
             "Anzahl als Anteil von Spalte": tpl.fractionOf(tpl.count(), "col",   frFmtPct)
 
         renderers:
-            "Talelle":                      $.pivotUtilities.renderers["Table"]
+            "Tabelle":                      $.pivotUtilities.renderers["Table"]
             "Tabelle mit Balkendiagramm":   $.pivotUtilities.renderers["Table Barchart"]
             "Heatmap":                      $.pivotUtilities.renderers["Heatmap"]
             "Heatmap pro Zeile":            $.pivotUtilities.renderers["Row Heatmap"]
