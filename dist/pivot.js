@@ -918,6 +918,7 @@
         cols: [],
         rows: [],
         vals: [],
+        dataClass: PivotData,
         filter: function() {
           return true;
         },
@@ -932,7 +933,7 @@
       opts = $.extend(defaults, opts);
       result = null;
       try {
-        pivotData = new PivotData(input, opts);
+        pivotData = new opts.dataClass(input, opts);
         try {
           result = opts.renderer(pivotData, opts.rendererOptions);
         } catch (error) {
@@ -979,6 +980,7 @@
         cols: [],
         rows: [],
         vals: [],
+        dataClass: PivotData,
         exclusions: {},
         inclusions: {},
         unusedAttrsVertical: 85,
@@ -1236,7 +1238,8 @@
               rendererOptions: opts.rendererOptions,
               sorters: opts.sorters,
               cols: [],
-              rows: []
+              rows: [],
+              dataClass: opts.dataClass
             };
             numInputsToProcess = (ref5 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? ref5 : 0;
             vals = [];
