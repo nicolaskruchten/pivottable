@@ -8,7 +8,7 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
 
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
@@ -36,13 +36,16 @@
     // This example shows off the C3 Scatterplot renderer with CSV input.
 
     $(function(){
-        $.get("/Rdatasets/csv/datasets/iris.csv", function(iris) {
-            $("#output").pivot($.csv.toArrays(iris), {
-                rows: ["Petal.Length"], 
-                cols: ["Petal.Width", "Species"], 
-                renderer: $.pivotUtilities.c3_renderers["Scatter Chart"],
-                rendererOptions: { c3: { size: {width: 600, height: 600} } }
-            });
+        Papa.parse("/Rdatasets/csv/datasets/iris.csv", {
+            download: true,
+            complete: function(parsed){
+                $("#output").pivot(parsed.data, {
+                    rows: ["Petal.Length"], 
+                    cols: ["Petal.Width", "Species"], 
+                    renderer: $.pivotUtilities.c3_renderers["Scatter Chart"],
+                    rendererOptions: { c3: { size: {width: 600, height: 600} } }
+                });
+            }
         });
      });
         </script>

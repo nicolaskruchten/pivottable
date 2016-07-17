@@ -8,7 +8,7 @@
             <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
             <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
             <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
             <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
             <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
 
@@ -48,57 +48,61 @@
         var sortAs =           $.pivotUtilities.sortAs;
         var tpl =              $.pivotUtilities.aggregatorTemplates;
 
-        $.get("montreal_2014.csv", function(montreal_2014) {
-            $("#output").pivotUI($.csv.toArrays(montreal_2014), {
-                hiddenAttributes: ["Date","Max Temp (C)","Mean Temp (C)",
-                    "Min Temp (C)" ,"Total Rain (mm)","Total Snow (cm)"],
+        Papa.parse("montreal_2014.csv", {
+            download: true,
+            skipEmptyLines: true,
+            complete: function(parsed){
+                $("#output").pivotUI(parsed.data, {
+                    hiddenAttributes: ["Date","Max Temp (C)","Mean Temp (C)",
+                        "Min Temp (C)" ,"Total Rain (mm)","Total Snow (cm)"],
 
-                derivedAttributes: {
-                    "month name": dateFormat("Date", "%n", true),
-                    "day name":   dateFormat("Date", "%w", true)
-                },
+                    derivedAttributes: {
+                        "month name": dateFormat("Date", "%n", true),
+                        "day name":   dateFormat("Date", "%w", true)
+                    },
 
-                rows: ["day name"], 
-                cols: ["month name"],
+                    rows: ["day name"], 
+                    cols: ["month name"],
 
-                sorters: function(attr) {
-                    if(attr == "month name") {
-                        return sortAs(["Jan","Feb","Mar","Apr", "May",
-                            "Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
-                    }
-                    if(attr == "day name") {
-                        return sortAs(["Mon","Tue","Wed", "Thu","Fri",
-                            "Sat","Sun"]);
-                    }
-                },
+                    sorters: function(attr) {
+                        if(attr == "month name") {
+                            return sortAs(["Jan","Feb","Mar","Apr", "May",
+                                "Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
+                        }
+                        if(attr == "day name") {
+                            return sortAs(["Mon","Tue","Wed", "Thu","Fri",
+                                "Sat","Sun"]);
+                        }
+                    },
 
-                aggregators: {
-                    "Mean Temp (Celsius)":  
-                        function() { return tpl.average()(["Mean Temp (C)"])},
-                    "Max Temp (Celsius)":   
-                        function() { return tpl.max()(["Max Temp (C)"]) },
-                    "Min Temp (Celsius)":   
-                        function() { return tpl.min()(["Min Temp (C)"]) }
-                },
+                    aggregators: {
+                        "Mean Temp (Celsius)":  
+                            function() { return tpl.average()(["Mean Temp (C)"])},
+                        "Max Temp (Celsius)":   
+                            function() { return tpl.max()(["Max Temp (C)"]) },
+                        "Min Temp (Celsius)":   
+                            function() { return tpl.min()(["Min Temp (C)"]) }
+                    },
 
-                renderers: $.extend(
-                    $.pivotUtilities.renderers,
-                    $.pivotUtilities.c3_renderers,
-                    $.pivotUtilities.export_renderers
-                    ),
+                    renderers: $.extend(
+                        $.pivotUtilities.renderers,
+                        $.pivotUtilities.c3_renderers,
+                        $.pivotUtilities.export_renderers
+                        ),
 
-                rendererName: "Heatmap",
-                
-                rendererOptions: {
-                    heatmap: {
-                        colorScaleGenerator: function(values) {
-                            return d3.scale.linear()
-                                .domain([d3.min(values), 0, d3.max(values)])
-                                .range(["blue", "white", "red"])
+                    rendererName: "Heatmap",
+                    
+                    rendererOptions: {
+                        heatmap: {
+                            colorScaleGenerator: function(values) {
+                                return d3.scale.linear()
+                                    .domain([d3.min(values), 0, d3.max(values)])
+                                    .range(["blue", "white", "red"])
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         });
     });
         </script>

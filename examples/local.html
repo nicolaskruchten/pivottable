@@ -10,7 +10,7 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
 
         <!-- PivotTable.js libs from ../dist -->
@@ -41,29 +41,20 @@
     <body>
         <script type="text/javascript">
             $(function(){
+                var renderers = $.extend(
+                    $.pivotUtilities.renderers, 
+                    $.pivotUtilities.c3_renderers, 
+                    $.pivotUtilities.d3_renderers,
+                    $.pivotUtilities.export_renderers
+                    );
                 $("#csv").bind("change", function(event){
-                    var reader = new FileReader();
-                    reader.onload = function(theFile) { 
-                        try {
-                            var input = $.csv.toArrays(theFile.target.result);
-
-                        }
-                        catch(e) { 
-                            alert("CSV Parse error.");
-                            return; 
-                        }
-
-                        var renderers = $.extend(
-                            $.pivotUtilities.renderers, 
-                            $.pivotUtilities.c3_renderers, 
-                            $.pivotUtilities.d3_renderers,
-                            $.pivotUtilities.export_renderers
-                            );
-
-                        $("#output").pivotUI( input, { renderers: renderers }, true);
-                    };
-                    reader.readAsText(event.target.files[0]);
-                });  
+                    Papa.parse(event.target.files[0], {
+                        error: function(e){ alert(e)},
+                        complete: function(parsed){
+                            $("#output").pivotUI(parsed.data, { renderers: renderers }, true);
+                        }  
+                    });
+                });
              });
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>

@@ -5,7 +5,7 @@
         <!-- external libs from cdnjs -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
 
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
@@ -26,11 +26,13 @@
     // dataset from a CSV instead of from JSON.
 
     $(function(){
-        $.get("mps.csv", function(mps) {
-            var input = $.csv.toArrays(mps);
-            $("#output").pivotUI(input, {
-                rows: ["Province"], cols: ["Party"]
-            });
+        Papa.parse("mps.csv", {
+            download: true,
+            complete: function(parsed){
+                $("#output").pivotUI(parsed.data, {
+                    rows: ["Province"], cols: ["Party"]
+                });
+            }
         });
      });
         </script>
