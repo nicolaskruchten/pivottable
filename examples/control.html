@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+            body {font-family: Verdana;}
+        </style>
+        
+        <!-- optional: mobile support with jqueryui-touch-punch -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+        
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+    // Setting the third parameter of pivotUI() to true causes an overwrite
+    // of the existing configuration.
+    // This enables the saving/reloading of configs stored under the pivotUIOptions
+    // data element.
+    // To see this in action:
+    // 1. configure the pivot table however you like then hit 'save'
+    // 2. reload the page then hit 'restore' to see your saved configuration
+
+    $(function(){
+        $.getJSON("mps.json", function(mps) {
+            $("#output2").pivotUI(mps);
+
+            $("#save").on("click", function(){
+                var config = $("#output2").data("pivotUIOptions");
+                var config_copy = JSON.parse(JSON.stringify(config));
+                //delete some values which will not serialize to JSON
+                delete config_copy["aggregators"];
+                delete config_copy["renderers"];
+                $.cookie("pivotConfig", JSON.stringify(config_copy));
+            });
+
+            $("#restore").on("click", function(){
+                $("#output2").pivotUI(mps, JSON.parse($.cookie("pivotConfig")), true);
+            });
+
+        });
+     });
+        </script>
+
+        <p><a href="index.html">&laquo; back to examples</a></p>
+        <div id="output" style="margin: 30px;">
+            <input type="button" value="Save Config to Cookie" id="save" style="font-size: 24px;" />
+            <input type="button" value="Restore Config from Cookie" id="restore" style="font-size: 24px;" />
+            <br /><br /><br />
+            <div id="output2"></div>
+        </div>
+
+    </body>
+</html>
