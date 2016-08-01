@@ -261,6 +261,7 @@ callWithJQuery ($) ->
             @colTotals = {}
             @allTotal = @aggregator(this, [], [])
             @sorted = false
+            @onFieldClick = opts.onFieldClick
 
             # iterate through input, accumulating data for cells
             PivotData.forEachRecord input, opts.derivedAttributes, (record) =>
@@ -409,6 +410,42 @@ callWithJQuery ($) ->
                 len++
             return len
 
+        #helper function for drilldown handling
+        valueClick = ->
+            myClass = $(this).data('for')
+            attrs = {}
+            attrs.filter = {}
+        
+            addAttribute = (className, attrNameArry, attrValueArry) ->
+              j = 0
+              while j < attrNameArry.length
+                  key = attrNameArry[j]
+                  attrs.filter[key] = attrValueArry[className.substr(3)][j]
+                  j++
+              return
+        
+            attrs.result = '' + $(this).html()
+            if !myClass
+                myClass = $(this).attr('class')
+            myClasses = myClass.split(' ')
+            i = 0
+            while i < myClasses.length
+                className = myClasses[i]
+                if className[0] == 'r'
+                    addAttribute className, rowAttrs, rowKeys
+                else if className[0] == 'c'
+                    addAttribute className, colAttrs, colKeys
+                i++
+            filtered = data.filter((item, index) ->
+                for key of attrs.filter
+                    if item[key] == undefined or item[key] != attrs.filter[key]
+                        return false
+                true
+            )
+            attrs.data = filtered
+            pivotData.onFieldClick attrs
+            return
+
         #the first few rows are for col headers
         thead = document.createElement("thead")
         for own j, c of colAttrs
@@ -518,6 +555,11 @@ callWithJQuery ($) ->
         #squirrel this away for later
         result.setAttribute("data-numrows", rowKeys.length)
         result.setAttribute("data-numcols", colKeys.length)
+
+        if pivotData.onFieldClick
+            jelem = $(result)
+            jelem.find(".pvtVal,.pvtTotal").bind("click", valueClick)
+            result = jelem[0]
 
         return result
 
@@ -770,6 +812,7 @@ callWithJQuery ($) ->
             refreshDelayed = =>
                 subopts =
                     derivedAttributes: opts.derivedAttributes
+                    onFieldClick: opts.onFieldClick
                     localeStrings: opts.localeStrings
                     rendererOptions: opts.rendererOptions
                     sorters: opts.sorters
