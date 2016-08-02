@@ -15,7 +15,7 @@ callWithJQuery ($) ->
     frFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: " ", decimalSep: ",")
     frFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: " ", decimalSep: ",")
 
-    $.pivotUtilities.locales.fr = 
+    $.pivotUtilities.locales.nl = 
         localeStrings:
             renderError: "Er is een fout opgetreden bij het renderen van de kruistabel."
             computeError: "Er is een fout opgetreden bij het berekenen van de kruistabel."
