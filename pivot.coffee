@@ -557,9 +557,9 @@ callWithJQuery ($) ->
         result.setAttribute("data-numcols", colKeys.length)
 
         if pivotData.onFieldClick
-            jelem = $(result)
-            jelem.find(".pvtVal,.pvtTotal").bind("click", valueClick)
-            result = jelem[0]
+            targets = result.querySelectorAll(".pvtVal, .pvtTotal")
+            for i of targets
+                targets[i].onclick = valueClick
 
         return result
 
