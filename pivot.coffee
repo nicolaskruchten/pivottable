@@ -436,13 +436,6 @@ callWithJQuery ($) ->
                 else if className[0] == 'c'
                     addAttribute className, colAttrs, colKeys
                 i++
-            filtered = data.filter((item, index) ->
-                for key of attrs.filter
-                    if item[key] == undefined or item[key] != attrs.filter[key]
-                        return false
-                true
-            )
-            attrs.data = filtered
             pivotData.onFieldClick attrs
             return
 
