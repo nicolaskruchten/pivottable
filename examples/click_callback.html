@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Pivot Demo</title>
+            <!-- external libs from cdnjs -->
+            <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
+            <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> -->
+              <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+              <script src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
+
+            <!-- PivotTable.js libs from ../dist -->
+            <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+            <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+                body {font-family: Verdana;}
+        </style>
+
+            <!-- for examples only! script to show code to user -->
+            <script type="text/javascript" src="show_code.js"></script>
+    </head>
+
+    <body>
+        <script type="text/javascript">
+    // This example uses a function to provide the input values to pivot()
+
+    $(function () {
+        var rawData = [
+            { color: 0, shape: "circle"},
+            { color: 1, shape: "circle"},
+            { color: 1, shape: "circle"},
+            { color: 0, shape: "triangle"},
+            { color: 0, shape: "triangle"},
+            { color: 1, shape: "triangle"}
+        ];
+
+        $("#output").pivotUI(
+            rawData,
+            {
+                aggregatorName: "Count",
+                rendererName: "Heatmap",
+                rows: ['color'],
+                cols: ['shape'],
+                rendererOptions: {
+                    clickCallback: function(e,value,filters,pivotData) {
+                        alert('Clicked cell!\nvalue: '+value+'\nfilters: '+JSON.stringify(filters));
+                    }
+                }
+        });
+    });
+        </script>
+
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+
+</html>

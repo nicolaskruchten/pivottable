@@ -386,6 +386,7 @@ callWithJQuery ($) ->
         rowAttrs = pivotData.rowAttrs
         rowKeys = pivotData.getRowKeys()
         colKeys = pivotData.getColKeys()
+        allAttrs = colAttrs.concat(rowAttrs)
 
         #now actually build the output
         result = document.createElement("table")
@@ -408,6 +409,13 @@ callWithJQuery ($) ->
                 break if stop
                 len++
             return len
+
+        #cell click callback generator
+        makeClickCallback = (cb,cellValue,attributes,keys,data) ->
+            filters = {}
+            for own key,attr of attributes
+                filters[attr] = keys[key]
+            return (e) -> cb(e,cellValue,filters,data)
 
         #the first few rows are for col headers
         thead = document.createElement("thead")
@@ -477,6 +485,9 @@ callWithJQuery ($) ->
                 td.className = "pvtVal row#{i} col#{j}"
                 td.textContent = aggregator.format(val)
                 td.setAttribute("data-value", val)
+                #cell click callback
+                if opts.clickCallback
+                    $(td).on("click",makeClickCallback(opts.clickCallback,val,allAttrs,colKey.concat(rowKey),pivotData))
                 tr.appendChild td
 
             totalAggregator = pivotData.getAggregator(rowKey, [])
@@ -486,6 +497,9 @@ callWithJQuery ($) ->
             td.textContent = totalAggregator.format(val)
             td.setAttribute("data-value", val)
             td.setAttribute("data-for", "row"+i)
+            #cell click callback
+            if opts.clickCallback
+                $(td).on("click",makeClickCallback(opts.clickCallback,val,rowAttrs,rowKey,pivotData))
             tr.appendChild td
             tbody.appendChild tr
 
@@ -504,6 +518,9 @@ callWithJQuery ($) ->
             td.textContent = totalAggregator.format(val)
             td.setAttribute("data-value", val)
             td.setAttribute("data-for", "col"+j)
+            #cell click callback
+            if opts.clickCallback
+                $(td).on("click",makeClickCallback(opts.clickCallback,val,colAttrs,colKey,pivotData))
             tr.appendChild td
         totalAggregator = pivotData.getAggregator([], [])
         val = totalAggregator.value()
@@ -511,6 +528,9 @@ callWithJQuery ($) ->
         td.className = "pvtGrandTotal"
         td.textContent = totalAggregator.format(val)
         td.setAttribute("data-value", val)
+        #cell click callback
+        if opts.clickCallback
+            $(td).on("click",makeClickCallback(opts.clickCallback,val,[],[],pivotData))
         tr.appendChild td
         tbody.appendChild tr
         result.appendChild tbody
