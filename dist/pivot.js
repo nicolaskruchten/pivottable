@@ -737,7 +737,7 @@
     Default Renderer for hierarchical table layout
      */
     pivotTableRenderer = function(pivotData, opts) {
-      var aggregator, c, colAttrs, colKey, colKeys, defaults, i, j, r, result, rowAttrs, rowKey, rowKeys, spanSize, td, th, totalAggregator, tr, txt, val, x;
+      var aggregator, allAttrs, c, colAttrs, colKey, colKeys, defaults, i, j, makeClickCallback, r, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
       defaults = {
         localeStrings: {
           totals: "Totals"
@@ -748,6 +748,7 @@
       rowAttrs = pivotData.rowAttrs;
       rowKeys = pivotData.getRowKeys();
       colKeys = pivotData.getColKeys();
+      allAttrs = colAttrs.concat(rowAttrs);
       result = document.createElement("table");
       result.className = "pvtTable";
       spanSize = function(arr, i, j) {
@@ -778,6 +779,19 @@
         }
         return len;
       };
+      makeClickCallback = function(cb, cellValue, attributes, keys, data) {
+        var attr, filters, key;
+        filters = {};
+        for (key in attributes) {
+          if (!hasProp.call(attributes, key)) continue;
+          attr = attributes[key];
+          filters[attr] = keys[key];
+        }
+        return function(e) {
+          return cb(e, cellValue, filters, data);
+        };
+      };
+      thead = document.createElement("thead");
       for (j in colAttrs) {
         if (!hasProp.call(colAttrs, j)) continue;
         c = colAttrs[j];
@@ -814,7 +828,7 @@
           th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
           tr.appendChild(th);
         }
-        result.appendChild(tr);
+        thead.appendChild(tr);
       }
       if (rowAttrs.length !== 0) {
         tr = document.createElement("tr");
@@ -832,8 +846,10 @@
           th.innerHTML = opts.localeStrings.totals;
         }
         tr.appendChild(th);
-        result.appendChild(tr);
+        thead.appendChild(tr);
       }
+      result.appendChild(thead);
+      tbody = document.createElement("tbody");
       for (i in rowKeys) {
         if (!hasProp.call(rowKeys, i)) continue;
         rowKey = rowKeys[i];
@@ -862,6 +878,9 @@
           td.className = "pvtVal row" + i + " col" + j;
           td.textContent = aggregator.format(val);
           td.setAttribute("data-value", val);
+          if (opts.clickCallback) {
+            $(td).on("click", makeClickCallback(opts.clickCallback, val, allAttrs, colKey.concat(rowKey), pivotData));
+          }
           tr.appendChild(td);
         }
         totalAggregator = pivotData.getAggregator(rowKey, []);
@@ -871,8 +890,11 @@
         td.textContent = totalAggregator.format(val);
         td.setAttribute("data-value", val);
         td.setAttribute("data-for", "row" + i);
+        if (opts.clickCallback) {
+          $(td).on("click", makeClickCallback(opts.clickCallback, val, rowAttrs, rowKey, pivotData));
+        }
         tr.appendChild(td);
-        result.appendChild(tr);
+        tbody.appendChild(tr);
       }
       tr = document.createElement("tr");
       th = document.createElement("th");
@@ -890,6 +912,9 @@
         td.textContent = totalAggregator.format(val);
         td.setAttribute("data-value", val);
         td.setAttribute("data-for", "col" + j);
+        if (opts.clickCallback) {
+          $(td).on("click", makeClickCallback(opts.clickCallback, val, colAttrs, colKey, pivotData));
+        }
         tr.appendChild(td);
       }
       totalAggregator = pivotData.getAggregator([], []);
@@ -898,8 +923,12 @@
       td.className = "pvtGrandTotal";
       td.textContent = totalAggregator.format(val);
       td.setAttribute("data-value", val);
+      if (opts.clickCallback) {
+        $(td).on("click", makeClickCallback(opts.clickCallback, val, [], [], pivotData));
+      }
       tr.appendChild(td);
-      result.appendChild(tr);
+      tbody.appendChild(tr);
+      result.appendChild(tbody);
       result.setAttribute("data-numrows", rowKeys.length);
       result.setAttribute("data-numcols", colKeys.length);
       return result;
