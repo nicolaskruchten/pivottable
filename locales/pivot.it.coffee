@@ -15,7 +15,7 @@ callWithJQuery ($) ->
   frFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: " ", decimalSep: ",")
   frFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: " ", decimalSep: ",")
 
-  $.pivotUtilities.locales.fr =
+  $.pivotUtilities.locales.it =
     localeStrings:
       renderError: "Si è verificato un errore durante la creazione della tabella."
       computeError: "Si è verificato un errore di calcolo nella tabella."
