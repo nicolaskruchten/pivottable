@@ -31,7 +31,7 @@
       thousandsSep: " ",
       decimalSep: ","
     });
-    return $.pivotUtilities.locales.fr = {
+    return $.pivotUtilities.locales.de = {
       localeStrings: {
         renderError: "Bei der Darstellung der Pivot-Tabelle ist ein Fehler aufgetreten.",
         computeError: "Bei der Berechnung der Pivot-Tabelle ist ein Fehler aufgetreten.",

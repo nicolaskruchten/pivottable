@@ -31,7 +31,7 @@
       thousandsSep: " ",
       decimalSep: ","
     });
-    return $.pivotUtilities.locales.fr = {
+    return $.pivotUtilities.locales.it = {
       localeStrings: {
         renderError: "Si è verificato un errore durante la creazione della tabella.",
         computeError: "Si è verificato un errore di calcolo nella tabella.",
