@@ -651,9 +651,9 @@ callWithJQuery ($) ->
                         valueList.append $("<p>").html(opts.localeStrings.tooMany)
                     else
                         btns = $("<p>").appendTo(valueList)
-                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectAll).bind "click", ->
+                        btns.append $("<input>", {type:"button"}).val(opts.localeStrings.selectAll).bind "click", ->
                             valueList.find("input:visible").prop "checked", true
-                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectNone).bind "click", ->
+                        btns.append $("<input>", {type:"button"}).val(opts.localeStrings.selectNone).bind "click", ->
                             valueList.find("input:visible").prop "checked", false
                         btns.append $("<br>")
                         btns.append $("<input>", {type: "text", placeholder: opts.localeStrings.filterResults, class: "pvtSearch"}).bind "keyup", ->
@@ -697,7 +697,7 @@ callWithJQuery ($) ->
                             valueList.toggle(0, refresh)
 
                     $("<p>").appendTo(valueList)
-                        .append $("<button>", {type:"button"}).text("OK").bind "click", updateFilter
+                        .append $("<input>", {type:"button"}).val("OK").bind "click", updateFilter
 
                     showFilterList = (e) ->
                         {left: clickLeft, top: clickTop, } = $(e.currentTarget).position()
