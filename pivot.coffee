@@ -578,6 +578,7 @@ callWithJQuery ($) ->
             inclusions: {}
             unusedAttrsVertical: 85
             autoSortUnusedAttrs: false
+            useRegexForFilters: false
             rendererOptions: localeStrings: locales[locale].localeStrings
             onRefresh: null
             filter: -> true
@@ -657,13 +658,22 @@ callWithJQuery ($) ->
                             valueList.find("input:visible").prop "checked", false
                         btns.append $("<br>")
                         btns.append $("<input>", {type: "text", placeholder: opts.localeStrings.filterResults, class: "pvtSearch"}).bind "keyup", ->
-                            filter = $(this).val().toLowerCase()
-                            valueList.find('.pvtCheckContainer p').each ->
-                                testString = $(this).text().toLowerCase().indexOf(filter)
-                                if testString isnt -1
-                                    $(this).show()
-                                else
-                                    $(this).hide()
+                            if opts.useRegexForFilters
+                                filter = $(this).val()
+                                valueList.find('.pvtCheckContainer p').each ->
+                                    testString = $(this).text().match(filter)
+                                    if  testString?
+                                        $(this).show()
+                                    else
+                                        $(this).hide()
+                            else
+                                filter = $(this).val().toLowerCase()
+                                valueList.find('.pvtCheckContainer p').each ->
+                                    testString = $(this).text().toLowerCase().indexOf(filter)
+                                    if testString isnt -1
+                                        $(this).show()
+                                    else
+                                        $(this).hide()
 
                         checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
