@@ -1005,11 +1005,13 @@
         input = PivotData.convertToArray(input);
         tblCols = (function() {
           var ref, results;
-          ref = input[0];
           results = [];
-          for (k in ref) {
-            if (!hasProp.call(ref, k)) continue;
-            results.push(k);
+          for (var i = 0; i < input.length; i++) {
+            ref = input[i];
+            for (k in ref) {
+              if (!hasProp.call(ref, k)) continue;
+              results.push(k);
+            }
           }
           return results;
         })();
