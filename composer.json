@@ -1,0 +1,27 @@
+{
+  "name": "montefuscolo/pivottable",
+  "description": "Javascript Pivot Table (aka Pivot Grid, Pivot Chart, Cross-Tab) implementation with drag'n'drop.",
+  "keywords": [
+    "pivot",
+    "crosstab",
+    "grid",
+    "table",
+    "pivottable",
+    "pivotgrid",
+    "pivotchart",
+    "jquery",
+    "jquery-plugin"
+  ],
+  "minimum-stability": "stable",
+  "homepage": "http://nicolas.kruchten.com/pivottable/",
+  "require": {
+      "components/jquery": ">=1.9"
+  },
+  "license": "MIT License",
+  "authors": [
+      {
+          "name": "Nicolas Kruchten",
+          "email": "nicolas@kruchten.com"
+      }
+  ]
+}
