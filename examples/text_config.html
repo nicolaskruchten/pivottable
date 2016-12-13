@@ -5,6 +5,7 @@
         <!-- external libs from cdnjs -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
@@ -21,19 +22,18 @@
     </head>
     <body>
         <script type="text/javascript">
-    // This example shows custom aggregators and sorters using
-    // the "Canadian Parliament 2012" dataset.
+    // If you are loading a configuration which has been serialized to text,
+    // you will need to merge it with an object containing the aggregators,
+    // renderers, and sorters you wish to use, because functions cannot be
+    // serialized to text.
 
     $(function(){
-        var tpl = $.pivotUtilities.aggregatorTemplates;
-
         $.getJSON("mps.json", function(mps) {
-            $("#output").pivotUI(mps, {
-                rows: ["Province"], cols: ["Party"],
-                aggregators: {
-                    "Number of MPs":      function() { return tpl.count()() },
-                    "Average Age of MPs": function() { return tpl.average()(["Age"])}
-                },
+
+            // these are the functions you wish to use
+            var functionsConfig = {
+                aggregators: $.pivotUtilities.aggregators,
+                renderers:   $.pivotUtilities.renderers,
                 sorters: function(attr) {
                     if(attr == "Province") {
                         return $.pivotUtilities.sortAs(
@@ -47,14 +47,25 @@
                         return function(a,b){ return b-a; };
                     }
                 }
-            });
+            };
+
+            // this is your saved/serialized config in a string
+            var serializedConfig = '{"rows":["Province"], "cols":["Party"],'+
+                            '"vals":["Age"],"aggregatorName":"Integer Sum"}';
+
+            // deserialized it into an object
+            var deserializedConfig = JSON.parse(serializedConfig)
+
+            // merge the deserialized object with the functions object
+            var mergedConfig = $.extend({}, functionsConfig, deserializedConfig);
+
+            $("#output").pivotUI(mps, mergedConfig);
         });
      });
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
-
-        <div id="output" style="margin: 30px;"></div>
+        <div id="output"></div>
 
     </body>
 </html>
