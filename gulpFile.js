@@ -23,16 +23,16 @@ gulp.task('makeCss', function() {
 
 
 gulp.task('makeJs', function() {
-    
-    gulp.src(['./*.coffee', './locales/*.coffee'])
+
+    gulp.src(['./*.coffee', './locales/*.coffee', './tests/*.coffee'])
         //compile to js (and create map files)
         .pipe(sourcemaps.init())
         .pipe(coffee()).on('error', gutil.log)
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('./dist'))
-        
+
         //minify js files as well
-        .pipe(filter('*.js'))//filter, to avoid doing this processing on the map files generated above 
+        .pipe(filter('*.js'))//filter, to avoid doing this processing on the map files generated above
          .pipe(rename({
             suffix: '.min'
         }))
@@ -46,7 +46,7 @@ gulp.task('makeJs', function() {
 
 function inc(importance) {
     // get all the files to bump version in
-    return gulp.src(['./package.json', './bower.json', './pivottable.jquery.json']) 
+    return gulp.src(['./package.json', './bower.json', './pivottable.jquery.json'])
         // bump the version number in those files
         .pipe(bump({type: importance}))
         // save it back to filesystem
@@ -68,7 +68,7 @@ gulp.task('tag', function() {
     return gulp.src(['./package.json', './bower.json', './pivottable.jquery.json'])
     .pipe(git.commit('version bump'))
     // read only one file to get the version number
-    .pipe(filter('package.json')) 
+    .pipe(filter('package.json'))
     .pipe(tag_version());
 });
 
