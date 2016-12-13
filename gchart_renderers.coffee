@@ -6,7 +6,7 @@ callWithJQuery = (pivotModule) ->
     # Plain browser env
     else
         pivotModule jQuery
-        
+
 callWithJQuery ($) ->
 
     makeGoogleChart = (chartType, extraOptions) -> (pivotData, opts) ->
@@ -24,7 +24,7 @@ callWithJQuery ($) ->
         rowKeys.push [] if rowKeys.length == 0
         colKeys = pivotData.getColKeys()
         colKeys.push [] if colKeys.length == 0
-        fullAggName = pivotData.aggregatorName 
+        fullAggName = pivotData.aggregatorName
         if pivotData.valAttrs.length
             fullAggName += "(#{pivotData.valAttrs.join(", ")})"
         headers = (h.join("-") for h in rowKeys)
@@ -42,7 +42,7 @@ callWithJQuery ($) ->
                         ]
             dataTable = new google.visualization.DataTable()
             dataTable.addColumn 'number', pivotData.colAttrs.join("-")
-            dataTable.addColumn 'number', pivotData.rowAttrs.join("-") 
+            dataTable.addColumn 'number', pivotData.rowAttrs.join("-")
             dataTable.addColumn type: "string", role: "tooltip"
             dataTable.addRows dataArray
             hAxisTitle = pivotData.colAttrs.join("-")
@@ -75,7 +75,7 @@ callWithJQuery ($) ->
             groupByTitle = pivotData.rowAttrs.join("-")
             title += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
 
-        options = 
+        options =
             title: title
             hAxis: {title: hAxisTitle, slantedText: numCharsInHAxis > 50}
             vAxis: {title: vAxisTitle}
@@ -90,20 +90,20 @@ callWithJQuery ($) ->
 
         else if dataArray[0].length == 2 and dataArray[0][1] ==  ""
             options.legend = position: "none"
-        
+
         $.extend options, opts.gchart, extraOptions
 
         result = $("<div>").css(width: "100%", height: "100%")
         wrapper = new google.visualization.ChartWrapper {dataTable, chartType, options}
-        wrapper.draw(result[0])    
-        result.bind "dblclick", -> 
+        wrapper.draw(result[0])
+        result.bind "dblclick", ->
             editor = new google.visualization.ChartEditor()
-            google.visualization.events.addListener editor, 'ok', -> 
+            google.visualization.events.addListener editor, 'ok', ->
                 editor.getChartWrapper().draw(result[0])
             editor.openDialog(wrapper)
         return result
 
-    $.pivotUtilities.gchart_renderers = 
+    $.pivotUtilities.gchart_renderers =
         "Line Chart": makeGoogleChart("LineChart")
         "Bar Chart": makeGoogleChart("ColumnChart")
         "Stacked Bar Chart": makeGoogleChart("ColumnChart", isStacked: true)

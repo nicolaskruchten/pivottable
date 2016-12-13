@@ -3,7 +3,7 @@
 
 # PivotTable.js
 
-PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com). 
+PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com).
 
 It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`.
 
@@ -47,7 +47,7 @@ PivotTable.js implements a pivot table drag'n'drop UI similar to that found in p
 
 ## How do I load the code?
 
-PivotTable.js implements the [Universal Module Definition (UMD)](https://github.com/umdjs/umd) pattern and so should be compatible with most approaches to script loading and dependency management: direct script loading i.e. from [CDNJS](https://cdnjs.com/libraries/pivottable) or with [RequireJS](http://requirejs.org/), [Browserify](http://browserify.org/) etc. For the latter options, you can grab it from [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`. 
+PivotTable.js implements the [Universal Module Definition (UMD)](https://github.com/umdjs/umd) pattern and so should be compatible with most approaches to script loading and dependency management: direct script loading i.e. from [CDNJS](https://cdnjs.com/libraries/pivottable) or with [RequireJS](http://requirejs.org/), [Browserify](http://browserify.org/) etc. For the latter options, you can grab it from [NPM](https://www.npmjs.com/package/pivottable) with `npm install pivottable` or via [Bower](http://bower.io/) with `bower install pivottable`.
 
 If you are loading the scripts directly (as in the [examples](http://nicolas.kruchten.com/pivottable)), you need to:
 

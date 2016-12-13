@@ -6,7 +6,7 @@ callWithJQuery = (pivotModule) ->
     # Plain browser env
     else
         pivotModule jQuery
-        
+
 callWithJQuery ($) ->
 
     $.pivotUtilities.export_renderers = "TSV Export": (pivotData, opts) ->
@@ -50,8 +50,8 @@ callWithJQuery ($) ->
         text = ""
         for r in result
             text += r.join("\t")+"\n"
-        
+
         return $("<textarea>").text(text).css(
-                width: ($(window).width() / 2) + "px", 
+                width: ($(window).width() / 2) + "px",
                 height: ($(window).height() / 2) + "px")
-    
+
