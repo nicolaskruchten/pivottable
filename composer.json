@@ -1,5 +1,5 @@
 {
-  "name": "montefuscolo/pivottable",
+  "name": "nicolaskruchten/pivottable",
   "description": "Javascript Pivot Table (aka Pivot Grid, Pivot Chart, Cross-Tab) implementation with drag'n'drop.",
   "keywords": [
     "pivot",
