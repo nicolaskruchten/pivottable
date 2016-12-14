@@ -205,8 +205,8 @@ callWithJQuery ($) ->
             return 1  if isNaN(as)
             return -1  if isNaN(bs)
             return as - bs
-        a = String(as).toLowerCase()
-        b = String(bs).toLowerCase()
+        a = String(as)
+        b = String(bs)
         return 0  if a is b
         return (if a > b then 1 else -1)  unless rd.test(a) and rd.test(b)
         a = a.match(rx)

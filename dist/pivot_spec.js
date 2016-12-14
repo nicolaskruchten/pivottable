@@ -258,7 +258,7 @@
       });
       describe("with jQuery table element input", function() {
         var pd, tableInput;
-        tableInput = $("<table>\n    <thead> \n        <tr> <th>a</th><th>b</th> </tr>\n    </thead> \n    <tbody>\n        <tr> <td>1</td> <td>2</td> </tr>\n        <tr> <td>3</td> <td>4</td> </tr>\n    </tbody>\n</table>");
+        tableInput = $("<table>\n    <thead>\n        <tr> <th>a</th><th>b</th> </tr>\n    </thead>\n    <tbody>\n        <tr> <td>1</td> <td>2</td> </tr>\n        <tr> <td>3</td> <td>4</td> </tr>\n    </tbody>\n</table>");
         pd = new $.pivotUtilities.PivotData(tableInput, sumOverSumOpts);
         return it("has the correct grand total value", function() {
           return expect(pd.getAggregator([], []).value()).toBe((1 + 3) / (2 + 4));
@@ -323,8 +323,8 @@
       it("sorts numbers", function() {
         return expect([2, 1, 3, 4, 0].sort(naturalSort)).toEqual([0, 1, 2, 3, 4]);
       });
-      it("sorts strings", function() {
-        return expect(['b', 'a', 'c', 'd'].sort(naturalSort)).toEqual(['a', 'b', 'c', 'd']);
+      it("sorts strings case-sensitively", function() {
+        return expect(['b', 'a', 'c', 'd', 'A', 'a', 'A'].sort(naturalSort)).toEqual(['A', 'A', 'a', 'a', 'b', 'c', 'd']);
       });
       it("sorts numbers in strings", function() {
         return expect(['1', '12', '2', '10', '11', '112'].sort(naturalSort)).toEqual(['1', '2', '10', '11', '12', '112']);

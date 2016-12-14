@@ -39,16 +39,16 @@ describe "$.pivotUI()", ->
 
         it "renders a table", (done) ->
             expect table.find("table.pvtTable").length
-            .toBe  1 
+            .toBe  1
             done()
 
 
         describe "its renderer output", ->
             it "has the correct type and number of cells", (done) ->
                 expect table.find("th.pvtTotalLabel").length
-                .toBe  1 
+                .toBe  1
                 expect table.find("td.pvtGrandTotal").length
-                .toBe  1 
+                .toBe  1
                 done()
 
             it "has the correct textual representation", (done) ->
@@ -67,7 +67,7 @@ describe "$.pivotUI()", ->
         table = null
 
         beforeEach (done) ->
-            table = $("<div>").pivotUI fixtureData, 
+            table = $("<div>").pivotUI fixtureData,
                 rows: ["gender"], cols: ["colour"]
                 aggregatorName: "Sum over Sum"
                 vals: ["successes", "trials"]
@@ -104,25 +104,25 @@ describe "$.pivotUI()", ->
 
         it "renders a table", (done) ->
             expect table.find("table.pvtTable").length
-            .toBe  1 
+            .toBe  1
             done()
 
         describe "its renderer output", ->
             it "has the correct type and number of cells", (done) ->
                 expect table.find("th.pvtAxisLabel").length
-                .toBe  2 
+                .toBe  2
                 expect table.find("th.pvtRowLabel").length
-                .toBe  2 
+                .toBe  2
                 expect table.find("th.pvtColLabel").length
-                .toBe  3 
+                .toBe  3
                 expect table.find("th.pvtTotalLabel").length
-                .toBe  2 
+                .toBe  2
                 expect table.find("td.pvtVal").length
-                .toBe  6 
+                .toBe  6
                 expect table.find("td.pvtTotal").length
-                .toBe  5 
+                .toBe  5
                 expect table.find("td.pvtGrandTotal").length
-                .toBe  1 
+                .toBe  1
                 done()
 
             it "has the correct textual representation", (done) ->
@@ -150,7 +150,7 @@ describe "$.pivot()", ->
 
         it "renders a table", ->
             expect table.find("table.pvtTable").length
-            .toBe  1 
+            .toBe  1
 
         describe "its renderer output", ->
 
@@ -179,7 +179,7 @@ describe "$.pivot()", ->
             expect table.find("table.pvtTable").text()
             .toBe [
                 "birthyear",    "1982",     "1983",     "Totals"
-                "gender",  
+                "gender",
                 "male",         "110.00",               "110.00"
                 "female",       "90.00",    "100.00",   "190.00"
                 "Totals",       "200.00",   "100.00",   "300.00"
@@ -204,14 +204,14 @@ describe "$.pivot()", ->
         received_PivotData = null
         received_rendererOptions = null
 
-        table = $("<div>").pivot fixtureData, 
+        table = $("<div>").pivot fixtureData,
             rows: ["name", "colour"], cols: ["trials", "successes"]
-            aggregator: -> 
+            aggregator: ->
                 count2x: 0
-                push: -> @count2x +=2 
+                push: -> @count2x +=2
                 value: -> @count2x
                 format: (x) -> "formatted " + x
-            renderer: (a,b) -> 
+            renderer: (a,b) ->
                 received_PivotData = a
                 received_rendererOptions = b
                 return $("<div>").addClass(b.greeting).text("world")
@@ -219,19 +219,19 @@ describe "$.pivot()", ->
 
         it "renders the custom renderer as per options", ->
             expect table.find("div.hithere").length
-            .toBe  1 
+            .toBe  1
 
         describe "its received PivotData object", ->
             it "has a correct grand total value and format for custom aggregator", ->
                 agg = received_PivotData.getAggregator([],[])
                 val = agg.value()
-                expect(val).toBe 8 
+                expect(val).toBe 8
                 expect(agg.format(val)).toBe "formatted 8"
 
 describe "$.pivotUtilities", ->
 
     describe ".PivotData()", ->
-        sumOverSumOpts = 
+        sumOverSumOpts =
             rows: [], cols: []
             aggregator: $.pivotUtilities.aggregators["Sum over Sum"](["a","b"])
             filter: -> true
@@ -266,9 +266,9 @@ describe "$.pivotUtilities", ->
         describe "with jQuery table element input", ->
             tableInput = $ """
                 <table>
-                    <thead> 
+                    <thead>
                         <tr> <th>a</th><th>b</th> </tr>
-                    </thead> 
+                    </thead>
                     <tbody>
                         <tr> <td>1</td> <td>2</td> </tr>
                         <tr> <td>3</td> <td>4</td> </tr>
@@ -284,8 +284,8 @@ describe "$.pivotUtilities", ->
 
 
         describe "with rows/cols, no filters/sorters, count aggregator", ->
-            pd = new $.pivotUtilities.PivotData fixtureData, 
-                rows: ["name", "colour"], 
+            pd = new $.pivotUtilities.PivotData fixtureData,
+                rows: ["name", "colour"],
                 cols: ["trials", "successes"],
                 aggregator: $.pivotUtilities.aggregators["Count"](),
                 filter: -> true
@@ -294,7 +294,7 @@ describe "$.pivotUtilities", ->
             it "has correctly-ordered row keys", ->
                 expect pd.getRowKeys()
                 .toEqual [ [ 'Carol', 'yellow' ], [ 'Jane', 'red' ], [ 'John', 'blue' ], [ 'Nick', 'blue' ] ]
-               
+
             it "has correctly-ordered col keys", ->
                 expect pd.getColKeys()
                 .toEqual [ [ 95, 25 ], [ 102, 14 ], [ 103, 12 ], [ 112, 30 ] ]
@@ -305,7 +305,7 @@ describe "$.pivotUtilities", ->
                 for r in pd.getRowKeys()
                     for c in pd.getColKeys()
                         if pd.getAggregator(r, c).value()?
-                            numNotNull++ 
+                            numNotNull++
                         else
                             numNull++
                 expect numNotNull
@@ -316,13 +316,13 @@ describe "$.pivotUtilities", ->
             it "has a correct spot-checked aggregator", ->
                 agg = pd.getAggregator([ 'Carol', 'yellow' ],[ 102, 14 ])
                 val = agg.value()
-                expect(val).toBe 1 
+                expect(val).toBe 1
                 expect(agg.format(val)).toBe "1"
 
             it "has a correct grand total aggregator", ->
                 agg = pd.getAggregator([],[])
                 val = agg.value()
-                expect(val).toBe 4 
+                expect(val).toBe 4
                 expect(agg.format(val)).toBe "4"
 
     describe ".naturalSort()", ->
@@ -332,9 +332,9 @@ describe "$.pivotUtilities", ->
             expect [2,1,3,4,0].sort naturalSort
             .toEqual [0,1,2,3,4]
 
-        it "sorts strings", ->
-            expect ['b','a','c','d'].sort naturalSort
-            .toEqual ['a','b','c','d']
+        it "sorts strings case-sensitively", ->
+            expect ['b','a','c','d','A','a','A'].sort naturalSort
+            .toEqual ['A','A','a','a','b','c','d']
 
         it "sorts numbers in strings", ->
             expect ['1','12','2','10','11','112'].sort naturalSort

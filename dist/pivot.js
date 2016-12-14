@@ -456,8 +456,8 @@
           }
           return as - bs;
         }
-        a = String(as).toLowerCase();
-        b = String(bs).toLowerCase();
+        a = String(as);
+        b = String(bs);
         if (a === b) {
           return 0;
         }
