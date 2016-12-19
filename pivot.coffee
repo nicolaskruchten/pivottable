@@ -296,12 +296,6 @@ callWithJQuery ($) ->
             else
                 throw new Error("unknown input format")
 
-        #converts to [{attr:val, attr:val},{attr:val, attr:val}] using method above
-        @convertToArray = (input) ->
-            result = []
-            PivotData.forEachRecord input, {}, (record) -> result.push record
-            return result
-
         arrSort: (attrs) =>
             sortersArr = (getSort(@sorters, a) for a in attrs)
             (a,b) ->
@@ -591,20 +585,23 @@ callWithJQuery ($) ->
             opts = existingOpts
 
         try
-            #cache the input in some useful form
-            input = PivotData.convertToArray(input)
-            tblCols = (k for own k of input[0])
-            tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
-
-            #figure out the cardinality and some stats
+            # do a first pass on the data to cache a materialized copy of any
+            # function-valued inputs and to compute dimension cardinalities
             axisValues = {}
-            axisValues[x] = {} for x in tblCols
-
+            materializedInput = []
+            recordsProcessed = 0
             PivotData.forEachRecord input, opts.derivedAttributes, (record) ->
+                materializedInput.push(record)
                 for own k, v of record when opts.filter(record)
+                    if not axisValues[k]?
+                        if recordsProcessed < 0
+                            axisValues[k] = {}
+                        else
+                            axisValues[k] = {"null": recordsProcessed}
                     v ?= "null"
                     axisValues[k][v] ?= 0
                     axisValues[k][v]++
+                recordsProcessed++
 
             #start building the output
             uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
@@ -622,7 +619,7 @@ callWithJQuery ($) ->
 
             #axis list, including the double-click menu
             colList = $("<td>").addClass('pvtAxisContainer pvtUnused')
-            shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
+            shownAttributes = (c for c of axisValues when c not in opts.hiddenAttributes)
 
             unusedAttrsVerticalAutoOverride = false
             if opts.unusedAttrsVertical == "auto"
@@ -835,7 +832,7 @@ callWithJQuery ($) ->
                         return false if ""+record[k] in excludedItems
                     return true
 
-                pivotTable.pivot(input,subopts)
+                pivotTable.pivot(materializedInput,subopts)
                 pivotUIOptions = $.extend opts,
                     cols: subopts.cols
                     rows: subopts.rows

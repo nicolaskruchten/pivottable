@@ -601,15 +601,6 @@
         }
       };
 
-      PivotData.convertToArray = function(input) {
-        var result;
-        result = [];
-        PivotData.forEachRecord(input, {}, function(record) {
-          return result.push(record);
-        });
-        return result;
-      };
-
       PivotData.prototype.arrSort = function(attrs) {
         var a, sortersArr;
         sortersArr = (function() {
@@ -961,7 +952,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, error, existingOpts, fn, i, initialRender, k, l, len1, len2, len3, len4, n, o, opts, pivotTable, q, ref, ref1, ref2, ref3, ref4, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tblCols, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attrLength, axisValues, c, colList, defaults, e, error, existingOpts, fn, i, initialRender, l, len1, len2, len3, materializedInput, n, o, opts, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1002,37 +993,26 @@
         opts = existingOpts;
       }
       try {
-        input = PivotData.convertToArray(input);
-        tblCols = (function() {
-          var ref, results;
-          ref = input[0];
-          results = [];
-          for (k in ref) {
-            if (!hasProp.call(ref, k)) continue;
-            results.push(k);
-          }
-          return results;
-        })();
-        ref = opts.derivedAttributes;
-        for (c in ref) {
-          if (!hasProp.call(ref, c)) continue;
-          if ((indexOf.call(tblCols, c) < 0)) {
-            tblCols.push(c);
-          }
-        }
         axisValues = {};
-        for (l = 0, len1 = tblCols.length; l < len1; l++) {
-          x = tblCols[l];
-          axisValues[x] = {};
-        }
+        materializedInput = [];
+        recordsProcessed = 0;
         PivotData.forEachRecord(input, opts.derivedAttributes, function(record) {
-          var base, results, v;
-          results = [];
+          var base, k, v;
+          materializedInput.push(record);
           for (k in record) {
             if (!hasProp.call(record, k)) continue;
             v = record[k];
             if (!(opts.filter(record))) {
               continue;
+            }
+            if (axisValues[k] == null) {
+              if (recordsProcessed < 0) {
+                axisValues[k] = {};
+              } else {
+                axisValues[k] = {
+                  "null": recordsProcessed
+                };
+              }
             }
             if (v == null) {
               v = "null";
@@ -1040,9 +1020,9 @@
             if ((base = axisValues[k])[v] == null) {
               base[v] = 0;
             }
-            results.push(axisValues[k][v]++);
+            axisValues[k][v]++;
           }
-          return results;
+          return recordsProcessed++;
         });
         uiTable = $("<table>", {
           "class": "pvtUi"
@@ -1051,17 +1031,16 @@
         renderer = $("<select>").addClass('pvtRenderer').appendTo(rendererControl).bind("change", function() {
           return refresh();
         });
-        ref1 = opts.renderers;
-        for (x in ref1) {
-          if (!hasProp.call(ref1, x)) continue;
+        ref = opts.renderers;
+        for (x in ref) {
+          if (!hasProp.call(ref, x)) continue;
           $("<option>").val(x).html(x).appendTo(renderer);
         }
         colList = $("<td>").addClass('pvtAxisContainer pvtUnused');
         shownAttributes = (function() {
-          var len2, n, results;
+          var results;
           results = [];
-          for (n = 0, len2 = tblCols.length; n < len2; n++) {
-            c = tblCols[n];
+          for (c in axisValues) {
             if (indexOf.call(opts.hiddenAttributes, c) < 0) {
               results.push(c);
             }
@@ -1076,8 +1055,8 @@
         }
         if (!isNaN(unusedAttrsVerticalAutoCutoff)) {
           attrLength = 0;
-          for (n = 0, len2 = shownAttributes.length; n < len2; n++) {
-            a = shownAttributes[n];
+          for (l = 0, len1 = shownAttributes.length; l < len1; l++) {
+            a = shownAttributes[l];
             attrLength += a.length;
           }
           unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff;
@@ -1088,7 +1067,7 @@
           colList.addClass('pvtHorizList');
         }
         fn = function(c) {
-          var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, keys, len3, o, ref2, showFilterList, triangleLink, updateFilter, v, valueList;
+          var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, k, keys, len2, n, ref1, showFilterList, triangleLink, updateFilter, v, valueList;
           keys = (function() {
             var results;
             results = [];
@@ -1133,9 +1112,9 @@
               });
             }));
             checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
-            ref2 = keys.sort(getSort(opts.sorters, c));
-            for (o = 0, len3 = ref2.length; o < len3; o++) {
-              k = ref2[o];
+            ref1 = keys.sort(getSort(opts.sorters, c));
+            for (n = 0, len2 = ref1.length; n < len2; n++) {
+              k = ref1[n];
               v = axisValues[c][k];
               filterItem = $("<label>");
               filterItemExcluded = false;
@@ -1169,8 +1148,8 @@
             type: "button"
           }).text("OK").bind("click", updateFilter));
           showFilterList = function(e) {
-            var clickLeft, clickTop, ref3;
-            ref3 = $(e.currentTarget).position(), clickLeft = ref3.left, clickTop = ref3.top;
+            var clickLeft, clickTop, ref2;
+            ref2 = $(e.currentTarget).position(), clickLeft = ref2.left, clickTop = ref2.top;
             valueList.css({
               left: clickLeft + 10,
               top: clickTop + 10
@@ -1195,9 +1174,9 @@
         aggregator = $("<select>").addClass('pvtAggregator').bind("change", function() {
           return refresh();
         });
-        ref2 = opts.aggregators;
-        for (x in ref2) {
-          if (!hasProp.call(ref2, x)) continue;
+        ref1 = opts.aggregators;
+        for (x in ref1) {
+          if (!hasProp.call(ref1, x)) continue;
           aggregator.append($("<option>").val(x).html(x));
         }
         $("<td>").addClass('pvtVals').appendTo(tr1).append(aggregator).append($("<br>"));
@@ -1212,14 +1191,14 @@
           uiTable.prepend($("<tr>").append(rendererControl).append(colList));
         }
         this.html(uiTable);
-        ref3 = opts.cols;
-        for (o = 0, len3 = ref3.length; o < len3; o++) {
-          x = ref3[o];
+        ref2 = opts.cols;
+        for (n = 0, len2 = ref2.length; n < len2; n++) {
+          x = ref2[n];
           this.find(".pvtCols").append(this.find(".axis_" + ($.inArray(x, shownAttributes))));
         }
-        ref4 = opts.rows;
-        for (q = 0, len4 = ref4.length; q < len4; q++) {
-          x = ref4[q];
+        ref3 = opts.rows;
+        for (o = 0, len3 = ref3.length; o < len3; o++) {
+          x = ref3[o];
           this.find(".pvtRows").append(this.find(".axis_" + ($.inArray(x, shownAttributes))));
         }
         if (opts.aggregatorName != null) {
@@ -1231,7 +1210,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var attr, exclusions, inclusions, len5, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref5, ref6, s, subopts, t, unusedAttrsContainer, vals;
+            var attr, exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, q, ref4, ref5, s, subopts, unusedAttrsContainer, vals;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1241,7 +1220,7 @@
               rows: [],
               dataClass: opts.dataClass
             };
-            numInputsToProcess = (ref5 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? ref5 : 0;
+            numInputsToProcess = (ref4 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? ref4 : 0;
             vals = [];
             _this.find(".pvtRows li span.pvtAttr").each(function() {
               return subopts.rows.push($(this).data("attrName"));
@@ -1261,12 +1240,12 @@
             });
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
-              for (x = s = 0, ref6 = numInputsToProcess; 0 <= ref6 ? s < ref6 : s > ref6; x = 0 <= ref6 ? ++s : --s) {
+              for (x = q = 0, ref5 = numInputsToProcess; 0 <= ref5 ? q < ref5 : q > ref5; x = 0 <= ref5 ? ++q : --q) {
                 newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
-                for (t = 0, len5 = shownAttributes.length; t < len5; t++) {
-                  attr = shownAttributes[t];
+                for (s = 0, len4 = shownAttributes.length; s < len4; s++) {
+                  attr = shownAttributes[s];
                   newDropdown.append($("<option>").val(attr).text(attr));
                 }
                 pvtVals.append(newDropdown);
@@ -1308,19 +1287,19 @@
               }
             });
             subopts.filter = function(record) {
-              var excludedItems, ref7;
+              var excludedItems, k, ref6;
               if (!opts.filter(record)) {
                 return false;
               }
               for (k in exclusions) {
                 excludedItems = exclusions[k];
-                if (ref7 = "" + record[k], indexOf.call(excludedItems, ref7) >= 0) {
+                if (ref6 = "" + record[k], indexOf.call(excludedItems, ref6) >= 0) {
                   return false;
                 }
               }
               return true;
             };
-            pivotTable.pivot(input, subopts);
+            pivotTable.pivot(materializedInput, subopts);
             pivotUIOptions = $.extend(opts, {
               cols: subopts.cols,
               rows: subopts.rows,

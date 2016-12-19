@@ -1,7 +1,26 @@
 (function() {
-  var fixtureData;
+  var fixtureData, raggedFixtureData;
 
   fixtureData = [["name", "gender", "colour", "birthday", "trials", "successes"], ["Nick", "male", "blue", "1982-11-07", 103, 12], ["Jane", "female", "red", "1982-11-08", 95, 25], ["John", "male", "blue", "1982-12-08", 112, 30], ["Carol", "female", "yellow", "1983-12-08", 102, 14]];
+
+  raggedFixtureData = [
+    {
+      name: "Nick",
+      "colour": "red",
+      "age": 34
+    }, {
+      name: "Jane",
+      "gender": "female"
+    }, {
+      name: "John",
+      "gender": "male",
+      "age": 12
+    }, {
+      name: "Jim",
+      "gender": null,
+      "age": 12
+    }
+  ];
 
   describe("$.pivotUI()", function() {
     describe("with no rows/cols, default count aggregator, default TableRenderer", function() {
@@ -48,7 +67,7 @@
         });
       });
     });
-    return describe("with rows/cols, sum-over-sum aggregator, Heatmap renderer", function() {
+    describe("with rows/cols, sum-over-sum aggregator, Heatmap renderer", function() {
       var table;
       table = null;
       beforeEach(function(done) {
@@ -102,6 +121,16 @@
           expect(table.find("td.col0.row1").data("value")).toBe((12 + 30) / (103 + 112));
           return done();
         });
+      });
+    });
+    return describe("with ragged input", function() {
+      var table;
+      table = $("<div>").pivotUI(raggedFixtureData, {
+        rows: ["gender"],
+        cols: ["age"]
+      });
+      return it("renders a table with the correct textual representation", function() {
+        return expect(table.find("table.pvtTable").text()).toBe(["age", "12", "34", "null", "Totals", "gender", "female", "1", "1", "male", "1", "1", "null", "1", "1", "2", "Totals", "2", "1", "1", "4"].join(""));
       });
     });
   });
@@ -158,7 +187,7 @@
         return expect(table.find("table.pvtTable").text()).toBe(["gender", "Totals", "female", "47.8%", "male", "52.2%", "Totals", "100.0%"].join(""));
       });
     });
-    return describe("with rows/cols, custom aggregator, custom renderer with options", function() {
+    describe("with rows/cols, custom aggregator, custom renderer with options", function() {
       var received_PivotData, received_rendererOptions, table;
       received_PivotData = null;
       received_rendererOptions = null;
@@ -201,6 +230,16 @@
         });
       });
     });
+    return describe("with ragged input", function() {
+      var table;
+      table = $("<div>").pivot(raggedFixtureData, {
+        rows: ["gender"],
+        cols: ["age"]
+      });
+      return it("renders a table with the correct textual representation", function() {
+        return expect(table.find("table.pvtTable").text()).toBe(["age", "12", "34", "null", "Totals", "gender", "female", "1", "1", "male", "1", "1", "null", "1", "1", "2", "Totals", "2", "1", "1", "4"].join(""));
+      });
+    });
   });
 
   describe("$.pivotUtilities", function() {
@@ -235,6 +274,23 @@
           }
         ];
         pd = new $.pivotUtilities.PivotData(aosInput, sumOverSumOpts);
+        return it("has the correct grand total value", function() {
+          return expect(pd.getAggregator([], []).value()).toBe((1 + 3) / (2 + 4));
+        });
+      });
+      describe("with ragged array-of-object input", function() {
+        var pd, raggedAosInput;
+        raggedAosInput = [
+          {
+            a: 1
+          }, {
+            b: 4
+          }, {
+            a: 3,
+            b: 2
+          }
+        ];
+        pd = new $.pivotUtilities.PivotData(raggedAosInput, sumOverSumOpts);
         return it("has the correct grand total value", function() {
           return expect(pd.getAggregator([], []).value()).toBe((1 + 3) / (2 + 4));
         });
