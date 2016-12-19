@@ -587,20 +587,21 @@ callWithJQuery ($) ->
         try
             # do a first pass on the data to cache a materialized copy of any
             # function-valued inputs and to compute dimension cardinalities
-            axisValues = {}
+            attrValues = {}
             materializedInput = []
             recordsProcessed = 0
             PivotData.forEachRecord input, opts.derivedAttributes, (record) ->
+                return unless opts.filter(record)
                 materializedInput.push(record)
-                for own k, v of record when opts.filter(record)
-                    if not axisValues[k]?
-                        if recordsProcessed < 0
-                            axisValues[k] = {}
-                        else
-                            axisValues[k] = {"null": recordsProcessed}
-                    v ?= "null"
-                    axisValues[k][v] ?= 0
-                    axisValues[k][v]++
+                for own attr of record
+                    if not attrValues[attr]?
+                        attrValues[attr] = {}
+                        if recordsProcessed > 0
+                            attrValues[attr]["null"] = recordsProcessed
+                for attr of attrValues
+                    value = record[attr] ? "null"
+                    attrValues[attr][value] ?= 0
+                    attrValues[attr][value]++
                 recordsProcessed++
 
             #start building the output
@@ -619,7 +620,7 @@ callWithJQuery ($) ->
 
             #axis list, including the double-click menu
             colList = $("<td>").addClass('pvtAxisContainer pvtUnused')
-            shownAttributes = (c for c of axisValues when c not in opts.hiddenAttributes)
+            shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
 
             unusedAttrsVerticalAutoOverride = false
             if opts.unusedAttrsVertical == "auto"
@@ -637,14 +638,14 @@ callWithJQuery ($) ->
             else
                 colList.addClass('pvtHorizList')
 
-            for own i, c of shownAttributes
-                do (c) ->
-                    keys = (k for k of axisValues[c])
+            for own i, attr of shownAttributes
+                do (attr) ->
+                    values = (v for v of attrValues[attr])
                     hasExcludedItem = false
                     valueList = $("<div>").addClass('pvtFilterBox').hide()
 
-                    valueList.append $("<h4>").text("#{c} (#{keys.length})")
-                    if keys.length > opts.menuLimit
+                    valueList.append $("<h4>").text("#{attr} (#{values.length})")
+                    if values.length > opts.menuLimit
                         valueList.append $("<p>").html(opts.localeStrings.tooMany)
                     else
                         btns = $("<p>").appendTo(valueList)
@@ -664,21 +665,21 @@ callWithJQuery ($) ->
 
                         checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
-                        for k in keys.sort(getSort(opts.sorters, c))
-                             v = axisValues[c][k]
+                        for value in values.sort(getSort(opts.sorters, attr))
+                             valueCount = attrValues[attr][value]
                              filterItem = $("<label>")
                              filterItemExcluded = false
-                             if opts.inclusions[c]
-                                filterItemExcluded = (k not in opts.inclusions[c])
-                             else if opts.exclusions[c]
-                                filterItemExcluded = (k in opts.exclusions[c])
+                             if opts.inclusions[attr]
+                                filterItemExcluded = (value not in opts.inclusions[attr])
+                             else if opts.exclusions[attr]
+                                filterItemExcluded = (value in opts.exclusions[attr])
                              hasExcludedItem ||= filterItemExcluded
                              $("<input>")
                                 .attr("type", "checkbox").addClass('pvtFilter')
-                                .attr("checked", !filterItemExcluded).data("filter", [c,k])
+                                .attr("checked", !filterItemExcluded).data("filter", [attr,value])
                                 .appendTo filterItem
-                             filterItem.append $("<span>").text k
-                             filterItem.append $("<span>").text " ("+v+")"
+                             filterItem.append $("<span>").text value
+                             filterItem.append $("<span>").text " ("+valueCount+")"
                              checkContainer.append $("<p>").append(filterItem)
 
                     updateFilter = ->
@@ -688,7 +689,7 @@ callWithJQuery ($) ->
                             attrElem.addClass "pvtFilteredAttribute"
                         else
                             attrElem.removeClass "pvtFilteredAttribute"
-                        if keys.length > opts.menuLimit
+                        if values.length > opts.menuLimit
                             valueList.toggle()
                         else
                             valueList.toggle(0, refresh)
@@ -697,8 +698,8 @@ callWithJQuery ($) ->
                         .append $("<button>", {type:"button"}).text("OK").bind "click", updateFilter
 
                     showFilterList = (e) ->
-                        {left: clickLeft, top: clickTop, } = $(e.currentTarget).position()
-                        valueList.css(left: clickLeft+10, top: clickTop+10).toggle()
+                        {left, top} = $(e.currentTarget).position()
+                        valueList.css(left: left+10, top: top+10).toggle()
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
@@ -706,7 +707,7 @@ callWithJQuery ($) ->
                         .bind "click", showFilterList
 
                     attrElem = $("<li>").addClass("axis_#{i}")
-                        .append $("<span>").addClass('pvtAttr').text(c).data("attrName", c).append(triangleLink)
+                        .append $("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink)
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                     colList.append(attrElem).append(valueList)
 
