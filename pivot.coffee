@@ -830,7 +830,7 @@ callWithJQuery ($) ->
                 subopts.filter = (record) ->
                     return false if not opts.filter(record)
                     for k,excludedItems of exclusions
-                        return false if ""+record[k] in excludedItems
+                        return false if ""+(record[k] ? 'null') in excludedItems
                     return true
 
                 pivotTable.pivot(materializedInput,subopts)

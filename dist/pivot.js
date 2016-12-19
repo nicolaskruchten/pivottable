@@ -1282,14 +1282,15 @@
                 }
               }
             });
+            console.log(exclusions);
             subopts.filter = function(record) {
-              var excludedItems, k, ref6;
+              var excludedItems, k, ref6, ref7;
               if (!opts.filter(record)) {
                 return false;
               }
               for (k in exclusions) {
                 excludedItems = exclusions[k];
-                if (ref6 = "" + record[k], indexOf.call(excludedItems, ref6) >= 0) {
+                if (ref6 = "" + ((ref7 = record[k]) != null ? ref7 : 'null'), indexOf.call(excludedItems, ref6) >= 0) {
                   return false;
                 }
               }
