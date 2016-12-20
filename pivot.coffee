@@ -619,7 +619,7 @@ callWithJQuery ($) ->
 
 
             #axis list, including the double-click menu
-            colList = $("<td>").addClass('pvtAxisContainer pvtUnused')
+            unused = $("<td>").addClass('pvtAxisContainer pvtUnused')
             shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
 
             unusedAttrsVerticalAutoOverride = false
@@ -634,9 +634,9 @@ callWithJQuery ($) ->
                 unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff
 
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
-                colList.addClass('pvtVertList')
+                unused.addClass('pvtVertList')
             else
-                colList.addClass('pvtHorizList')
+                unused.addClass('pvtHorizList')
 
             for own i, attr of shownAttributes
                 do (attr) ->
@@ -703,15 +703,15 @@ callWithJQuery ($) ->
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
-                    triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;")
-                        .bind "click", showFilterList
+                    triangleLink = $("<span>").addClass('pvtTriangle')
+                        .html(" &#x25BE;").bind("click", showFilterList)
 
                     attrElem = $("<li>").addClass("axis_#{i}")
-                        .append $("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink)
+                        .append $("<span>").addClass('pvtAttr').text(attr)
+                        .data("attrName", attr).append(triangleLink)
+                        .bind("dblclick", showFilterList)
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
-                    colList.append(attrElem).append(valueList)
-
-                    attrElem.bind "dblclick", showFilterList
+                    unused.append(attrElem).append(valueList)
 
             tr1 = $("<tr>").appendTo(uiTable)
 
@@ -744,9 +744,9 @@ callWithJQuery ($) ->
             #finally the renderer dropdown and unused attribs are inserted at the requested location
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
                 uiTable.find('tr:nth-child(1)').prepend rendererControl
-                uiTable.find('tr:nth-child(2)').prepend colList
+                uiTable.find('tr:nth-child(2)').prepend unused
             else
-                uiTable.prepend $("<tr>").append(rendererControl).append(colList)
+                uiTable.prepend $("<tr>").append(rendererControl).append(unused)
 
             #render the UI in its default state
             @html uiTable
