@@ -42,23 +42,38 @@
         <script type="text/javascript">
             $(function(){
                 var renderers = $.extend(
-                    $.pivotUtilities.renderers, 
-                    $.pivotUtilities.c3_renderers, 
+                    $.pivotUtilities.renderers,
+                    $.pivotUtilities.c3_renderers,
                     $.pivotUtilities.d3_renderers,
                     $.pivotUtilities.export_renderers
                     );
-                $("#csv").bind("change", function(event){
-                    Papa.parse(event.target.files[0], {
+                var parseAndPivot = function(f) {
+                    Papa.parse(f, {
                         error: function(e){ alert(e)},
                         complete: function(parsed){
                             $("#output").pivotUI(parsed.data, { renderers: renderers }, true);
-                        }  
+                        }
                     });
+                };
+
+                $("#csv").bind("change", function(event){
+                    parseAndPivot(event.target.files[0]);
                 });
+                document.addEventListener('dragover', function(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    evt.dataTransfer.dropEffect = 'copy';
+                }, false);
+
+                document.addEventListener('drop', function(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    parseAndPivot(evt.dataTransfer.files[0]);
+                }, false);
              });
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>
-        <p align="center">Select a CSV file: <input id="csv" type="file" /></p>
+        <p align="center">Drop a CSV file on this page or select it here: <input id="csv" type="file" /></p>
         <div id="output" style="margin: 10px;"></div>
 
     </body>
