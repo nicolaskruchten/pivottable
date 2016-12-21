@@ -296,12 +296,6 @@ callWithJQuery ($) ->
             else
                 throw new Error("unknown input format")
 
-        #converts to [{attr:val, attr:val},{attr:val, attr:val}] using method above
-        @convertToArray = (input) ->
-            result = []
-            PivotData.forEachRecord input, {}, (record) -> result.push record
-            return result
-
         arrSort: (attrs) =>
             sortersArr = (getSort(@sorters, a) for a in attrs)
             (a,b) ->
@@ -591,20 +585,24 @@ callWithJQuery ($) ->
             opts = existingOpts
 
         try
-            #cache the input in some useful form
-            input = PivotData.convertToArray(input)
-            tblCols = (k for own k of input[0])
-            tblCols.push c for own c of opts.derivedAttributes when (c not in tblCols)
-
-            #figure out the cardinality and some stats
-            axisValues = {}
-            axisValues[x] = {} for x in tblCols
-
+            # do a first pass on the data to cache a materialized copy of any
+            # function-valued inputs and to compute dimension cardinalities
+            attrValues = {}
+            materializedInput = []
+            recordsProcessed = 0
             PivotData.forEachRecord input, opts.derivedAttributes, (record) ->
-                for own k, v of record when opts.filter(record)
-                    v ?= "null"
-                    axisValues[k][v] ?= 0
-                    axisValues[k][v]++
+                return unless opts.filter(record)
+                materializedInput.push(record)
+                for own attr of record
+                    if not attrValues[attr]?
+                        attrValues[attr] = {}
+                        if recordsProcessed > 0
+                            attrValues[attr]["null"] = recordsProcessed
+                for attr of attrValues
+                    value = record[attr] ? "null"
+                    attrValues[attr][value] ?= 0
+                    attrValues[attr][value]++
+                recordsProcessed++
 
             #start building the output
             uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
@@ -621,8 +619,8 @@ callWithJQuery ($) ->
 
 
             #axis list, including the double-click menu
-            colList = $("<td>").addClass('pvtAxisContainer pvtUnused')
-            shownAttributes = (c for c in tblCols when c not in opts.hiddenAttributes)
+            unused = $("<td>").addClass('pvtAxisContainer pvtUnused')
+            shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
 
             unusedAttrsVerticalAutoOverride = false
             if opts.unusedAttrsVertical == "auto"
@@ -636,18 +634,18 @@ callWithJQuery ($) ->
                 unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff
 
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
-                colList.addClass('pvtVertList')
+                unused.addClass('pvtVertList')
             else
-                colList.addClass('pvtHorizList')
+                unused.addClass('pvtHorizList')
 
-            for own i, c of shownAttributes
-                do (c) ->
-                    keys = (k for k of axisValues[c])
+            for own i, attr of shownAttributes
+                do (attr) ->
+                    values = (v for v of attrValues[attr])
                     hasExcludedItem = false
                     valueList = $("<div>").addClass('pvtFilterBox').hide()
 
-                    valueList.append $("<h4>").text("#{c} (#{keys.length})")
-                    if keys.length > opts.menuLimit
+                    valueList.append $("<h4>").text("#{attr} (#{values.length})")
+                    if values.length > opts.menuLimit
                         valueList.append $("<p>").html(opts.localeStrings.tooMany)
                     else
                         btns = $("<p>").appendTo(valueList)
@@ -667,21 +665,21 @@ callWithJQuery ($) ->
 
                         checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
-                        for k in keys.sort(getSort(opts.sorters, c))
-                             v = axisValues[c][k]
+                        for value in values.sort(getSort(opts.sorters, attr))
+                             valueCount = attrValues[attr][value]
                              filterItem = $("<label>")
                              filterItemExcluded = false
-                             if opts.inclusions[c]
-                                filterItemExcluded = (k not in opts.inclusions[c])
-                             else if opts.exclusions[c]
-                                filterItemExcluded = (k in opts.exclusions[c])
+                             if opts.inclusions[attr]
+                                filterItemExcluded = (value not in opts.inclusions[attr])
+                             else if opts.exclusions[attr]
+                                filterItemExcluded = (value in opts.exclusions[attr])
                              hasExcludedItem ||= filterItemExcluded
                              $("<input>")
                                 .attr("type", "checkbox").addClass('pvtFilter')
-                                .attr("checked", !filterItemExcluded).data("filter", [c,k])
+                                .attr("checked", !filterItemExcluded).data("filter", [attr,value])
                                 .appendTo filterItem
-                             filterItem.append $("<span>").text k
-                             filterItem.append $("<span>").text " ("+v+")"
+                             filterItem.append $("<span>").text value
+                             filterItem.append $("<span>").text " ("+valueCount+")"
                              checkContainer.append $("<p>").append(filterItem)
 
                     updateFilter = ->
@@ -691,7 +689,7 @@ callWithJQuery ($) ->
                             attrElem.addClass "pvtFilteredAttribute"
                         else
                             attrElem.removeClass "pvtFilteredAttribute"
-                        if keys.length > opts.menuLimit
+                        if values.length > opts.menuLimit
                             valueList.toggle()
                         else
                             valueList.toggle(0, refresh)
@@ -700,20 +698,20 @@ callWithJQuery ($) ->
                         .append $("<button>", {type:"button"}).text("OK").bind "click", updateFilter
 
                     showFilterList = (e) ->
-                        {left: clickLeft, top: clickTop, } = $(e.currentTarget).position()
-                        valueList.css(left: clickLeft+10, top: clickTop+10).toggle()
+                        {left, top} = $(e.currentTarget).position()
+                        valueList.css(left: left+10, top: top+10).toggle()
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
-                    triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;")
-                        .bind "click", showFilterList
+                    triangleLink = $("<span>").addClass('pvtTriangle')
+                        .html(" &#x25BE;").bind("click", showFilterList)
 
                     attrElem = $("<li>").addClass("axis_#{i}")
-                        .append $("<span>").addClass('pvtAttr').text(c).data("attrName", c).append(triangleLink)
+                        .append $("<span>").addClass('pvtAttr').text(attr)
+                        .data("attrName", attr).append(triangleLink)
+                        .bind("dblclick", showFilterList)
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
-                    colList.append(attrElem).append(valueList)
-
-                    attrElem.bind "dblclick", showFilterList
+                    unused.append(attrElem).append(valueList)
 
             tr1 = $("<tr>").appendTo(uiTable)
 
@@ -746,9 +744,9 @@ callWithJQuery ($) ->
             #finally the renderer dropdown and unused attribs are inserted at the requested location
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
                 uiTable.find('tr:nth-child(1)').prepend rendererControl
-                uiTable.find('tr:nth-child(2)').prepend colList
+                uiTable.find('tr:nth-child(2)').prepend unused
             else
-                uiTable.prepend $("<tr>").append(rendererControl).append(colList)
+                uiTable.prepend $("<tr>").append(rendererControl).append(unused)
 
             #render the UI in its default state
             @html uiTable
@@ -832,10 +830,10 @@ callWithJQuery ($) ->
                 subopts.filter = (record) ->
                     return false if not opts.filter(record)
                     for k,excludedItems of exclusions
-                        return false if ""+record[k] in excludedItems
+                        return false if ""+(record[k] ? 'null') in excludedItems
                     return true
 
-                pivotTable.pivot(input,subopts)
+                pivotTable.pivot(materializedInput,subopts)
                 pivotUIOptions = $.extend opts,
                     cols: subopts.cols
                     rows: subopts.rows
