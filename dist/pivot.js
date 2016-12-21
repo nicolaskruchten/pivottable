@@ -904,7 +904,7 @@
     Pivot Table core: create PivotData object and call Renderer on it
      */
     $.fn.pivot = function(input, opts) {
-      var defaults, e, pivotData, result, x;
+      var defaults, e, error, error1, pivotData, result, x;
       defaults = {
         cols: [],
         rows: [],
@@ -927,15 +927,15 @@
         pivotData = new opts.dataClass(input, opts);
         try {
           result = opts.renderer(pivotData, opts.rendererOptions);
-        } catch (_error) {
-          e = _error;
+        } catch (error) {
+          e = error;
           if (typeof console !== "undefined" && console !== null) {
             console.error(e.stack);
           }
           result = $("<span>").html(opts.localeStrings.renderError);
         }
-      } catch (_error) {
-        e = _error;
+      } catch (error1) {
+        e = error1;
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }
@@ -952,7 +952,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, colList, defaults, e, existingOpts, fn, i, initialRender, l, len1, len2, len3, materializedInput, n, o, opts, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tr1, tr2, uiTable, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, defaults, e, error, existingOpts, fn, i, initialRender, l, len1, len2, len3, materializedInput, n, o, opts, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1032,7 +1032,7 @@
           if (!hasProp.call(ref, x)) continue;
           $("<option>").val(x).html(x).appendTo(renderer);
         }
-        colList = $("<td>").addClass('pvtAxisContainer pvtUnused');
+        unused = $("<td>").addClass('pvtAxisContainer pvtUnused');
         shownAttributes = (function() {
           var results;
           results = [];
@@ -1058,9 +1058,9 @@
           unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff;
         }
         if (opts.unusedAttrsVertical === true || unusedAttrsVerticalAutoOverride) {
-          colList.addClass('pvtVertList');
+          unused.addClass('pvtVertList');
         } else {
-          colList.addClass('pvtHorizList');
+          unused.addClass('pvtHorizList');
         }
         fn = function(attr) {
           var attrElem, btns, checkContainer, filterItem, filterItemExcluded, hasExcludedItem, len2, n, ref1, showFilterList, triangleLink, updateFilter, v, value, valueCount, valueList, values;
@@ -1154,12 +1154,11 @@
             return valueList.find('.pvtCheckContainer p').show();
           };
           triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", showFilterList);
-          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink));
+          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink)).bind("dblclick", showFilterList);
           if (hasExcludedItem) {
             attrElem.addClass('pvtFilteredAttribute');
           }
-          colList.append(attrElem).append(valueList);
-          return attrElem.bind("dblclick", showFilterList);
+          return unused.append(attrElem).append(valueList);
         };
         for (i in shownAttributes) {
           if (!hasProp.call(shownAttributes, i)) continue;
@@ -1182,9 +1181,9 @@
         pivotTable = $("<td>").attr("valign", "top").addClass('pvtRendererArea').appendTo(tr2);
         if (opts.unusedAttrsVertical === true || unusedAttrsVerticalAutoOverride) {
           uiTable.find('tr:nth-child(1)').prepend(rendererControl);
-          uiTable.find('tr:nth-child(2)').prepend(colList);
+          uiTable.find('tr:nth-child(2)').prepend(unused);
         } else {
-          uiTable.prepend($("<tr>").append(rendererControl).append(colList));
+          uiTable.prepend($("<tr>").append(rendererControl).append(unused));
         }
         this.html(uiTable);
         ref2 = opts.cols;
@@ -1282,7 +1281,6 @@
                 }
               }
             });
-            console.log(exclusions);
             subopts.filter = function(record) {
               var excludedItems, k, ref6, ref7;
               if (!opts.filter(record)) {
@@ -1337,8 +1335,8 @@
           items: 'li',
           placeholder: 'pvtPlaceholder'
         });
-      } catch (_error) {
-        e = _error;
+      } catch (error) {
+        e = error;
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }

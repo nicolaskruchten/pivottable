@@ -703,12 +703,10 @@ callWithJQuery ($) ->
                         valueList.find('.pvtSearch').val('')
                         valueList.find('.pvtCheckContainer p').show()
 
-                    triangleLink = $("<span>").addClass('pvtTriangle')
-                        .html(" &#x25BE;").bind("click", showFilterList)
+                    triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", showFilterList)
 
                     attrElem = $("<li>").addClass("axis_#{i}")
-                        .append $("<span>").addClass('pvtAttr').text(attr)
-                        .data("attrName", attr).append(triangleLink)
+                        .append $("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink)
                         .bind("dblclick", showFilterList)
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                     unused.append(attrElem).append(valueList)
