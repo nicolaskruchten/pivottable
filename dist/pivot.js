@@ -1074,22 +1074,11 @@
           })();
           hasExcludedItem = false;
           valueList = $("<div>").addClass('pvtFilterBox').hide();
-          valueList.append($("<h4>").text(attr + " (" + values.length + ")"));
+          valueList.append($("<h4>").append($("<span>").text(attr + " "), $("<span>").addClass("count").text("(" + values.length + ")")));
           if (values.length > opts.menuLimit) {
             valueList.append($("<p>").html(opts.localeStrings.tooMany));
           } else {
             btns = $("<p>").appendTo(valueList);
-            btns.append($("<button>", {
-              type: "button"
-            }).html(opts.localeStrings.selectAll).bind("click", function() {
-              return valueList.find("input:visible").prop("checked", true);
-            }));
-            btns.append($("<button>", {
-              type: "button"
-            }).html(opts.localeStrings.selectNone).bind("click", function() {
-              return valueList.find("input:visible").prop("checked", false);
-            }));
-            btns.append($("<br>"));
             btns.append($("<input>", {
               type: "text",
               placeholder: opts.localeStrings.filterResults,
@@ -1107,6 +1096,17 @@
                 }
               });
             }));
+            btns.append($("<br>"));
+            btns.append($("<button>", {
+              type: "button"
+            }).html(opts.localeStrings.selectAll).bind("click", function() {
+              return valueList.find("input:visible").prop("checked", true);
+            }));
+            btns.append($("<button>", {
+              type: "button"
+            }).html(opts.localeStrings.selectNone).bind("click", function() {
+              return valueList.find("input:visible").prop("checked", false);
+            }));
             checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
             ref1 = values.sort(getSort(opts.sorters, attr));
             for (n = 0, len2 = ref1.length; n < len2; n++) {
@@ -1122,7 +1122,7 @@
               hasExcludedItem || (hasExcludedItem = filterItemExcluded);
               $("<input>").attr("type", "checkbox").addClass('pvtFilter').attr("checked", !filterItemExcluded).data("filter", [attr, value]).appendTo(filterItem);
               filterItem.append($("<span>").text(value));
-              filterItem.append($("<span>").text(" (" + valueCount + ")"));
+              filterItem.append($("<span>").addClass("count").text(" (" + valueCount + ")"));
               checkContainer.append($("<p>").append(filterItem));
             }
           }

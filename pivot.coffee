@@ -644,16 +644,14 @@ callWithJQuery ($) ->
                     hasExcludedItem = false
                     valueList = $("<div>").addClass('pvtFilterBox').hide()
 
-                    valueList.append $("<h4>").text("#{attr} (#{values.length})")
+                    valueList.append $("<h4>").append(
+                        $("<span>").text(attr+" "),
+                        $("<span>").addClass("count").text("(#{values.length})"),
+                        )
                     if values.length > opts.menuLimit
                         valueList.append $("<p>").html(opts.localeStrings.tooMany)
                     else
                         btns = $("<p>").appendTo(valueList)
-                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectAll).bind "click", ->
-                            valueList.find("input:visible").prop "checked", true
-                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectNone).bind "click", ->
-                            valueList.find("input:visible").prop "checked", false
-                        btns.append $("<br>")
                         btns.append $("<input>", {type: "text", placeholder: opts.localeStrings.filterResults, class: "pvtSearch"}).bind "keyup", ->
                             filter = $(this).val().toLowerCase()
                             valueList.find('.pvtCheckContainer p').each ->
@@ -662,6 +660,11 @@ callWithJQuery ($) ->
                                     $(this).show()
                                 else
                                     $(this).hide()
+                        btns.append $("<br>")
+                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectAll).bind "click", ->
+                            valueList.find("input:visible").prop "checked", true
+                        btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectNone).bind "click", ->
+                            valueList.find("input:visible").prop "checked", false
 
                         checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
@@ -679,7 +682,7 @@ callWithJQuery ($) ->
                                 .attr("checked", !filterItemExcluded).data("filter", [attr,value])
                                 .appendTo filterItem
                              filterItem.append $("<span>").text value
-                             filterItem.append $("<span>").text " ("+valueCount+")"
+                             filterItem.append $("<span>").addClass("count").text " ("+valueCount+")"
                              checkContainer.append $("<p>").append(filterItem)
 
                     updateFilter = ->
