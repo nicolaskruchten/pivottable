@@ -47,6 +47,7 @@
                     $.pivotUtilities.d3_renderers,
                     $.pivotUtilities.export_renderers
                     );
+
                 var parseAndPivot = function(f) {
                     Papa.parse(f, {
                         error: function(e){ alert(e)},
@@ -59,17 +60,16 @@
                 $("#csv").bind("change", function(event){
                     parseAndPivot(event.target.files[0]);
                 });
-                document.addEventListener('dragover', function(evt) {
-                    evt.stopPropagation();
-                    evt.preventDefault();
-                    evt.dataTransfer.dropEffect = 'copy';
-                }, false);
 
-                document.addEventListener('drop', function(evt) {
+                $("html").on("dragover", function(evt) {
                     evt.stopPropagation();
                     evt.preventDefault();
-                    parseAndPivot(evt.dataTransfer.files[0]);
-                }, false);
+                    evt.originalEvent.dataTransfer.dropEffect = 'copy';
+                }).on("drop", function(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    parseAndPivot(evt.originalEvent.dataTransfer.files[0]);
+                });
              });
         </script>
         <p><a href="index.html">&laquo; back to examples</a></p>
