@@ -85,7 +85,12 @@ table.pvtTable tbody tr td {
 .pvtFilterBox label { font-weight: normal; }
 .pvtFilterBox input[type='checkbox'] { margin-right: 10px; margin-left: 10px; }
 .pvtFilterBox input[type='text'] { width: 230px; }
-.pvtFilterBox .count { color: gray; font-weight: normal;}
+.pvtFilterBox .count { color: gray; font-weight: normal; margin-left: 3px;}
+.pvtFilterBox .close {
+    position: absolute; right: 4px;
+    font-size: 20px; color: gray;
+    text-decoration: none;
+}
 
 .pvtCheckContainer{
     text-align: left;
@@ -95,7 +100,6 @@ table.pvtTable tbody tr td {
     width: 100%;
     max-height: 250px;
     border-top: 1px solid lightgrey;
-    border-bottom: 1px solid lightgrey;
 }
 
 .pvtCheckContainer p{ margin: 5px; }

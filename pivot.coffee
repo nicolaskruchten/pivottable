@@ -167,7 +167,7 @@ callWithJQuery ($) ->
                 selectAll: "Select All"
                 selectNone: "Select None"
                 tooMany: "(too many to list)"
-                filterResults: "Filter results"
+                filterResults: "Filter values"
                 totals: "Totals" #for table renderer
                 vs: "vs" #for gchart renderer
                 by: "by" #for gchart renderer
@@ -644,17 +644,31 @@ callWithJQuery ($) ->
                     hasExcludedItem = false
                     valueList = $("<div>").addClass('pvtFilterBox').hide()
 
+                    $("<a>", {href:"#", role: "button", "class": "close"})
+                        .html("&times;").appendTo(valueList).bind "click", ->
+                            unselectedCount = valueList.find("[type='checkbox']").length -
+                                              valueList.find("[type='checkbox']:checked").length
+                            if unselectedCount > 0
+                                attrElem.addClass "pvtFilteredAttribute"
+                            else
+                                attrElem.removeClass "pvtFilteredAttribute"
+                            if values.length > opts.menuLimit
+                                valueList.toggle()
+                            else
+                                valueList.toggle(0, refresh)
+
                     valueList.append $("<h4>").append(
-                        $("<span>").text(attr+" "),
+                        $("<span>").text(attr),
                         $("<span>").addClass("count").text("(#{values.length})"),
                         )
                     if values.length > opts.menuLimit
                         valueList.append $("<p>").html(opts.localeStrings.tooMany)
-                    else
-                        if values.length > 5
-                            btns = $("<p>").appendTo(valueList)
-                            sorter = getSort(opts.sorters, attr)
-                            btns.append $("<input>", {type: "text", placeholder: opts.localeStrings.filterResults, class: "pvtSearch"}).bind "keyup", ->
+                    else if values.length > 5
+                        controls = $("<p>").appendTo(valueList)
+                        sorter = getSort(opts.sorters, attr)
+                        $("<input>", {type: "text"}).appendTo(controls)
+                            .attr({placeholder: opts.localeStrings.filterResults, class: "pvtSearch"})
+                            .bind "keyup", ->
                                 filter = $(this).val().toLowerCase().trim()
                                 if filter.startsWith(">")
                                     check = (v) ->
@@ -675,43 +689,36 @@ callWithJQuery ($) ->
                                         $(this).parent().parent().show()
                                     else
                                         $(this).parent().parent().hide()
-                            btns.append $("<br>")
-                            btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectAll).bind "click", ->
+                        controls.append $("<br>")
+                        $("<button>", {type:"button"}).appendTo(controls)
+                            .html(opts.localeStrings.selectAll)
+                            .bind "click", ->
                                 valueList.find("input:visible").prop "checked", true
-                            btns.append $("<button>", {type:"button"}).html(opts.localeStrings.selectNone).bind "click", ->
+                                return false
+                        $("<button>", {type:"button"}).appendTo(controls)
+                            .html(opts.localeStrings.selectNone)
+                            .bind "click", ->
                                 valueList.find("input:visible").prop "checked", false
+                                return false
 
-                        checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
+                    checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
 
-                        for value in values.sort(getSort(opts.sorters, attr))
-                             valueCount = attrValues[attr][value]
-                             filterItem = $("<label>")
-                             filterItemExcluded = false
-                             if opts.inclusions[attr]
-                                filterItemExcluded = (value not in opts.inclusions[attr])
-                             else if opts.exclusions[attr]
-                                filterItemExcluded = (value in opts.exclusions[attr])
-                             hasExcludedItem ||= filterItemExcluded
-                             $("<input>")
-                                .attr("type", "checkbox").addClass('pvtFilter')
-                                .attr("checked", !filterItemExcluded).data("filter", [attr,value])
-                                .appendTo filterItem
-                             filterItem.append $("<span class='value'>").text value
-                             filterItem.append $("<span class='count'>").text " ("+valueCount+")"
-                             checkContainer.append $("<p>").append(filterItem)
-
-                    $("<p>").appendTo(valueList)
-                        .append $("<button>", {type:"button"}).text("OK").bind "click", ->
-                            unselectedCount = valueList.find("[type='checkbox']").length -
-                                              valueList.find("[type='checkbox']:checked").length
-                            if unselectedCount > 0
-                                attrElem.addClass "pvtFilteredAttribute"
-                            else
-                                attrElem.removeClass "pvtFilteredAttribute"
-                            if values.length > opts.menuLimit
-                                valueList.toggle()
-                            else
-                                valueList.toggle(0, refresh)
+                    for value in values.sort(getSort(opts.sorters, attr))
+                         valueCount = attrValues[attr][value]
+                         filterItem = $("<label>")
+                         filterItemExcluded = false
+                         if opts.inclusions[attr]
+                            filterItemExcluded = (value not in opts.inclusions[attr])
+                         else if opts.exclusions[attr]
+                            filterItemExcluded = (value in opts.exclusions[attr])
+                         hasExcludedItem ||= filterItemExcluded
+                         $("<input>")
+                            .attr("type", "checkbox").addClass('pvtFilter')
+                            .attr("checked", !filterItemExcluded).data("filter", [attr,value])
+                            .appendTo filterItem
+                         filterItem.append $("<span>").addClass("value").text(value)
+                         filterItem.append $("<span>").addClass("count").text("("+valueCount+")")
+                         checkContainer.append $("<p>").append(filterItem)
 
                     showFilterList = (e) ->
                         {left, top} = $(e.currentTarget).position()
