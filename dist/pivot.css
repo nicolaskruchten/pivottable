@@ -100,6 +100,7 @@ table.pvtTable tbody tr td {
     width: 100%;
     max-height: 250px;
     border-top: 1px solid lightgrey;
+    border-bottom: 1px solid lightgrey;
 }
 
 .pvtCheckContainer p{ margin: 5px; }

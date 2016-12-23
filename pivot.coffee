@@ -644,19 +644,6 @@ callWithJQuery ($) ->
                     hasExcludedItem = false
                     valueList = $("<div>").addClass('pvtFilterBox').hide()
 
-                    $("<a>", {href:"#", role: "button", "class": "close"})
-                        .html("&times;").appendTo(valueList).bind "click", ->
-                            unselectedCount = valueList.find("[type='checkbox']").length -
-                                              valueList.find("[type='checkbox']:checked").length
-                            if unselectedCount > 0
-                                attrElem.addClass "pvtFilteredAttribute"
-                            else
-                                attrElem.removeClass "pvtFilteredAttribute"
-                            if values.length > opts.menuLimit
-                                valueList.toggle()
-                            else
-                                valueList.toggle(0, refresh)
-
                     valueList.append $("<h4>").append(
                         $("<span>").text(attr),
                         $("<span>").addClass("count").text("(#{values.length})"),
@@ -666,8 +653,9 @@ callWithJQuery ($) ->
                     else if values.length > 5
                         controls = $("<p>").appendTo(valueList)
                         sorter = getSort(opts.sorters, attr)
+                        placeholder = opts.localeStrings.filterResults
                         $("<input>", {type: "text"}).appendTo(controls)
-                            .attr({placeholder: opts.localeStrings.filterResults, class: "pvtSearch"})
+                            .attr({placeholder: placeholder, class: "pvtSearch"})
                             .bind "keyup", ->
                                 filter = $(this).val().toLowerCase().trim()
                                 if filter.startsWith(">")
@@ -719,6 +707,20 @@ callWithJQuery ($) ->
                          filterItem.append $("<span>").addClass("value").text(value)
                          filterItem.append $("<span>").addClass("count").text("("+valueCount+")")
                          checkContainer.append $("<p>").append(filterItem)
+
+                    $("<button>", {type: "button"}).text("Apply")
+                        .appendTo($("<p>").appendTo(valueList))
+                        .bind "click", ->
+                            unselectedCount = valueList.find("[type='checkbox']").length -
+                                              valueList.find("[type='checkbox']:checked").length
+                            if unselectedCount > 0
+                                attrElem.addClass "pvtFilteredAttribute"
+                            else
+                                attrElem.removeClass "pvtFilteredAttribute"
+                            if values.length > opts.menuLimit
+                                valueList.toggle()
+                            else
+                                valueList.toggle(0, refresh)
 
                     showFilterList = (e) ->
                         {left, top} = $(e.currentTarget).position()
