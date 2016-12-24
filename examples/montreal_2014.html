@@ -3,7 +3,7 @@
 
     <head>
         <title>Pivot Demo</title>
-        
+
             <!-- external libs from cdnjs -->
             <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
             <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -27,10 +27,10 @@
             .c3-axis path {stroke: grey;}
             .c3-circle { opacity: 1 !important; }
         </style>
-        
+
         <!-- optional: mobile support with jqueryui-touch-punch -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-            
+
             <!-- for examples only! script to show code to user -->
             <script type="text/javascript" src="show_code.js"></script>
     </head>
@@ -41,7 +41,7 @@
     // from a CSV and shows date handling with derivers and
     // sort overriding. This example also features custom
     // aggregators, C3 Charts and hidden attributes.
-    
+
     $(function () {
 
         var dateFormat =       $.pivotUtilities.derivers.dateFormat;
@@ -61,26 +61,22 @@
                         "day name":   dateFormat("Date", "%w", true)
                     },
 
-                    rows: ["day name"], 
+                    rows: ["day name"],
                     cols: ["month name"],
 
-                    sorters: function(attr) {
-                        if(attr == "month name") {
-                            return sortAs(["Jan","Feb","Mar","Apr", "May",
-                                "Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
-                        }
-                        if(attr == "day name") {
-                            return sortAs(["Mon","Tue","Wed", "Thu","Fri",
-                                "Sat","Sun"]);
-                        }
+                    sorters: {
+                        "month name": sortAs(["Jan","Feb","Mar","Apr", "May",
+                                "Jun","Jul","Aug","Sep","Oct","Nov","Dec"]),
+                        "day name": sortAs(["Mon","Tue","Wed", "Thu","Fri",
+                                "Sat","Sun"])
                     },
 
                     aggregators: {
-                        "Mean Temp (Celsius)":  
+                        "Mean Temp (Celsius)":
                             function() { return tpl.average()(["Mean Temp (C)"])},
-                        "Max Temp (Celsius)":   
+                        "Max Temp (Celsius)":
                             function() { return tpl.max()(["Max Temp (C)"]) },
-                        "Min Temp (Celsius)":   
+                        "Min Temp (Celsius)":
                             function() { return tpl.min()(["Min Temp (C)"]) }
                     },
 
@@ -91,7 +87,7 @@
                         ),
 
                     rendererName: "Heatmap",
-                    
+
                     rendererOptions: {
                         heatmap: {
                             colorScaleGenerator: function(values) {

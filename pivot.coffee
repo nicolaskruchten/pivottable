@@ -70,20 +70,22 @@ callWithJQuery ($) ->
 
         min: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             val: null
+            sorter: getSort(data?.sorters, attr)
             push: (record) ->
-                x = parseFloat(record[attr])
-                if not isNaN x then @val = Math.min(x, @val ? x)
+                x = record[attr]
+                @val = x if @sorter(x, @val ? x) <= 0
             value: -> @val
-            format: formatter
+            format: (x) -> if isNaN(x) then x else formatter(x)
             numInputs: if attr? then 0 else 1
 
         max: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             val: null
+            sorter: getSort(data?.sorters, attr)
             push: (record) ->
-                x = parseFloat(record[attr])
-                if not isNaN x then @val = Math.max(x, @val ? x)
+                x = record[attr]
+                @val = x if @sorter(x, @val ? x) >= 0
             value: -> @val
-            format: formatter
+            format: (x) -> if isNaN(x) then x else formatter(x)
             numInputs: if attr? then 0 else 1
 
         average:  (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
@@ -223,24 +225,27 @@ callWithJQuery ($) ->
 
     sortAs = (order) ->
         mapping = {}
+        l_mapping = {} # sort lowercased keys similarly
         for i, x of order
             mapping[x] = i
+            l_mapping[x.toLowerCase()] = i if typeof x == "string"
         (a, b) ->
-            if mapping[a]? and mapping[b]?
-                return mapping[a] - mapping[b]
-            else if mapping[a]?
-                return -1
-            else if mapping[b]?
-                return 1
-            else
-                return naturalSort(a,b)
+            if mapping[a]? and mapping[b]? then mapping[a] - mapping[b]
+            else if mapping[a]? then -1
+            else if mapping[b]? then 1
+            else if l_mapping[a]? and l_mapping[b]? then l_mapping[a] - l_mapping[b]
+            else if l_mapping[a]? then -1
+            else if l_mapping[b]? then 1
+            else naturalSort(a,b)
 
     getSort = (sorters, attr) ->
-        sort = sorters(attr)
-        if $.isFunction(sort)
-            return sort
-        else
-            return naturalSort
+        if sorters?
+            if $.isFunction(sorters)
+                sort = sorters(attr)
+                return sort if $.isFunction(sort)
+            else if sorters[attr]?
+                return sorters[attr]
+        return naturalSort
 
     ###
     Data Model class
@@ -528,8 +533,8 @@ callWithJQuery ($) ->
             filter: -> true
             aggregator: aggregatorTemplates.count()()
             aggregatorName: "Count"
-            sorters: ->
-            derivedAttributes: {},
+            sorters: {}
+            derivedAttributes: {}
             renderer: pivotTableRenderer
             rendererOptions: null
             localeStrings: locales.en.localeStrings
@@ -575,7 +580,7 @@ callWithJQuery ($) ->
             rendererOptions: localeStrings: locales[locale].localeStrings
             onRefresh: null
             filter: -> true
-            sorters: ->
+            sorters: {}
             localeStrings: locales[locale].localeStrings
 
         existingOpts = @data "pivotUIOptions"
@@ -658,22 +663,22 @@ callWithJQuery ($) ->
                             .attr({placeholder: placeholder, class: "pvtSearch"})
                             .bind "keyup", ->
                                 filter = $(this).val().toLowerCase().trim()
-                                if filter.startsWith(">")
-                                    check = (v) ->
-                                        return true if filter.substring(1).trim().length == 0
-                                        sorter(v.toLowerCase(), filter.substring(1).trim()) > 0
-                                else if filter.startsWith("<")
-                                    check = (v) ->
-                                        return true if filter.substring(1).trim().length == 0
-                                        sorter(v.toLowerCase(), filter.substring(1).trim()) < 0
-                                else if filter.startsWith("~")
-                                    check = (v) ->
-                                        return true if filter.substring(1).trim().length == 0
-                                        v.toLowerCase().match(filter.substring(1))
-                                else
-                                    check = (v) -> v.toLowerCase().indexOf(filter) != -1
+                                accept_gen = (prefix, accepted) -> (v) ->
+                                    real_filter = filter.substring(prefix.length).trim()
+                                    return true if real_filter.length == 0
+                                    return Math.sign(sorter(v.toLowerCase(), real_filter)) in accepted
+                                accept =
+                                    if      filter.startsWith(">=") then accept_gen(">=", [1,0])
+                                    else if filter.startsWith("<=") then accept_gen("<=", [-1,0])
+                                    else if filter.startsWith(">")  then accept_gen(">",  [1])
+                                    else if filter.startsWith("<")  then accept_gen("<",  [-1])
+                                    else if filter.startsWith("~")  then (v) ->
+                                            return true if filter.substring(1).trim().length == 0
+                                            v.toLowerCase().match(filter.substring(1))
+                                    else (v) -> v.toLowerCase().indexOf(filter) != -1
+
                                 valueList.find('.pvtCheckContainer p label span.value').each ->
-                                    if check($(this).text())
+                                    if accept($(this).text())
                                         $(this).parent().parent().show()
                                     else
                                         $(this).parent().parent().hide()

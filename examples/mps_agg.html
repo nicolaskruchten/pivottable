@@ -34,18 +34,14 @@
                     "Number of MPs":      function() { return tpl.count()() },
                     "Average Age of MPs": function() { return tpl.average()(["Age"])}
                 },
-                sorters: function(attr) {
-                    if(attr == "Province") {
-                        return $.pivotUtilities.sortAs(
+                sorters: {
+                    Province: $.pivotUtilities.sortAs(
                             ["British Columbia", "Alberta",
                             "Saskatchewan", "Manitoba",
                             "Territories", "Ontario", "Quebec",
                             "New Brunswick", "Prince Edward Island",
-                            "Nova Scotia", "Newfoundland"]);
-                    }
-                    if(attr == "Age") { // sort backwards
-                        return function(a,b){ return b-a; };
-                    }
+                            "Nova Scotia", "Newfoundland and Labrador"]),
+                    Age: function(a,b){ return b-a; } //sort backwards
                 }
             });
         });

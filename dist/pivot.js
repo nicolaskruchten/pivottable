@@ -169,17 +169,24 @@
           return function(data, rowKey, colKey) {
             return {
               val: null,
+              sorter: getSort(data != null ? data.sorters : void 0, attr),
               push: function(record) {
                 var ref, x;
-                x = parseFloat(record[attr]);
-                if (!isNaN(x)) {
-                  return this.val = Math.min(x, (ref = this.val) != null ? ref : x);
+                x = record[attr];
+                if (this.sorter(x, (ref = this.val) != null ? ref : x) <= 0) {
+                  return this.val = x;
                 }
               },
               value: function() {
                 return this.val;
               },
-              format: formatter,
+              format: function(x) {
+                if (isNaN(x)) {
+                  return x;
+                } else {
+                  return formatter(x);
+                }
+              },
               numInputs: attr != null ? 0 : 1
             };
           };
@@ -195,17 +202,24 @@
           return function(data, rowKey, colKey) {
             return {
               val: null,
+              sorter: getSort(data != null ? data.sorters : void 0, attr),
               push: function(record) {
                 var ref, x;
-                x = parseFloat(record[attr]);
-                if (!isNaN(x)) {
-                  return this.val = Math.max(x, (ref = this.val) != null ? ref : x);
+                x = record[attr];
+                if (this.sorter(x, (ref = this.val) != null ? ref : x) >= 0) {
+                  return this.val = x;
                 }
               },
               value: function() {
                 return this.val;
               },
-              format: formatter,
+              format: function(x) {
+                if (isNaN(x)) {
+                  return x;
+                } else {
+                  return formatter(x);
+                }
+              },
               numInputs: attr != null ? 0 : 1
             };
           };
@@ -481,11 +495,15 @@
       };
     })(this);
     sortAs = function(order) {
-      var i, mapping, x;
+      var i, l_mapping, mapping, x;
       mapping = {};
+      l_mapping = {};
       for (i in order) {
         x = order[i];
         mapping[x] = i;
+        if (typeof x === "string") {
+          l_mapping[x.toLowerCase()] = i;
+        }
       }
       return function(a, b) {
         if ((mapping[a] != null) && (mapping[b] != null)) {
@@ -494,6 +512,12 @@
           return -1;
         } else if (mapping[b] != null) {
           return 1;
+        } else if ((l_mapping[a] != null) && (l_mapping[b] != null)) {
+          return l_mapping[a] - l_mapping[b];
+        } else if (l_mapping[a] != null) {
+          return -1;
+        } else if (l_mapping[b] != null) {
+          return 1;
         } else {
           return naturalSort(a, b);
         }
@@ -501,12 +525,17 @@
     };
     getSort = function(sorters, attr) {
       var sort;
-      sort = sorters(attr);
-      if ($.isFunction(sort)) {
-        return sort;
-      } else {
-        return naturalSort;
+      if (sorters != null) {
+        if ($.isFunction(sorters)) {
+          sort = sorters(attr);
+          if ($.isFunction(sort)) {
+            return sort;
+          }
+        } else if (sorters[attr] != null) {
+          return sorters[attr];
+        }
       }
+      return naturalSort;
     };
 
     /*
@@ -915,7 +944,7 @@
         },
         aggregator: aggregatorTemplates.count()(),
         aggregatorName: "Count",
-        sorters: function() {},
+        sorters: {},
         derivedAttributes: {},
         renderer: pivotTableRenderer,
         rendererOptions: null,
@@ -983,7 +1012,7 @@
         filter: function() {
           return true;
         },
-        sorters: function() {},
+        sorters: {},
         localeStrings: locales[locale].localeStrings
       };
       existingOpts = this.data("pivotUIOptions");
@@ -1087,36 +1116,28 @@
               placeholder: placeholder,
               "class": "pvtSearch"
             }).bind("keyup", function() {
-              var check, filter;
+              var accept, accept_gen, filter;
               filter = $(this).val().toLowerCase().trim();
-              if (filter.startsWith(">")) {
-                check = function(v) {
-                  if (filter.substring(1).trim().length === 0) {
+              accept_gen = function(prefix, accepted) {
+                return function(v) {
+                  var real_filter, ref1;
+                  real_filter = filter.substring(prefix.length).trim();
+                  if (real_filter.length === 0) {
                     return true;
                   }
-                  return sorter(v.toLowerCase(), filter.substring(1).trim()) > 0;
+                  return ref1 = Math.sign(sorter(v.toLowerCase(), real_filter)), indexOf.call(accepted, ref1) >= 0;
                 };
-              } else if (filter.startsWith("<")) {
-                check = function(v) {
-                  if (filter.substring(1).trim().length === 0) {
-                    return true;
-                  }
-                  return sorter(v.toLowerCase(), filter.substring(1).trim()) < 0;
-                };
-              } else if (filter.startsWith("~")) {
-                check = function(v) {
-                  if (filter.substring(1).trim().length === 0) {
-                    return true;
-                  }
-                  return v.toLowerCase().match(filter.substring(1));
-                };
-              } else {
-                check = function(v) {
-                  return v.toLowerCase().indexOf(filter) !== -1;
-                };
-              }
+              };
+              accept = filter.startsWith(">=") ? accept_gen(">=", [1, 0]) : filter.startsWith("<=") ? accept_gen("<=", [-1, 0]) : filter.startsWith(">") ? accept_gen(">", [1]) : filter.startsWith("<") ? accept_gen("<", [-1]) : filter.startsWith("~") ? function(v) {
+                if (filter.substring(1).trim().length === 0) {
+                  return true;
+                }
+                return v.toLowerCase().match(filter.substring(1));
+              } : function(v) {
+                return v.toLowerCase().indexOf(filter) !== -1;
+              };
               return valueList.find('.pvtCheckContainer p label span.value').each(function() {
-                if (check($(this).text())) {
+                if (accept($(this).text())) {
                   return $(this).parent().parent().show();
                 } else {
                   return $(this).parent().parent().hide();
