@@ -543,17 +543,24 @@
      */
     PivotData = (function() {
       function PivotData(input, opts) {
+        var ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7;
+        if (opts == null) {
+          opts = {};
+        }
         this.getAggregator = bind(this.getAggregator, this);
         this.getRowKeys = bind(this.getRowKeys, this);
         this.getColKeys = bind(this.getColKeys, this);
         this.sortKeys = bind(this.sortKeys, this);
         this.arrSort = bind(this.arrSort, this);
-        this.aggregator = opts.aggregator;
-        this.aggregatorName = opts.aggregatorName;
-        this.colAttrs = opts.cols;
-        this.rowAttrs = opts.rows;
-        this.valAttrs = opts.vals;
-        this.sorters = opts.sorters;
+        this.aggregator = (ref = opts.aggregator) != null ? ref : aggregatorTemplates.count()();
+        this.aggregatorName = (ref1 = opts.aggregatorName) != null ? ref1 : "Count";
+        this.colAttrs = (ref2 = opts.cols) != null ? ref2 : [];
+        this.rowAttrs = (ref3 = opts.rows) != null ? ref3 : [];
+        this.valAttrs = (ref4 = opts.vals) != null ? ref4 : [];
+        this.sorters = (ref5 = opts.sorters) != null ? ref5 : {};
+        this.filter = (ref6 = opts.filter) != null ? ref6 : (function() {
+          return true;
+        });
         this.tree = {};
         this.rowKeys = [];
         this.colKeys = [];
@@ -561,9 +568,9 @@
         this.colTotals = {};
         this.allTotal = this.aggregator(this, [], []);
         this.sorted = false;
-        PivotData.forEachRecord(input, opts.derivedAttributes, (function(_this) {
+        PivotData.forEachRecord(input, (ref7 = opts.derivedAttributes) != null ? ref7 : {}, (function(_this) {
           return function(record) {
-            if (opts.filter(record)) {
+            if (_this.filter(record)) {
               return _this.processRecord(record);
             }
           };

@@ -267,10 +267,15 @@ describe "$.pivotUtilities", ->
 
     describe ".PivotData()", ->
         sumOverSumOpts =
-            rows: [], cols: []
             aggregator: $.pivotUtilities.aggregators["Sum over Sum"](["a","b"])
-            filter: -> true
-            sorters: ->
+
+        describe "with no options", ->
+            aoaInput =  [ ["a","b"], [1,2], [3,4] ]
+            pd = new $.pivotUtilities.PivotData aoaInput
+
+            it "has the correct grand total value", ->
+                expect pd.getAggregator([],[]).value()
+                .toBe 2
 
         describe "with array-of-array input", ->
             aoaInput =  [ ["a","b"], [1,2], [3,4] ]
@@ -318,7 +323,6 @@ describe "$.pivotUtilities", ->
                     </tbody>
                 </table>
                 """
-
             pd = new $.pivotUtilities.PivotData tableInput, sumOverSumOpts
 
             it "has the correct grand total value", ->
@@ -326,13 +330,10 @@ describe "$.pivotUtilities", ->
                 .toBe (1+3)/(2+4)
 
 
-        describe "with rows/cols, no filters/sorters, count aggregator", ->
+        describe "with rows/cols", ->
             pd = new $.pivotUtilities.PivotData fixtureData,
                 rows: ["name", "colour"],
-                cols: ["trials", "successes"],
-                aggregator: $.pivotUtilities.aggregators["Count"](),
-                filter: -> true
-                sorters: ->
+                cols: ["trials", "successes"]
 
             it "has correctly-ordered row keys", ->
                 expect pd.getRowKeys()

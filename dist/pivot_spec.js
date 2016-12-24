@@ -246,14 +246,16 @@
     describe(".PivotData()", function() {
       var sumOverSumOpts;
       sumOverSumOpts = {
-        rows: [],
-        cols: [],
-        aggregator: $.pivotUtilities.aggregators["Sum over Sum"](["a", "b"]),
-        filter: function() {
-          return true;
-        },
-        sorters: function() {}
+        aggregator: $.pivotUtilities.aggregators["Sum over Sum"](["a", "b"])
       };
+      describe("with no options", function() {
+        var aoaInput, pd;
+        aoaInput = [["a", "b"], [1, 2], [3, 4]];
+        pd = new $.pivotUtilities.PivotData(aoaInput);
+        return it("has the correct grand total value", function() {
+          return expect(pd.getAggregator([], []).value()).toBe(2);
+        });
+      });
       describe("with array-of-array input", function() {
         var aoaInput, pd;
         aoaInput = [["a", "b"], [1, 2], [3, 4]];
@@ -320,16 +322,11 @@
           return expect(pd.getAggregator([], []).value()).toBe((1 + 3) / (2 + 4));
         });
       });
-      return describe("with rows/cols, no filters/sorters, count aggregator", function() {
+      return describe("with rows/cols", function() {
         var pd;
         pd = new $.pivotUtilities.PivotData(fixtureData, {
           rows: ["name", "colour"],
-          cols: ["trials", "successes"],
-          aggregator: $.pivotUtilities.aggregators["Count"](),
-          filter: function() {
-            return true;
-          },
-          sorters: function() {}
+          cols: ["trials", "successes"]
         });
         it("has correctly-ordered row keys", function() {
           return expect(pd.getRowKeys()).toEqual([['Carol', 'yellow'], ['Jane', 'red'], ['John', 'blue'], ['Nick', 'blue']]);

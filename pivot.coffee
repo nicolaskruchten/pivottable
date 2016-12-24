@@ -252,13 +252,14 @@ callWithJQuery ($) ->
     ###
 
     class PivotData
-        constructor: (input, opts) ->
-            @aggregator = opts.aggregator
-            @aggregatorName = opts.aggregatorName
-            @colAttrs = opts.cols
-            @rowAttrs = opts.rows
-            @valAttrs = opts.vals
-            @sorters = opts.sorters
+        constructor: (input, opts = {}) ->
+            @aggregator = opts.aggregator ? aggregatorTemplates.count()()
+            @aggregatorName = opts.aggregatorName ? "Count"
+            @colAttrs = opts.cols ? []
+            @rowAttrs = opts.rows ? []
+            @valAttrs = opts.vals ? []
+            @sorters = opts.sorters ? {}
+            @filter = opts.filter ? (-> true)
             @tree = {}
             @rowKeys = []
             @colKeys = []
@@ -268,8 +269,8 @@ callWithJQuery ($) ->
             @sorted = false
 
             # iterate through input, accumulating data for cells
-            PivotData.forEachRecord input, opts.derivedAttributes, (record) =>
-                @processRecord(record) if opts.filter(record)
+            PivotData.forEachRecord input, (opts.derivedAttributes ? {}), (record) =>
+                @processRecord(record) if @filter(record)
 
         #can handle arrays or jQuery selections of tables
         @forEachRecord = (input, derivedAttributes, f) ->
