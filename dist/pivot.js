@@ -1099,7 +1099,7 @@
           unused.addClass('pvtHorizList');
         }
         fn = function(attr) {
-          var attrElem, checkContainer, controls, filterItem, filterItemExcluded, hasExcludedItem, len2, n, placeholder, ref1, showFilterList, sorter, triangleLink, v, value, valueCount, valueList, values;
+          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, n, placeholder, ref1, sorter, triangleLink, v, value, valueCount, valueList, values;
           values = (function() {
             var results;
             results = [];
@@ -1113,104 +1113,115 @@
           valueList.append($("<h4>").append($("<span>").text(attr), $("<span>").addClass("count").text("(" + values.length + ")")));
           if (values.length > opts.menuLimit) {
             valueList.append($("<p>").html(opts.localeStrings.tooMany));
-          } else if (values.length > 5) {
-            controls = $("<p>").appendTo(valueList);
-            sorter = getSort(opts.sorters, attr);
-            placeholder = opts.localeStrings.filterResults;
-            $("<input>", {
-              type: "text"
-            }).appendTo(controls).attr({
-              placeholder: placeholder,
-              "class": "pvtSearch"
-            }).bind("keyup", function() {
-              var accept, accept_gen, filter;
-              filter = $(this).val().toLowerCase().trim();
-              accept_gen = function(prefix, accepted) {
-                return function(v) {
-                  var real_filter, ref1;
-                  real_filter = filter.substring(prefix.length).trim();
-                  if (real_filter.length === 0) {
+          } else {
+            if (values.length > 5) {
+              controls = $("<p>").appendTo(valueList);
+              sorter = getSort(opts.sorters, attr);
+              placeholder = opts.localeStrings.filterResults;
+              $("<input>", {
+                type: "text"
+              }).appendTo(controls).attr({
+                placeholder: placeholder,
+                "class": "pvtSearch"
+              }).bind("keyup", function() {
+                var accept, accept_gen, filter;
+                filter = $(this).val().toLowerCase().trim();
+                accept_gen = function(prefix, accepted) {
+                  return function(v) {
+                    var real_filter, ref1;
+                    real_filter = filter.substring(prefix.length).trim();
+                    if (real_filter.length === 0) {
+                      return true;
+                    }
+                    return ref1 = Math.sign(sorter(v.toLowerCase(), real_filter)), indexOf.call(accepted, ref1) >= 0;
+                  };
+                };
+                accept = filter.startsWith(">=") ? accept_gen(">=", [1, 0]) : filter.startsWith("<=") ? accept_gen("<=", [-1, 0]) : filter.startsWith(">") ? accept_gen(">", [1]) : filter.startsWith("<") ? accept_gen("<", [-1]) : filter.startsWith("~") ? function(v) {
+                  if (filter.substring(1).trim().length === 0) {
                     return true;
                   }
-                  return ref1 = Math.sign(sorter(v.toLowerCase(), real_filter)), indexOf.call(accepted, ref1) >= 0;
+                  return v.toLowerCase().match(filter.substring(1));
+                } : function(v) {
+                  return v.toLowerCase().indexOf(filter) !== -1;
                 };
-              };
-              accept = filter.startsWith(">=") ? accept_gen(">=", [1, 0]) : filter.startsWith("<=") ? accept_gen("<=", [-1, 0]) : filter.startsWith(">") ? accept_gen(">", [1]) : filter.startsWith("<") ? accept_gen("<", [-1]) : filter.startsWith("~") ? function(v) {
-                if (filter.substring(1).trim().length === 0) {
-                  return true;
-                }
-                return v.toLowerCase().match(filter.substring(1));
-              } : function(v) {
-                return v.toLowerCase().indexOf(filter) !== -1;
-              };
-              return valueList.find('.pvtCheckContainer p label span.value').each(function() {
-                if (accept($(this).text())) {
-                  return $(this).parent().parent().show();
-                } else {
-                  return $(this).parent().parent().hide();
-                }
+                return valueList.find('.pvtCheckContainer p label span.value').each(function() {
+                  if (accept($(this).text())) {
+                    return $(this).parent().parent().show();
+                  } else {
+                    return $(this).parent().parent().hide();
+                  }
+                });
               });
-            });
-            controls.append($("<br>"));
-            $("<button>", {
-              type: "button"
-            }).appendTo(controls).html(opts.localeStrings.selectAll).bind("click", function() {
-              valueList.find("input:visible").prop("checked", true);
-              return false;
-            });
-            $("<button>", {
-              type: "button"
-            }).appendTo(controls).html(opts.localeStrings.selectNone).bind("click", function() {
-              valueList.find("input:visible").prop("checked", false);
-              return false;
-            });
-          }
-          checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
-          ref1 = values.sort(getSort(opts.sorters, attr));
-          for (n = 0, len2 = ref1.length; n < len2; n++) {
-            value = ref1[n];
-            valueCount = attrValues[attr][value];
-            filterItem = $("<label>");
-            filterItemExcluded = false;
-            if (opts.inclusions[attr]) {
-              filterItemExcluded = (indexOf.call(opts.inclusions[attr], value) < 0);
-            } else if (opts.exclusions[attr]) {
-              filterItemExcluded = (indexOf.call(opts.exclusions[attr], value) >= 0);
+              controls.append($("<br>"));
+              $("<button>", {
+                type: "button"
+              }).appendTo(controls).html(opts.localeStrings.selectAll).bind("click", function() {
+                valueList.find("input:visible:not(:checked)").prop("checked", true).toggleClass("changed");
+                return false;
+              });
+              $("<button>", {
+                type: "button"
+              }).appendTo(controls).html(opts.localeStrings.selectNone).bind("click", function() {
+                valueList.find("input:visible:checked").prop("checked", false).toggleClass("changed");
+                return false;
+              });
             }
-            hasExcludedItem || (hasExcludedItem = filterItemExcluded);
-            $("<input>").attr("type", "checkbox").addClass('pvtFilter').attr("checked", !filterItemExcluded).data("filter", [attr, value]).appendTo(filterItem);
-            filterItem.append($("<span>").addClass("value").text(value));
-            filterItem.append($("<span>").addClass("count").text("(" + valueCount + ")"));
-            checkContainer.append($("<p>").append(filterItem));
+            checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
+            ref1 = values.sort(getSort(opts.sorters, attr));
+            for (n = 0, len2 = ref1.length; n < len2; n++) {
+              value = ref1[n];
+              valueCount = attrValues[attr][value];
+              filterItem = $("<label>");
+              filterItemExcluded = false;
+              if (opts.inclusions[attr]) {
+                filterItemExcluded = (indexOf.call(opts.inclusions[attr], value) < 0);
+              } else if (opts.exclusions[attr]) {
+                filterItemExcluded = (indexOf.call(opts.exclusions[attr], value) >= 0);
+              }
+              hasExcludedItem || (hasExcludedItem = filterItemExcluded);
+              $("<input>").attr("type", "checkbox").addClass('pvtFilter').attr("checked", !filterItemExcluded).data("filter", [attr, value]).appendTo(filterItem).bind("change", function() {
+                return $(this).toggleClass("changed");
+              });
+              filterItem.append($("<span>").addClass("value").text(value));
+              filterItem.append($("<span>").addClass("count").text("(" + valueCount + ")"));
+              checkContainer.append($("<p>").append(filterItem));
+            }
           }
-          $("<button>", {
-            type: "button"
-          }).text("Apply").appendTo($("<p>").appendTo(valueList)).bind("click", function() {
-            var unselectedCount;
-            unselectedCount = valueList.find("[type='checkbox']").length - valueList.find("[type='checkbox']:checked").length;
-            if (unselectedCount > 0) {
+          closeFilterBox = function() {
+            if (valueList.find("[type='checkbox']").length > valueList.find("[type='checkbox']:checked").length) {
               attrElem.addClass("pvtFilteredAttribute");
             } else {
               attrElem.removeClass("pvtFilteredAttribute");
             }
-            if (values.length > opts.menuLimit) {
-              return valueList.toggle();
-            } else {
-              return valueList.toggle(0, refresh);
+            valueList.find('.pvtSearch').val('');
+            valueList.find('.pvtCheckContainer p').show();
+            return valueList.hide();
+          };
+          finalButtons = $("<p>").appendTo(valueList);
+          $("<button>", {
+            type: "button"
+          }).text("Apply").appendTo(finalButtons).bind("click", function() {
+            if (valueList.find(".changed").removeClass("changed").length) {
+              refresh();
             }
+            return closeFilterBox();
           });
-          showFilterList = function(e) {
+          $("<button>", {
+            type: "button"
+          }).text("Cancel").appendTo(finalButtons).bind("click", function() {
+            valueList.find(".changed:checked").removeClass("changed").prop("checked", false);
+            valueList.find(".changed:not(:checked)").removeClass("changed").prop("checked", true);
+            return closeFilterBox();
+          });
+          triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", function(e) {
             var left, ref2, top;
             ref2 = $(e.currentTarget).position(), left = ref2.left, top = ref2.top;
-            valueList.css({
+            return valueList.css({
               left: left + 10,
               top: top + 10
-            }).toggle();
-            valueList.find('.pvtSearch').val('');
-            return valueList.find('.pvtCheckContainer p').show();
-          };
-          triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", showFilterList);
-          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink)).bind("dblclick", showFilterList);
+            }).show();
+          });
+          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink));
           if (hasExcludedItem) {
             attrElem.addClass('pvtFilteredAttribute');
           }

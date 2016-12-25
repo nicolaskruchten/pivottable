@@ -50,6 +50,7 @@
 
                 var parseAndPivot = function(f) {
                     Papa.parse(f, {
+                        skipEmptyLines: true,
                         error: function(e){ alert(e)},
                         complete: function(parsed){
                             $("#output").pivotUI(parsed.data, { renderers: renderers }, true);

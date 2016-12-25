@@ -13,21 +13,22 @@
         <style>
             body {font-family: Verdana;}
         </style>
-        
+
         <!-- optional: mobile support with jqueryui-touch-punch -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-        
+
         <!-- for examples only! script to show code to user -->
         <script type="text/javascript" src="show_code.js"></script>
     </head>
     <body>
         <script type="text/javascript">
-    // This example loads the "Canadian Parliament 2012" 
+    // This example loads the "Canadian Parliament 2012"
     // dataset from a CSV instead of from JSON.
 
     $(function(){
         Papa.parse("mps.csv", {
             download: true,
+            skipEmptyLines: true,
             complete: function(parsed){
                 $("#output").pivotUI(parsed.data, {
                     rows: ["Province"], cols: ["Party"]
@@ -40,7 +41,7 @@
 
         <p style="width: 800px"></p>
 
-        
+
         <div id="output" style="margin: 30px;"></div>
 
     </body>

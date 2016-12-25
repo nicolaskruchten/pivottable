@@ -24,10 +24,10 @@
         .c3-axis path {stroke: grey;}
         .c3-circle { opacity: 1 !important; }
         </style>
-        
+
         <!-- optional: mobile support with jqueryui-touch-punch -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-        
+
         <!-- for examples only! script to show code to user -->
         <script type="text/javascript" src="show_code.js"></script>
     </head>
@@ -38,10 +38,11 @@
     $(function(){
         Papa.parse("/Rdatasets/csv/datasets/iris.csv", {
             download: true,
+            skipEmptyLines: true,
             complete: function(parsed){
                 $("#output").pivot(parsed.data, {
-                    rows: ["Petal.Length"], 
-                    cols: ["Petal.Width", "Species"], 
+                    rows: ["Petal.Length"],
+                    cols: ["Petal.Width", "Species"],
                     renderer: $.pivotUtilities.c3_renderers["Scatter Chart"],
                     rendererOptions: { c3: { size: {width: 600, height: 600} } }
                 });

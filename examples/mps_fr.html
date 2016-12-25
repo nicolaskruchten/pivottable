@@ -13,10 +13,10 @@
         <style>
             body {font-family: Verdana;}
         </style>
-        
+
         <!-- optional: mobile support with jqueryui-touch-punch -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-        
+
         <!-- for examples only! script to show code to user -->
         <script type="text/javascript" src="show_code.js"></script>
     </head>
@@ -27,8 +27,8 @@
 
     $(function(){
         $.getJSON("mps.json", function(mps) {
-            $("#output").pivotUI(mps, 
-                { rows: ["Province"], cols: ["Party"] }, 
+            $("#output").pivotUI(mps,
+                { rows: ["Province"], cols: ["Party"] },
                 false, "fr"
             );
         });
@@ -36,7 +36,7 @@
         </script>
 
         <p><a href="index.html">&laquo; back to examples</a></p>
-        
+
         <div id="output" style="margin: 30px;"></div>
 
     </body>
