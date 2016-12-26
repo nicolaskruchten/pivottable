@@ -545,7 +545,7 @@
      */
     PivotData = (function() {
       function PivotData(input, opts) {
-        var ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7;
+        var ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8;
         if (opts == null) {
           opts = {};
         }
@@ -571,7 +571,7 @@
         this.rowTotals = {};
         this.colTotals = {};
         this.allTotal = this.aggregator(this, [], []);
-        this.sorted = false;
+        this.sorted = (ref8 = opts.sorted) != null ? ref8 : false;
         PivotData.forEachRecord(this.input, this.derivedAttributes, (function(_this) {
           return function(record) {
             if (_this.filter(record)) {
@@ -1034,15 +1034,15 @@
         pivotData = new opts.dataClass(input, opts);
         try {
           result = opts.renderer(pivotData, opts.rendererOptions);
-        } catch (_error) {
-          e = _error;
+        } catch (error) {
+          e = error;
           if (typeof console !== "undefined" && console !== null) {
             console.error(e.stack);
           }
           result = $("<span>").html(opts.localeStrings.renderError);
         }
-      } catch (_error) {
-        e = _error;
+      } catch (error) {
+        e = error;
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }
@@ -1478,8 +1478,8 @@
           items: 'li',
           placeholder: 'pvtPlaceholder'
         });
-      } catch (_error) {
-        e = _error;
+      } catch (error) {
+        e = error;
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }
