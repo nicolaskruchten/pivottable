@@ -354,6 +354,16 @@
           expect(numNotNull).toBe(4);
           return expect(numNull).toBe(12);
         });
+        it("returns matching records", function() {
+          var records;
+          records = [];
+          pd.forEachMatchingRecord({
+            gender: "male"
+          }, function(x) {
+            return records.push(x.name);
+          });
+          return expect(records).toEqual(["Nick", "John"]);
+        });
         it("has a correct spot-checked aggregator", function() {
           var agg, val;
           agg = pd.getAggregator(['Carol', 'yellow'], [102, 14]);
@@ -389,8 +399,11 @@
     describe(".sortAs()", function() {
       var sortAs;
       sortAs = $.pivotUtilities.sortAs;
-      return it("sorts with unknown values sorted at the end", function() {
+      it("sorts with unknown values sorted at the end", function() {
         return expect([5, 2, 3, 4, 1].sort(sortAs([4, 3, 2]))).toEqual([4, 3, 2, 1, 5]);
+      });
+      return it("sorts lowercase after uppercase", function() {
+        return expect(["Ab", "aA", "aa", "ab"].sort(sortAs(["Ab", "Aa"]))).toEqual(["Ab", "ab", "aa", "aA"]);
       });
     });
     describe(".numberFormat()", function() {

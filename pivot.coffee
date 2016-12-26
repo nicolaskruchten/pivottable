@@ -253,12 +253,14 @@ callWithJQuery ($) ->
 
     class PivotData
         constructor: (input, opts = {}) ->
+            @input = input
             @aggregator = opts.aggregator ? aggregatorTemplates.count()()
             @aggregatorName = opts.aggregatorName ? "Count"
             @colAttrs = opts.cols ? []
             @rowAttrs = opts.rows ? []
             @valAttrs = opts.vals ? []
             @sorters = opts.sorters ? {}
+            @derivedAttributes = opts.derivedAttributes ? {}
             @filter = opts.filter ? (-> true)
             @tree = {}
             @rowKeys = []
@@ -269,7 +271,7 @@ callWithJQuery ($) ->
             @sorted = false
 
             # iterate through input, accumulating data for cells
-            PivotData.forEachRecord input, (opts.derivedAttributes ? {}), (record) =>
+            PivotData.forEachRecord @input, @derivedAttributes, (record) =>
                 @processRecord(record) if @filter(record)
 
         #can handle arrays or jQuery selections of tables
@@ -301,6 +303,13 @@ callWithJQuery ($) ->
                     addRecord(record)
             else
                 throw new Error("unknown input format")
+
+        forEachMatchingRecord: (criteria, callback) ->
+            PivotData.forEachRecord @input, @derivedAttributes, (record) =>
+                return if not @filter(record)
+                for k, v of criteria
+                    return if v != (record[k] ? "null")
+                callback(record)
 
         arrSort: (attrs) =>
             sortersArr = (getSort(@sorters, a) for a in attrs)
@@ -377,15 +386,22 @@ callWithJQuery ($) ->
     pivotTableRenderer = (pivotData, opts) ->
 
         defaults =
-            localeStrings:
-                totals: "Totals"
+            table: clickCallback: null
+            localeStrings: totals: "Totals"
 
-        opts = $.extend defaults, opts
+        opts = $.extend true, defaults, opts
 
         colAttrs = pivotData.colAttrs
         rowAttrs = pivotData.rowAttrs
         rowKeys = pivotData.getRowKeys()
         colKeys = pivotData.getColKeys()
+
+        if opts.table.clickCallback
+            getClickHandler = (value, rowValues, colValues) ->
+                filters = {}
+                filters[attr] = colValues[i] for own i, attr of colAttrs when colValues[i]?
+                filters[attr] = rowValues[i] for own i, attr of rowAttrs when rowValues[i]?
+                return (e) -> opts.table.clickCallback(e, value, filters, pivotData)
 
         #now actually build the output
         result = document.createElement("table")
@@ -477,6 +493,8 @@ callWithJQuery ($) ->
                 td.className = "pvtVal row#{i} col#{j}"
                 td.textContent = aggregator.format(val)
                 td.setAttribute("data-value", val)
+                if getClickHandler?
+                    td.onclick = getClickHandler(val, rowKey, colKey)
                 tr.appendChild td
 
             totalAggregator = pivotData.getAggregator(rowKey, [])
@@ -485,6 +503,8 @@ callWithJQuery ($) ->
             td.className = "pvtTotal rowTotal"
             td.textContent = totalAggregator.format(val)
             td.setAttribute("data-value", val)
+            if getClickHandler?
+                td.onclick = getClickHandler(val, rowKey, [])
             td.setAttribute("data-for", "row"+i)
             tr.appendChild td
             tbody.appendChild tr
@@ -503,6 +523,8 @@ callWithJQuery ($) ->
             td.className = "pvtTotal colTotal"
             td.textContent = totalAggregator.format(val)
             td.setAttribute("data-value", val)
+            if getClickHandler?
+                td.onclick = getClickHandler(val, [], colKey)
             td.setAttribute("data-for", "col"+j)
             tr.appendChild td
         totalAggregator = pivotData.getAggregator([], [])
@@ -511,6 +533,8 @@ callWithJQuery ($) ->
         td.className = "pvtGrandTotal"
         td.textContent = totalAggregator.format(val)
         td.setAttribute("data-value", val)
+        if getClickHandler?
+            td.onclick = getClickHandler(val, [], [])
         tr.appendChild td
         tbody.appendChild tr
         result.appendChild tbody

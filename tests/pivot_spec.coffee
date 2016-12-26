@@ -357,6 +357,12 @@ describe "$.pivotUtilities", ->
                 expect numNull
                 .toBe 12
 
+            it "returns matching records", ->
+                records = []
+                pd.forEachMatchingRecord gender: "male", (x) -> records.push(x.name)
+                expect records
+                .toEqual ["Nick", "John"]
+
             it "has a correct spot-checked aggregator", ->
                 agg = pd.getAggregator([ 'Carol', 'yellow' ],[ 102, 14 ])
                 val = agg.value()
@@ -394,6 +400,10 @@ describe "$.pivotUtilities", ->
         it "sorts with unknown values sorted at the end", ->
             expect [5,2,3,4,1].sort sortAs([4,3,2])
             .toEqual [4,3,2,1,5]
+
+        it "sorts lowercase after uppercase", ->
+            expect ["Ab","aA","aa","ab"].sort sortAs(["Ab","Aa"])
+            .toEqual ["Ab","ab","aa","aA"]
 
     describe ".numberFormat()", ->
         numberFormat = $.pivotUtilities.numberFormat
