@@ -23,7 +23,7 @@
           },
           gchart: {}
         };
-        opts = $.extend(true, defaults, opts);
+        opts = $.extend(true, {}, defaults, opts);
         if ((base = opts.gchart).width == null) {
           base.width = window.innerWidth / 1.4;
         }
@@ -143,7 +143,7 @@
             position: "none"
           };
         }
-        $.extend(options, opts.gchart, extraOptions);
+        options = $.extend(true, {}, options, opts.gchart, extraOptions);
         result = $("<div>").css({
           width: "100%",
           height: "100%"

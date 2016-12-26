@@ -18,7 +18,7 @@
         defaults = {
           localeStrings: {}
         };
-        opts = $.extend(defaults, opts);
+        opts = $.extend(true, {}, defaults, opts);
         rowKeys = pivotData.getRowKeys();
         if (rowKeys.length === 0) {
           rowKeys.push([]);

@@ -28,7 +28,7 @@ callWithJQuery ($) ->
             thousandsSep: ",", decimalSep: "."
             prefix: "", suffix: ""
             showZero: false
-        opts = $.extend defaults, opts
+        opts = $.extend({}, defaults, opts)
         (x) ->
             return "" if isNaN(x) or not isFinite(x)
             return "" if x == 0 and not opts.showZero
@@ -391,7 +391,7 @@ callWithJQuery ($) ->
             table: clickCallback: null
             localeStrings: totals: "Totals"
 
-        opts = $.extend true, defaults, opts
+        opts = $.extend(true, {}, defaults, opts)
 
         colAttrs = pivotData.colAttrs
         rowAttrs = pivotData.rowAttrs
@@ -551,11 +551,11 @@ callWithJQuery ($) ->
     Pivot Table core: create PivotData object and call Renderer on it
     ###
 
-    $.fn.pivot = (input, opts) ->
+    $.fn.pivot = (input, opts, locale="en") ->
+        locale = "en" if not locales[locale]?
+        localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         defaults =
-            cols : []
-            rows: []
-            vals: []
+            cols : [], rows: [], vals: []
             dataClass: PivotData
             filter: -> true
             aggregator: aggregatorTemplates.count()()
@@ -563,10 +563,10 @@ callWithJQuery ($) ->
             sorters: {}
             derivedAttributes: {}
             renderer: pivotTableRenderer
-            rendererOptions: null
-            localeStrings: locales.en.localeStrings
+            rendererOptions: {localeStrings}
+            localeStrings: localeStrings
 
-        opts = $.extend defaults, opts
+        opts = $.extend(true, {}, defaults, opts)
 
         result = null
         try
@@ -590,8 +590,8 @@ callWithJQuery ($) ->
     ###
 
     $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
-        if not locales[locale]?
-            locale = "en"
+        locale = "en" if not locales[locale]?
+        localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         defaults =
             derivedAttributes: {}
             aggregators: locales[locale].aggregators
@@ -604,15 +604,15 @@ callWithJQuery ($) ->
             inclusions: {}
             unusedAttrsVertical: 85
             autoSortUnusedAttrs: false
-            rendererOptions: localeStrings: locales[locale].localeStrings
+            rendererOptions: {localeStrings}
             onRefresh: null
             filter: -> true
             sorters: {}
-            localeStrings: locales[locale].localeStrings
+            localeStrings: localeStrings
 
         existingOpts = @data "pivotUIOptions"
         if not existingOpts? or overwrite
-            opts = $.extend defaults, inputOpts
+            opts = $.extend(true, {}, defaults, inputOpts)
         else
             opts = existingOpts
 
@@ -904,7 +904,7 @@ callWithJQuery ($) ->
                     return true
 
                 pivotTable.pivot(materializedInput,subopts)
-                pivotUIOptions = $.extend opts,
+                pivotUIOptions = $.extend {}, opts,
                     cols: subopts.cols
                     rows: subopts.rows
                     vals: vals

@@ -10,10 +10,9 @@ callWithJQuery = (pivotModule) ->
 callWithJQuery ($) ->
 
     $.pivotUtilities.export_renderers = "TSV Export": (pivotData, opts) ->
-        defaults =
-            localeStrings: {}
+        defaults = localeStrings: {}
 
-        opts = $.extend defaults, opts
+        opts = $.extend(true, {}, defaults, opts)
 
         rowKeys = pivotData.getRowKeys()
         rowKeys.push [] if rowKeys.length == 0

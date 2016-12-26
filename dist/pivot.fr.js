@@ -42,7 +42,9 @@
         filterResults: "Filtrer les valeurs",
         totals: "Totaux",
         vs: "sur",
-        by: "par"
+        by: "par",
+        apply: "Appliquer",
+        cancel: "Annuler"
       },
       aggregators: {
         "Nombre": tpl.count(frFmtInt),

@@ -26,7 +26,7 @@
             }
           }
         };
-        opts = $.extend(defaults, opts);
+        opts = $.extend(true, {}, defaults, opts);
         result = $("<div>").css({
           width: "100%",
           height: "100%"

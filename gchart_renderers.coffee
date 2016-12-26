@@ -16,7 +16,7 @@ callWithJQuery ($) ->
                 by: "by"
             gchart: {}
 
-        opts = $.extend true, defaults, opts
+        opts = $.extend(true, {}, defaults, opts)
         opts.gchart.width ?= window.innerWidth / 1.4
         opts.gchart.height ?= window.innerHeight / 1.4
 
@@ -91,7 +91,7 @@ callWithJQuery ($) ->
         else if dataArray[0].length == 2 and dataArray[0][1] ==  ""
             options.legend = position: "none"
 
-        $.extend options, opts.gchart, extraOptions
+        options = $.extend(true, {}, options, opts.gchart, extraOptions)
 
         result = $("<div>").css(width: "100%", height: "100%")
         wrapper = new google.visualization.ChartWrapper {dataTable, chartType, options}

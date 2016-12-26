@@ -11,12 +11,10 @@ callWithJQuery ($, c3) ->
 
     makeC3Chart = (chartOpts = {}) -> (pivotData, opts) ->
         defaults =
-            localeStrings:
-                vs: "vs"
-                by: "by"
+            localeStrings: {vs: "vs", by: "by"}
             c3: {}
 
-        opts = $.extend true, defaults, opts
+        opts = $.extend(true, {}, defaults, opts)
         opts.c3.size ?= {}
         opts.c3.size.width ?= window.innerWidth / 1.4
         opts.c3.size.height ?= window.innerHeight / 1.4 - 50
@@ -111,7 +109,7 @@ callWithJQuery ($, c3) ->
                            "#651067", "#329262", "#5574a6", "#3b3eac" ]
 
 
-        $.extend true, params, opts.c3
+        params = $.extend(true, {}, params, opts.c3)
 
         if chartOpts.type == "scatter"
             xs = {}
