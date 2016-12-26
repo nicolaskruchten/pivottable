@@ -1026,7 +1026,7 @@
         },
         localeStrings: localeStrings
       };
-      opts = $.extend(true, {}, defaults, opts);
+      opts = $.extend({}, defaults, opts);
       result = null;
       try {
         pivotData = new opts.dataClass(input, opts);
@@ -1094,7 +1094,7 @@
       };
       existingOpts = this.data("pivotUIOptions");
       if ((existingOpts == null) || overwrite) {
-        opts = $.extend(true, {}, defaults, inputOpts);
+        opts = $.extend({}, defaults, inputOpts);
       } else {
         opts = existingOpts;
       }

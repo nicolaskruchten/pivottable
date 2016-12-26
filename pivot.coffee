@@ -566,7 +566,7 @@ callWithJQuery ($) ->
             rendererOptions: {localeStrings}
             localeStrings: localeStrings
 
-        opts = $.extend(true, {}, defaults, opts)
+        opts = $.extend({}, defaults, opts)
 
         result = null
         try
@@ -612,7 +612,7 @@ callWithJQuery ($) ->
 
         existingOpts = @data "pivotUIOptions"
         if not existingOpts? or overwrite
-            opts = $.extend(true, {}, defaults, inputOpts)
+            opts = $.extend({}, defaults, inputOpts)
         else
             opts = existingOpts
 
