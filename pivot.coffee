@@ -170,6 +170,8 @@ callWithJQuery ($) ->
                 selectNone: "Select None"
                 tooMany: "(too many to list)"
                 filterResults: "Filter values"
+                apply: "Apply"
+                cancel: "Cancel"
                 totals: "Totals" #for table renderer
                 vs: "vs" #for gchart renderer
                 by: "by" #for gchart renderer
@@ -755,13 +757,14 @@ callWithJQuery ($) ->
 
                     finalButtons = $("<p>").appendTo(valueList)
 
-                    $("<button>", {type: "button"}).text("Apply")
-                        .appendTo(finalButtons).bind "click", ->
-                            if valueList.find(".changed").removeClass("changed").length
-                                refresh()
-                            closeFilterBox()
+                    if values.length <= opts.menuLimit
+                        $("<button>", {type: "button"}).text(opts.localeStrings.apply)
+                            .appendTo(finalButtons).bind "click", ->
+                                if valueList.find(".changed").removeClass("changed").length
+                                    refresh()
+                                closeFilterBox()
 
-                    $("<button>", {type: "button"}).text("Cancel")
+                    $("<button>", {type: "button"}).text(opts.localeStrings.cancel)
                         .appendTo(finalButtons).bind "click", ->
                             valueList.find(".changed:checked")
                                 .removeClass("changed").prop("checked", false)
