@@ -999,15 +999,14 @@
     /*
     Pivot Table core: create PivotData object and call Renderer on it
      */
-    $.fn.pivot = function(input, opts, locale) {
-      var defaults, e, localeStrings, pivotData, result, x;
+    $.fn.pivot = function(input, inputOpts, locale) {
+      var defaults, e, localeDefaults, localeStrings, opts, pivotData, result, x;
       if (locale == null) {
         locale = "en";
       }
       if (locales[locale] == null) {
         locale = "en";
       }
-      localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
       defaults = {
         cols: [],
         rows: [],
@@ -1020,13 +1019,16 @@
         aggregatorName: "Count",
         sorters: {},
         derivedAttributes: {},
-        renderer: pivotTableRenderer,
+        renderer: pivotTableRenderer
+      };
+      localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
+      localeDefaults = {
         rendererOptions: {
           localeStrings: localeStrings
         },
         localeStrings: localeStrings
       };
-      opts = $.extend({}, defaults, opts);
+      opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts));
       result = null;
       try {
         pivotData = new opts.dataClass(input, opts);
@@ -1057,7 +1059,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, defaults, e, existingOpts, fn, i, initialRender, l, len1, len2, len3, localeStrings, materializedInput, n, o, opts, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, defaults, e, existingOpts, fn, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1067,7 +1069,6 @@
       if (locales[locale] == null) {
         locale = "en";
       }
-      localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
       defaults = {
         derivedAttributes: {},
         aggregators: locales[locale].aggregators,
@@ -1082,19 +1083,22 @@
         inclusions: {},
         unusedAttrsVertical: 85,
         autoSortUnusedAttrs: false,
-        rendererOptions: {
-          localeStrings: localeStrings
-        },
         onRefresh: null,
         filter: function() {
           return true;
         },
-        sorters: {},
+        sorters: {}
+      };
+      localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
+      localeDefaults = {
+        rendererOptions: {
+          localeStrings: localeStrings
+        },
         localeStrings: localeStrings
       };
       existingOpts = this.data("pivotUIOptions");
       if ((existingOpts == null) || overwrite) {
-        opts = $.extend({}, defaults, inputOpts);
+        opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts));
       } else {
         opts = existingOpts;
       }

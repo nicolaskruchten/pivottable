@@ -551,9 +551,8 @@ callWithJQuery ($) ->
     Pivot Table core: create PivotData object and call Renderer on it
     ###
 
-    $.fn.pivot = (input, opts, locale="en") ->
+    $.fn.pivot = (input, inputOpts, locale="en") ->
         locale = "en" if not locales[locale]?
-        localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         defaults =
             cols : [], rows: [], vals: []
             dataClass: PivotData
@@ -563,10 +562,13 @@ callWithJQuery ($) ->
             sorters: {}
             derivedAttributes: {}
             renderer: pivotTableRenderer
+
+        localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
+        localeDefaults =
             rendererOptions: {localeStrings}
             localeStrings: localeStrings
 
-        opts = $.extend({}, defaults, opts)
+        opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts))
 
         result = null
         try
@@ -591,7 +593,6 @@ callWithJQuery ($) ->
 
     $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
         locale = "en" if not locales[locale]?
-        localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         defaults =
             derivedAttributes: {}
             aggregators: locales[locale].aggregators
@@ -604,15 +605,18 @@ callWithJQuery ($) ->
             inclusions: {}
             unusedAttrsVertical: 85
             autoSortUnusedAttrs: false
-            rendererOptions: {localeStrings}
             onRefresh: null
             filter: -> true
             sorters: {}
+
+        localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
+        localeDefaults =
+            rendererOptions: {localeStrings}
             localeStrings: localeStrings
 
         existingOpts = @data "pivotUIOptions"
         if not existingOpts? or overwrite
-            opts = $.extend({}, defaults, inputOpts)
+            opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts))
         else
             opts = existingOpts
 
