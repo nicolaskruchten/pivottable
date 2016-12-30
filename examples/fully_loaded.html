@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Pivot Demo</title>
-        
+
         <!-- external libs from cdnjs -->
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -35,22 +35,22 @@
             .c3-axis path {stroke: grey;}
             .c3-circle { opacity: 1 !important; }
         </style>
-        
+
         <!-- for examples only! script to show code to user -->
         <script type="text/javascript" src="show_code.js"></script>
     </head>
     <body>
         <script type="text/javascript">
-    // This example has all the renderers loaded, 
+    // This example has all the renderers loaded,
     // and should work with touch devices.
 
     $(function(){
         var derivers = $.pivotUtilities.derivers;
 
         var renderers = $.extend(
-            $.pivotUtilities.renderers, 
-            $.pivotUtilities.c3_renderers, 
-            $.pivotUtilities.d3_renderers, 
+            $.pivotUtilities.renderers,
+            $.pivotUtilities.c3_renderers,
+            $.pivotUtilities.d3_renderers,
             $.pivotUtilities.export_renderers
             );
 
@@ -70,9 +70,9 @@
      });
         </script>
 
-        <p><a href="index.html">&laquo; back to examples</a></p>
+        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
 
-        
+
         <div id="output" style="margin: 30px;"></div>
 
     </body>

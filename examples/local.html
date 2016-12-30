@@ -21,7 +21,19 @@
         <script type="text/javascript" src="../dist/export_renderers.js"></script>
 
         <style>
-            body {font-family: Verdana;}
+            html { height:100%; }
+            body {
+                font-family: Verdana;
+                min-height: 95%;
+                border: 5px dotted;
+            }
+            .whiteborder {border-color: white;}
+            .greyborder {border-color: lightgrey;}
+            label {
+                color: #555;
+                text-decoration: underline;;
+                cursor: pointer; /* "hand" cursor */
+            }
             .node {
               border: solid 1px white;
               font: 10px sans-serif;
@@ -38,7 +50,7 @@
             .c3-circle { opacity: 1 !important; }
         </style>
     </head>
-    <body>
+    <body class="whiteborder">
         <script type="text/javascript">
             $(function(){
                 var renderers = $.extend(
@@ -49,6 +61,7 @@
                     );
 
                 var parseAndPivot = function(f) {
+                    $("#output").html("<p align='center' style='color:grey;'>(processing...)</p>")
                     Papa.parse(f, {
                         skipEmptyLines: true,
                         error: function(e){ alert(e)},
@@ -62,19 +75,37 @@
                     parseAndPivot(event.target.files[0]);
                 });
 
-                $("html").on("dragover", function(evt) {
+                var dragging = function(evt) {
                     evt.stopPropagation();
                     evt.preventDefault();
                     evt.originalEvent.dataTransfer.dropEffect = 'copy';
-                }).on("drop", function(evt) {
+                    $("body").removeClass("whiteborder").addClass("greyborder");
+                };
+
+                var endDrag = function(evt) {
                     evt.stopPropagation();
                     evt.preventDefault();
+                    evt.originalEvent.dataTransfer.dropEffect = 'copy';
+                    $("body").removeClass("greyborder").addClass("whiteborder");
+                };
+
+                var dropped = function(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    $("body").removeClass("greyborder").addClass("whiteborder");
                     parseAndPivot(evt.originalEvent.dataTransfer.files[0]);
-                });
+                };
+
+                $("html")
+                    .on("dragover", dragging)
+                    .on("dragend", endDrag)
+                    .on("dragexit", endDrag)
+                    .on("dragleave", endDrag)
+                    .on("drop", dropped);
              });
         </script>
-        <p><a href="index.html">&laquo; back to examples</a></p>
-        <p align="center">Drop a CSV file on this page or select it here: <input id="csv" type="file" /></p>
+        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
+        <p align="center">Drop a CSV file on this page or <label>click here to choose one<input id="csv" type="file" style="display:none"/></label></p>
         <div id="output" style="margin: 10px;"></div>
 
     </body>

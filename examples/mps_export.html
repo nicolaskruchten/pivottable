@@ -13,20 +13,20 @@
         <style>
             body {font-family: Verdana;}
         </style>
-        
+
         <!-- optional: mobile support with jqueryui-touch-punch -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-        
+
         <!-- for examples only! script to show code to user -->
         <script type="text/javascript" src="show_code.js"></script>
     </head>
     <body>
         <script type="text/javascript">
-    // When using the 'TSV Export' Renderer, you can 
+    // When using the 'TSV Export' Renderer, you can
     // copy from this textarea straight into Excel.
 
     $(function(){
-        var renderers = $.extend($.pivotUtilities.renderers, 
+        var renderers = $.extend($.pivotUtilities.renderers,
             $.pivotUtilities.export_renderers);
 
         $.getJSON("mps.json", function(mps) {
@@ -39,8 +39,8 @@
      });
         </script>
 
-        <p><a href="index.html">&laquo; back to examples</a></p>
-        
+        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
+
         <div id="output" style="margin: 30px;"></div>
 
     </body>

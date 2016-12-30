@@ -26,7 +26,7 @@
             var suite = new Benchmark.Suite;
             suite
             .add('PD: 1-cell', function() {
-                new $.pivotUtilities.PivotData(mps, 
+                new $.pivotUtilities.PivotData(mps,
                     {
                         rows: [], cols: [],
                         aggregator: $.pivotUtilities.aggregators.Count(),
@@ -36,7 +36,7 @@
                 );
             })
             .add('PD: Party, Province', function() {
-                new $.pivotUtilities.PivotData(mps, 
+                new $.pivotUtilities.PivotData(mps,
                     {
                         rows: ['Party', 'Province'], cols: [],
                         aggregator: $.pivotUtilities.aggregators.Count(),
@@ -46,7 +46,7 @@
                 );
             })
             .add('PD: Party vs Province', function() {
-                new $.pivotUtilities.PivotData(mps, 
+                new $.pivotUtilities.PivotData(mps,
                     {
                         rows: ['Party'], cols: ['Province'],
                         aggregator: $.pivotUtilities.aggregators.Count(),
@@ -56,7 +56,7 @@
                 );
             })
             .add('PD: Party, Province vs Gender, Age', function() {
-                new $.pivotUtilities.PivotData(mps, 
+                new $.pivotUtilities.PivotData(mps,
                     {
                         rows: ['Party', 'Province'], cols: ['Gender', 'Age'],
                         aggregator: $.pivotUtilities.aggregators.Count(),
@@ -72,7 +72,7 @@
      });
         </script>
 
-        <p><a href="index.html">&laquo; back to examples</a></p>
+        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
 
         <pre id="output"></pre>
 
