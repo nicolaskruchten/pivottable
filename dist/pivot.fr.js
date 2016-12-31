@@ -55,6 +55,8 @@
         "Moyenne": tpl.average(frFmt),
         "Minimum": tpl.min(frFmt),
         "Maximum": tpl.max(frFmt),
+        "Premier": tpl.min(frFmt),
+        "Dernier": tpl.max(frFmt),
         "Ratio de sommes": tpl.sumOverSum(frFmt),
         "Borne supérieure 80%": tpl.sumOverSumBound80(true, frFmt),
         "Borne inférieure 80%": tpl.sumOverSumBound80(false, frFmt),

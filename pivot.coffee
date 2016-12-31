@@ -70,6 +70,24 @@ callWithJQuery ($) ->
 
         min: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             val: null
+            push: (record) ->
+                x = parseFloat(record[attr])
+                if not isNaN x then @val = Math.min(x, @val ? x)
+            value: -> @val
+            format: formatter
+            numInputs: if attr? then 0 else 1
+
+        max: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
+            val: null
+            push: (record) ->
+                x = parseFloat(record[attr])
+                if not isNaN x then @val = Math.max(x, @val ? x)
+            value: -> @val
+            format: formatter
+            numInputs: if attr? then 0 else 1
+
+        first: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
+            val: null
             sorter: getSort(data?.sorters, attr)
             push: (record) ->
                 x = record[attr]
@@ -78,7 +96,7 @@ callWithJQuery ($) ->
             format: (x) -> if isNaN(x) then x else formatter(x)
             numInputs: if attr? then 0 else 1
 
-        max: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
+        last: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             val: null
             sorter: getSort(data?.sorters, attr)
             push: (record) ->
@@ -141,6 +159,8 @@ callWithJQuery ($) ->
         "Average":              tpl.average(usFmt)
         "Minimum":              tpl.min(usFmt)
         "Maximum":              tpl.max(usFmt)
+        "First":                tpl.first(usFmt)
+        "Last":                 tpl.last(usFmt)
         "Sum over Sum":         tpl.sumOverSum(usFmt)
         "80% Upper Bound":      tpl.sumOverSumBound80(true, usFmt)
         "80% Lower Bound":      tpl.sumOverSumBound80(false, usFmt)

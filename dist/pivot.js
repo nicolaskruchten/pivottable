@@ -169,6 +169,58 @@
           return function(data, rowKey, colKey) {
             return {
               val: null,
+              push: function(record) {
+                var ref, x;
+                x = parseFloat(record[attr]);
+                if (!isNaN(x)) {
+                  return this.val = Math.min(x, (ref = this.val) != null ? ref : x);
+                }
+              },
+              value: function() {
+                return this.val;
+              },
+              format: formatter,
+              numInputs: attr != null ? 0 : 1
+            };
+          };
+        };
+      },
+      max: function(formatter) {
+        if (formatter == null) {
+          formatter = usFmt;
+        }
+        return function(arg) {
+          var attr;
+          attr = arg[0];
+          return function(data, rowKey, colKey) {
+            return {
+              val: null,
+              push: function(record) {
+                var ref, x;
+                x = parseFloat(record[attr]);
+                if (!isNaN(x)) {
+                  return this.val = Math.max(x, (ref = this.val) != null ? ref : x);
+                }
+              },
+              value: function() {
+                return this.val;
+              },
+              format: formatter,
+              numInputs: attr != null ? 0 : 1
+            };
+          };
+        };
+      },
+      first: function(formatter) {
+        if (formatter == null) {
+          formatter = usFmt;
+        }
+        return function(arg) {
+          var attr;
+          attr = arg[0];
+          return function(data, rowKey, colKey) {
+            return {
+              val: null,
               sorter: getSort(data != null ? data.sorters : void 0, attr),
               push: function(record) {
                 var ref, x;
@@ -192,7 +244,7 @@
           };
         };
       },
-      max: function(formatter) {
+      last: function(formatter) {
         if (formatter == null) {
           formatter = usFmt;
         }
@@ -353,6 +405,8 @@
         "Average": tpl.average(usFmt),
         "Minimum": tpl.min(usFmt),
         "Maximum": tpl.max(usFmt),
+        "First": tpl.first(usFmt),
+        "Last": tpl.last(usFmt),
         "Sum over Sum": tpl.sumOverSum(usFmt),
         "80% Upper Bound": tpl.sumOverSumBound80(true, usFmt),
         "80% Lower Bound": tpl.sumOverSumBound80(false, usFmt),
