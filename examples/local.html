@@ -29,7 +29,7 @@
             }
             .whiteborder {border-color: white;}
             .greyborder {border-color: lightgrey;}
-            label {
+            #filechooser {
                 color: #555;
                 text-decoration: underline;;
                 cursor: pointer; /* "hand" cursor */
@@ -105,7 +105,7 @@
              });
         </script>
         <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
-        <p align="center">Drop a CSV file on this page or <label>click here to choose one<input id="csv" type="file" style="display:none"/></label></p>
+        <p align="center" style="line-height: 1.5">Drop a CSV file on this page or <label id="filechooser">click here to choose one<input id="csv" type="file" style="display:none"/></label><br /> <em><small>note: the data never leaves your browser!</small></em></p>
         <div id="output" style="margin: 10px;"></div>
 
     </body>
