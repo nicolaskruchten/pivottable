@@ -1023,6 +1023,8 @@ callWithJQuery ($) ->
             values = []
             forEachCell (x) -> values.push x
             max = Math.max(values...)
+            if max < 0
+                max = 0
             range = max;
             min = Math.min(values...)
             if min < 0
