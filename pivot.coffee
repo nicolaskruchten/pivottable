@@ -1038,7 +1038,7 @@ callWithJQuery ($) ->
                 if min < 0
                     bBase = scaler(-min)
                 if x < 0
-                    bBase = 0
+                    bBase += scaler(x)
                     bgColor = "red"
                     x = -x
                 wrapper.append $("<div>").css
