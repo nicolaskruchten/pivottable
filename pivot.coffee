@@ -282,6 +282,8 @@ callWithJQuery ($) ->
             @rowAttrs = opts.rows ? []
             @valAttrs = opts.vals ? []
             @sorters = opts.sorters ? {}
+            @rowOrder = opts.rowOrder
+            @colOrder = opts.colOrder
             @derivedAttributes = opts.derivedAttributes ? {}
             @filter = opts.filter ? (-> true)
             @tree = {}
@@ -344,8 +346,15 @@ callWithJQuery ($) ->
         sortKeys: () =>
             if not @sorted
                 @sorted = true
-                @rowKeys.sort @arrSort(@rowAttrs)
-                @colKeys.sort @arrSort(@colAttrs)
+                v = (r,c) => @getAggregator(r,c).value()
+                switch @rowOrder
+                    when "asc"  then @rowKeys.sort (a,b) => -naturalSort v(a,[]), v(b,[])
+                    when "desc" then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
+                    else             @rowKeys.sort @arrSort(@rowAttrs)
+                switch @colOrder
+                    when "asc"  then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
+                    when "desc" then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
+                    else             @colKeys.sort @arrSort(@colAttrs)
 
         getColKeys: () =>
             @sortKeys()
@@ -816,9 +825,36 @@ callWithJQuery ($) ->
             for own x of opts.aggregators
                 aggregator.append $("<option>").val(x).html(x)
 
+            cycle = ["none","asc","desc","none"]
+            setRowSymbol = (x) ->
+                s = {"asc": "&uarr;", "desc":"&darr;", "none": "&varr;"}
+                x.html(s[rowOrderArrow.data("order")])
+            setColSymbol = (x) ->
+                s = {"asc": "&larr;", "desc":"&rarr;", "none": "&harr;"}
+                x.html(s[colOrderArrow.data("order")])
+
+            rowOrderArrow = $("<a>", role: "button").addClass("pvtRowOrder")
+                .data("order", opts.rowOrder ? "none")
+                .bind "click", ->
+                    $(this).data("order", cycle[cycle.indexOf($(this).data("order"))+1])
+                    setRowSymbol($(this))
+                    refresh()
+            setRowSymbol(rowOrderArrow)
+
+            colOrderArrow = $("<a>", role: "button").addClass("pvtColOrder")
+                .data("order", opts.colOrder ? "none")
+                .bind "click", ->
+                    $(this).data("order", cycle[cycle.indexOf($(this).data("order"))+1])
+                    setColSymbol($(this))
+                    refresh()
+            setColSymbol(colOrderArrow)
+
+
             $("<td>").addClass('pvtVals')
               .appendTo(tr1)
               .append(aggregator)
+              .append(rowOrderArrow)
+              .append(colOrderArrow)
               .append($("<br>"))
 
             #column axes
@@ -902,7 +938,8 @@ callWithJQuery ($) ->
                 subopts.vals = vals
                 subopts.aggregator = opts.aggregators[aggregator.val()](vals)
                 subopts.renderer = opts.renderers[renderer.val()]
-
+                subopts.rowOrder = rowOrderArrow.data("order")
+                subopts.colOrder = colOrderArrow.data("order")
                 #construct filter here
                 exclusions = {}
                 @find('input.pvtFilter').not(':checked').each ->
