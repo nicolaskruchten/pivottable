@@ -378,21 +378,20 @@ describe "$.pivotUtilities", ->
     describe ".naturalSort()", ->
         naturalSort = $.pivotUtilities.naturalSort
 
-        it "sorts numbers", ->
-            expect [2,1,3,4,0].sort naturalSort
-            .toEqual [0,1,2,3,4]
+        sortedArr = [
+            null, NaN,
+            -Infinity, '-Infinity', -3, '-3', -2, '-2', -1, '-1',
+            0, '2e-1', 1, '01', '1', 2, '002', '002e0', '02', '2', '2e-0',
+            3, 10, '10', '11', '12', '1e2', '112', Infinity, 'Infinity',
+            '1a', '2a','12a','20a',
+            'A', 'A', 'NaN', 'a', 'a',
+            'a01', 'a012', 'a02', 'a1', 'a2', 'a12', 'a12', 'a21', 'a21',
+            'b', 'c', 'd', 'null'
+        ]
 
-        it "sorts strings case-sensitively", ->
-            expect ['b','a','c','d','A','a','A'].sort naturalSort
-            .toEqual ['A','A','a','a','b','c','d']
-
-        it "sorts numbers in strings", ->
-            expect ['1','12','2','10','11','112'].sort naturalSort
-            .toEqual ['1','2','10','11','12','112']
-
-        it "sorts 0-padded numbers", ->
-            expect ['02','01','10','11'].sort naturalSort
-            .toEqual ['01','02','10','11']
+        it "sorts naturally (null, NaN, numbers & numbery strings, Alphanum for text strings)", ->
+            expect sortedArr.slice().sort(naturalSort)
+            .toEqual sortedArr
 
     describe ".sortAs()", ->
         sortAs = $.pivotUtilities.sortAs
