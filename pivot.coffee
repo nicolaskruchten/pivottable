@@ -304,8 +304,8 @@ callWithJQuery ($) ->
             @rowAttrs = opts.rows ? []
             @valAttrs = opts.vals ? []
             @sorters = opts.sorters ? {}
-            @rowOrder = opts.rowOrder
-            @colOrder = opts.colOrder
+            @rowOrder = opts.rowOrder ? "key_a_to_z"
+            @colOrder = opts.colOrder ? "key_a_to_z"
             @derivedAttributes = opts.derivedAttributes ? {}
             @filter = opts.filter ? (-> true)
             @tree = {}
@@ -370,12 +370,12 @@ callWithJQuery ($) ->
                 @sorted = true
                 v = (r,c) => @getAggregator(r,c).value()
                 switch @rowOrder
-                    when "asc"  then @rowKeys.sort (a,b) => -naturalSort v(a,[]), v(b,[])
-                    when "desc" then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
+                    when "value_a_to_z"  then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
+                    when "value_z_to_a" then @rowKeys.sort (a,b) => -naturalSort v(a,[]), v(b,[])
                     else             @rowKeys.sort @arrSort(@rowAttrs)
                 switch @colOrder
-                    when "asc"  then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
-                    when "desc" then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
+                    when "value_a_to_z"  then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
+                    when "value_z_to_a" then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
                     else             @colKeys.sort @arrSort(@colAttrs)
 
         getColKeys: () =>
@@ -606,6 +606,7 @@ callWithJQuery ($) ->
         locale = "en" if not locales[locale]?
         defaults =
             cols : [], rows: [], vals: []
+            rowOrder: "key_a_to_z", colOrder: "key_a_to_z"
             dataClass: PivotData
             filter: -> true
             aggregator: aggregatorTemplates.count()()
@@ -651,6 +652,7 @@ callWithJQuery ($) ->
             hiddenAttributes: []
             menuLimit: 500
             cols: [], rows: [], vals: []
+            rowOrder: "key_a_to_z", colOrder: "key_a_to_z"
             dataClass: PivotData
             exclusions: {}
             inclusions: {}
@@ -847,30 +849,24 @@ callWithJQuery ($) ->
             for own x of opts.aggregators
                 aggregator.append $("<option>").val(x).html(x)
 
-            cycle = ["none","asc","desc","none"]
-            setRowSymbol = (x) ->
-                s = {"asc": "&uarr;", "desc":"&darr;", "none": "&varr;"}
-                x.html(s[rowOrderArrow.data("order")])
-            setColSymbol = (x) ->
-                s = {"asc": "&larr;", "desc":"&rarr;", "none": "&harr;"}
-                x.html(s[colOrderArrow.data("order")])
+            ordering =
+                key_a_to_z:   {rowSymbol: "&varr;", colSymbol: "&harr;", next: "value_a_to_z"}
+                value_a_to_z: {rowSymbol: "&darr;", colSymbol: "&rarr;", next: "value_z_to_a"}
+                value_z_to_a: {rowSymbol: "&uarr;", colSymbol: "&larr;", next: "key_a_to_z"}
 
             rowOrderArrow = $("<a>", role: "button").addClass("pvtRowOrder")
-                .data("order", opts.rowOrder ? "none")
+                .data("order", opts.rowOrder).html(ordering[opts.rowOrder].rowSymbol)
                 .bind "click", ->
-                    $(this).data("order", cycle[cycle.indexOf($(this).data("order"))+1])
-                    setRowSymbol($(this))
+                    $(this).data("order", ordering[$(this).data("order")].next)
+                    $(this).html(ordering[$(this).data("order")].rowSymbol)
                     refresh()
-            setRowSymbol(rowOrderArrow)
 
             colOrderArrow = $("<a>", role: "button").addClass("pvtColOrder")
-                .data("order", opts.colOrder ? "none")
+                .data("order", opts.colOrder).html(ordering[opts.colOrder].colSymbol)
                 .bind "click", ->
-                    $(this).data("order", cycle[cycle.indexOf($(this).data("order"))+1])
-                    setColSymbol($(this))
+                    $(this).data("order", ordering[$(this).data("order")].next)
+                    $(this).html(ordering[$(this).data("order")].colSymbol)
                     refresh()
-            setColSymbol(colOrderArrow)
-
 
             $("<td>").addClass('pvtVals')
               .appendTo(tr1)
@@ -990,6 +986,8 @@ callWithJQuery ($) ->
                 pivotUIOptions = $.extend {}, opts,
                     cols: subopts.cols
                     rows: subopts.rows
+                    colOrder: subopts.colOrder
+                    rowOrder: subopts.rowOrder
                     vals: vals
                     exclusions: exclusions
                     inclusions: inclusions

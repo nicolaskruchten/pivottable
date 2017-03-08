@@ -99,6 +99,7 @@ callWithJQuery ($, c3) ->
                         multiline: false
             data:
                 type: chartOpts.type
+                order: null
             tooltip:
                 grouped: false
             color:
@@ -134,9 +135,9 @@ callWithJQuery ($, c3) ->
             params.axis.x.categories = headers
             params.data.columns = columns
 
-
         if chartOpts.stacked?
             params.data.groups = [x.join("-") for x in rowKeys]
+
         renderArea = $("<div>", style: "display:none;").appendTo $("body")
         result = $("<div>").appendTo renderArea
         params.bindto = result[0]
