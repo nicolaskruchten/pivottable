@@ -5,7 +5,7 @@
 
 PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality built on top of jQuery/jQueryUI and originally written in CoffeeScript by [Nicolas Kruchten](http://nicolas.kruchten.com) at [Datacratic](http://datacratic.com).
 
-It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`.
+It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`. And on [Packagist.org](https://packagist.org/packages/nicolaskruchten/pivottable), it is `nicolaskruchten/pivottable`. 
 
 PivotTable.js can be used with [Python/Jupyter](https://pypi.python.org/pypi/pivottablejs) and [R/RStudio](https://github.com/smartinsightsfromdata/rpivotTable) and you can [try it right now](http://nicolas.kruchten.com/pivottable/examples/local.html) in your browser on a CSV file.
 
@@ -119,14 +119,13 @@ See the wiki for [full parameter documentation](https://github.com/nicolaskrucht
 More extensive documentation can be found in the [wiki](https://github.com/nicolaskruchten/pivottable/wiki):
 
 * [Frequently Asked Questions](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions)
-* [Step by step UI Tutorial](https://github.com/nicolaskruchten/pivottable/wiki/UI-Tutorial)
 * [Full Parameter Documentation](https://github.com/nicolaskruchten/pivottable/wiki/Parameters)
 * [Input Formats](https://github.com/nicolaskruchten/pivottable/wiki/Input-Formats)
 * [Aggregators](https://github.com/nicolaskruchten/pivottable/wiki/Aggregators)
 * [Renderers](https://github.com/nicolaskruchten/pivottable/wiki/Renderers)
 * [Derived Attributes](https://github.com/nicolaskruchten/pivottable/wiki/Derived-Attributes)
 * [Localization](https://github.com/nicolaskruchten/pivottable/wiki/Localization)
-* [Optional Extra Renderers: Google Charts and D3/C3 Support](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
+* [Optional Extra Renderers: Charting and Exporting](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
 * [Used By](https://github.com/nicolaskruchten/pivottable/wiki/Used-By)
 
 ## How can I build the code and run the tests?
@@ -145,7 +144,7 @@ Pull requests are welcome! Here are some [Contribution Guidelines](https://githu
 
 ## I have a question, how can I get in touch?
 
-Please first check the [Frequently Asked Questions](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions) and if you can't find what you're looking for there, or in the [wiki](https://github.com/nicolaskruchten/pivottable/wiki), then please [create a GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues/new). When creating an issue, please try to provide a replicable test case so that others can more easily help you.
+Please first check the [Frequently Asked Questions](https://github.com/nicolaskruchten/pivottable/wiki/Frequently-Asked-Questions) and if you can't find what you're looking for there, or in the [wiki](https://github.com/nicolaskruchten/pivottable/wiki), then please [create a GitHub Issue](https://github.com/nicolaskruchten/pivottable/issues/new). When creating an issue, please try to provide a replicable test case so that others can more easily help you. Please do not email the author directly, as you will just be asked to create a Github Issue :)
 
 ## Copyright & Licence (MIT License)
 
