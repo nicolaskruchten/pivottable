@@ -20,7 +20,7 @@
     /*
     Utilities
      */
-    var PivotData, addSeparators, aggregatorTemplates, aggregators, dayNamesEn, derivers, getSort, locales, mthNamesEn, naturalSort, numberFormat, pivotTableRenderer, renderers, sortAs, usFmt, usFmtInt, usFmtPct, zeroPad;
+    var PivotData, addSeparators, aggregatorTemplates, aggregators, dayNamesEn, derivers, getSort, locales, mthNamesEn, naturalSort, numberFormat, pivotTableRenderer, rd, renderers, rx, rz, sortAs, usFmt, usFmtInt, usFmtPct, zeroPad;
     addSeparators = function(nStr, thousandsSep, decimalSep) {
       var rgx, x, x1, x2;
       nStr += '';
@@ -511,20 +511,46 @@
         };
       }
     };
+    rx = /(\d+)|(\D+)/g;
+    rd = /\d/;
+    rz = /^0/;
     naturalSort = (function(_this) {
       return function(as, bs) {
-        var a, a1, b, b1, rd, rx, rz;
-        rx = /(\d+)|(\D+)/g;
-        rd = /\d/;
-        rz = /^0/;
-        if (typeof as === "number" || typeof bs === "number") {
-          if (isNaN(as)) {
-            return 1;
-          }
-          if (isNaN(bs)) {
-            return -1;
-          }
-          return as - bs;
+        var a, a1, b, b1, nas, nbs;
+        if ((bs != null) && (as == null)) {
+          return -1;
+        }
+        if ((as != null) && (bs == null)) {
+          return 1;
+        }
+        if (typeof as === "number" && isNaN(as)) {
+          return -1;
+        }
+        if (typeof bs === "number" && isNaN(bs)) {
+          return 1;
+        }
+        nas = +as;
+        nbs = +bs;
+        if (nas < nbs) {
+          return -1;
+        }
+        if (nas > nbs) {
+          return 1;
+        }
+        if (typeof as === "number" && typeof bs !== "number") {
+          return -1;
+        }
+        if (typeof bs === "number" && typeof as !== "number") {
+          return 1;
+        }
+        if (typeof as === "number" && typeof bs === "number") {
+          return 0;
+        }
+        if (isNaN(nbs) && !isNaN(nas)) {
+          return -1;
+        }
+        if (isNaN(nas) && !isNaN(nbs)) {
+          return 1;
         }
         a = String(as);
         b = String(bs);
