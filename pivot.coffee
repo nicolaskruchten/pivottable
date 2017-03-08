@@ -221,29 +221,51 @@ callWithJQuery ($) ->
                         when "S" then zeroPad(date["get#{utc}Seconds"]())
                         else "%" + p
 
-    naturalSort = (as, bs) => #thanks http://stackoverflow.com/a/4373421/112871
-        rx = /(\d+)|(\D+)/g
-        rd = /\d/
-        rz = /^0/
-        if typeof as is "number" or typeof bs is "number"
-            return 1  if isNaN(as)
-            return -1  if isNaN(bs)
-            return as - bs
+    rx = /(\d+)|(\D+)/g
+    rd = /\d/
+    rz = /^0/
+    naturalSort = (as, bs) =>
+        #nulls first
+        return -1 if bs? and not as?
+        return  1 if as? and not bs?
+
+        #then raw NaNs
+        return -1 if typeof as == "number" and isNaN(as)
+        return  1 if typeof bs == "number" and isNaN(bs)
+
+        #numbers and numbery strings group together
+        nas = +as
+        nbs = +bs
+        return -1 if nas < nbs
+        return  1 if nas > nbs
+
+        #within that, true numbers before numbery strings
+        return -1 if typeof as == "number" and typeof bs != "number"
+        return  1 if typeof bs == "number" and typeof as != "number"
+        return  0 if typeof as == "number" and typeof bs == "number"
+
+        # 'Infinity' is a textual number, so less than 'A'
+        return -1 if isNaN(nbs) and not isNaN(nas)
+        return  1 if isNaN(nas) and not isNaN(nbs)
+
+        #finally, "smart" string sorting per http://stackoverflow.com/a/4373421/112871
         a = String(as)
         b = String(bs)
-        return 0  if a is b
-        return (if a > b then 1 else -1)  unless rd.test(a) and rd.test(b)
-        a = a.match(rx)
+        return 0 if a == b
+        return (if a > b then 1 else -1) unless rd.test(a) and rd.test(b)
+
+        #special treatment for strings containing digits
+        a = a.match(rx) #create digits vs non-digit chunks and iterate through
         b = b.match(rx)
         while a.length and b.length
             a1 = a.shift()
             b1 = b.shift()
             if a1 != b1
-                if rd.test(a1) and rd.test(b1)
+                if rd.test(a1) and rd.test(b1) #both are digit chunks
                     return a1.replace(rz, ".0") - b1.replace(rz, ".0")
                 else
                     return (if a1 > b1 then 1 else -1)
-        a.length - b.length
+        return a.length - b.length
 
     sortAs = (order) ->
         mapping = {}
