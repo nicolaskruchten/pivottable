@@ -18,7 +18,7 @@
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, attrs, base, base1, base2, base3, base4, base5, colKey, colKeys, columns, dataColumns, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs;
+        var agg, attrs, base, base1, base2, base3, base4, base5, c, categories, colKey, colKeys, columns, dataColumns, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -117,7 +117,7 @@
           for (l = 0, len3 = rowKeys.length; l < len3; l++) {
             rowKey = rowKeys[l];
             rowHeader = rowKey.join("-");
-            row = [rowHeader === "" ? pivotData.aggregatorName : rowHeader];
+            row = [rowHeader === "" ? fullAggName : rowHeader];
             for (m = 0, len4 = colKeys.length; m < len4; m++) {
               colKey = colKeys[m];
               val = parseFloat(pivotData.getAggregator(rowKey, colKey).value());
@@ -133,13 +133,18 @@
             }
             columns.push(row);
           }
-          vAxisTitle = pivotData.aggregatorName + (pivotData.valAttrs.length ? "(" + (pivotData.valAttrs.join(", ")) + ")" : "");
-          hAxisTitle = pivotData.colAttrs.join("-");
+          vAxisTitle = fullAggName;
+          if (chartOpts.horizontal) {
+            hAxisTitle = pivotData.rowAttrs.join("-");
+            groupByTitle = pivotData.colAttrs.join("-");
+          } else {
+            hAxisTitle = pivotData.colAttrs.join("-");
+            groupByTitle = pivotData.rowAttrs.join("-");
+          }
           titleText = fullAggName;
           if (hAxisTitle !== "") {
             titleText += " " + opts.localeStrings.vs + " " + hAxisTitle;
           }
-          groupByTitle = pivotData.rowAttrs.join("-");
           if (groupByTitle !== "") {
             titleText += " " + opts.localeStrings.by + " " + groupByTitle;
           }
@@ -150,6 +155,7 @@
         title.text(titleText);
         params = {
           axis: {
+            rotated: chartOpts.horizontal,
             y: {
               label: vAxisTitle
             },
@@ -162,7 +168,8 @@
             }
           },
           data: {
-            type: chartOpts.type
+            type: chartOpts.type,
+            order: null
           },
           tooltip: {
             grouped: false
@@ -205,21 +212,56 @@
           };
         } else {
           params.axis.x.type = 'category';
-          params.axis.x.categories = headers;
-          params.data.columns = columns;
-        }
-        if (chartOpts.stacked != null) {
-          params.data.groups = [
-            (function() {
+          if (chartOpts.horizontal) {
+            categories = (function() {
               var len5, n, results;
               results = [];
-              for (n = 0, len5 = rowKeys.length; n < len5; n++) {
-                x = rowKeys[n];
-                results.push(x.join("-"));
+              for (n = 0, len5 = columns.length; n < len5; n++) {
+                c = columns[n];
+                results.push(c.shift());
               }
               return results;
-            })()
-          ];
+            })();
+            if (categories.length === 1 && categories[0] === fullAggName) {
+              categories = [""];
+            }
+            params.axis.x.categories = categories;
+            if (headers.length === 1 && headers[0] === "") {
+              headers = [fullAggName];
+            }
+            columns.unshift(headers);
+            params.data.rows = columns;
+          } else {
+            params.axis.x.categories = headers;
+            params.data.columns = columns;
+          }
+        }
+        if (chartOpts.stacked != null) {
+          if (chartOpts.horizontal) {
+            params.data.groups = [
+              (function() {
+                var len5, n, results;
+                results = [];
+                for (n = 0, len5 = colKeys.length; n < len5; n++) {
+                  x = colKeys[n];
+                  results.push(x.join("-"));
+                }
+                return results;
+              })()
+            ];
+          } else {
+            params.data.groups = [
+              (function() {
+                var len5, n, results;
+                results = [];
+                for (n = 0, len5 = rowKeys.length; n < len5; n++) {
+                  x = rowKeys[n];
+                  results.push(x.join("-"));
+                }
+                return results;
+              })()
+            ];
+          }
         }
         renderArea = $("<div>", {
           style: "display:none;"
@@ -233,7 +275,15 @@
       };
     };
     return $.pivotUtilities.c3_renderers = {
-      "Line Chart": makeC3Chart(),
+      "Horizontal Bar Chart": makeC3Chart({
+        type: "bar",
+        horizontal: true
+      }),
+      "Horizontal Stacked Bar Chart": makeC3Chart({
+        type: "bar",
+        stacked: true,
+        horizontal: true
+      }),
       "Bar Chart": makeC3Chart({
         type: "bar"
       }),
@@ -241,6 +291,7 @@
         type: "bar",
         stacked: true
       }),
+      "Line Chart": makeC3Chart(),
       "Area Chart": makeC3Chart({
         type: "area",
         stacked: true

@@ -19,6 +19,8 @@ callWithJQuery ($, c3) ->
         opts.c3.size.width ?= window.innerWidth / 1.4
         opts.c3.size.height ?= window.innerHeight / 1.4 - 50
         chartOpts.type ?= "line"
+        chartOpts.horizontal ?= false
+        chartOpts.stacked ?= false
 
         rowKeys = pivotData.getRowKeys()
         rowKeys.push [] if rowKeys.length == 0
@@ -64,7 +66,7 @@ callWithJQuery ($, c3) ->
             columns = []
             for rowKey in rowKeys
                 rowHeader = rowKey.join("-")
-                row = [if rowHeader == "" then pivotData.aggregatorName else rowHeader]
+                row = [if rowHeader == "" then fullAggName else rowHeader]
                 for colKey in colKeys
                     val = parseFloat  pivotData.getAggregator(rowKey, colKey).value()
                     if isFinite(val)
@@ -76,13 +78,16 @@ callWithJQuery ($, c3) ->
                         row.push null
                 columns.push row
 
-            vAxisTitle = pivotData.aggregatorName+
-                if pivotData.valAttrs.length then "(#{pivotData.valAttrs.join(", ")})" else ""
-            hAxisTitle = pivotData.colAttrs.join("-")
+            vAxisTitle = fullAggName
 
+            if chartOpts.horizontal
+                hAxisTitle = pivotData.rowAttrs.join("-")
+                groupByTitle = pivotData.colAttrs.join("-")
+            else
+                hAxisTitle = pivotData.colAttrs.join("-")
+                groupByTitle = pivotData.rowAttrs.join("-")
             titleText = fullAggName
             titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
-            groupByTitle = pivotData.rowAttrs.join("-")
             titleText += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
 
         title = $("<p>", {style: "text-align: center; font-weight: bold"})
@@ -90,6 +95,7 @@ callWithJQuery ($, c3) ->
 
         params =
             axis:
+                rotated: chartOpts.horizontal
                 y:
                     label: vAxisTitle
                 x:
@@ -99,6 +105,7 @@ callWithJQuery ($, c3) ->
                         multiline: false
             data:
                 type: chartOpts.type
+                order: null
             tooltip:
                 grouped: false
             color:
@@ -131,12 +138,26 @@ callWithJQuery ($, c3) ->
                 value: (a,b,c,d) -> scatterData.t[c][d]
         else
             params.axis.x.type= 'category'
-            params.axis.x.categories = headers
-            params.data.columns = columns
+
+            if chartOpts.horizontal
+                categories = (c.shift() for c in columns)
+                if categories.length == 1 and categories[0] == fullAggName
+                    categories = [""]
+                params.axis.x.categories = categories
+                if headers.length == 1 and headers[0] == ""
+                    headers = [fullAggName]
+                columns.unshift(headers)
+                params.data.rows = columns
+            else
+                params.axis.x.categories = headers
+                params.data.columns = columns
 
 
-        if chartOpts.stacked?
-            params.data.groups = [x.join("-") for x in rowKeys]
+        if chartOpts.stacked
+            if chartOpts.horizontal
+                params.data.groups = [x.join("-") for x in colKeys]
+            else
+                params.data.groups = [x.join("-") for x in rowKeys]
         renderArea = $("<div>", style: "display:none;").appendTo $("body")
         result = $("<div>").appendTo renderArea
         params.bindto = result[0]
@@ -146,8 +167,10 @@ callWithJQuery ($, c3) ->
         return $("<div>").append title, result
 
     $.pivotUtilities.c3_renderers =
-        "Line Chart": makeC3Chart()
+        "Horizontal Bar Chart": makeC3Chart(type: "bar", horizontal: true)
+        "Horizontal Stacked Bar Chart": makeC3Chart(type: "bar", stacked: true, horizontal: true)
         "Bar Chart": makeC3Chart(type: "bar")
         "Stacked Bar Chart": makeC3Chart(type: "bar", stacked: true)
+        "Line Chart": makeC3Chart()
         "Area Chart": makeC3Chart(type: "area", stacked: true)
         "Scatter Chart": makeC3Chart(type: "scatter")
