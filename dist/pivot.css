@@ -27,7 +27,12 @@ table.pvtTable tbody tr td {
 
 .pvtTotal, .pvtGrandTotal { font-weight: bold; }
 
-.pvtVals { text-align: center;}
+.pvtVals { text-align: center; white-space: nowrap;}
+.pvtRowOrder, .pvtColOrder {
+    cursor:pointer;
+    width: 15px;
+    margin-left: 5px;
+    display: inline-block; }
 .pvtAggregator { margin-bottom: 5px ;}
 
 .pvtAxisContainer, .pvtVals {

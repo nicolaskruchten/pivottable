@@ -158,6 +158,7 @@ callWithJQuery ($, c3) ->
                 params.data.groups = [x.join("-") for x in colKeys]
             else
                 params.data.groups = [x.join("-") for x in rowKeys]
+
         renderArea = $("<div>", style: "display:none;").appendTo $("body")
         result = $("<div>").appendTo renderArea
         params.bindto = result[0]
