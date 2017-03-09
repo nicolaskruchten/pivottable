@@ -625,7 +625,7 @@
      */
     PivotData = (function() {
       function PivotData(input, opts) {
-        var ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7;
+        var ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9;
         if (opts == null) {
           opts = {};
         }
@@ -641,8 +641,10 @@
         this.rowAttrs = (ref3 = opts.rows) != null ? ref3 : [];
         this.valAttrs = (ref4 = opts.vals) != null ? ref4 : [];
         this.sorters = (ref5 = opts.sorters) != null ? ref5 : {};
-        this.derivedAttributes = (ref6 = opts.derivedAttributes) != null ? ref6 : {};
-        this.filter = (ref7 = opts.filter) != null ? ref7 : (function() {
+        this.rowOrder = (ref6 = opts.rowOrder) != null ? ref6 : "key_a_to_z";
+        this.colOrder = (ref7 = opts.colOrder) != null ? ref7 : "key_a_to_z";
+        this.derivedAttributes = (ref8 = opts.derivedAttributes) != null ? ref8 : {};
+        this.filter = (ref9 = opts.filter) != null ? ref9 : (function() {
           return true;
         });
         this.tree = {};
@@ -765,10 +767,48 @@
       };
 
       PivotData.prototype.sortKeys = function() {
+        var v;
         if (!this.sorted) {
           this.sorted = true;
-          this.rowKeys.sort(this.arrSort(this.rowAttrs));
-          return this.colKeys.sort(this.arrSort(this.colAttrs));
+          v = (function(_this) {
+            return function(r, c) {
+              return _this.getAggregator(r, c).value();
+            };
+          })(this);
+          switch (this.rowOrder) {
+            case "value_a_to_z":
+              this.rowKeys.sort((function(_this) {
+                return function(a, b) {
+                  return naturalSort(v(a, []), v(b, []));
+                };
+              })(this));
+              break;
+            case "value_z_to_a":
+              this.rowKeys.sort((function(_this) {
+                return function(a, b) {
+                  return -naturalSort(v(a, []), v(b, []));
+                };
+              })(this));
+              break;
+            default:
+              this.rowKeys.sort(this.arrSort(this.rowAttrs));
+          }
+          switch (this.colOrder) {
+            case "value_a_to_z":
+              return this.colKeys.sort((function(_this) {
+                return function(a, b) {
+                  return naturalSort(v([], a), v([], b));
+                };
+              })(this));
+            case "value_z_to_a":
+              return this.colKeys.sort((function(_this) {
+                return function(a, b) {
+                  return -naturalSort(v([], a), v([], b));
+                };
+              })(this));
+            default:
+              return this.colKeys.sort(this.arrSort(this.colAttrs));
+          }
         }
       };
 
@@ -1091,6 +1131,8 @@
         cols: [],
         rows: [],
         vals: [],
+        rowOrder: "key_a_to_z",
+        colOrder: "key_a_to_z",
         dataClass: PivotData,
         filter: function() {
           return true;
@@ -1139,7 +1181,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, defaults, e, existingOpts, fn, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, shownAttributes, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, colOrderArrow, defaults, e, existingOpts, fn, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1158,6 +1200,8 @@
         cols: [],
         rows: [],
         vals: [],
+        rowOrder: "key_a_to_z",
+        colOrder: "key_a_to_z",
         dataClass: PivotData,
         exclusions: {},
         inclusions: {},
@@ -1397,7 +1441,38 @@
           if (!hasProp.call(ref1, x)) continue;
           aggregator.append($("<option>").val(x).html(x));
         }
-        $("<td>").addClass('pvtVals').appendTo(tr1).append(aggregator).append($("<br>"));
+        ordering = {
+          key_a_to_z: {
+            rowSymbol: "&varr;",
+            colSymbol: "&harr;",
+            next: "value_a_to_z"
+          },
+          value_a_to_z: {
+            rowSymbol: "&darr;",
+            colSymbol: "&rarr;",
+            next: "value_z_to_a"
+          },
+          value_z_to_a: {
+            rowSymbol: "&uarr;",
+            colSymbol: "&larr;",
+            next: "key_a_to_z"
+          }
+        };
+        rowOrderArrow = $("<a>", {
+          role: "button"
+        }).addClass("pvtRowOrder").data("order", opts.rowOrder).html(ordering[opts.rowOrder].rowSymbol).bind("click", function() {
+          $(this).data("order", ordering[$(this).data("order")].next);
+          $(this).html(ordering[$(this).data("order")].rowSymbol);
+          return refresh();
+        });
+        colOrderArrow = $("<a>", {
+          role: "button"
+        }).addClass("pvtColOrder").data("order", opts.colOrder).html(ordering[opts.colOrder].colSymbol).bind("click", function() {
+          $(this).data("order", ordering[$(this).data("order")].next);
+          $(this).html(ordering[$(this).data("order")].colSymbol);
+          return refresh();
+        });
+        $("<td>").addClass('pvtVals').appendTo(tr1).append(aggregator).append(rowOrderArrow).append(colOrderArrow).append($("<br>"));
         $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols').appendTo(tr1);
         tr2 = $("<tr>").appendTo(uiTable);
         tr2.append($("<td>").addClass('pvtAxisContainer pvtRows').attr("valign", "top"));
@@ -1482,6 +1557,8 @@
             subopts.vals = vals;
             subopts.aggregator = opts.aggregators[aggregator.val()](vals);
             subopts.renderer = opts.renderers[renderer.val()];
+            subopts.rowOrder = rowOrderArrow.data("order");
+            subopts.colOrder = colOrderArrow.data("order");
             exclusions = {};
             _this.find('input.pvtFilter').not(':checked').each(function() {
               var filter;
@@ -1521,6 +1598,8 @@
             pivotUIOptions = $.extend({}, opts, {
               cols: subopts.cols,
               rows: subopts.rows,
+              colOrder: subopts.colOrder,
+              rowOrder: subopts.rowOrder,
               vals: vals,
               exclusions: exclusions,
               inclusions: inclusions,

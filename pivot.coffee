@@ -304,6 +304,8 @@ callWithJQuery ($) ->
             @rowAttrs = opts.rows ? []
             @valAttrs = opts.vals ? []
             @sorters = opts.sorters ? {}
+            @rowOrder = opts.rowOrder ? "key_a_to_z"
+            @colOrder = opts.colOrder ? "key_a_to_z"
             @derivedAttributes = opts.derivedAttributes ? {}
             @filter = opts.filter ? (-> true)
             @tree = {}
@@ -366,8 +368,15 @@ callWithJQuery ($) ->
         sortKeys: () =>
             if not @sorted
                 @sorted = true
-                @rowKeys.sort @arrSort(@rowAttrs)
-                @colKeys.sort @arrSort(@colAttrs)
+                v = (r,c) => @getAggregator(r,c).value()
+                switch @rowOrder
+                    when "value_a_to_z"  then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
+                    when "value_z_to_a" then @rowKeys.sort (a,b) => -naturalSort v(a,[]), v(b,[])
+                    else             @rowKeys.sort @arrSort(@rowAttrs)
+                switch @colOrder
+                    when "value_a_to_z"  then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
+                    when "value_z_to_a" then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
+                    else             @colKeys.sort @arrSort(@colAttrs)
 
         getColKeys: () =>
             @sortKeys()
@@ -597,6 +606,7 @@ callWithJQuery ($) ->
         locale = "en" if not locales[locale]?
         defaults =
             cols : [], rows: [], vals: []
+            rowOrder: "key_a_to_z", colOrder: "key_a_to_z"
             dataClass: PivotData
             filter: -> true
             aggregator: aggregatorTemplates.count()()
@@ -642,6 +652,7 @@ callWithJQuery ($) ->
             hiddenAttributes: []
             menuLimit: 500
             cols: [], rows: [], vals: []
+            rowOrder: "key_a_to_z", colOrder: "key_a_to_z"
             dataClass: PivotData
             exclusions: {}
             inclusions: {}
@@ -838,9 +849,30 @@ callWithJQuery ($) ->
             for own x of opts.aggregators
                 aggregator.append $("<option>").val(x).html(x)
 
+            ordering =
+                key_a_to_z:   {rowSymbol: "&varr;", colSymbol: "&harr;", next: "value_a_to_z"}
+                value_a_to_z: {rowSymbol: "&darr;", colSymbol: "&rarr;", next: "value_z_to_a"}
+                value_z_to_a: {rowSymbol: "&uarr;", colSymbol: "&larr;", next: "key_a_to_z"}
+
+            rowOrderArrow = $("<a>", role: "button").addClass("pvtRowOrder")
+                .data("order", opts.rowOrder).html(ordering[opts.rowOrder].rowSymbol)
+                .bind "click", ->
+                    $(this).data("order", ordering[$(this).data("order")].next)
+                    $(this).html(ordering[$(this).data("order")].rowSymbol)
+                    refresh()
+
+            colOrderArrow = $("<a>", role: "button").addClass("pvtColOrder")
+                .data("order", opts.colOrder).html(ordering[opts.colOrder].colSymbol)
+                .bind "click", ->
+                    $(this).data("order", ordering[$(this).data("order")].next)
+                    $(this).html(ordering[$(this).data("order")].colSymbol)
+                    refresh()
+
             $("<td>").addClass('pvtVals')
               .appendTo(tr1)
               .append(aggregator)
+              .append(rowOrderArrow)
+              .append(colOrderArrow)
               .append($("<br>"))
 
             #column axes
@@ -924,7 +956,8 @@ callWithJQuery ($) ->
                 subopts.vals = vals
                 subopts.aggregator = opts.aggregators[aggregator.val()](vals)
                 subopts.renderer = opts.renderers[renderer.val()]
-
+                subopts.rowOrder = rowOrderArrow.data("order")
+                subopts.colOrder = colOrderArrow.data("order")
                 #construct filter here
                 exclusions = {}
                 @find('input.pvtFilter').not(':checked').each ->
@@ -953,6 +986,8 @@ callWithJQuery ($) ->
                 pivotUIOptions = $.extend {}, opts,
                     cols: subopts.cols
                     rows: subopts.rows
+                    colOrder: subopts.colOrder
+                    rowOrder: subopts.rowOrder
                     vals: vals
                     exclusions: exclusions
                     inclusions: inclusions
