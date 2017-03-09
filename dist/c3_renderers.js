@@ -39,6 +39,12 @@
         if (chartOpts.type == null) {
           chartOpts.type = "line";
         }
+        if (chartOpts.horizontal == null) {
+          chartOpts.horizontal = false;
+        }
+        if (chartOpts.stacked == null) {
+          chartOpts.stacked = false;
+        }
         rowKeys = pivotData.getRowKeys();
         if (rowKeys.length === 0) {
           rowKeys.push([]);
@@ -236,7 +242,7 @@
             params.data.columns = columns;
           }
         }
-        if (chartOpts.stacked != null) {
+        if (chartOpts.stacked) {
           if (chartOpts.horizontal) {
             params.data.groups = [
               (function() {
