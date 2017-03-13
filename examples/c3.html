@@ -43,14 +43,15 @@
         $.getJSON("mps.json", function(mps) {
             $("#output").pivotUI(mps, {
                 renderers: renderers,
-                derivedAttributes: {
-                    "Age Bin": derivers.bin("Age", 10),
-                    "Gender Imbalance": function(mp) {
-                        return mp["Gender"] == "Male" ? 1 : -1;
-                    }
-                },
-                cols: ["Age Bin"], rows: ["Gender"],
-                rendererName: "Area Chart"
+                cols: ["Party"], rows: ["Province"],
+                rendererName: "Horizontal Stacked Bar Chart",
+                rowOrder: "value_z_to_a", colOrder: "value_z_to_a",
+                rendererOptions: {
+                    c3: { data: {colors: {
+                        Liberal: '#dc3912', Conservative: '#3366cc', NDP: '#ff9900',
+                        Green:'#109618', 'Bloc Quebecois': '#990099'
+                    }}}
+                }
             });
         });
      });
