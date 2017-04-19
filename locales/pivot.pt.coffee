@@ -22,14 +22,16 @@ callWithJQuery ($) ->
     $.pivotUtilities.locales.pt = 
 
         localeStrings:
-            renderError: "Ocorreu um error ao renderizar os resultados da Tabela Dinãmica."
-            computeError: "Ocorreu um error ao computar os resultados da Tabela Dinãmica."
-            uiRenderError: "Ocorreu um error ao renderizar a interface da Tabela Dinãmica."
+            renderError: "Ocorreu um error ao renderizar os resultados da Tabela Dinâmica."
+            computeError: "Ocorreu um error ao computar os resultados da Tabela Dinâmica."
+            uiRenderError: "Ocorreu um error ao renderizar a interface da Tabela Dinâmica."
             selectAll: "Selecionar Tudo"
             selectNone: "Selecionar Nenhum"
             tooMany: "(demais para listar)"
             filterResults: "Filtrar resultados"
             totals: "Totais"
+            apply:"Aplicar",
+            cancel: "Cancelar",
             vs: "vs"
             by: "por"
 
