@@ -44,6 +44,8 @@ callWithJQuery ($) ->
             "Média":                                        tpl.average(frFmt)
             "Mínimo":                                       tpl.min(frFmt)
             "Máximo":                                       tpl.max(frFmt)
+            "Primeiro":                                     tpl.first(frFmt),
+            "Último":                                       tpl.last(frFmt),
             "Soma sobre Soma":                              tpl.sumOverSum(frFmt)
             "Limite Superior a 80%":                        tpl.sumOverSumBound80(true, frFmt)
             "Limite Inferior a 80%":                        tpl.sumOverSumBound80(false, frFmt)
