@@ -303,6 +303,88 @@
           };
         };
       },
+      quantile: function(formatter, q) {
+        if (formatter == null) {
+          formatter = usFmt;
+        }
+        return function(arg) {
+          var attr;
+          attr = arg[0];
+          return function(data, rowKey, colKey) {
+            return {
+              vals: [],
+              push: function(record) {
+                var x;
+                x = parseFloat(record[attr]);
+                if (!isNaN(x)) {
+                  return this.vals.push(x);
+                }
+              },
+              value: function() {
+                var i;
+                if (this.vals.length === 0) {
+                  return null;
+                }
+                this.vals.sort();
+                i = (this.vals.length - 1) * q;
+                return (this.vals[Math.floor(i)] + this.vals[Math.ceil(i)]) / 2.0;
+              },
+              format: formatter,
+              numInputs: attr != null ? 0 : 1
+            };
+          };
+        };
+      },
+      runningStat: function(formatter, mode, ddof) {
+        if (formatter == null) {
+          formatter = usFmt;
+        }
+        if (mode == null) {
+          mode = "var";
+        }
+        if (ddof == null) {
+          ddof = 1;
+        }
+        return function(arg) {
+          var attr;
+          attr = arg[0];
+          return function(data, rowKey, colKey) {
+            return {
+              n: 0.0,
+              m: 0.0,
+              s: 0.0,
+              push: function(record) {
+                var m_new, x;
+                x = parseFloat(record[attr]);
+                if (isNaN(x)) {
+                  return;
+                }
+                this.n += 1.0;
+                if (this.n === 1.0) {
+                  return this.m = x;
+                } else {
+                  m_new = this.m + (x - this.m) / this.n;
+                  this.s = this.s + (x - this.m) * (x - m_new);
+                  return this.m = m_new;
+                }
+              },
+              value: function() {
+                if (this.n <= ddof) {
+                  return 0;
+                }
+                switch (mode) {
+                  case "var":
+                    return this.s / (this.n - ddof);
+                  case "stdev":
+                    return Math.sqrt(this.s / (this.n - ddof));
+                }
+              },
+              format: formatter,
+              numInputs: attr != null ? 0 : 1
+            };
+          };
+        };
+      },
       sumOverSum: function(formatter) {
         if (formatter == null) {
           formatter = usFmt;
@@ -403,6 +485,9 @@
         "Sum": tpl.sum(usFmt),
         "Integer Sum": tpl.sum(usFmtInt),
         "Average": tpl.average(usFmt),
+        "Median": tpl.quantile(usFmt, 0.5),
+        "Sample Variance": tpl.runningStat(usFmt, 'var'),
+        "Sample Standard Deviation": tpl.runningStat(usFmt, 'stdev'),
         "Minimum": tpl.min(usFmt),
         "Maximum": tpl.max(usFmt),
         "First": tpl.first(usFmt),
@@ -1503,7 +1588,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, q, ref4, ref5, s, subopts, unusedAttrsContainer, vals;
+            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, s, subopts, t, unusedAttrsContainer, vals;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1533,12 +1618,12 @@
             });
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
-              for (x = q = 0, ref5 = numInputsToProcess; 0 <= ref5 ? q < ref5 : q > ref5; x = 0 <= ref5 ? ++q : --q) {
+              for (x = s = 0, ref5 = numInputsToProcess; 0 <= ref5 ? s < ref5 : s > ref5; x = 0 <= ref5 ? ++s : --s) {
                 newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
-                for (s = 0, len4 = shownAttributes.length; s < len4; s++) {
-                  attr = shownAttributes[s];
+                for (t = 0, len4 = shownAttributes.length; t < len4; t++) {
+                  attr = shownAttributes[t];
                   newDropdown.append($("<option>").val(attr).text(attr));
                 }
                 pvtVals.append(newDropdown);

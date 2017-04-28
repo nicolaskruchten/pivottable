@@ -117,6 +117,39 @@ callWithJQuery ($) ->
             format: formatter
             numInputs: if attr? then 0 else 1
 
+        quantile: (formatter=usFmt, q) -> ([attr]) -> (data, rowKey, colKey) ->
+            vals: []
+            push: (record) ->
+                x = parseFloat(record[attr])
+                @vals.push(x) if not isNaN(x)
+            value: ->
+                return null if @vals.length == 0
+                @vals.sort()
+                i = (@vals.length-1)*q
+                return (@vals[Math.floor(i)] + @vals[Math.ceil(i)])/2.0
+            format: formatter
+            numInputs: if attr? then 0 else 1
+
+        runningStat: (formatter=usFmt, mode="var", ddof=1) -> ([attr]) -> (data, rowKey, colKey) ->
+            n: 0.0, m: 0.0, s: 0.0
+            push: (record) ->
+                x = parseFloat(record[attr])
+                return if isNaN(x)
+                @n += 1.0
+                if @n == 1.0
+                    @m = x
+                else
+                    m_new = @m + (x - @m)/@n
+                    @s = @s + (x - @m)*(x - m_new)
+                    @m = m_new
+            value: ->
+                return 0 if @n <= ddof
+                switch mode
+                    when "var"   then @s/(@n-ddof)
+                    when "stdev" then Math.sqrt(@s/(@n-ddof))
+            format: formatter
+            numInputs: if attr? then 0 else 1
+
         sumOverSum: (formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
             sumNum: 0
             sumDenom: 0
@@ -157,6 +190,9 @@ callWithJQuery ($) ->
         "Sum":                  tpl.sum(usFmt)
         "Integer Sum":          tpl.sum(usFmtInt)
         "Average":              tpl.average(usFmt)
+        "Median":               tpl.quantile(usFmt, 0.5)
+        "Sample Variance":      tpl.runningStat(usFmt, 'var')
+        "Sample Standard Deviation": tpl.runningStat(usFmt, 'stdev')
         "Minimum":              tpl.min(usFmt)
         "Maximum":              tpl.max(usFmt)
         "First":                tpl.first(usFmt)
