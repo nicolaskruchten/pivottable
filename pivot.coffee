@@ -47,18 +47,11 @@ callWithJQuery ($) ->
             value: -> @count
             format: formatter
 
-        countUnique: (formatter=usFmtInt) -> ([attr]) -> (data, rowKey, colKey) ->
+        uniques: (fn, formatter=usFmtInt) -> ([attr]) -> (data, rowKey, colKey) ->
             uniq: []
             push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
-            value: -> @uniq.length
+            value: -> fn(@uniq)
             format: formatter
-            numInputs: if attr? then 0 else 1
-
-        listUnique: (sep) -> ([attr]) -> (data, rowKey, colKey)  ->
-            uniq: []
-            push: (record) -> @uniq.push(record[attr]) if record[attr] not in @uniq
-            value: -> @uniq.join sep
-            format: (x) -> x
             numInputs: if attr? then 0 else 1
 
         sum: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
@@ -68,69 +61,34 @@ callWithJQuery ($) ->
             format: formatter
             numInputs: if attr? then 0 else 1
 
-        min: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
-            val: null
-            push: (record) ->
-                x = parseFloat(record[attr])
-                if not isNaN x then @val = Math.min(x, @val ? x)
-            value: -> @val
-            format: formatter
-            numInputs: if attr? then 0 else 1
-
-        max: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
-            val: null
-            push: (record) ->
-                x = parseFloat(record[attr])
-                if not isNaN x then @val = Math.max(x, @val ? x)
-            value: -> @val
-            format: formatter
-            numInputs: if attr? then 0 else 1
-
-        first: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
+        extremes: (mode, formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             val: null
             sorter: getSort(data?.sorters, attr)
             push: (record) ->
                 x = record[attr]
-                @val = x if @sorter(x, @val ? x) <= 0
+                if mode in ["min", "max"]
+                    x = parseFloat(x)
+                    if not isNaN x then @val = Math[mode](x, @val ? x)
+                if mode == "first" then @val = x if @sorter(x, @val ? x) <= 0
+                if mode == "last"  then @val = x if @sorter(x, @val ? x) >= 0
             value: -> @val
             format: (x) -> if isNaN(x) then x else formatter(x)
             numInputs: if attr? then 0 else 1
 
-        last: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
-            val: null
-            sorter: getSort(data?.sorters, attr)
-            push: (record) ->
-                x = record[attr]
-                @val = x if @sorter(x, @val ? x) >= 0
-            value: -> @val
-            format: (x) -> if isNaN(x) then x else formatter(x)
-            numInputs: if attr? then 0 else 1
-
-        average:  (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
-            sum: 0
-            len: 0
-            push: (record) ->
-                if not isNaN parseFloat(record[attr])
-                    @sum += parseFloat(record[attr])
-                    @len++
-            value: -> @sum/@len
-            format: formatter
-            numInputs: if attr? then 0 else 1
-
-        quantile: (formatter=usFmt, q) -> ([attr]) -> (data, rowKey, colKey) ->
+        quantile: (q, formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             vals: []
             push: (record) ->
                 x = parseFloat(record[attr])
                 @vals.push(x) if not isNaN(x)
             value: ->
                 return null if @vals.length == 0
-                @vals.sort()
+                @vals.sort((a,b) -> a-b)
                 i = (@vals.length-1)*q
                 return (@vals[Math.floor(i)] + @vals[Math.ceil(i)])/2.0
             format: formatter
             numInputs: if attr? then 0 else 1
 
-        runningStat: (formatter=usFmt, mode="var", ddof=1) -> ([attr]) -> (data, rowKey, colKey) ->
+        runningStat: (mode="mean", ddof=1, formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             n: 0.0, m: 0.0, s: 0.0
             push: (record) ->
                 x = parseFloat(record[attr])
@@ -143,6 +101,8 @@ callWithJQuery ($) ->
                     @s = @s + (x - @m)*(x - m_new)
                     @m = m_new
             value: ->
+                if mode == "mean"
+                    return if @n == 0 then 0/0 else @m
                 return 0 if @n <= ddof
                 switch mode
                     when "var"   then @s/(@n-ddof)
@@ -182,6 +142,17 @@ callWithJQuery ($) ->
             value: -> @inner.value() / data.getAggregator(@selector...).inner.value()
             numInputs: wrapped(x...)().numInputs
 
+    aggregatorTemplates.countUnique = (f) -> aggregatorTemplates.uniques(((x) -> x.length), f)
+    aggregatorTemplates.listUnique =  (s) -> aggregatorTemplates.uniques(((x) -> x.join(s)), ((x)->x))
+    aggregatorTemplates.max =         (f) -> aggregatorTemplates.extremes('max', f)
+    aggregatorTemplates.min =         (f) -> aggregatorTemplates.extremes('min', f)
+    aggregatorTemplates.first =       (f) -> aggregatorTemplates.extremes('first', f)
+    aggregatorTemplates.last =        (f) -> aggregatorTemplates.extremes('last', f)
+    aggregatorTemplates.median =      (f) -> aggregatorTemplates.quantile(0.5, f)
+    aggregatorTemplates.average =     (f) -> aggregatorTemplates.runningStat("mean", f)
+    aggregatorTemplates.var =         (f) -> aggregatorTemplates.runningStat("var", f)
+    aggregatorTemplates.stdev =       (f) -> aggregatorTemplates.runningStat("stdev", f)
+
     #default aggregators & renderers use US naming and number formatting
     aggregators = do (tpl = aggregatorTemplates) ->
         "Count":                tpl.count(usFmtInt)
@@ -190,9 +161,9 @@ callWithJQuery ($) ->
         "Sum":                  tpl.sum(usFmt)
         "Integer Sum":          tpl.sum(usFmtInt)
         "Average":              tpl.average(usFmt)
-        "Median":               tpl.quantile(usFmt, 0.5)
-        "Sample Variance":      tpl.runningStat(usFmt, 'var')
-        "Sample Standard Deviation": tpl.runningStat(usFmt, 'stdev')
+        "Median":               tpl.median(usFmt)
+        "Sample Variance":      tpl.var(usFmt)
+        "Sample Standard Deviation": tpl.stdev(usFmt)
         "Minimum":              tpl.min(usFmt)
         "Maximum":              tpl.max(usFmt)
         "First":                tpl.first(usFmt)
