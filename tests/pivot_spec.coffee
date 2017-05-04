@@ -375,6 +375,96 @@ describe "$.pivotUtilities", ->
                 expect(val).toBe 4
                 expect(agg.format(val)).toBe "4"
 
+    describe ".aggregatorTemplates", ->
+
+        getVal = (aggregator) ->
+            pd = new $.pivotUtilities.PivotData(fixtureData, {aggregator})
+            return pd.getAggregator([],[]).value()
+        tpl = $.pivotUtilities.aggregatorTemplates
+
+        describe ".count", ->
+            it "works", ->
+                expect getVal(tpl.count()())
+                .toBe 4
+
+        describe ".countUnique", ->
+            it "works", ->
+                expect getVal(tpl.countUnique()(['gender']))
+                .toBe 2
+
+        describe ".listUnique", ->
+            it "works", ->
+                expect getVal(tpl.listUnique()(['gender']))
+                .toBe 'male,female'
+
+        describe ".average", ->
+            it "works", ->
+                expect getVal(tpl.average()(['trials']))
+                .toBe 103
+
+        describe ".sum", ->
+            it "works", ->
+                expect getVal(tpl.sum()(['trials']))
+                .toBe 412
+
+        describe ".min", ->
+            it "works", ->
+                expect getVal(tpl.min()(['trials']))
+                .toBe 95
+
+        describe ".max", ->
+            it "works", ->
+                expect getVal(tpl.max()(['trials']))
+                .toBe 112
+
+        describe ".first", ->
+            it "works", ->
+                expect getVal(tpl.first()(['name']))
+                .toBe 'Carol'
+
+        describe ".last", ->
+            it "works", ->
+                expect getVal(tpl.last()(['name']))
+                .toBe 'Nick'
+
+        describe ".average", ->
+            it "works", ->
+                expect getVal(tpl.average()(['trials']))
+                .toBe 103
+
+        describe ".median", ->
+            it "works", ->
+                expect getVal(tpl.median()(['trials']))
+                .toBe 102.5
+
+        describe ".quantile", ->
+            it "works", ->
+                expect getVal(tpl.quantile(0)(['trials']))
+                .toBe 95
+                expect getVal(tpl.quantile(0.1)(['trials']))
+                .toBe 98.5
+                expect getVal(tpl.quantile(0.25)(['trials']))
+                .toBe 98.5
+                expect getVal(tpl.quantile(1/3)(['trials']))
+                .toBe 102
+                expect getVal(tpl.quantile(1)(['trials']))
+                .toBe 112
+
+        describe ".var", ->
+            it "works", ->
+                expect getVal(tpl.var()(['trials']))
+                .toBe 48.666666666666686
+
+        describe ".stdev", ->
+            it "works", ->
+                expect getVal(tpl.stdev()(['trials']))
+                .toBe 6.976149845485451
+
+        describe ".sumOverSum", ->
+            it "works", ->
+                expect getVal(tpl.sumOverSum()(['successes', 'trials']))
+                .toBe (12+25+30+14)/(95+102+103+112)
+
     describe ".naturalSort()", ->
         naturalSort = $.pivotUtilities.naturalSort
 
@@ -504,8 +594,3 @@ describe "$.pivotUtilities", ->
             it "doesn't bin objects", ->
                 expect binner {x: {a:1}}
                 .toBeNaN()
-
-# todo
-# agg templates
-# date.parse -> date() ?
-# default options for PivotData, including filter

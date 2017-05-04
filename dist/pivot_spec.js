@@ -380,6 +380,96 @@
         });
       });
     });
+    describe(".aggregatorTemplates", function() {
+      var getVal, tpl;
+      getVal = function(aggregator) {
+        var pd;
+        pd = new $.pivotUtilities.PivotData(fixtureData, {
+          aggregator: aggregator
+        });
+        return pd.getAggregator([], []).value();
+      };
+      tpl = $.pivotUtilities.aggregatorTemplates;
+      describe(".count", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.count()())).toBe(4);
+        });
+      });
+      describe(".countUnique", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.countUnique()(['gender']))).toBe(2);
+        });
+      });
+      describe(".listUnique", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.listUnique()(['gender']))).toBe('male,female');
+        });
+      });
+      describe(".average", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.average()(['trials']))).toBe(103);
+        });
+      });
+      describe(".sum", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.sum()(['trials']))).toBe(412);
+        });
+      });
+      describe(".min", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.min()(['trials']))).toBe(95);
+        });
+      });
+      describe(".max", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.max()(['trials']))).toBe(112);
+        });
+      });
+      describe(".first", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.first()(['name']))).toBe('Carol');
+        });
+      });
+      describe(".last", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.last()(['name']))).toBe('Nick');
+        });
+      });
+      describe(".average", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.average()(['trials']))).toBe(103);
+        });
+      });
+      describe(".median", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.median()(['trials']))).toBe(102.5);
+        });
+      });
+      describe(".quantile", function() {
+        return it("works", function() {
+          expect(getVal(tpl.quantile(0)(['trials']))).toBe(95);
+          expect(getVal(tpl.quantile(0.1)(['trials']))).toBe(98.5);
+          expect(getVal(tpl.quantile(0.25)(['trials']))).toBe(98.5);
+          expect(getVal(tpl.quantile(1 / 3)(['trials']))).toBe(102);
+          return expect(getVal(tpl.quantile(1)(['trials']))).toBe(112);
+        });
+      });
+      describe(".var", function() {
+        return it("works", function() {
+          return expect(getVal(tpl["var"]()(['trials']))).toBe(48.666666666666686);
+        });
+      });
+      describe(".stdev", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.stdev()(['trials']))).toBe(6.976149845485451);
+        });
+      });
+      return describe(".sumOverSum", function() {
+        return it("works", function() {
+          return expect(getVal(tpl.sumOverSum()(['successes', 'trials']))).toBe((12 + 25 + 30 + 14) / (95 + 102 + 103 + 112));
+        });
+      });
+    });
     describe(".naturalSort()", function() {
       var naturalSort, sortedArr;
       naturalSort = $.pivotUtilities.naturalSort;

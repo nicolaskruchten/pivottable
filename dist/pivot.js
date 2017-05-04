@@ -86,7 +86,7 @@
           };
         };
       },
-      countUnique: function(formatter) {
+      uniques: function(fn, formatter) {
         if (formatter == null) {
           formatter = usFmtInt;
         }
@@ -103,33 +103,9 @@
                 }
               },
               value: function() {
-                return this.uniq.length;
+                return fn(this.uniq);
               },
               format: formatter,
-              numInputs: attr != null ? 0 : 1
-            };
-          };
-        };
-      },
-      listUnique: function(sep) {
-        return function(arg) {
-          var attr;
-          attr = arg[0];
-          return function(data, rowKey, colKey) {
-            return {
-              uniq: [],
-              push: function(record) {
-                var ref;
-                if (ref = record[attr], indexOf.call(this.uniq, ref) < 0) {
-                  return this.uniq.push(record[attr]);
-                }
-              },
-              value: function() {
-                return this.uniq.join(sep);
-              },
-              format: function(x) {
-                return x;
-              },
               numInputs: attr != null ? 0 : 1
             };
           };
@@ -159,59 +135,7 @@
           };
         };
       },
-      min: function(formatter) {
-        if (formatter == null) {
-          formatter = usFmt;
-        }
-        return function(arg) {
-          var attr;
-          attr = arg[0];
-          return function(data, rowKey, colKey) {
-            return {
-              val: null,
-              push: function(record) {
-                var ref, x;
-                x = parseFloat(record[attr]);
-                if (!isNaN(x)) {
-                  return this.val = Math.min(x, (ref = this.val) != null ? ref : x);
-                }
-              },
-              value: function() {
-                return this.val;
-              },
-              format: formatter,
-              numInputs: attr != null ? 0 : 1
-            };
-          };
-        };
-      },
-      max: function(formatter) {
-        if (formatter == null) {
-          formatter = usFmt;
-        }
-        return function(arg) {
-          var attr;
-          attr = arg[0];
-          return function(data, rowKey, colKey) {
-            return {
-              val: null,
-              push: function(record) {
-                var ref, x;
-                x = parseFloat(record[attr]);
-                if (!isNaN(x)) {
-                  return this.val = Math.max(x, (ref = this.val) != null ? ref : x);
-                }
-              },
-              value: function() {
-                return this.val;
-              },
-              format: formatter,
-              numInputs: attr != null ? 0 : 1
-            };
-          };
-        };
-      },
-      first: function(formatter) {
+      extremes: function(mode, formatter) {
         if (formatter == null) {
           formatter = usFmt;
         }
@@ -223,10 +147,23 @@
               val: null,
               sorter: getSort(data != null ? data.sorters : void 0, attr),
               push: function(record) {
-                var ref, x;
+                var ref, ref1, ref2, x;
                 x = record[attr];
-                if (this.sorter(x, (ref = this.val) != null ? ref : x) <= 0) {
-                  return this.val = x;
+                if (mode === "min" || mode === "max") {
+                  x = parseFloat(x);
+                  if (!isNaN(x)) {
+                    this.val = Math[mode](x, (ref = this.val) != null ? ref : x);
+                  }
+                }
+                if (mode === "first") {
+                  if (this.sorter(x, (ref1 = this.val) != null ? ref1 : x) <= 0) {
+                    this.val = x;
+                  }
+                }
+                if (mode === "last") {
+                  if (this.sorter(x, (ref2 = this.val) != null ? ref2 : x) >= 0) {
+                    return this.val = x;
+                  }
                 }
               },
               value: function() {
@@ -244,7 +181,7 @@
           };
         };
       },
-      last: function(formatter) {
+      quantile: function(q, formatter) {
         if (formatter == null) {
           formatter = usFmt;
         }
@@ -253,31 +190,38 @@
           attr = arg[0];
           return function(data, rowKey, colKey) {
             return {
-              val: null,
-              sorter: getSort(data != null ? data.sorters : void 0, attr),
+              vals: [],
               push: function(record) {
-                var ref, x;
-                x = record[attr];
-                if (this.sorter(x, (ref = this.val) != null ? ref : x) >= 0) {
-                  return this.val = x;
+                var x;
+                x = parseFloat(record[attr]);
+                if (!isNaN(x)) {
+                  return this.vals.push(x);
                 }
               },
               value: function() {
-                return this.val;
-              },
-              format: function(x) {
-                if (isNaN(x)) {
-                  return x;
-                } else {
-                  return formatter(x);
+                var i;
+                if (this.vals.length === 0) {
+                  return null;
                 }
+                this.vals.sort(function(a, b) {
+                  return a - b;
+                });
+                i = (this.vals.length - 1) * q;
+                return (this.vals[Math.floor(i)] + this.vals[Math.ceil(i)]) / 2.0;
               },
+              format: formatter,
               numInputs: attr != null ? 0 : 1
             };
           };
         };
       },
-      average: function(formatter) {
+      runningStat: function(mode, ddof, formatter) {
+        if (mode == null) {
+          mode = "mean";
+        }
+        if (ddof == null) {
+          ddof = 1;
+        }
         if (formatter == null) {
           formatter = usFmt;
         }
@@ -286,16 +230,41 @@
           attr = arg[0];
           return function(data, rowKey, colKey) {
             return {
-              sum: 0,
-              len: 0,
+              n: 0.0,
+              m: 0.0,
+              s: 0.0,
               push: function(record) {
-                if (!isNaN(parseFloat(record[attr]))) {
-                  this.sum += parseFloat(record[attr]);
-                  return this.len++;
+                var m_new, x;
+                x = parseFloat(record[attr]);
+                if (isNaN(x)) {
+                  return;
+                }
+                this.n += 1.0;
+                if (this.n === 1.0) {
+                  return this.m = x;
+                } else {
+                  m_new = this.m + (x - this.m) / this.n;
+                  this.s = this.s + (x - this.m) * (x - m_new);
+                  return this.m = m_new;
                 }
               },
               value: function() {
-                return this.sum / this.len;
+                if (mode === "mean") {
+                  if (this.n === 0) {
+                    return 0 / 0;
+                  } else {
+                    return this.m;
+                  }
+                }
+                if (this.n <= ddof) {
+                  return 0;
+                }
+                switch (mode) {
+                  case "var":
+                    return this.s / (this.n - ddof);
+                  case "stdev":
+                    return Math.sqrt(this.s / (this.n - ddof));
+                }
               },
               format: formatter,
               numInputs: attr != null ? 0 : 1
@@ -395,6 +364,42 @@
         };
       }
     };
+    aggregatorTemplates.countUnique = function(f) {
+      return aggregatorTemplates.uniques((function(x) {
+        return x.length;
+      }), f);
+    };
+    aggregatorTemplates.listUnique = function(s) {
+      return aggregatorTemplates.uniques((function(x) {
+        return x.join(s);
+      }), (function(x) {
+        return x;
+      }));
+    };
+    aggregatorTemplates.max = function(f) {
+      return aggregatorTemplates.extremes('max', f);
+    };
+    aggregatorTemplates.min = function(f) {
+      return aggregatorTemplates.extremes('min', f);
+    };
+    aggregatorTemplates.first = function(f) {
+      return aggregatorTemplates.extremes('first', f);
+    };
+    aggregatorTemplates.last = function(f) {
+      return aggregatorTemplates.extremes('last', f);
+    };
+    aggregatorTemplates.median = function(f) {
+      return aggregatorTemplates.quantile(0.5, f);
+    };
+    aggregatorTemplates.average = function(f) {
+      return aggregatorTemplates.runningStat("mean", f);
+    };
+    aggregatorTemplates["var"] = function(f) {
+      return aggregatorTemplates.runningStat("var", f);
+    };
+    aggregatorTemplates.stdev = function(f) {
+      return aggregatorTemplates.runningStat("stdev", f);
+    };
     aggregators = (function(tpl) {
       return {
         "Count": tpl.count(usFmtInt),
@@ -403,6 +408,9 @@
         "Sum": tpl.sum(usFmt),
         "Integer Sum": tpl.sum(usFmtInt),
         "Average": tpl.average(usFmt),
+        "Median": tpl.median(usFmt),
+        "Sample Variance": tpl["var"](usFmt),
+        "Sample Standard Deviation": tpl.stdev(usFmt),
         "Minimum": tpl.min(usFmt),
         "Maximum": tpl.max(usFmt),
         "First": tpl.first(usFmt),
@@ -1181,7 +1189,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, colOrderArrow, defaults, e, existingOpts, fn, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1296,7 +1304,7 @@
         } else {
           unused.addClass('pvtHorizList');
         }
-        fn = function(attr) {
+        fn1 = function(attr) {
           var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, n, placeholder, ref1, sorter, triangleLink, v, value, valueCount, valueList, values;
           values = (function() {
             var results;
@@ -1430,7 +1438,7 @@
         for (i in shownAttributes) {
           if (!hasProp.call(shownAttributes, i)) continue;
           attr = shownAttributes[i];
-          fn(attr);
+          fn1(attr);
         }
         tr1 = $("<tr>").appendTo(uiTable);
         aggregator = $("<select>").addClass('pvtAggregator').bind("change", function() {
@@ -1503,7 +1511,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, q, ref4, ref5, s, subopts, unusedAttrsContainer, vals;
+            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, subopts, t, u, unusedAttrsContainer, vals;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1533,12 +1541,12 @@
             });
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
-              for (x = q = 0, ref5 = numInputsToProcess; 0 <= ref5 ? q < ref5 : q > ref5; x = 0 <= ref5 ? ++q : --q) {
+              for (x = t = 0, ref5 = numInputsToProcess; 0 <= ref5 ? t < ref5 : t > ref5; x = 0 <= ref5 ? ++t : --t) {
                 newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
-                for (s = 0, len4 = shownAttributes.length; s < len4; s++) {
-                  attr = shownAttributes[s];
+                for (u = 0, len4 = shownAttributes.length; u < len4; u++) {
+                  attr = shownAttributes[u];
                   newDropdown.append($("<option>").val(attr).text(attr));
                 }
                 pvtVals.append(newDropdown);
