@@ -149,9 +149,9 @@ callWithJQuery ($) ->
     aggregatorTemplates.first =       (f) -> aggregatorTemplates.extremes('first', f)
     aggregatorTemplates.last =        (f) -> aggregatorTemplates.extremes('last', f)
     aggregatorTemplates.median =      (f) -> aggregatorTemplates.quantile(0.5, f)
-    aggregatorTemplates.average =     (f) -> aggregatorTemplates.runningStat("mean", f)
-    aggregatorTemplates.var =         (f) -> aggregatorTemplates.runningStat("var", f)
-    aggregatorTemplates.stdev =       (f) -> aggregatorTemplates.runningStat("stdev", f)
+    aggregatorTemplates.average =     (f) -> aggregatorTemplates.runningStat("mean", 1, f)
+    aggregatorTemplates.var =         (ddof, f) -> aggregatorTemplates.runningStat("var", ddof, f)
+    aggregatorTemplates.stdev =       (ddof, f) -> aggregatorTemplates.runningStat("stdev", ddof, f)
 
     #default aggregators & renderers use US naming and number formatting
     aggregators = do (tpl = aggregatorTemplates) ->
@@ -162,8 +162,8 @@ callWithJQuery ($) ->
         "Integer Sum":          tpl.sum(usFmtInt)
         "Average":              tpl.average(usFmt)
         "Median":               tpl.median(usFmt)
-        "Sample Variance":      tpl.var(usFmt)
-        "Sample Standard Deviation": tpl.stdev(usFmt)
+        "Sample Variance":      tpl.var(1, usFmt)
+        "Sample Standard Deviation": tpl.stdev(1, usFmt)
         "Minimum":              tpl.min(usFmt)
         "Maximum":              tpl.max(usFmt)
         "First":                tpl.first(usFmt)

@@ -392,13 +392,13 @@
       return aggregatorTemplates.quantile(0.5, f);
     };
     aggregatorTemplates.average = function(f) {
-      return aggregatorTemplates.runningStat("mean", f);
+      return aggregatorTemplates.runningStat("mean", 1, f);
     };
-    aggregatorTemplates["var"] = function(f) {
-      return aggregatorTemplates.runningStat("var", f);
+    aggregatorTemplates["var"] = function(ddof, f) {
+      return aggregatorTemplates.runningStat("var", ddof, f);
     };
-    aggregatorTemplates.stdev = function(f) {
-      return aggregatorTemplates.runningStat("stdev", f);
+    aggregatorTemplates.stdev = function(ddof, f) {
+      return aggregatorTemplates.runningStat("stdev", ddof, f);
     };
     aggregators = (function(tpl) {
       return {
@@ -409,8 +409,8 @@
         "Integer Sum": tpl.sum(usFmtInt),
         "Average": tpl.average(usFmt),
         "Median": tpl.median(usFmt),
-        "Sample Variance": tpl["var"](usFmt),
-        "Sample Standard Deviation": tpl.stdev(usFmt),
+        "Sample Variance": tpl["var"](1, usFmt),
+        "Sample Standard Deviation": tpl.stdev(1, usFmt),
         "Minimum": tpl.min(usFmt),
         "Maximum": tpl.max(usFmt),
         "First": tpl.first(usFmt),
