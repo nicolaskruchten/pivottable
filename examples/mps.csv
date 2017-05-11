@@ -26,23 +26,23 @@ Name,Party,Province,Age,Gender
 "Murray, Joyce",Liberal,British Columbia,58,Female
 "Findlay, Kerry-Lynne D.",Conservative,British Columbia,57,Female
 "Brown, Lois",Conservative,Ontario,57,Female
-"Laverdière, Hélène",NDP,Quebec,57,Female
+"Laverdi√®re, H√©l√®ne",NDP,Quebec,57,Female
 "Boutin-Sweet, Marjolaine",NDP,Quebec,57,Female
 "Crockatt, Joan",Conservative,Alberta,56,Female
 "Chow, Olivia",NDP,Ontario,55,Female
 "McLeod, Cathy",Conservative,British Columbia,55,Female
 "Finley, Diane",Conservative,Ontario,55,Female
-"LeBlanc, Hélène",NDP,Quebec,54,Female
+"LeBlanc, H√©l√®ne",NDP,Quebec,54,Female
 "Grewal, Nina",Conservative,British Columbia,54,Female
 "Hughes, Carol",NDP,Ontario,54,Female
 "Shea, Gail",Conservative,Prince Edward Island,53,Female
 "Truppe, Susan",Conservative,Ontario,53,Female
 "Young, Wai",Conservative,British Columbia,52,Female
 "Gallant, Cheryl",Conservative,Ontario,52,Female
-"Boivin, Françoise",NDP,Quebec,52,Female
+"Boivin, Fran√ßoise",NDP,Quebec,52,Female
 "Block, Kelly",Conservative,Saskatchewan,51,Female
 "Ayala, Paulina",NDP,Quebec,50,Female
-"Groguhé, Sadia",NDP,Quebec,50,Female
+"Groguh√©, Sadia",NDP,Quebec,50,Female
 "Charlton, Chris",NDP,Ontario,49,Female
 "Bergen, Candice",Conservative,Manitoba,48,Female
 "Perreault, Manon",NDP,Quebec,46,Female
@@ -67,11 +67,11 @@ Name,Party,Province,Age,Gender
 "Blanchette-Lamothe, Lysane",NDP,Quebec,28,Female
 "Brosseau, Ruth Ellen",NDP,Quebec,28,Female
 "Latendresse, Alexandrine",NDP,Quebec,28,Female
-"Doré Lefebvre, Rosane",NDP,Quebec,28,Female
+"Dor√© Lefebvre, Rosane",NDP,Quebec,28,Female
 "Morin, Marie-Claude",NDP,Quebec,27,Female
-"Michaud, Élaine",NDP,Quebec,27,Female
-"Péclet, Ève",NDP,Quebec,24,Female
-"Freeman, Mylène",NDP,Quebec,23,Female
+"Michaud, √âlaine",NDP,Quebec,27,Female
+"P√©clet, √àve",NDP,Quebec,24,Female
+"Freeman, Myl√®ne",NDP,Quebec,23,Female
 "Borg, Charmaine",NDP,Quebec,22,Female
 "Bateman, Joyce",Conservative,Manitoba,,Female
 "Hiebert, Russ",Conservative,British Columbia,43,Male
@@ -92,7 +92,7 @@ Name,Party,Province,Age,Gender
 "Atamanenko, Alex",NDP,British Columbia,67,Male
 "Payne, LaVar",Conservative,Alberta,67,Male
 "Breitkreuz, Garry W.",Conservative,Saskatchewan,67,Male
-"Genest, Réjean",NDP,Quebec,66,Male
+"Genest, R√©jean",NDP,Quebec,66,Male
 "MacKenzie, Dave",Conservative,Ontario,66,Male
 "Hyer, Bruce",NDP,Ontario,66,Male
 "MacAulay, Lawrence",Liberal,Prince Edward Island,66,Male
@@ -124,7 +124,7 @@ Name,Party,Province,Age,Gender
 "Obhrai, Deepak",Conservative,Alberta,62,Male
 "Benoit, Leon Earl",Conservative,Alberta,62,Male
 "Leung, Chungsen",Conservative,Ontario,62,Male
-"Morin, Marc-André",NDP,Quebec,61,Male
+"Morin, Marc-Andr√©",NDP,Quebec,61,Male
 "Sopuck, Robert",Conservative,Manitoba,61,Male
 "Ritz, Gerry",Conservative,Saskatchewan,61,Male
 "Garrison, Randall",NDP,British Columbia,61,Male
@@ -159,17 +159,17 @@ Name,Party,Province,Age,Gender
 "Godin, Yvon",NDP,New Brunswick,57,Male
 "Dionne Labelle, Pierre",NDP,Quebec,57,Male
 "Preston, Joe",Conservative,Ontario,57,Male
-"Bélanger, Mauril",Liberal,Ontario,57,Male
+"B√©langer, Mauril",Liberal,Ontario,57,Male
 "Fast, Edward",Conservative,British Columbia,57,Male
 "Tweed, Mervin C.",Conservative,Manitoba,57,Male
-"Dion, Stéphane",Liberal,Quebec,57,Male
+"Dion, St√©phane",Liberal,Quebec,57,Male
 "Van Kesteren, Dave",Conservative,Ontario,57,Male
 "Cuzner, Rodger",Liberal,Nova Scotia,57,Male
 "Martin, Pat",NDP,Manitoba,57,Male
 "Stoffer, Peter",NDP,Nova Scotia,56,Male
 "Miller, Larry",Conservative,Ontario,56,Male
 "Blanchette, Denis",NDP,Quebec,56,Male
-"Nunez-Melo, José",NDP,Quebec,56,Male
+"Nunez-Melo, Jos√©",NDP,Quebec,56,Male
 "Goguen, Robert",Conservative,New Brunswick,55,Male
 "Scarpaleggia, Francis",Liberal,Quebec,55,Male
 "Sweet, David",Conservative,Ontario,55,Male
@@ -180,9 +180,9 @@ Name,Party,Province,Age,Gender
 "Weston, John",Conservative,British Columbia,54,Male
 "Dechert, Bob",Conservative,Ontario,54,Male
 "Shory, Devinder",Conservative,Alberta,54,Male
-"Pilon, François",NDP,Quebec,54,Male
+"Pilon, Fran√ßois",NDP,Quebec,54,Male
 "Hayes, Bryan",Conservative,Ontario,54,Male
-"Giguère, Alain",NDP,Quebec,54,Male
+"Gigu√®re, Alain",NDP,Quebec,54,Male
 "Sorenson, Kevin",Conservative,Alberta,54,Male
 "Benskin, Tyrone",NDP,Quebec,53,Male
 "Menegakis, Costas",Conservative,Ontario,53,Male
@@ -227,7 +227,7 @@ Name,Party,Province,Age,Gender
 "Saxton, Andrew",Conservative,British Columbia,48,Male
 "Weston, Rodney",Conservative,New Brunswick,48,Male
 "Penashue, Peter",Conservative,Newfoundland and Labrador,48,Male
-"Bellavance, André",Bloc Quebecois,Quebec,48,Male
+"Bellavance, Andr√©",Bloc Quebecois,Quebec,48,Male
 "Rathgeber, Brent",Conservative,Alberta,48,Male
 "Kellway, Matthew",NDP,Ontario,48,Male
 "Toone, Philip",NDP,Quebec,47,Male
@@ -243,7 +243,7 @@ Name,Party,Province,Age,Gender
 "Byrne, Gerry",Liberal,Newfoundland and Labrador,46,Male
 "Stewart, Kennedy",NDP,British Columbia,46,Male
 "Cleary, Ryan",NDP,Newfoundland and Labrador,46,Male
-"Côté, Raymond",NDP,Quebec,45,Male
+"C√¥t√©, Raymond",NDP,Quebec,45,Male
 "Clarke, Rob",Conservative,Saskatchewan,45,Male
 "Brison, Scott",Liberal,Nova Scotia,45,Male
 "Butt, Brad",Conservative,Ontario,45,Male
@@ -268,11 +268,11 @@ Name,Party,Province,Age,Gender
 "Rajotte, James",Conservative,Alberta,42,Male
 "Seeback, Kyle",Conservative,Ontario,42,Male
 "Watson, Jeff",Conservative,Ontario,41,Male
-"Lapointe, François",NDP,Quebec,41,Male
+"Lapointe, Fran√ßois",NDP,Quebec,41,Male
 "Nicholls, Jamie",NDP,Quebec,41,Male
 "Chong, Michael D.",Conservative,Ontario,41,Male
 "Trudeau, Justin",Liberal,Quebec,41,Male
-"Larose, Jean-François",NDP,Quebec,40,Male
+"Larose, Jean-Fran√ßois",NDP,Quebec,40,Male
 "Anders, Rob",Conservative,Alberta,40,Male
 "Fletcher, Steven John",Conservative,Manitoba,40,Male
 "Cullen, Nathan",NDP,British Columbia,40,Male
@@ -280,10 +280,10 @@ Name,Party,Province,Age,Gender
 "Bruinooge, Rod",Conservative,Manitoba,39,Male
 "Mai, Hoang",NDP,Quebec,39,Male
 "Boulerice, Alexandre",NDP,Quebec,39,Male
-"Fortin, Jean-François",Bloc Quebecois,Quebec,39,Male
+"Fortin, Jean-Fran√ßois",Bloc Quebecois,Quebec,39,Male
 "Leef, Ryan",Conservative,Territories,38,Male
 "Paradis, Christian",Conservative,Quebec,38,Male
-"Choquette, François",NDP,Quebec,38,Male
+"Choquette, Fran√ßois",NDP,Quebec,38,Male
 "Moore, Rob",Conservative,New Brunswick,38,Male
 "Trost, Brad",Conservative,Saskatchewan,38,Male
 "Gill, Parm",Conservative,Ontario,38,Male
@@ -304,6 +304,6 @@ Name,Party,Province,Age,Gender
 "Harris, Dan",NDP,Ontario,33,Male
 "Tremblay, Jonathan",NDP,Quebec,28,Male
 "Morin, Dany",NDP,Quebec,27,Male
-"Dubé, Matthew",NDP,Quebec,24,Male
+"Dub√©, Matthew",NDP,Quebec,24,Male
 "Dusseault, Pierre-Luc",NDP,Quebec,21,Male
 "O'Toole, Erin",Conservative,Ontario,,Male
