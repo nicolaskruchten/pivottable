@@ -25,7 +25,7 @@ table.pvtTable tbody tr td {
     text-align: right;
 }
 
-.pvtTotal, .pvtGrandTotal { font-weight: bold; }
+.pvtTotal, .pvtGrandTotal { font-weight: bold; white-space:nowrap;}
 
 .pvtVals { text-align: center; white-space: nowrap;}
 .pvtRowOrder, .pvtColOrder {
