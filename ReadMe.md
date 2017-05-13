@@ -17,6 +17,11 @@ PivotTable.js' basic function is to enable data exploration and analysis by turn
 
 The animation above is based on the [Canadian Parliament 2012 dataset example](http://nicolas.kruchten.com/pivottable/examples/fully_loaded.html).
 
+You can show your unused parameters on left instead of top
+![3 columns desing](https://cloud.githubusercontent.com/assets/1175402/18603799/3f0034d4-7c3a-11e6-895f-c4556c181298.png)
+
+By default this layout is used when you have more than 85 characters on your total columns names, you can change this behavior using the parameter unusedAttrsVertical
+
 ## Where are the demos/examples?
 
 There are lots on the [examples page](http://nicolas.kruchten.com/pivottable/examples/index.html) but here are some good entry points:
