@@ -711,30 +711,7 @@ callWithJQuery ($) ->
                 .appendTo(rendererControl)
                 .bind "change", -> refresh() #capture reference
                 
-            #sort renderers if opts.sorting exists
-            rendererClone = $.extend(true, {}, opts.renderers)
-            if opts.sorting
-                # generate array of renderer titles
-                rendererList = []
-                for own r of rendererClone
-                    rendererList.push r
-            
-                if typeof opts.sorting == "function"
-                    # sort based on given function
-                    rendererList.sort(opts.sorting)
-                else
-                    # sort based on alphabetical order
-                    rendererList.sort()
-                    
-                # repopulate rendererClone
-                orderedRenderers = {}
-                
-                for r, i in rendererList
-                    orderedRenderers[r] = rendererClone[r];
-                    
-                rendererClone = orderedRenderers
-                
-            for own x of rendererClone
+            for own x of opts.renderers
                 $("<option>").val(x).html(x).appendTo(renderer)
 
             #axis list, including the double-click menu
@@ -876,31 +853,8 @@ callWithJQuery ($) ->
 
             aggregator = $("<select>").addClass('pvtAggregator')
                 .bind "change", -> refresh() #capture reference
-                
-            #sort aggregators if opts.sorting exists
-            aggregatorClone = $.extend(true, {}, opts.aggregators)
-            if opts.sorting
-                # generate array of aggregator titles
-                aggregatorList = []
-                for own a of aggregatorClone
-                    aggregatorList.push a
             
-                if typeof opts.sorting == "function"
-                    # sort based on given function
-                    aggregatorList.sort(opts.sorting)
-                else
-                    # sort based on alphabetical order
-                    aggregatorList.sort()
-                    
-                # repopulate aggregatorClone
-                orderedAggregators = {}
-                
-                for a, i in aggregatorList
-                    orderedAggregators[a] = aggregatorClone[a];
-                    
-                aggregatorClone = orderedAggregators
-                
-            for own x of aggregatorClone
+            for own x of opts.aggregators
                 aggregator.append $("<option>").val(x).html(x)
 
             ordering =
@@ -994,6 +948,16 @@ callWithJQuery ($) ->
                             .addClass('pvtAttrDropdown')
                             .append($("<option>"))
                             .bind "change", -> refresh()
+                       
+                        #sort attributes if opts.sorting exists
+                        if opts.sorting
+                            if typeof opts.sorting == "function"
+                                # sort based on given function
+                                shownAttributes.sort(opts.sorting)
+                            else
+                                # sort based on alphabetical order
+                                shownAttributes.sort()
+                            
                         for attr in shownAttributes
                             newDropdown.append($("<option>").val(attr).text(attr))
                         pvtVals.append(newDropdown)
