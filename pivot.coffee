@@ -710,9 +710,32 @@ callWithJQuery ($) ->
                 .addClass('pvtRenderer')
                 .appendTo(rendererControl)
                 .bind "change", -> refresh() #capture reference
-            for own x of opts.renderers
+                
+            #sort renderers if opts.sorting exists
+            rendererClone = $.extend(true, {}, opts.renderers)
+            if opts.sorting
+            	# generate array of renderer titles
+            	rendererList = []
+            	for own r of rendererClone
+            		rendererList.push r
+            
+            	if typeof opts.sorting == "function"
+            		# sort based on given function
+            		rendererList.sort(opts.sorting)
+            	else
+            		# sort based on alphabetical order
+            		rendererList.sort()
+            		
+            	# repopulate rendererClone
+            	orderedRenderers = {}
+            	
+            	for r, i in rendererList
+            		orderedRenderers[r] = rendererClone[r];
+            		
+            	rendererClone = orderedRenderers
+                
+            for own x of rendererClone
                 $("<option>").val(x).html(x).appendTo(renderer)
-
 
             #axis list, including the double-click menu
             unused = $("<td>").addClass('pvtAxisContainer pvtUnused')
@@ -853,7 +876,31 @@ callWithJQuery ($) ->
 
             aggregator = $("<select>").addClass('pvtAggregator')
                 .bind "change", -> refresh() #capture reference
-            for own x of opts.aggregators
+                
+            #sort aggregators if opts.sorting exists
+            aggregatorClone = $.extend(true, {}, opts.aggregators)
+            if opts.sorting
+            	# generate array of aggregator titles
+            	aggregatorList = []
+            	for own a of aggregatorClone
+            		aggregatorList.push a
+            
+            	if typeof opts.sorting == "function"
+            		# sort based on given function
+            		aggregatorList.sort(opts.sorting)
+            	else
+            		# sort based on alphabetical order
+            		aggregatorList.sort()
+            		
+            	# repopulate aggregatorClone
+            	orderedAggregators = {}
+            	
+            	for a, i in aggregatorList
+            		orderedAggregators[a] = aggregatorClone[a];
+            		
+            	aggregatorClone = orderedAggregators
+                
+            for own x of aggregatorClone
                 aggregator.append $("<option>").val(x).html(x)
 
             ordering =
