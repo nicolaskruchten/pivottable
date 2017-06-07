@@ -710,7 +710,6 @@ callWithJQuery ($) ->
                 .addClass('pvtRenderer')
                 .appendTo(rendererControl)
                 .bind "change", -> refresh() #capture reference
-                
             for own x of opts.renderers
                 $("<option>").val(x).html(x).appendTo(renderer)
 
@@ -853,7 +852,6 @@ callWithJQuery ($) ->
 
             aggregator = $("<select>").addClass('pvtAggregator')
                 .bind "change", -> refresh() #capture reference
-            
             for own x of opts.aggregators
                 aggregator.append $("<option>").val(x).html(x)
 
