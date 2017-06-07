@@ -713,7 +713,6 @@ callWithJQuery ($) ->
             for own x of opts.renderers
                 $("<option>").val(x).html(x).appendTo(renderer)
 
-
             #axis list, including the double-click menu
             unused = $("<td>").addClass('pvtAxisContainer pvtUnused')
             shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
@@ -947,6 +946,16 @@ callWithJQuery ($) ->
                             .addClass('pvtAttrDropdown')
                             .append($("<option>"))
                             .bind "change", -> refresh()
+                       
+                        #sort attributes if opts.sorting exists
+                        if opts.sorting
+                            if typeof opts.sorting == "function"
+                                # sort based on given function
+                                shownAttributes.sort(opts.sorting)
+                            else
+                                # sort based on alphabetical order
+                                shownAttributes.sort()
+                            
                         for attr in shownAttributes
                             newDropdown.append($("<option>").val(attr).text(attr))
                         pvtVals.append(newDropdown)
