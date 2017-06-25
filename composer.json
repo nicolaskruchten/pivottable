@@ -13,7 +13,7 @@
     "jquery-plugin"
   ],
   "minimum-stability": "stable",
-  "homepage": "http://nicolas.kruchten.com/pivottable/",
+  "homepage": "https://pivottable.js.org/",
   "require": {
       "components/jquery": ">=1.9"
   },

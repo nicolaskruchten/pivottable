@@ -20,7 +20,7 @@
     "pivotchart",
     "jquery"
   ],
-  "homepage": "http://nicolas.kruchten.com/pivottable",
+  "homepage": "https://pivottable.js.org",
   "repository": {
     "type": "git",
     "url": "git://github.com/nicolaskruchten/pivottable.git"
