@@ -43,7 +43,7 @@
     <body>
         <script type="text/javascript">
             $(function(){
-                Papa.parse("/Rdatasets/datasets.csv", {
+                Papa.parse("http://nicolas.kruchten.com/Rdatasets/datasets.csv", {
                     download: true,
                     header: true,
                     skipEmptyLines: true,
@@ -69,7 +69,7 @@
                         $("#csv").bind("change", function(event){
                             $("#output").empty().text("Loading...")
                             var val = $(this).val();
-                            Papa.parse("/Rdatasets/csv/"+val+".csv", {
+                            Papa.parse("http://nicolas.kruchten.com/Rdatasets/csv/"+val+".csv", {
                                 download: true,
                                 skipEmptyLines: true,
                                 complete: function(parsed){
