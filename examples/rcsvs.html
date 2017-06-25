@@ -83,7 +83,7 @@
                                 skipEmptyLines: true,
                                 complete: function(parsed){
                                 $("#doc").empty().append(
-                                    $("<a>",{target:"_blank", href:"/Rdatasets/doc/"+val+".html"}).html("Dataset documentation &raquo;")
+                                    $("<a>",{target:"_blank", href:"http://nicolas.kruchten.com/Rdatasets/doc/"+val+".html"}).html("Dataset documentation &raquo;")
                                     );
                                     $("#output").pivotUI(parsed.data, {
                                         hiddenAttributes: [""],
