@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+            body {font-family: Verdana;}
+        </style>
+
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+    // This example is the most basic usage of pivot()
+
+    $(function(){
+        $("#output").pivot(
+            [
+                {color: "blue", shape: "circle"},
+                {color: "red", shape: "triangle"}
+            ],
+            {
+                rows: ["color"],
+                cols: ["shape"],
+                rendererOptions: {
+                    headCellRenderer: $.pivotUtilities.cellRenderers.byType({
+                        color: function(value) {
+                            var img = document.createElement("img");
+                            img.setAttribute("src", value + ".png");
+                            return img;
+                        }
+                    })
+                }
+            }
+        );
+     });
+        </script>
+
+        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
+
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>

@@ -248,7 +248,6 @@ describe "$.pivot()", ->
                 expect(val).toBe 8
                 expect(agg.format(val)).toBe "formatted 8"
 
-
     describe "with ragged input",  ->
         table = $("<div>").pivot raggedFixtureData, rows: ["gender"], cols: ["age"]
 
@@ -261,6 +260,27 @@ describe "$.pivot()", ->
                 "male",    "1",                   "1"
                 "null",    "1",    "1",           "2"
                 "Totals",  "2",    "1",   "1",    "4"
+                ].join("")
+
+    describe "with rows/cols, default count aggregator, default TableRenderer, custom CellRederers",  ->
+        table = $("<div>").pivot fixtureData,
+            rows: ["gender"], cols: ["colour"],
+            rendererOptions:
+                headCellRenderer: (value, type) ->
+                    console.log arguments
+                    return document.createTextNode('h_' + type + '_' + value)
+                dataCellRenderer: (value) ->
+                    console.log arguments
+                    return document.createTextNode('d_' + value)
+
+        it "renders a table with the correct textual representation", ->
+            expect table.find("table.pvtTable").text()
+            .toBe [
+                "colour",           "h_colour_blue",    "h_colour_red", "h_colour_yellow",  "Totals"
+                "gender",
+                "h_gender_female",  "d_",               "d_1",          "d_1",              "2"
+                "h_gender_male",    "d_2",              "d_",           "d_",               "2",
+                "Totals",           "2",                "1",            "1",                "4"
                 ].join("")
 
 describe "$.pivotUtilities", ->

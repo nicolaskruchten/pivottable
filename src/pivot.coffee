@@ -183,6 +183,11 @@ callWithJQuery ($) ->
         "Row Heatmap":    (data, opts) -> $(pivotTableRenderer(data, opts)).heatmap("rowheatmap", opts)
         "Col Heatmap":    (data, opts) -> $(pivotTableRenderer(data, opts)).heatmap("colheatmap", opts)
 
+    
+    cellRenderers =
+        text: (value) -> document.createTextNode(value)
+        byType: (opts, def) -> (value, type) -> (opts[type] || def || cellRenderers.text).apply(this, arguments)
+
     locales =
         en:
             aggregators: aggregators
@@ -434,19 +439,21 @@ callWithJQuery ($) ->
             return agg ? {value: (-> null), format: -> ""}
 
     #expose these to the outside world
-    $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
+    $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, cellRenderers, derivers, locales,
         naturalSort, numberFormat, sortAs, PivotData}
+
 
     ###
     Default Renderer for hierarchical table layout
     ###
-
     pivotTableRenderer = (pivotData, opts) ->
 
         defaults =
             table: clickCallback: null
             localeStrings: totals: "Totals"
-
+            headCellRenderer: cellRenderers.text
+            dataCellRenderer: cellRenderers.text
+            
         opts = $.extend(true, {}, defaults, opts)
 
         colAttrs = pivotData.colAttrs
@@ -501,7 +508,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtColLabel"
-                    th.textContent = colKey[j]
+                    th.appendChild opts.headCellRenderer(colKey[j], c)
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
@@ -539,7 +546,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtRowLabel"
-                    th.textContent = txt
+                    th.appendChild opts.headCellRenderer(txt, rowAttrs[j])
                     th.setAttribute("rowspan", x)
                     if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
                         th.setAttribute("colspan",2)
@@ -549,7 +556,7 @@ callWithJQuery ($) ->
                 val = aggregator.value()
                 td = document.createElement("td")
                 td.className = "pvtVal row#{i} col#{j}"
-                td.textContent = aggregator.format(val)
+                td.appendChild opts.dataCellRenderer(aggregator.format(val), rowKey, colKey)
                 td.setAttribute("data-value", val)
                 if getClickHandler?
                     td.onclick = getClickHandler(val, rowKey, colKey)

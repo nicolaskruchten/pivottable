@@ -20,7 +20,7 @@
     /*
     Utilities
      */
-    var PivotData, addSeparators, aggregatorTemplates, aggregators, dayNamesEn, derivers, getSort, locales, mthNamesEn, naturalSort, numberFormat, pivotTableRenderer, rd, renderers, rx, rz, sortAs, usFmt, usFmtInt, usFmtPct, zeroPad;
+    var PivotData, addSeparators, aggregatorTemplates, aggregators, cellRenderers, dayNamesEn, derivers, getSort, locales, mthNamesEn, naturalSort, numberFormat, pivotTableRenderer, rd, renderers, rx, rz, sortAs, usFmt, usFmtInt, usFmtPct, zeroPad;
     addSeparators = function(nStr, thousandsSep, decimalSep) {
       var rgx, x, x1, x2;
       nStr += '';
@@ -437,6 +437,16 @@
       },
       "Col Heatmap": function(data, opts) {
         return $(pivotTableRenderer(data, opts)).heatmap("colheatmap", opts);
+      }
+    };
+    cellRenderers = {
+      text: function(value) {
+        return document.createTextNode(value);
+      },
+      byType: function(opts, def) {
+        return function(value, type) {
+          return (opts[type] || def || cellRenderers.text).apply(this, arguments);
+        };
       }
     };
     locales = {
@@ -898,6 +908,7 @@
       aggregatorTemplates: aggregatorTemplates,
       aggregators: aggregators,
       renderers: renderers,
+      cellRenderers: cellRenderers,
       derivers: derivers,
       locales: locales,
       naturalSort: naturalSort,
@@ -917,7 +928,9 @@
         },
         localeStrings: {
           totals: "Totals"
-        }
+        },
+        headCellRenderer: cellRenderers.text,
+        dataCellRenderer: cellRenderers.text
       };
       opts = $.extend(true, {}, defaults, opts);
       colAttrs = pivotData.colAttrs;
@@ -999,7 +1012,7 @@
           if (x !== -1) {
             th = document.createElement("th");
             th.className = "pvtColLabel";
-            th.textContent = colKey[j];
+            th.appendChild(opts.headCellRenderer(colKey[j], c));
             th.setAttribute("colspan", x);
             if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
               th.setAttribute("rowspan", 2);
@@ -1047,7 +1060,7 @@
           if (x !== -1) {
             th = document.createElement("th");
             th.className = "pvtRowLabel";
-            th.textContent = txt;
+            th.appendChild(opts.headCellRenderer(txt, rowAttrs[j]));
             th.setAttribute("rowspan", x);
             if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
               th.setAttribute("colspan", 2);
@@ -1062,7 +1075,7 @@
           val = aggregator.value();
           td = document.createElement("td");
           td.className = "pvtVal row" + i + " col" + j;
-          td.textContent = aggregator.format(val);
+          td.appendChild(opts.dataCellRenderer(aggregator.format(val), rowKey, colKey));
           td.setAttribute("data-value", val);
           if (getClickHandler != null) {
             td.onclick = getClickHandler(val, rowKey, colKey);
@@ -1160,15 +1173,15 @@
         pivotData = new opts.dataClass(input, opts);
         try {
           result = opts.renderer(pivotData, opts.rendererOptions);
-        } catch (_error) {
-          e = _error;
+        } catch (error) {
+          e = error;
           if (typeof console !== "undefined" && console !== null) {
             console.error(e.stack);
           }
           result = $("<span>").html(opts.localeStrings.renderError);
         }
-      } catch (_error) {
-        e = _error;
+      } catch (error) {
+        e = error;
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }
@@ -1641,8 +1654,8 @@
           items: 'li',
           placeholder: 'pvtPlaceholder'
         });
-      } catch (_error) {
-        e = _error;
+      } catch (error) {
+        e = error;
         if (typeof console !== "undefined" && console !== null) {
           console.error(e.stack);
         }
