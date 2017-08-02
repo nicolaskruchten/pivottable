@@ -127,7 +127,11 @@
             for (m = 0, len4 = colKeys.length; m < len4; m++) {
               colKey = colKeys[m];
               val = parseFloat(pivotData.getAggregator(rowKey, colKey).value());
-              row.push(isFinite(val) ? val : null);
+              if (isFinite(val)) {
+                row.push(val);
+              } else {
+                row.push(null);
+              }
             }
             columns.push(row);
           }
@@ -213,8 +217,8 @@
         } else {
           params.axis.x.type = 'category';
           if ((base6 = params.axis.y.tick).format == null) {
-            base6.format = function(x) {
-              return formatter(x, true);
+            base6.format = function(v) {
+              return formatter(v);
             };
           }
           params.tooltip.format = {
