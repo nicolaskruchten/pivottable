@@ -90,7 +90,7 @@ gulp.task('major', function() {
 gulp.task('serve', serve('.'));
 
 gulp.task('watch', function() {
-  gulp.watch(['./*.coffee', './locales/*.coffee', './tests/*.coffee'], ['makeJs']);
+  gulp.watch(['./src/*.coffee', './locales/*.coffee', './tests/*.coffee'], ['makeJs']);
   gulp.watch('./dist/pivot.css', ['makeCss']);
 });
 
