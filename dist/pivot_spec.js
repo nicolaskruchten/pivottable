@@ -542,24 +542,13 @@
         });
         return expect(nf(1234567.89123456)).toEqual("a1,234,567.89b");
       });
-      it("scales and rounds", function() {
+      return it("scales and rounds", function() {
         var nf;
         nf = numberFormat({
           digitsAfterDecimal: 3,
           scaler: 1000
         });
         return expect(nf(1234567.89123456)).toEqual("1,234,567,891.235");
-      });
-      return it("shows and hides zero", function() {
-        var nf;
-        nf = numberFormat({
-          showZero: true
-        });
-        expect(nf(0)).toEqual("0.00");
-        nf = numberFormat({
-          showZero: false
-        });
-        return expect(nf(0)).toEqual("");
       });
     });
     return describe(".derivers", function() {

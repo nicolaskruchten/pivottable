@@ -55,7 +55,7 @@ callWithJQuery ($, c3) ->
                         scatterData.t[series] ?= []
                         scatterData.y[series].push vals[0] ? 0
                         scatterData.x[series].push vals[1] ? 0
-                        scatterData.t[series].push agg.format(agg.value())
+                        scatterData.t[series].push agg.value()
         else
             numCharsInHAxis = 0
             for x in headers
@@ -70,12 +70,9 @@ callWithJQuery ($, c3) ->
                 for colKey in colKeys
                     val = parseFloat  pivotData.getAggregator(rowKey, colKey).value()
                     if isFinite(val)
-                        if val < 1
-                            row.push val.toPrecision(3)
-                        else
-                            row.push val.toFixed(3)
+                        row.push(val)
                     else
-                        row.push null
+                        row.push(null)
                 columns.push row
 
             vAxisTitle = fullAggName
@@ -93,11 +90,14 @@ callWithJQuery ($, c3) ->
         title = $("<p>", {style: "text-align: center; font-weight: bold"})
         title.text(titleText)
 
+        formatter = pivotData.getAggregator([], []).format
+
         params =
             axis:
                 rotated: chartOpts.horizontal
                 y:
                     label: vAxisTitle
+                    tick: {}
                 x:
                     label: hAxisTitle
                     tick:
@@ -117,7 +117,6 @@ callWithJQuery ($, c3) ->
 
 
         params = $.extend(true, {}, params, opts.c3)
-
         if chartOpts.type == "scatter"
             xs = {}
             numSeries = 0
@@ -135,9 +134,11 @@ callWithJQuery ($, c3) ->
             params.tooltip.format =
                 title: -> fullAggName
                 name: -> ""
-                value: (a,b,c,d) -> scatterData.t[c][d]
+                value: (a,b,c,d) -> formatter(scatterData.t[c][d])
         else
             params.axis.x.type= 'category'
+            params.axis.y.tick.format ?= (v) -> formatter(v)
+            params.tooltip.format = value: (v) -> formatter(v)
 
             if chartOpts.horizontal
                 categories = (c.shift() for c in columns)

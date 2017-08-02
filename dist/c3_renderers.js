@@ -18,7 +18,7 @@
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, attrs, base, base1, base2, base3, base4, base5, c, categories, colKey, colKeys, columns, dataColumns, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs;
+        var agg, attrs, base, base1, base2, base3, base4, base5, base6, c, categories, colKey, colKeys, columns, dataColumns, defaults, formatter, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -106,7 +106,7 @@
                 }
                 scatterData.y[series].push((ref2 = vals[0]) != null ? ref2 : 0);
                 scatterData.x[series].push((ref3 = vals[1]) != null ? ref3 : 0);
-                scatterData.t[series].push(agg.format(agg.value()));
+                scatterData.t[series].push(agg.value());
               }
             }
           }
@@ -128,11 +128,7 @@
               colKey = colKeys[m];
               val = parseFloat(pivotData.getAggregator(rowKey, colKey).value());
               if (isFinite(val)) {
-                if (val < 1) {
-                  row.push(val.toPrecision(3));
-                } else {
-                  row.push(val.toFixed(3));
-                }
+                row.push(val);
               } else {
                 row.push(null);
               }
@@ -159,11 +155,13 @@
           style: "text-align: center; font-weight: bold"
         });
         title.text(titleText);
+        formatter = pivotData.getAggregator([], []).format;
         params = {
           axis: {
             rotated: chartOpts.horizontal,
             y: {
-              label: vAxisTitle
+              label: vAxisTitle,
+              tick: {}
             },
             x: {
               label: hAxisTitle,
@@ -213,11 +211,21 @@
               return "";
             },
             value: function(a, b, c, d) {
-              return scatterData.t[c][d];
+              return formatter(scatterData.t[c][d]);
             }
           };
         } else {
           params.axis.x.type = 'category';
+          if ((base6 = params.axis.y.tick).format == null) {
+            base6.format = function(v) {
+              return formatter(v);
+            };
+          }
+          params.tooltip.format = {
+            value: function(v) {
+              return formatter(v);
+            }
+          };
           if (chartOpts.horizontal) {
             categories = (function() {
               var len5, n, results;
