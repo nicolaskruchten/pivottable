@@ -542,15 +542,6 @@ describe "$.pivotUtilities", ->
             expect nf 1234567.89123456
             .toEqual "1,234,567,891.235"
 
-        it "shows and hides zero", ->
-            nf = numberFormat(showZero: true)
-            expect nf 0
-            .toEqual "0.00"
-
-            nf = numberFormat(showZero: false)
-            expect nf 0
-            .toEqual ""
-
     describe ".derivers", ->
         describe ".dateFormat()", ->
             df = $.pivotUtilities.derivers.dateFormat "x", "abc % %% %%% %a %y %m %n %d %w %x %H %M %S", true

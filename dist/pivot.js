@@ -41,16 +41,12 @@
         thousandsSep: ",",
         decimalSep: ".",
         prefix: "",
-        suffix: "",
-        showZero: false
+        suffix: ""
       };
       opts = $.extend({}, defaults, opts);
       return function(x) {
         var result;
         if (isNaN(x) || !isFinite(x)) {
-          return "";
-        }
-        if (x === 0 && !opts.showZero) {
           return "";
         }
         result = addSeparators((opts.scaler * x).toFixed(opts.digitsAfterDecimal), opts.thousandsSep, opts.decimalSep);
