@@ -451,6 +451,7 @@ callWithJQuery ($) ->
         defaults =
             table: clickCallback: null
             localeStrings: totals: "Totals"
+            typeCellRenderer: cellRenderers.text
             headCellRenderer: cellRenderers.text
             dataCellRenderer: cellRenderers.text
             
@@ -501,7 +502,7 @@ callWithJQuery ($) ->
                 tr.appendChild th
             th = document.createElement("th")
             th.className = "pvtAxisLabel"
-            th.textContent = c
+            th.appendChild opts.typeCellRenderer(c)
             tr.appendChild th
             for own i, colKey of colKeys
                 x = spanSize(colKeys, parseInt(i), parseInt(j))
@@ -527,7 +528,7 @@ callWithJQuery ($) ->
             for own i, r of rowAttrs
                 th = document.createElement("th")
                 th.className = "pvtAxisLabel"
-                th.textContent = r
+                th.appendChild opts.typeCellRenderer(r)
                 tr.appendChild th
             th = document.createElement("th")
             if colAttrs.length ==0
