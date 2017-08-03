@@ -929,6 +929,7 @@
         localeStrings: {
           totals: "Totals"
         },
+        typeCellRenderer: cellRenderers.text,
         headCellRenderer: cellRenderers.text,
         dataCellRenderer: cellRenderers.text
       };
@@ -1003,7 +1004,7 @@
         }
         th = document.createElement("th");
         th.className = "pvtAxisLabel";
-        th.textContent = c;
+        th.appendChild(opts.typeCellRenderer(c));
         tr.appendChild(th);
         for (i in colKeys) {
           if (!hasProp.call(colKeys, i)) continue;
@@ -1036,7 +1037,7 @@
           r = rowAttrs[i];
           th = document.createElement("th");
           th.className = "pvtAxisLabel";
-          th.textContent = r;
+          th.appendChild(opts.typeCellRenderer(r));
           tr.appendChild(th);
         }
         th = document.createElement("th");

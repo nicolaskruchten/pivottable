@@ -442,10 +442,10 @@ callWithJQuery ($) ->
     $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, cellRenderers, derivers, locales,
         naturalSort, numberFormat, sortAs, PivotData}
 
-
     ###
     Default Renderer for hierarchical table layout
     ###
+
     pivotTableRenderer = (pivotData, opts) ->
 
         defaults =
