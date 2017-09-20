@@ -1077,7 +1077,7 @@ callWithJQuery ($) ->
     Barchart post-processing
     ###
 
-    $.fn.barchart =  ->
+    $.fn.barchart = (opts) ->
         numRows = @data "numrows"
         numCols = @data "numcols"
 
@@ -1090,19 +1090,33 @@ callWithJQuery ($) ->
             values = []
             forEachCell (x) -> values.push x
             max = Math.max(values...)
-            scaler = (x) -> 100*x/(1.4*max)
+            if max < 0
+                max = 0
+            range = max;
+            min = Math.min(values...)
+            if min < 0
+                range = max - min
+            scaler = (x) -> 100*x/(1.4*range)
             forEachCell (x, elem) ->
                 text = elem.text()
                 wrapper = $("<div>").css
                     "position": "relative"
                     "height": "55px"
+                bgColor = "gray"
+                bBase = 0
+                if min < 0
+                    bBase = scaler(-min)
+                if x < 0
+                    bBase += scaler(x)
+                    bgColor = "darkred"
+                    x = -x
                 wrapper.append $("<div>").css
                     "position": "absolute"
-                    "bottom": 0
+                    "bottom": bBase + "%"
                     "left": 0
                     "right": 0
                     "height": scaler(x) + "%"
-                    "background-color": "gray"
+                    "background-color": bgColor
                 wrapper.append $("<div>").text(text).css
                     "position":"relative"
                     "padding-left":"5px"
