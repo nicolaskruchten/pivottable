@@ -655,6 +655,8 @@ callWithJQuery ($) ->
             aggregators: locales[locale].aggregators
             renderers: locales[locale].renderers
             hiddenAttributes: []
+            hiddenFromAggregators: []
+            hiddenFromDragDrop: []
             menuLimit: 500
             cols: [], rows: [], vals: []
             rowOrder: "key_a_to_z", colOrder: "key_a_to_z"
@@ -715,6 +717,9 @@ callWithJQuery ($) ->
             #axis list, including the double-click menu
             unused = $("<td>").addClass('pvtAxisContainer pvtUnused')
             shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
+            shownInAggregators = (c for c in shownAttributes when c not in opts.hiddenFromAggregators)
+            shownInDragDrop = (c for c in shownAttributes when c not in opts.hiddenFromDragDrop)
+
 
             unusedAttrsVerticalAutoOverride = false
             if opts.unusedAttrsVertical == "auto"
@@ -724,7 +729,7 @@ callWithJQuery ($) ->
 
             if not isNaN(unusedAttrsVerticalAutoCutoff)
                 attrLength = 0
-                attrLength += a.length for a in shownAttributes
+                attrLength += a.length for a in shownInDragDrop
                 unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff
 
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
@@ -732,7 +737,7 @@ callWithJQuery ($) ->
             else
                 unused.addClass('pvtHorizList')
 
-            for own i, attr of shownAttributes
+            for own i, attr of shownInDragDrop
                 do (attr) ->
                     values = (v for v of attrValues[attr])
                     hasExcludedItem = false
@@ -907,9 +912,9 @@ callWithJQuery ($) ->
             #set up the UI initial state as requested by moving elements around
 
             for x in opts.cols
-                @find(".pvtCols").append @find(".axis_#{$.inArray(x, shownAttributes)}")
+                @find(".pvtCols").append @find(".axis_#{$.inArray(x, shownInDragDrop)}")
             for x in opts.rows
-                @find(".pvtRows").append @find(".axis_#{$.inArray(x, shownAttributes)}")
+                @find(".pvtRows").append @find(".axis_#{$.inArray(x, shownInDragDrop)}")
             if opts.aggregatorName?
                 @find(".pvtAggregator").val opts.aggregatorName
             if opts.rendererName?
@@ -945,7 +950,7 @@ callWithJQuery ($) ->
                             .addClass('pvtAttrDropdown')
                             .append($("<option>"))
                             .bind "change", -> refresh()
-                        for attr in shownAttributes
+                        for attr in shownInAggregators
                             newDropdown.append($("<option>").val(attr).text(attr))
                         pvtVals.append(newDropdown)
 
