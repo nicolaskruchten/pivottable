@@ -230,7 +230,7 @@
         });
       });
     });
-    return describe("with ragged input", function() {
+    describe("with ragged input", function() {
       var table;
       table = $("<div>").pivot(raggedFixtureData, {
         rows: ["gender"],
@@ -238,6 +238,26 @@
       });
       return it("renders a table with the correct textual representation", function() {
         return expect(table.find("table.pvtTable").text()).toBe(["age", "12", "34", "null", "Totals", "gender", "female", "1", "1", "male", "1", "1", "null", "1", "1", "2", "Totals", "2", "1", "1", "4"].join(""));
+      });
+    });
+    return describe("with rows/cols, default count aggregator, default TableRenderer, custom CellRederers", function() {
+      var table;
+      table = $("<div>").pivot(fixtureData, {
+        rows: ["gender"],
+        cols: ["colour"],
+        rendererOptions: {
+          headCellRenderer: function(value, type) {
+            console.log(arguments);
+            return document.createTextNode('h_' + type + '_' + value);
+          },
+          dataCellRenderer: function(value) {
+            console.log(arguments);
+            return document.createTextNode('d_' + value);
+          }
+        }
+      });
+      return it("renders a table with the correct textual representation", function() {
+        return expect(table.find("table.pvtTable").text()).toBe(["colour", "h_colour_blue", "h_colour_red", "h_colour_yellow", "Totals", "gender", "h_gender_female", "d_", "d_1", "d_1", "2", "h_gender_male", "d_2", "d_", "d_", "2", "Totals", "2", "1", "1", "4"].join(""));
       });
     });
   });
@@ -473,7 +493,7 @@
     describe(".naturalSort()", function() {
       var naturalSort, sortedArr;
       naturalSort = $.pivotUtilities.naturalSort;
-      sortedArr = [null, NaN, -Infinity, '-Infinity', -3, '-3', -2, '-2', -1, '-1', 0, '2e-1', 1, '01', '1', 2, '002', '002e0', '02', '2', '2e-0', 3, 10, '10', '11', '12', '1e2', '112', Infinity, 'Infinity', '1a', '2a', '12a', '20a', 'A', 'A', 'NaN', 'a', 'a', 'a01', 'a012', 'a02', 'a1', 'a2', 'a12', 'a12', 'a21', 'a21', 'b', 'c', 'd', 'null'];
+      sortedArr = [null, 0/0, -2e308, '-Infinity', -3, '-3', -2, '-2', -1, '-1', 0, '2e-1', 1, '01', '1', 2, '002', '002e0', '02', '2', '2e-0', 3, 10, '10', '11', '12', '1e2', '112', 2e308, 'Infinity', '1a', '2a', '12a', '20a', 'A', 'A', 'NaN', 'a', 'a', 'a01', 'a012', 'a02', 'a1', 'a2', 'a12', 'a12', 'a21', 'a21', 'b', 'c', 'd', 'null'];
       return it("sorts naturally (null, NaN, numbers & numbery strings, Alphanum for text strings)", function() {
         return expect(sortedArr.slice().sort(naturalSort)).toEqual(sortedArr);
       });
