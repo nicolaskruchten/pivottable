@@ -508,7 +508,7 @@ callWithJQuery ($) ->
                     tr.appendChild th
             if parseInt(j) == 0
                 th = document.createElement("th")
-                th.className = "pvtTotalLabel"
+                th.className = "pvtTotalLabel pvtRowTotalLabel"
                 th.innerHTML = opts.localeStrings.totals
                 th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
                 tr.appendChild th
@@ -524,7 +524,7 @@ callWithJQuery ($) ->
                 tr.appendChild th
             th = document.createElement("th")
             if colAttrs.length ==0
-                th.className = "pvtTotalLabel"
+                th.className = "pvtTotalLabel pvtRowTotalLabel"
                 th.innerHTML = opts.localeStrings.totals
             tr.appendChild th
             thead.appendChild tr
@@ -570,7 +570,7 @@ callWithJQuery ($) ->
         #finally, the row for col totals, and a grand total
         tr = document.createElement("tr")
         th = document.createElement("th")
-        th.className = "pvtTotalLabel"
+        th.className = "pvtTotalLabel pvtColTotalLabel"
         th.innerHTML = opts.localeStrings.totals
         th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
         tr.appendChild th
