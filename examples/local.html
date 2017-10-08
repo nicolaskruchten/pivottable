@@ -74,7 +74,7 @@
                     $("#output").html("<p align='center' style='color:grey;'>(processing...)</p>")
                     Papa.parse(f, {
                         skipEmptyLines: true,
-                        error: function(e){ alert(e)},
+                        error: function(e){ alert(e) },
                         complete: function(parsed){
                             $("#output").pivotUI(parsed.data, { renderers: renderers }, true);
                         }
@@ -83,6 +83,10 @@
 
                 $("#csv").bind("change", function(event){
                     parseAndPivot(event.target.files[0]);
+                });
+
+                $("#textarea").bind("input change", function(){
+                    parseAndPivot($("#textarea").val());
                 });
 
                 var dragging = function(evt) {
@@ -115,7 +119,15 @@
              });
         </script>
         <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
-        <p align="center" style="line-height: 1.5">Drop a CSV file on this page or <label id="filechooser">click here to choose one<input id="csv" type="file" style="display:none"/></label><br /> <em><small>note: the data never leaves your browser!</small></em></p>
+        <p align="center" style="line-height: 1.5">
+            Drop a CSV file on this page or
+            <label id="filechooser">click here to choose one<input id="csv" type="file" style="display:none"/></label>
+            <br /><br />
+            <textarea placeholder="or type or paste CSV text here" style="width: 300px;" id="textarea"></textarea>
+            <br />
+            <em><small>note: the data never leaves your browser!</small></em>
+        </p>
+
         <div id="output" style="margin: 10px;"></div>
 
     </body>

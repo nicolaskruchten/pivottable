@@ -27,11 +27,9 @@ callWithJQuery ($) ->
             digitsAfterDecimal: 2, scaler: 1,
             thousandsSep: ",", decimalSep: "."
             prefix: "", suffix: ""
-            showZero: false
         opts = $.extend({}, defaults, opts)
         (x) ->
             return "" if isNaN(x) or not isFinite(x)
-            return "" if x == 0 and not opts.showZero
             result = addSeparators (opts.scaler*x).toFixed(opts.digitsAfterDecimal), opts.thousandsSep, opts.decimalSep
             return ""+opts.prefix+result+opts.suffix
 
@@ -510,7 +508,7 @@ callWithJQuery ($) ->
                     tr.appendChild th
             if parseInt(j) == 0
                 th = document.createElement("th")
-                th.className = "pvtTotalLabel"
+                th.className = "pvtTotalLabel pvtRowTotalLabel"
                 th.innerHTML = opts.localeStrings.totals
                 th.setAttribute("rowspan", colAttrs.length + (if rowAttrs.length ==0 then 0 else 1))
                 tr.appendChild th
@@ -526,7 +524,7 @@ callWithJQuery ($) ->
                 tr.appendChild th
             th = document.createElement("th")
             if colAttrs.length ==0
-                th.className = "pvtTotalLabel"
+                th.className = "pvtTotalLabel pvtRowTotalLabel"
                 th.innerHTML = opts.localeStrings.totals
             tr.appendChild th
             thead.appendChild tr
@@ -572,7 +570,7 @@ callWithJQuery ($) ->
         #finally, the row for col totals, and a grand total
         tr = document.createElement("tr")
         th = document.createElement("th")
-        th.className = "pvtTotalLabel"
+        th.className = "pvtTotalLabel pvtColTotalLabel"
         th.innerHTML = opts.localeStrings.totals
         th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
         tr.appendChild th
@@ -657,6 +655,8 @@ callWithJQuery ($) ->
             aggregators: locales[locale].aggregators
             renderers: locales[locale].renderers
             hiddenAttributes: []
+            hiddenFromAggregators: []
+            hiddenFromDragDrop: []
             menuLimit: 500
             cols: [], rows: [], vals: []
             rowOrder: "key_a_to_z", colOrder: "key_a_to_z"
@@ -717,6 +717,9 @@ callWithJQuery ($) ->
             #axis list, including the double-click menu
             unused = $("<td>").addClass('pvtAxisContainer pvtUnused')
             shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
+            shownInAggregators = (c for c in shownAttributes when c not in opts.hiddenFromAggregators)
+            shownInDragDrop = (c for c in shownAttributes when c not in opts.hiddenFromDragDrop)
+
 
             unusedAttrsVerticalAutoOverride = false
             if opts.unusedAttrsVertical == "auto"
@@ -726,7 +729,7 @@ callWithJQuery ($) ->
 
             if not isNaN(unusedAttrsVerticalAutoCutoff)
                 attrLength = 0
-                attrLength += a.length for a in shownAttributes
+                attrLength += a.length for a in shownInDragDrop
                 unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff
 
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
@@ -734,7 +737,7 @@ callWithJQuery ($) ->
             else
                 unused.addClass('pvtHorizList')
 
-            for own i, attr of shownAttributes
+            for own i, attr of shownInDragDrop
                 do (attr) ->
                     values = (v for v of attrValues[attr])
                     hasExcludedItem = false
@@ -909,9 +912,9 @@ callWithJQuery ($) ->
             #set up the UI initial state as requested by moving elements around
 
             for x in opts.cols
-                @find(".pvtCols").append @find(".axis_#{$.inArray(x, shownAttributes)}")
+                @find(".pvtCols").append @find(".axis_#{$.inArray(x, shownInDragDrop)}")
             for x in opts.rows
-                @find(".pvtRows").append @find(".axis_#{$.inArray(x, shownAttributes)}")
+                @find(".pvtRows").append @find(".axis_#{$.inArray(x, shownInDragDrop)}")
             if opts.aggregatorName?
                 @find(".pvtAggregator").val opts.aggregatorName
             if opts.rendererName?
@@ -947,7 +950,7 @@ callWithJQuery ($) ->
                             .addClass('pvtAttrDropdown')
                             .append($("<option>"))
                             .bind "change", -> refresh()
-                        for attr in shownAttributes
+                        for attr in shownInAggregators
                             newDropdown.append($("<option>").val(attr).text(attr))
                         pvtVals.append(newDropdown)
 
@@ -1074,7 +1077,7 @@ callWithJQuery ($) ->
     Barchart post-processing
     ###
 
-    $.fn.barchart =  ->
+    $.fn.barchart = (opts) ->
         numRows = @data "numrows"
         numCols = @data "numcols"
 
@@ -1087,19 +1090,33 @@ callWithJQuery ($) ->
             values = []
             forEachCell (x) -> values.push x
             max = Math.max(values...)
-            scaler = (x) -> 100*x/(1.4*max)
+            if max < 0
+                max = 0
+            range = max;
+            min = Math.min(values...)
+            if min < 0
+                range = max - min
+            scaler = (x) -> 100*x/(1.4*range)
             forEachCell (x, elem) ->
                 text = elem.text()
                 wrapper = $("<div>").css
                     "position": "relative"
                     "height": "55px"
+                bgColor = "gray"
+                bBase = 0
+                if min < 0
+                    bBase = scaler(-min)
+                if x < 0
+                    bBase += scaler(x)
+                    bgColor = "darkred"
+                    x = -x
                 wrapper.append $("<div>").css
                     "position": "absolute"
-                    "bottom": 0
+                    "bottom": bBase + "%"
                     "left": 0
                     "right": 0
                     "height": scaler(x) + "%"
-                    "background-color": "gray"
+                    "background-color": bgColor
                 wrapper.append $("<div>").text(text).css
                     "position":"relative"
                     "padding-left":"5px"
