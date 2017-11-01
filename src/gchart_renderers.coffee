@@ -67,6 +67,8 @@ callWithJQuery ($) ->
                     else row.push null
                 dataArray.push row
 
+            console.log(dataArray)
+
             dataTable = google.visualization.arrayToDataTable(dataArray)
 
             title = vAxisTitle = fullAggName

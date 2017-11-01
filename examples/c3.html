@@ -4,10 +4,15 @@
         <title>Pivot Demo</title>
         <!-- external libs from cdnjs -->
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/gridstack.js/0.2.6/gridstack.min.css" />
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+        <script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/gridstack.js/0.2.6/gridstack.min.js'></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
@@ -42,11 +47,12 @@
             $.pivotUtilities.c3_renderers);
 
         $.getJSON("mps.json", function(mps) {
+            console.log(mps)
             $("#output").pivotUI(mps, {
                 renderers: renderers,
-                cols: ["Party"], rows: ["Province"],
+                cols: ["metabolite_id"], rows: ["state"],
                 rendererName: "Horizontal Stacked Bar Chart",
-                rowOrder: "value_z_to_a", colOrder: "value_z_to_a",
+                rowOrder: "value_a_to_z", colOrder: "value_z_to_a",
                 rendererOptions: {
                     c3: { data: {colors: {
                         Liberal: '#dc3912', Conservative: '#3366cc', NDP: '#ff9900',
@@ -61,6 +67,7 @@
         <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
 
         <div id="output" style="margin: 30px;"></div>
-
+        <button id="addslice">Add New Slice</button>
+        
     </body>
 </html>
