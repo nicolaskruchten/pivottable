@@ -37,14 +37,16 @@
     });
     $.pivotUtilities.locales.pt = {
       localeStrings: {
-        renderError: "Ocorreu um error ao renderizar os resultados da Tabela Dinãmica.",
-        computeError: "Ocorreu um error ao computar os resultados da Tabela Dinãmica.",
-        uiRenderError: "Ocorreu um error ao renderizar a interface da Tabela Dinãmica.",
+        renderError: "Ocorreu um error ao renderizar os resultados da Tabela Dinâmica.",
+        computeError: "Ocorreu um error ao computar os resultados da Tabela Dinâmica.",
+        uiRenderError: "Ocorreu um error ao renderizar a interface da Tabela Dinâmica.",
         selectAll: "Selecionar Tudo",
         selectNone: "Selecionar Nenhum",
         tooMany: "(demais para listar)",
         filterResults: "Filtrar resultados",
         totals: "Totais",
+        apply: "Aplicar",
+        cancel: "Cancelar",
         vs: "vs",
         by: "por"
       },
@@ -57,6 +59,8 @@
         "Média": tpl.average(frFmt),
         "Mínimo": tpl.min(frFmt),
         "Máximo": tpl.max(frFmt),
+        "Primeiro": tpl.first(frFmt),
+        "Último": tpl.last(frFmt),
         "Soma sobre Soma": tpl.sumOverSum(frFmt),
         "Limite Superior a 80%": tpl.sumOverSumBound80(true, frFmt),
         "Limite Inferior a 80%": tpl.sumOverSumBound80(false, frFmt),

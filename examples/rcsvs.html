@@ -52,7 +52,7 @@
     <body>
         <script type="text/javascript">
             $(function(){
-                Papa.parse("http://nicolas.kruchten.com/Rdatasets/datasets.csv", {
+                Papa.parse("https://raw.githubusercontent.com/nicolaskruchten/Rdatasets/master/datasets.csv", {
                     download: true,
                     header: true,
                     skipEmptyLines: true,
@@ -78,12 +78,12 @@
                         $("#csv").bind("change", function(event){
                             $("#output").empty().text("Loading...")
                             var val = $(this).val();
-                            Papa.parse("http://nicolas.kruchten.com/Rdatasets/csv/"+val+".csv", {
+                            Papa.parse("https://raw.githubusercontent.com/nicolaskruchten/Rdatasets/master/csv/"+val+".csv", {
                                 download: true,
                                 skipEmptyLines: true,
                                 complete: function(parsed){
                                 $("#doc").empty().append(
-                                    $("<a>",{target:"_blank", href:"/Rdatasets/doc/"+val+".html"}).html("Dataset documentation &raquo;")
+                                    $("<a>",{target:"_blank", href:"http://nicolas.kruchten.com/Rdatasets/doc/"+val+".html"}).html("Dataset documentation &raquo;")
                                     );
                                     $("#output").pivotUI(parsed.data, {
                                         hiddenAttributes: [""],

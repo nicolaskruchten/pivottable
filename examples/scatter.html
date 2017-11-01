@@ -37,7 +37,7 @@
     // This example shows off the C3 Scatterplot renderer with CSV input.
 
     $(function(){
-        Papa.parse("/Rdatasets/csv/datasets/iris.csv", {
+        Papa.parse("https://raw.githubusercontent.com/nicolaskruchten/Rdatasets/master/csv/datasets/iris.csv", {
             download: true,
             skipEmptyLines: true,
             complete: function(parsed){

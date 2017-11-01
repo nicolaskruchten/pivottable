@@ -41,16 +41,12 @@
         thousandsSep: ",",
         decimalSep: ".",
         prefix: "",
-        suffix: "",
-        showZero: false
+        suffix: ""
       };
       opts = $.extend({}, defaults, opts);
       return function(x) {
         var result;
         if (isNaN(x) || !isFinite(x)) {
-          return "";
-        }
-        if (x === 0 && !opts.showZero) {
           return "";
         }
         result = addSeparators((opts.scaler * x).toFixed(opts.digitsAfterDecimal), opts.thousandsSep, opts.decimalSep);
@@ -1013,7 +1009,7 @@
         }
         if (parseInt(j) === 0) {
           th = document.createElement("th");
-          th.className = "pvtTotalLabel";
+          th.className = "pvtTotalLabel pvtRowTotalLabel";
           th.innerHTML = opts.localeStrings.totals;
           th.setAttribute("rowspan", colAttrs.length + (rowAttrs.length === 0 ? 0 : 1));
           tr.appendChild(th);
@@ -1032,7 +1028,7 @@
         }
         th = document.createElement("th");
         if (colAttrs.length === 0) {
-          th.className = "pvtTotalLabel";
+          th.className = "pvtTotalLabel pvtRowTotalLabel";
           th.innerHTML = opts.localeStrings.totals;
         }
         tr.appendChild(th);
@@ -1088,7 +1084,7 @@
       }
       tr = document.createElement("tr");
       th = document.createElement("th");
-      th.className = "pvtTotalLabel";
+      th.className = "pvtTotalLabel pvtColTotalLabel";
       th.innerHTML = opts.localeStrings.totals;
       th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
       tr.appendChild(th);
@@ -1189,7 +1185,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1204,6 +1200,8 @@
         aggregators: locales[locale].aggregators,
         renderers: locales[locale].renderers,
         hiddenAttributes: [],
+        hiddenFromAggregators: [],
+        hiddenFromDragDrop: [],
         menuLimit: 500,
         cols: [],
         rows: [],
@@ -1285,6 +1283,28 @@
           }
           return results;
         })();
+        shownInAggregators = (function() {
+          var l, len1, results;
+          results = [];
+          for (l = 0, len1 = shownAttributes.length; l < len1; l++) {
+            c = shownAttributes[l];
+            if (indexOf.call(opts.hiddenFromAggregators, c) < 0) {
+              results.push(c);
+            }
+          }
+          return results;
+        })();
+        shownInDragDrop = (function() {
+          var l, len1, results;
+          results = [];
+          for (l = 0, len1 = shownAttributes.length; l < len1; l++) {
+            c = shownAttributes[l];
+            if (indexOf.call(opts.hiddenFromDragDrop, c) < 0) {
+              results.push(c);
+            }
+          }
+          return results;
+        })();
         unusedAttrsVerticalAutoOverride = false;
         if (opts.unusedAttrsVertical === "auto") {
           unusedAttrsVerticalAutoCutoff = 120;
@@ -1293,8 +1313,8 @@
         }
         if (!isNaN(unusedAttrsVerticalAutoCutoff)) {
           attrLength = 0;
-          for (l = 0, len1 = shownAttributes.length; l < len1; l++) {
-            a = shownAttributes[l];
+          for (l = 0, len1 = shownInDragDrop.length; l < len1; l++) {
+            a = shownInDragDrop[l];
             attrLength += a.length;
           }
           unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff;
@@ -1435,9 +1455,9 @@
           }
           return unused.append(attrElem).append(valueList);
         };
-        for (i in shownAttributes) {
-          if (!hasProp.call(shownAttributes, i)) continue;
-          attr = shownAttributes[i];
+        for (i in shownInDragDrop) {
+          if (!hasProp.call(shownInDragDrop, i)) continue;
+          attr = shownInDragDrop[i];
           fn1(attr);
         }
         tr1 = $("<tr>").appendTo(uiTable);
@@ -1495,12 +1515,12 @@
         ref2 = opts.cols;
         for (n = 0, len2 = ref2.length; n < len2; n++) {
           x = ref2[n];
-          this.find(".pvtCols").append(this.find(".axis_" + ($.inArray(x, shownAttributes))));
+          this.find(".pvtCols").append(this.find(".axis_" + ($.inArray(x, shownInDragDrop))));
         }
         ref3 = opts.rows;
         for (o = 0, len3 = ref3.length; o < len3; o++) {
           x = ref3[o];
-          this.find(".pvtRows").append(this.find(".axis_" + ($.inArray(x, shownAttributes))));
+          this.find(".pvtRows").append(this.find(".axis_" + ($.inArray(x, shownInDragDrop))));
         }
         if (opts.aggregatorName != null) {
           this.find(".pvtAggregator").val(opts.aggregatorName);
@@ -1545,8 +1565,8 @@
                 newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
-                for (u = 0, len4 = shownAttributes.length; u < len4; u++) {
-                  attr = shownAttributes[u];
+                for (u = 0, len4 = shownInAggregators.length; u < len4; u++) {
+                  attr = shownInAggregators[u];
                   newDropdown.append($("<option>").val(attr).text(attr));
                 }
                 pvtVals.append(newDropdown);
@@ -1722,13 +1742,13 @@
     /*
     Barchart post-processing
      */
-    return $.fn.barchart = function() {
+    return $.fn.barchart = function(opts) {
       var barcharter, i, l, numCols, numRows, ref;
       numRows = this.data("numrows");
       numCols = this.data("numcols");
       barcharter = (function(_this) {
         return function(scope) {
-          var forEachCell, max, scaler, values;
+          var forEachCell, max, min, range, scaler, values;
           forEachCell = function(f) {
             return _this.find(scope).each(function() {
               var x;
@@ -1743,23 +1763,41 @@
             return values.push(x);
           });
           max = Math.max.apply(Math, values);
+          if (max < 0) {
+            max = 0;
+          }
+          range = max;
+          min = Math.min.apply(Math, values);
+          if (min < 0) {
+            range = max - min;
+          }
           scaler = function(x) {
-            return 100 * x / (1.4 * max);
+            return 100 * x / (1.4 * range);
           };
           return forEachCell(function(x, elem) {
-            var text, wrapper;
+            var bBase, bgColor, text, wrapper;
             text = elem.text();
             wrapper = $("<div>").css({
               "position": "relative",
               "height": "55px"
             });
+            bgColor = "gray";
+            bBase = 0;
+            if (min < 0) {
+              bBase = scaler(-min);
+            }
+            if (x < 0) {
+              bBase += scaler(x);
+              bgColor = "darkred";
+              x = -x;
+            }
             wrapper.append($("<div>").css({
               "position": "absolute",
-              "bottom": 0,
+              "bottom": bBase + "%",
               "left": 0,
               "right": 0,
               "height": scaler(x) + "%",
-              "background-color": "gray"
+              "background-color": bgColor
             }));
             wrapper.append($("<div>").text(text).css({
               "position": "relative",
