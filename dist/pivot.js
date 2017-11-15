@@ -710,7 +710,7 @@
             }
             return results1;
           }
-        } else if (input instanceof jQuery) {
+        } else if (input instanceof $) {
           tblCols = [];
           $("thead > tr > th", input).each(function(i) {
             return tblCols.push($(this).text());
