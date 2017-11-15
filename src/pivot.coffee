@@ -345,7 +345,7 @@ callWithJQuery ($) ->
                         addRecord(record)
                 else #array of objects
                     addRecord(record) for record in input
-            else if input instanceof jQuery
+            else if input instanceof $
                 tblCols = []
                 $("thead > tr > th", input).each (i) -> tblCols.push $(this).text()
                 $("tbody > tr", input).each (i) ->
