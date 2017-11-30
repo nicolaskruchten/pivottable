@@ -41,6 +41,12 @@ table.pvtTable tbody tr td {
     padding: 5px;
     min-width: 20px;
     min-height: 20px;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -ms-user-select: none;
 }
 .pvtAxisContainer li {
     padding: 8px 6px;

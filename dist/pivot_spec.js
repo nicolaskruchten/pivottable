@@ -473,7 +473,7 @@
     describe(".naturalSort()", function() {
       var naturalSort, sortedArr;
       naturalSort = $.pivotUtilities.naturalSort;
-      sortedArr = [null, NaN, -Infinity, '-Infinity', -3, '-3', -2, '-2', -1, '-1', 0, '2e-1', 1, '01', '1', 2, '002', '002e0', '02', '2', '2e-0', 3, 10, '10', '11', '12', '1e2', '112', Infinity, 'Infinity', '1a', '2a', '12a', '20a', 'A', 'A', 'NaN', 'a', 'a', 'a01', 'a012', 'a02', 'a1', 'a2', 'a12', 'a12', 'a21', 'a21', 'b', 'c', 'd', 'null'];
+      sortedArr = [null, 0/0, -2e308, '-Infinity', -3, '-3', -2, '-2', -1, '-1', 0, '2e-1', 1, '01', '1', 2, '002', '002e0', '02', '2', '2e-0', 3, 10, '10', '11', '12', '1e2', '112', 2e308, 'Infinity', '1a', '2a', '12a', '20a', 'A', 'A', 'NaN', 'a', 'a', 'a01', 'a012', 'a02', 'a1', 'a2', 'a12', 'a12', 'a21', 'a21', 'b', 'c', 'd', 'null'];
       return it("sorts naturally (null, NaN, numbers & numbery strings, Alphanum for text strings)", function() {
         return expect(sortedArr.slice().sort(naturalSort)).toEqual(sortedArr);
       });

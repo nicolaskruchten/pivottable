@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <script type="text/javascript" src="../dist/plotly_renderers.js"></script>
+        <style>
+            body {font-family: Verdana;}
+        </style>
+
+        <!-- optional: mobile support with jqueryui-touch-punch -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+    // This example adds Plotly chart renderers.
+
+    $(function(){
+
+        var derivers = $.pivotUtilities.derivers;
+        var renderers = $.extend($.pivotUtilities.renderers,
+            $.pivotUtilities.plotly_renderers);
+
+        $.getJSON("mps.json", function(mps) {
+            $("#output").pivotUI(mps, {
+                renderers: renderers,
+                cols: ["Party"], rows: ["Province"],
+                rendererName: "Horizontal Stacked Bar Chart",
+                rowOrder: "value_a_to_z", colOrder: "value_z_to_a",
+            });
+        });
+     });
+        </script>
+
+        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
+
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>
