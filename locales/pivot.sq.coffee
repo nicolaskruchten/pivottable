@@ -15,7 +15,7 @@ callWithJQuery ($) ->
     frFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: " ", decimalSep: ",")
     frFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: " ", decimalSep: ",")
 
-    $.pivotUtilities.locales.de = 
+    $.pivotUtilities.locales.sq = 
         localeStrings:
             renderError: "Ka ndodhur një gabim gjatë shfaqjes së rezultateve të PivotTable."
             computeError: "Ka ndodhur një gabim gjatë llogaritjes së rezultateve të PivotTable."
