@@ -141,7 +141,7 @@ callWithJQuery ($) ->
             numInputs: wrapped(x...)().numInputs
 
     aggregatorTemplates.countUnique = (f) -> aggregatorTemplates.uniques(((x) -> x.length), f)
-    aggregatorTemplates.listUnique =  (s) -> aggregatorTemplates.uniques(((x) -> x.join(s)), ((x)->x))
+    aggregatorTemplates.listUnique =  (s) -> aggregatorTemplates.uniques(((x) -> x.sort(naturalSort).join(s)), ((x)->x))
     aggregatorTemplates.max =         (f) -> aggregatorTemplates.extremes('max', f)
     aggregatorTemplates.min =         (f) -> aggregatorTemplates.extremes('min', f)
     aggregatorTemplates.first =       (f) -> aggregatorTemplates.extremes('first', f)

@@ -367,7 +367,7 @@
     };
     aggregatorTemplates.listUnique = function(s) {
       return aggregatorTemplates.uniques((function(x) {
-        return x.join(s);
+        return x.sort(naturalSort).join(s);
       }), (function(x) {
         return x;
       }));
@@ -1362,7 +1362,7 @@
                     return ref1 = Math.sign(sorter(v.toLowerCase(), real_filter)), indexOf.call(accepted, ref1) >= 0;
                   };
                 };
-                accept = filter.startsWith(">=") ? accept_gen(">=", [1, 0]) : filter.startsWith("<=") ? accept_gen("<=", [-1, 0]) : filter.startsWith(">") ? accept_gen(">", [1]) : filter.startsWith("<") ? accept_gen("<", [-1]) : filter.startsWith("~") ? function(v) {
+                accept = filter.indexOf(">=") === 0 ? accept_gen(">=", [1, 0]) : filter.indexOf("<=") === 0 ? accept_gen("<=", [-1, 0]) : filter.indexOf(">") === 0 ? accept_gen(">", [1]) : filter.indexOf("<") === 0 ? accept_gen("<", [-1]) : filter.indexOf("~") === 0 ? function(v) {
                   if (filter.substring(1).trim().length === 0) {
                     return true;
                   }

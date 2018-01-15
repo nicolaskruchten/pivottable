@@ -40,6 +40,8 @@
         selectNone: "Deseleziona tutto",
         tooMany: "(troppi valori da visualizzare)",
         filterResults: "Filtra i valori",
+        apply: "Applica",
+        cancel: "Annulla",
         totals: "Totali",
         vs: "su",
         by: "da"
