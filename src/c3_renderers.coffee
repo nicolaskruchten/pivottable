@@ -52,10 +52,13 @@ callWithJQuery ($, c3) ->
                         if series == "" then series = "series"
                         scatterData.x[series] ?= []
                         scatterData.y[series] ?= []
-                        scatterData.t[series] ?= []
-                        scatterData.y[series].push vals[0] ? 0
-                        scatterData.x[series].push vals[1] ? 0
-                        scatterData.t[series].push agg.value()
+                        y = vals[0] ? 0
+                        x = vals[1] ? 0
+                        scatterData.y[series].push y
+                        scatterData.x[series].push x
+                        scatterData.t[series] ?= {}
+                        scatterData.t[series][x] ?= {}
+                        scatterData.t[series][x][y] = agg.value()
         else
             numCharsInHAxis = 0
             for x in headers
@@ -134,7 +137,9 @@ callWithJQuery ($, c3) ->
             params.tooltip.format =
                 title: -> fullAggName
                 name: -> ""
-                value: (a,b,c,d) -> formatter(scatterData.t[c][d])
+                value: (a,b,c,d,e) ->
+                    {name: series, value: y, x} = e[0]
+                    formatter(scatterData.t[series][x][y])
         else
             params.axis.x.type= 'category'
             params.axis.y.tick.format ?= (v) -> formatter(v)

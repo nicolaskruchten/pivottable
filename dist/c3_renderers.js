@@ -18,7 +18,7 @@
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, attrs, base, base1, base2, base3, base4, base5, base6, c, categories, colKey, colKeys, columns, dataColumns, defaults, formatter, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs;
+        var agg, attrs, base, base1, base2, base3, base4, base5, base6, base7, c, categories, colKey, colKeys, columns, dataColumns, defaults, formatter, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs, y;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -101,12 +101,17 @@
                 if ((base4 = scatterData.y)[series] == null) {
                   base4[series] = [];
                 }
+                y = (ref2 = vals[0]) != null ? ref2 : 0;
+                x = (ref3 = vals[1]) != null ? ref3 : 0;
+                scatterData.y[series].push(y);
+                scatterData.x[series].push(x);
                 if ((base5 = scatterData.t)[series] == null) {
-                  base5[series] = [];
+                  base5[series] = {};
                 }
-                scatterData.y[series].push((ref2 = vals[0]) != null ? ref2 : 0);
-                scatterData.x[series].push((ref3 = vals[1]) != null ? ref3 : 0);
-                scatterData.t[series].push(agg.value());
+                if ((base6 = scatterData.t[series])[x] == null) {
+                  base6[x] = {};
+                }
+                scatterData.t[series][x][y] = agg.value();
               }
             }
           }
@@ -210,14 +215,16 @@
             name: function() {
               return "";
             },
-            value: function(a, b, c, d) {
-              return formatter(scatterData.t[c][d]);
+            value: function(a, b, c, d, e) {
+              var ref4;
+              ref4 = e[0], series = ref4.name, y = ref4.value, x = ref4.x;
+              return formatter(scatterData.t[series][x][y]);
             }
           };
         } else {
           params.axis.x.type = 'category';
-          if ((base6 = params.axis.y.tick).format == null) {
-            base6.format = function(v) {
+          if ((base7 = params.axis.y.tick).format == null) {
+            base7.format = function(v) {
               return formatter(v);
             };
           }
