@@ -763,11 +763,11 @@ callWithJQuery ($) ->
                                         return true if real_filter.length == 0
                                         return Math.sign(sorter(v.toLowerCase(), real_filter)) in accepted
                                     accept =
-                                        if      filter.startsWith(">=") then accept_gen(">=", [1,0])
-                                        else if filter.startsWith("<=") then accept_gen("<=", [-1,0])
-                                        else if filter.startsWith(">")  then accept_gen(">",  [1])
-                                        else if filter.startsWith("<")  then accept_gen("<",  [-1])
-                                        else if filter.startsWith("~")  then (v) ->
+                                        if      filter.indexOf(">=") == 0 then accept_gen(">=", [1,0])
+                                        else if filter.indexOf("<=") == 0 then accept_gen("<=", [-1,0])
+                                        else if filter.indexOf(">") == 0  then accept_gen(">",  [1])
+                                        else if filter.indexOf("<") == 0  then accept_gen("<",  [-1])
+                                        else if filter.indexOf("~") == 0  then (v) ->
                                                 return true if filter.substring(1).trim().length == 0
                                                 v.toLowerCase().match(filter.substring(1))
                                         else (v) -> v.toLowerCase().indexOf(filter) != -1
