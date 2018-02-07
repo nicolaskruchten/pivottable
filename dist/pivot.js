@@ -687,20 +687,32 @@
           if ($.isArray(input[0])) {
             results = [];
             for (i in input) {
-              if (!hasProp.call(input, i)) continue;
+              if (!hasProp.call(input, i)) {
+                continue;
+              }
+
               compactRecord = input[i];
+              
               if (!(i > 0)) {
                 continue;
               }
+
               record = {};
               ref = input[0];
+              
               for (j in ref) {
-                if (!hasProp.call(ref, j)) continue;
+                if (!hasProp.call(ref, j)) {
+                  continue;
+                }
+
                 k = ref[j];
+
                 record[k] = compactRecord[j];
               }
+
               results.push(addRecord(record));
             }
+
             return results;
           } else {
             results1 = [];
@@ -759,13 +771,18 @@
         return function(a, b) {
           var comparison, i, sorter;
           for (i in sortersArr) {
-            if (!hasProp.call(sortersArr, i)) continue;
+            if (!hasProp.call(sortersArr, i)) {
+              continue;
+            }
+
             sorter = sortersArr[i];
             comparison = sorter(a[i], b[i]);
+            
             if (comparison !== 0) {
               return comparison;
             }
           }
+
           return 0;
         };
       };
@@ -929,19 +946,28 @@
           var attr, filters, i;
           filters = {};
           for (i in colAttrs) {
-            if (!hasProp.call(colAttrs, i)) continue;
+            if (!hasProp.call(colAttrs, i)) {
+              continue;
+            }
+
             attr = colAttrs[i];
+            
             if (colValues[i] != null) {
               filters[attr] = colValues[i];
             }
           }
           for (i in rowAttrs) {
-            if (!hasProp.call(rowAttrs, i)) continue;
+            if (!hasProp.call(rowAttrs, i)) {
+              continue;
+            }
+
             attr = rowAttrs[i];
+
             if (rowValues[i] != null) {
               filters[attr] = rowValues[i];
             }
           }
+
           return function(e) {
             return opts.table.clickCallback(e, value, filters, pivotData);
           };
@@ -956,8 +982,10 @@
           for (x = l = 0, ref = j; 0 <= ref ? l <= ref : l >= ref; x = 0 <= ref ? ++l : --l) {
             if (arr[i - 1][x] !== arr[i][x]) {
               noDraw = false;
+              break;
             }
           }
+
           if (noDraw) {
             return -1;
           }
@@ -979,7 +1007,10 @@
       };
       thead = document.createElement("thead");
       for (j in colAttrs) {
-        if (!hasProp.call(colAttrs, j)) continue;
+        if (!hasProp.call(colAttrs, j)) {
+          continue;
+        }
+
         c = colAttrs[j];
         tr = document.createElement("tr");
         if (parseInt(j) === 0 && rowAttrs.length !== 0) {
@@ -993,7 +1024,9 @@
         th.textContent = c;
         tr.appendChild(th);
         for (i in colKeys) {
-          if (!hasProp.call(colKeys, i)) continue;
+          if (!hasProp.call(colKeys, i)) {
+            continue;
+          }
           colKey = colKeys[i];
           x = spanSize(colKeys, parseInt(i), parseInt(j));
           if (x !== -1) {
@@ -1019,7 +1052,9 @@
       if (rowAttrs.length !== 0) {
         tr = document.createElement("tr");
         for (i in rowAttrs) {
-          if (!hasProp.call(rowAttrs, i)) continue;
+          if (!hasProp.call(rowAttrs, i)) {
+            continue;
+          }
           r = rowAttrs[i];
           th = document.createElement("th");
           th.className = "pvtAxisLabel";
@@ -1037,11 +1072,15 @@
       result.appendChild(thead);
       tbody = document.createElement("tbody");
       for (i in rowKeys) {
-        if (!hasProp.call(rowKeys, i)) continue;
+        if (!hasProp.call(rowKeys, i)) {
+          continue;
+        }
         rowKey = rowKeys[i];
         tr = document.createElement("tr");
         for (j in rowKey) {
-          if (!hasProp.call(rowKey, j)) continue;
+          if (!hasProp.call(rowKey, j)) {
+            continue;
+          }
           txt = rowKey[j];
           x = spanSize(rowKeys, parseInt(i), parseInt(j));
           if (x !== -1) {
@@ -1056,7 +1095,9 @@
           }
         }
         for (j in colKeys) {
-          if (!hasProp.call(colKeys, j)) continue;
+          if (!hasProp.call(colKeys, j)) {
+            continue;
+          }
           colKey = colKeys[j];
           aggregator = pivotData.getAggregator(rowKey, colKey);
           val = aggregator.value();
@@ -1089,7 +1130,9 @@
       th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
       tr.appendChild(th);
       for (j in colKeys) {
-        if (!hasProp.call(colKeys, j)) continue;
+        if (!hasProp.call(colKeys, j)) {
+          continue;
+        }
         colKey = colKeys[j];
         totalAggregator = pivotData.getAggregator([], colKey);
         val = totalAggregator.value();
@@ -1226,12 +1269,10 @@
         },
         localeStrings: localeStrings
       };
-      existingOpts = this.data("pivotUIOptions");
+      opts = existingOpts = this.data("pivotUIOptions");
       if ((existingOpts == null) || overwrite) {
         opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts));
-      } else {
-        opts = existingOpts;
-      }
+      } 
       try {
         attrValues = {};
         materializedInput = [];
@@ -1243,7 +1284,10 @@
           }
           materializedInput.push(record);
           for (attr in record) {
-            if (!hasProp.call(record, attr)) continue;
+            if (!hasProp.call(record, attr)) {
+              continue;
+            }
+
             if (attrValues[attr] == null) {
               attrValues[attr] = {};
               if (recordsProcessed > 0) {
@@ -1269,7 +1313,9 @@
         });
         ref = opts.renderers;
         for (x in ref) {
-          if (!hasProp.call(ref, x)) continue;
+          if (!hasProp.call(ref, x)) {
+            continue;
+          }
           $("<option>").val(x).html(x).appendTo(renderer);
         }
         unused = $("<td>").addClass('pvtAxisContainer pvtUnused');
@@ -1373,9 +1419,8 @@
                 return valueList.find('.pvtCheckContainer p label span.value').each(function() {
                   if (accept($(this).text())) {
                     return $(this).parent().parent().show();
-                  } else {
-                    return $(this).parent().parent().hide();
-                  }
+                  } 
+                  return $(this).parent().parent().hide();
                 });
               });
               controls.append($("<br>"));
@@ -1401,8 +1446,10 @@
               filterItemExcluded = false;
               if (opts.inclusions[attr]) {
                 filterItemExcluded = (indexOf.call(opts.inclusions[attr], value) < 0);
-              } else if (opts.exclusions[attr]) {
-                filterItemExcluded = (indexOf.call(opts.exclusions[attr], value) >= 0);
+              } else {
+                if (opts.exclusions[attr]) {
+                  filterItemExcluded = (indexOf.call(opts.exclusions[attr], value) >= 0);
+                }
               }
               hasExcludedItem || (hasExcludedItem = filterItemExcluded);
               $("<input>").attr("type", "checkbox").addClass('pvtFilter').attr("checked", !filterItemExcluded).data("filter", [attr, value]).appendTo(filterItem).bind("change", function() {
@@ -1456,7 +1503,9 @@
           return unused.append(attrElem).append(valueList);
         };
         for (i in shownInDragDrop) {
-          if (!hasProp.call(shownInDragDrop, i)) continue;
+          if (!hasProp.call(shownInDragDrop, i)) {
+            continue;
+          }
           attr = shownInDragDrop[i];
           fn1(attr);
         }
@@ -1466,7 +1515,9 @@
         });
         ref1 = opts.aggregators;
         for (x in ref1) {
-          if (!hasProp.call(ref1, x)) continue;
+          if (!hasProp.call(ref1, x)) {
+            continue;
+          }
           aggregator.append($("<option>").val(x).html(x));
         }
         ordering = {
