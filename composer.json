@@ -17,7 +17,7 @@
   "require": {
       "components/jquery": ">=1.9"
   },
-  "license": "MIT License",
+  "license": "MIT",
   "authors": [
       {
           "name": "Nicolas Kruchten",
