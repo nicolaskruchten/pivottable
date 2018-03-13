@@ -1185,7 +1185,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, button, c, colOrderArrow, defaults, e, existingOpts, fn1, hide_and_show, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1263,6 +1263,9 @@
         uiTable = $("<table>", {
           "class": "pvtUi"
         }).attr("cellpadding", 5);
+        button = $("<button>").text("Hide/Show column/row").bind("click", function() {
+          return hide_and_show();
+        }).appendTo(uiTable);
         rendererControl = $("<td>");
         renderer = $("<select>").addClass('pvtRenderer').appendTo(rendererControl).bind("change", function() {
           return refresh();
@@ -1665,6 +1668,31 @@
           items: 'li',
           placeholder: 'pvtPlaceholder'
         });
+        hide_and_show = (function(_this) {
+          return function() {
+            $("pvtUi").toggle();
+            $("pvtRendererArea").toggle(function() {
+              return $("pvtRendererArea").css({
+                width: "100px",
+                position: "absolute"
+              });
+            }, function() {
+              return $("pvtRendererArea").css({
+                width: "",
+                position: ""
+              });
+            });
+            _this.find(".pvtVals").each(function() {
+              return $(this).toggle();
+            });
+            _this.find(".pvtAxisContainer").each(function() {
+              return $(this).toggle();
+            });
+            return _this.find(".pvtRenderer").each(function() {
+              return $(this).toggle();
+            });
+          };
+        })(this);
       } catch (error) {
         e = error;
         if (typeof console !== "undefined" && console !== null) {
