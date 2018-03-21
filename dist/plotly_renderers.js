@@ -24,7 +24,7 @@
         transpose = false;
       }
       return function(pivotData, opts) {
-        var colKeys, data, datumKeys, defaults, fullAggName, groupByTitle, hAxisTitle, layout, renderArea, result, rowKeys, titleText, traceKeys;
+        var colKeys, data, datumKeys, defaults, fullAggName, groupByTitle, hAxisTitle, layout, result, rowKeys, titleText, traceKeys;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -82,26 +82,19 @@
           title: titleText,
           hovermode: 'closest',
           width: window.innerWidth / 1.4,
-          height: window.innerHeight / 1.4 - 50
+          height: window.innerHeight / 1.4 - 50,
+          xaxis: {
+            title: transpose ? fullAggName : null,
+            automargin: true
+          },
+          yaxis: {
+            title: transpose ? null : fullAggName,
+            automargin: true
+          }
         };
-        if (transpose) {
-          layout.xaxis = {
-            domain: [0.1, 1.0],
-            title: fullAggName
-          };
-        } else {
-          layout.yaxis = {
-            title: fullAggName
-          };
-        }
-        renderArea = $("<div>", {
-          style: "display:none;"
-        }).appendTo($("body"));
-        result = $("<div>").appendTo(renderArea);
-        Plotly.plot(result[0], data, $.extend(layout, layoutOptions, opts.plotly));
-        result.detach();
-        renderArea.remove();
-        return result;
+        result = $("<div>").appendTo($("body"));
+        Plotly.newPlot(result[0], data, $.extend(layout, layoutOptions, opts.plotly));
+        return result.detach();
       };
     };
     makePlotlyScatterChart = function() {

@@ -59,19 +59,17 @@ callWithJQuery ($, Plotly) ->
                 hovermode: 'closest'
                 width: window.innerWidth / 1.4
                 height: window.innerHeight / 1.4 - 50
+                xaxis:
+                    title: if transpose then fullAggName else null
+                    automargin: true
+                yaxis:
+                    title: if transpose then null else fullAggName
+                    automargin: true
             }
 
-            if transpose
-                layout.xaxis = {domain: [0.1, 1.0], title: fullAggName}
-            else
-                layout.yaxis = {title: fullAggName}
-
-            renderArea = $("<div>", style: "display:none;").appendTo $("body")
-            result = $("<div>").appendTo renderArea
-            Plotly.plot(result[0], data, $.extend(layout, layoutOptions, opts.plotly))
-            result.detach()
-            renderArea.remove()
-            return result
+            result = $("<div>").appendTo $("body")
+            Plotly.newPlot(result[0], data, $.extend(layout, layoutOptions, opts.plotly))
+            return result.detach()
 
     makePlotlyScatterChart = -> (pivotData, opts) ->
         defaults =
