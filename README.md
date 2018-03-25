@@ -7,7 +7,7 @@ PivotTable.js is a Javascript Pivot Table library with drag'n'drop functionality
 
 It is available under an MIT license from [CDNJS](https://cdnjs.com/libraries/pivottable) and [NPM](https://www.npmjs.com/package/pivottable) and [Bower](http://bower.io/) under the name `pivottable`. And on [Packagist.org](https://packagist.org/packages/nicolaskruchten/pivottable), it is `nicolaskruchten/pivottable`.
 
-PivotTable.js can be used with [Python/Jupyter](https://pypi.python.org/pypi/pivottablejs) and [R/RStudio](https://github.com/smartinsightsfromdata/rpivotTable) and you can [try it right now](https://pivottable.js.org/examples/local.html) in your browser on a CSV file.
+PivotTable.js can be used with [Python/Jupyter](https://github.com/nicolaskruchten/jupyter_pivottablejs) and [R/RStudio](https://github.com/smartinsightsfromdata/rpivotTable) and you can [try it right now](https://pivottable.js.org/examples/local.html) in your browser on a CSV file.
 
 **Are you using React? Check out the React port: [react-pivottable](https://github.com/plotly/react-pivottable).**
 
