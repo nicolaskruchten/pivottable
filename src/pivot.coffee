@@ -703,6 +703,11 @@ callWithJQuery ($) ->
             #start building the output
             uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
 
+            button = $("<button>")
+              .text("Hide/Show column/row")
+              .bind "click", -> hide_and_show()
+              .appendTo(uiTable)
+
             #renderer control
             rendererControl = $("<td>")
 
@@ -1029,6 +1034,30 @@ callWithJQuery ($) ->
                     connectWith: @find(".pvtAxisContainer")
                     items: 'li'
                     placeholder: 'pvtPlaceholder'
+
+            hide_and_show = =>
+                $("pvtUi").toggle()
+
+                $("pvtRendererArea").toggle(
+                    -> $("pvtRendererArea").css({
+                      width: "100px",
+                      position: "absolute"
+                    })
+                    -> $("pvtRendererArea").css({
+                      width: "",
+                      position: ""
+                    })
+                )
+
+                @find(".pvtVals").each ->
+                    $(this).toggle()
+
+                @find(".pvtAxisContainer").each ->
+                    $(this).toggle()
+
+                @find(".pvtRenderer").each ->
+                    $(this).toggle()
+
         catch e
             console.error(e.stack) if console?
             @html opts.localeStrings.uiRenderError
