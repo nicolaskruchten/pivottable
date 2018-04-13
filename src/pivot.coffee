@@ -668,6 +668,7 @@ callWithJQuery ($) ->
             onRefresh: null
             filter: -> true
             sorters: {}
+            minValuesToFilter: 5
 
         localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         localeDefaults =
@@ -750,7 +751,7 @@ callWithJQuery ($) ->
                     if values.length > opts.menuLimit
                         valueList.append $("<p>").html(opts.localeStrings.tooMany)
                     else
-                        if values.length > 5
+                        if values.length > opts.minValuesToFilter
                             controls = $("<p>").appendTo(valueList)
                             sorter = getSort(opts.sorters, attr)
                             placeholder = opts.localeStrings.filterResults
