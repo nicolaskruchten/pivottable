@@ -1186,6 +1186,30 @@
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
       var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var defValueListOpts = {
+        inside: false,
+        showOne: false,
+        offsetSide: 10,
+        className: 'pvtFilterBox',
+        getPosition: function(triangle, valueList) {
+          var left, ref2, top, uiTablePosition, valueListWidth, offsetLeft = 10;
+          ref2 = $(triangle.currentTarget).position(), left = ref2.left, top = ref2.top + offsetLeft;
+          if(opts.valuesList.inside) {
+            uiTablePosition = $(uiTable).position(), valueListWidth = $(valueList).width();
+            uiTablePosition.right = uiTablePosition.left + $(uiTable).width();
+            if(left + valueListWidth > uiTablePosition.right) {
+              return {
+                left: uiTablePosition.right - valueListWidth,
+                top: top
+              }
+            }
+          }
+          return {
+            left: left + offsetLeft,
+            top: top
+          };
+        }
+      };
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1217,7 +1241,8 @@
         filter: function() {
           return true;
         },
-        sorters: {}
+        sorters: {},
+        valuesList: defValueListOpts
       };
       localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
       localeDefaults = {
@@ -1232,6 +1257,7 @@
       } else {
         opts = existingOpts;
       }
+      opts.valuesList = $.extend(defValueListOpts, inputOpts.valuesList);
       try {
         attrValues = {};
         materializedInput = [];
@@ -1335,7 +1361,7 @@
             return results;
           })();
           hasExcludedItem = false;
-          valueList = $("<div>").addClass('pvtFilterBox').hide();
+          valueList = $("<div>").addClass(opts.valuesList.className).hide();
           valueList.append($("<h4>").append($("<span>").text(attr), $("<span>").addClass("count").text("(" + values.length + ")")));
           if (values.length > opts.menuLimit) {
             valueList.append($("<p>").html(opts.localeStrings.tooMany));
@@ -1442,12 +1468,8 @@
             return closeFilterBox();
           });
           triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", function(e) {
-            var left, ref2, top;
-            ref2 = $(e.currentTarget).position(), left = ref2.left, top = ref2.top;
-            return valueList.css({
-              left: left + 10,
-              top: top + 10
-            }).show();
+            opts.valuesList.showOne && $('.' + opts.valuesList.className).hide();
+            return valueList.css(opts.valuesList.getPosition(e, valueList)).show();
           });
           attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink));
           if (hasExcludedItem) {
