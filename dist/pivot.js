@@ -1189,7 +1189,6 @@
       var defValueListOpts = {
         inside: false,
         showOne: false,
-        offsetSide: 10,
         className: 'pvtFilterBox',
         getPosition: function(triangle, valueList) {
           var left, ref2, top, uiTablePosition, valueListWidth, offsetLeft = 10;
