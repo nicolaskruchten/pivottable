@@ -913,7 +913,9 @@
       var aggregator, c, colAttrs, colKey, colKeys, defaults, getClickHandler, i, j, r, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
       defaults = {
         table: {
-          clickCallback: null
+          clickCallback: null,
+          rowTotals: true,
+          colTotals: true
         },
         localeStrings: {
           totals: "Totals"
@@ -1007,7 +1009,7 @@
             tr.appendChild(th);
           }
         }
-        if (parseInt(j) === 0) {
+        if (parseInt(j) === 0 && opts.table.rowTotals) {
           th = document.createElement("th");
           th.className = "pvtTotalLabel pvtRowTotalLabel";
           th.innerHTML = opts.localeStrings.totals;
@@ -1069,51 +1071,59 @@
           }
           tr.appendChild(td);
         }
-        totalAggregator = pivotData.getAggregator(rowKey, []);
-        val = totalAggregator.value();
-        td = document.createElement("td");
-        td.className = "pvtTotal rowTotal";
-        td.textContent = totalAggregator.format(val);
-        td.setAttribute("data-value", val);
-        if (getClickHandler != null) {
-          td.onclick = getClickHandler(val, rowKey, []);
+        if (opts.table.rowTotals || colAttrs.length === 0) {
+          totalAggregator = pivotData.getAggregator(rowKey, []);
+          val = totalAggregator.value();
+          td = document.createElement("td");
+          td.className = "pvtTotal rowTotal";
+          td.textContent = totalAggregator.format(val);
+          td.setAttribute("data-value", val);
+          if (getClickHandler != null) {
+            td.onclick = getClickHandler(val, rowKey, []);
+          }
+          td.setAttribute("data-for", "row" + i);
+          tr.appendChild(td);
         }
-        td.setAttribute("data-for", "row" + i);
-        tr.appendChild(td);
         tbody.appendChild(tr);
       }
-      tr = document.createElement("tr");
-      th = document.createElement("th");
-      th.className = "pvtTotalLabel pvtColTotalLabel";
-      th.innerHTML = opts.localeStrings.totals;
-      th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
-      tr.appendChild(th);
-      for (j in colKeys) {
-        if (!hasProp.call(colKeys, j)) continue;
-        colKey = colKeys[j];
-        totalAggregator = pivotData.getAggregator([], colKey);
-        val = totalAggregator.value();
-        td = document.createElement("td");
-        td.className = "pvtTotal colTotal";
-        td.textContent = totalAggregator.format(val);
-        td.setAttribute("data-value", val);
-        if (getClickHandler != null) {
-          td.onclick = getClickHandler(val, [], colKey);
+      if (opts.table.colTotals || rowAttrs.length === 0) {
+        tr = document.createElement("tr");
+        if (opts.table.colTotals || rowAttrs.length === 0) {
+          th = document.createElement("th");
+          th.className = "pvtTotalLabel pvtColTotalLabel";
+          th.innerHTML = opts.localeStrings.totals;
+          th.setAttribute("colspan", rowAttrs.length + (colAttrs.length === 0 ? 0 : 1));
+          tr.appendChild(th);
         }
-        td.setAttribute("data-for", "col" + j);
-        tr.appendChild(td);
+        for (j in colKeys) {
+          if (!hasProp.call(colKeys, j)) continue;
+          colKey = colKeys[j];
+          totalAggregator = pivotData.getAggregator([], colKey);
+          val = totalAggregator.value();
+          td = document.createElement("td");
+          td.className = "pvtTotal colTotal";
+          td.textContent = totalAggregator.format(val);
+          td.setAttribute("data-value", val);
+          if (getClickHandler != null) {
+            td.onclick = getClickHandler(val, [], colKey);
+          }
+          td.setAttribute("data-for", "col" + j);
+          tr.appendChild(td);
+        }
+        if (opts.table.rowTotals || colAttrs.length === 0) {
+          totalAggregator = pivotData.getAggregator([], []);
+          val = totalAggregator.value();
+          td = document.createElement("td");
+          td.className = "pvtGrandTotal";
+          td.textContent = totalAggregator.format(val);
+          td.setAttribute("data-value", val);
+          if (getClickHandler != null) {
+            td.onclick = getClickHandler(val, [], []);
+          }
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
       }
-      totalAggregator = pivotData.getAggregator([], []);
-      val = totalAggregator.value();
-      td = document.createElement("td");
-      td.className = "pvtGrandTotal";
-      td.textContent = totalAggregator.format(val);
-      td.setAttribute("data-value", val);
-      if (getClickHandler != null) {
-        td.onclick = getClickHandler(val, [], []);
-      }
-      tr.appendChild(td);
-      tbody.appendChild(tr);
       result.appendChild(tbody);
       result.setAttribute("data-numrows", rowKeys.length);
       result.setAttribute("data-numcols", colKeys.length);
@@ -1214,6 +1224,7 @@
         unusedAttrsVertical: 85,
         autoSortUnusedAttrs: false,
         onRefresh: null,
+        showUI: true,
         filter: function() {
           return true;
         },
@@ -1263,7 +1274,7 @@
         uiTable = $("<table>", {
           "class": "pvtUi"
         }).attr("cellpadding", 5);
-        rendererControl = $("<td>");
+        rendererControl = $("<td>").addClass("pvtUiCell");
         renderer = $("<select>").addClass('pvtRenderer').appendTo(rendererControl).bind("change", function() {
           return refresh();
         });
@@ -1272,7 +1283,7 @@
           if (!hasProp.call(ref, x)) continue;
           $("<option>").val(x).html(x).appendTo(renderer);
         }
-        unused = $("<td>").addClass('pvtAxisContainer pvtUnused');
+        unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell');
         shownAttributes = (function() {
           var results;
           results = [];
@@ -1500,10 +1511,10 @@
           $(this).html(ordering[$(this).data("order")].colSymbol);
           return refresh();
         });
-        $("<td>").addClass('pvtVals').appendTo(tr1).append(aggregator).append(rowOrderArrow).append(colOrderArrow).append($("<br>"));
-        $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols').appendTo(tr1);
+        $("<td>").addClass('pvtVals pvtUiCell').appendTo(tr1).append(aggregator).append(rowOrderArrow).append(colOrderArrow).append($("<br>"));
+        $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell').appendTo(tr1);
         tr2 = $("<tr>").appendTo(uiTable);
-        tr2.append($("<td>").addClass('pvtAxisContainer pvtRows').attr("valign", "top"));
+        tr2.append($("<td>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top"));
         pivotTable = $("<td>").attr("valign", "top").addClass('pvtRendererArea').appendTo(tr2);
         if (opts.unusedAttrsVertical === true || unusedAttrsVerticalAutoOverride) {
           uiTable.find('tr:nth-child(1)').prepend(rendererControl);
@@ -1527,6 +1538,9 @@
         }
         if (opts.rendererName != null) {
           this.find(".pvtRenderer").val(opts.rendererName);
+        }
+        if (!opts.showUI) {
+          this.find(".pvtUiCell").hide();
         }
         initialRender = true;
         refreshDelayed = (function(_this) {

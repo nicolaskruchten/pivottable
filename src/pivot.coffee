@@ -444,7 +444,10 @@ callWithJQuery ($) ->
     pivotTableRenderer = (pivotData, opts) ->
 
         defaults =
-            table: clickCallback: null
+            table:
+                clickCallback: null
+                rowTotals: true
+                colTotals: true
             localeStrings: totals: "Totals"
 
         opts = $.extend(true, {}, defaults, opts)
@@ -506,7 +509,7 @@ callWithJQuery ($) ->
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
                     tr.appendChild th
-            if parseInt(j) == 0
+            if parseInt(j) == 0 && opts.table.rowTotals
                 th = document.createElement("th")
                 th.className = "pvtTotalLabel pvtRowTotalLabel"
                 th.innerHTML = opts.localeStrings.totals
@@ -555,46 +558,50 @@ callWithJQuery ($) ->
                     td.onclick = getClickHandler(val, rowKey, colKey)
                 tr.appendChild td
 
-            totalAggregator = pivotData.getAggregator(rowKey, [])
-            val = totalAggregator.value()
-            td = document.createElement("td")
-            td.className = "pvtTotal rowTotal"
-            td.textContent = totalAggregator.format(val)
-            td.setAttribute("data-value", val)
-            if getClickHandler?
-                td.onclick = getClickHandler(val, rowKey, [])
-            td.setAttribute("data-for", "row"+i)
-            tr.appendChild td
+            if opts.table.rowTotals || colAttrs.length == 0
+                totalAggregator = pivotData.getAggregator(rowKey, [])
+                val = totalAggregator.value()
+                td = document.createElement("td")
+                td.className = "pvtTotal rowTotal"
+                td.textContent = totalAggregator.format(val)
+                td.setAttribute("data-value", val)
+                if getClickHandler?
+                    td.onclick = getClickHandler(val, rowKey, [])
+                td.setAttribute("data-for", "row"+i)
+                tr.appendChild td
             tbody.appendChild tr
 
         #finally, the row for col totals, and a grand total
-        tr = document.createElement("tr")
-        th = document.createElement("th")
-        th.className = "pvtTotalLabel pvtColTotalLabel"
-        th.innerHTML = opts.localeStrings.totals
-        th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
-        tr.appendChild th
-        for own j, colKey of colKeys
-            totalAggregator = pivotData.getAggregator([], colKey)
-            val = totalAggregator.value()
-            td = document.createElement("td")
-            td.className = "pvtTotal colTotal"
-            td.textContent = totalAggregator.format(val)
-            td.setAttribute("data-value", val)
-            if getClickHandler?
-                td.onclick = getClickHandler(val, [], colKey)
-            td.setAttribute("data-for", "col"+j)
-            tr.appendChild td
-        totalAggregator = pivotData.getAggregator([], [])
-        val = totalAggregator.value()
-        td = document.createElement("td")
-        td.className = "pvtGrandTotal"
-        td.textContent = totalAggregator.format(val)
-        td.setAttribute("data-value", val)
-        if getClickHandler?
-            td.onclick = getClickHandler(val, [], [])
-        tr.appendChild td
-        tbody.appendChild tr
+        if opts.table.colTotals || rowAttrs.length == 0
+            tr = document.createElement("tr")
+            if opts.table.colTotals || rowAttrs.length == 0
+                th = document.createElement("th")
+                th.className = "pvtTotalLabel pvtColTotalLabel"
+                th.innerHTML = opts.localeStrings.totals
+                th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
+                tr.appendChild th
+            for own j, colKey of colKeys
+                totalAggregator = pivotData.getAggregator([], colKey)
+                val = totalAggregator.value()
+                td = document.createElement("td")
+                td.className = "pvtTotal colTotal"
+                td.textContent = totalAggregator.format(val)
+                td.setAttribute("data-value", val)
+                if getClickHandler?
+                    td.onclick = getClickHandler(val, [], colKey)
+                td.setAttribute("data-for", "col"+j)
+                tr.appendChild td
+            if opts.table.rowTotals || colAttrs.length == 0
+                totalAggregator = pivotData.getAggregator([], [])
+                val = totalAggregator.value()
+                td = document.createElement("td")
+                td.className = "pvtGrandTotal"
+                td.textContent = totalAggregator.format(val)
+                td.setAttribute("data-value", val)
+                if getClickHandler?
+                    td.onclick = getClickHandler(val, [], [])
+                tr.appendChild td
+            tbody.appendChild tr
         result.appendChild tbody
 
         #squirrel this away for later
@@ -666,6 +673,7 @@ callWithJQuery ($) ->
             unusedAttrsVertical: 85
             autoSortUnusedAttrs: false
             onRefresh: null
+            showUI: true
             filter: -> true
             sorters: {}
 
@@ -704,7 +712,7 @@ callWithJQuery ($) ->
             uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
 
             #renderer control
-            rendererControl = $("<td>")
+            rendererControl = $("<td>").addClass("pvtUiCell")
 
             renderer = $("<select>")
                 .addClass('pvtRenderer')
@@ -715,7 +723,7 @@ callWithJQuery ($) ->
 
 
             #axis list, including the double-click menu
-            unused = $("<td>").addClass('pvtAxisContainer pvtUnused')
+            unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
             shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
             shownInAggregators = (c for c in shownAttributes when c not in opts.hiddenFromAggregators)
             shownInDragDrop = (c for c in shownAttributes when c not in opts.hiddenFromDragDrop)
@@ -878,7 +886,7 @@ callWithJQuery ($) ->
                     $(this).html(ordering[$(this).data("order")].colSymbol)
                     refresh()
 
-            $("<td>").addClass('pvtVals')
+            $("<td>").addClass('pvtVals pvtUiCell')
               .appendTo(tr1)
               .append(aggregator)
               .append(rowOrderArrow)
@@ -886,12 +894,12 @@ callWithJQuery ($) ->
               .append($("<br>"))
 
             #column axes
-            $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols').appendTo(tr1)
+            $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell').appendTo(tr1)
 
             tr2 = $("<tr>").appendTo(uiTable)
 
             #row axes
-            tr2.append $("<td>").addClass('pvtAxisContainer pvtRows').attr("valign", "top")
+            tr2.append $("<td>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top")
 
             #the actual pivot table container
             pivotTable = $("<td>")
@@ -919,6 +927,8 @@ callWithJQuery ($) ->
                 @find(".pvtAggregator").val opts.aggregatorName
             if opts.rendererName?
                 @find(".pvtRenderer").val opts.rendererName
+
+            @find(".pvtUiCell").hide() unless opts.showUI
 
             initialRender = true
 
