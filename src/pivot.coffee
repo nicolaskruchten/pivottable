@@ -444,7 +444,10 @@ callWithJQuery ($) ->
     pivotTableRenderer = (pivotData, opts) ->
 
         defaults =
-            table: clickCallback: null
+            table:
+                clickCallback: null
+                rowTotals: true
+                colTotals: true
             localeStrings: totals: "Totals"
 
         opts = $.extend(true, {}, defaults, opts)
@@ -506,7 +509,7 @@ callWithJQuery ($) ->
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
                     tr.appendChild th
-            if parseInt(j) == 0
+            if parseInt(j) == 0 && opts.table.rowTotals
                 th = document.createElement("th")
                 th.className = "pvtTotalLabel pvtRowTotalLabel"
                 th.innerHTML = opts.localeStrings.totals
@@ -555,46 +558,50 @@ callWithJQuery ($) ->
                     td.onclick = getClickHandler(val, rowKey, colKey)
                 tr.appendChild td
 
-            totalAggregator = pivotData.getAggregator(rowKey, [])
-            val = totalAggregator.value()
-            td = document.createElement("td")
-            td.className = "pvtTotal rowTotal"
-            td.textContent = totalAggregator.format(val)
-            td.setAttribute("data-value", val)
-            if getClickHandler?
-                td.onclick = getClickHandler(val, rowKey, [])
-            td.setAttribute("data-for", "row"+i)
-            tr.appendChild td
+            if opts.table.rowTotals || colAttrs.length == 0
+                totalAggregator = pivotData.getAggregator(rowKey, [])
+                val = totalAggregator.value()
+                td = document.createElement("td")
+                td.className = "pvtTotal rowTotal"
+                td.textContent = totalAggregator.format(val)
+                td.setAttribute("data-value", val)
+                if getClickHandler?
+                    td.onclick = getClickHandler(val, rowKey, [])
+                td.setAttribute("data-for", "row"+i)
+                tr.appendChild td
             tbody.appendChild tr
 
         #finally, the row for col totals, and a grand total
-        tr = document.createElement("tr")
-        th = document.createElement("th")
-        th.className = "pvtTotalLabel pvtColTotalLabel"
-        th.innerHTML = opts.localeStrings.totals
-        th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
-        tr.appendChild th
-        for own j, colKey of colKeys
-            totalAggregator = pivotData.getAggregator([], colKey)
-            val = totalAggregator.value()
-            td = document.createElement("td")
-            td.className = "pvtTotal colTotal"
-            td.textContent = totalAggregator.format(val)
-            td.setAttribute("data-value", val)
-            if getClickHandler?
-                td.onclick = getClickHandler(val, [], colKey)
-            td.setAttribute("data-for", "col"+j)
-            tr.appendChild td
-        totalAggregator = pivotData.getAggregator([], [])
-        val = totalAggregator.value()
-        td = document.createElement("td")
-        td.className = "pvtGrandTotal"
-        td.textContent = totalAggregator.format(val)
-        td.setAttribute("data-value", val)
-        if getClickHandler?
-            td.onclick = getClickHandler(val, [], [])
-        tr.appendChild td
-        tbody.appendChild tr
+        if opts.table.colTotals || rowAttrs.length == 0
+            tr = document.createElement("tr")
+            if opts.table.colTotals || rowAttrs.length == 0
+                th = document.createElement("th")
+                th.className = "pvtTotalLabel pvtColTotalLabel"
+                th.innerHTML = opts.localeStrings.totals
+                th.setAttribute("colspan", rowAttrs.length + (if colAttrs.length == 0 then 0 else 1))
+                tr.appendChild th
+            for own j, colKey of colKeys
+                totalAggregator = pivotData.getAggregator([], colKey)
+                val = totalAggregator.value()
+                td = document.createElement("td")
+                td.className = "pvtTotal colTotal"
+                td.textContent = totalAggregator.format(val)
+                td.setAttribute("data-value", val)
+                if getClickHandler?
+                    td.onclick = getClickHandler(val, [], colKey)
+                td.setAttribute("data-for", "col"+j)
+                tr.appendChild td
+            if opts.table.rowTotals || colAttrs.length == 0
+                totalAggregator = pivotData.getAggregator([], [])
+                val = totalAggregator.value()
+                td = document.createElement("td")
+                td.className = "pvtGrandTotal"
+                td.textContent = totalAggregator.format(val)
+                td.setAttribute("data-value", val)
+                if getClickHandler?
+                    td.onclick = getClickHandler(val, [], [])
+                tr.appendChild td
+            tbody.appendChild tr
         result.appendChild tbody
 
         #squirrel this away for later
