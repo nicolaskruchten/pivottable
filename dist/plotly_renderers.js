@@ -169,7 +169,7 @@
         type: 'bar',
         orientation: 'h'
       }, {
-        barmode: 'stack'
+        barmode: 'relative'
       }, true),
       "Bar Chart": makePlotlyChart({
         type: 'bar'
@@ -179,7 +179,7 @@
       "Stacked Bar Chart": makePlotlyChart({
         type: 'bar'
       }, {
-        barmode: 'stack'
+        barmode: 'relative'
       }),
       "Line Chart": makePlotlyChart(),
       "Scatter Chart": makePlotlyScatterChart()
