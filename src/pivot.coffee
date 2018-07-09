@@ -706,6 +706,7 @@ callWithJQuery ($) ->
 
             #renderer control
             rendererControl = $("<td>")
+                .addClass('pvtRendererControl')
 
             renderer = $("<select>")
                 .addClass('pvtRenderer')
