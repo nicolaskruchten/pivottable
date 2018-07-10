@@ -1,4 +1,4 @@
-(MIT License)
+The MIT License (MIT)
 
 PivotTable.js is © 2012-2013 Nicolas Kruchten, Datacratic, other contributors
 
