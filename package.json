@@ -1,6 +1,6 @@
 {
   "name": "pivottable",
-  "version": "2.22.1",
+  "version": "2.22.2",
   "description": "Javascript Pivot Table (aka Pivot Grid, Pivot Chart, Cross-Tab) implementation with drag'n'drop",
   "main": "dist/pivot.js",
   "files": [
