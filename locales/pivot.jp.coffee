@@ -12,8 +12,8 @@ callWithJQuery ($) ->
     tpl = $.pivotUtilities.aggregatorTemplates
 
     jpFmt =    nf(thousandsSep: ",", decimalSep: ".")
-    jaFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: ",", decimalSep: ".")
-    jaFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: ",", decimalSep: ".")
+    jpFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: ",", decimalSep: ".")
+    jpFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: ",", decimalSep: ".")
 
     $.pivotUtilities.locales.ja =
         localeStrings:
