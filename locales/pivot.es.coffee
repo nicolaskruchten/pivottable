@@ -40,7 +40,7 @@ callWithJQuery ($) ->
             "Desviación estándar de la muestra":            tpl.stdev(1, frFmt)
             "Mínimo":                                       tpl.min(frFmt)
             "Máximo":                                       tpl.max(frFmt)
-            "Primeiro":                                     tpl.first(frFmt),
+            "Primero":                                     tpl.first(frFmt),
             "Pasado":                                       tpl.last(frFmt),
             "Suma de sumas":                    tpl.sumOverSum(frFmt)
             "Cota 80% superior":        tpl.sumOverSumBound80(true, frFmt)
