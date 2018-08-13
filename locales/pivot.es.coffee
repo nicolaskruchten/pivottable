@@ -41,7 +41,7 @@ callWithJQuery ($) ->
             "Mínimo":                                       tpl.min(frFmt)
             "Máximo":                                       tpl.max(frFmt)
             "Primero":                                     tpl.first(frFmt),
-            "Pasado":                                       tpl.last(frFmt),
+            "Pasado":                                      tpl.last(frFmt),
             "Suma de sumas":                    tpl.sumOverSum(frFmt)
             "Cota 80% superior":        tpl.sumOverSumBound80(true, frFmt)
             "Cota 80% inferior":        tpl.sumOverSumBound80(false, frFmt)
