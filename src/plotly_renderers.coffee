@@ -70,6 +70,105 @@ callWithJQuery ($, Plotly) ->
             result = $("<div>").appendTo $("body")
             Plotly.newPlot(result[0], data, $.extend(layout, layoutOptions, opts.plotly))
             return result.detach()
+    
+    makePlotlyPieChart = (traceOptions, layoutOptions, transpose) ->
+      if traceOptions == null
+        traceOptions = {}
+      if layoutOptions == null
+        layoutOptions = {}
+      if transpose == null
+        transpose = false
+      (pivotData, opts) ->
+        colKeys = undefined
+        data = undefined
+        datumKeys = undefined
+        defaults = undefined
+        fullAggName = undefined
+        groupByTitle = undefined
+        hAxisTitle = undefined
+        layout = undefined
+        result = undefined
+        rowKeys = undefined
+        titleText = undefined
+        traceKeys = undefined
+        defaults =
+          localeStrings:
+            vs: 'vs'
+            by: 'by'
+          plotly: {}
+        opts = $.extend(true, {}, defaults, opts)
+        rowKeys = pivotData.getRowKeys()
+        colKeys = pivotData.getColKeys()
+        traceKeys = if transpose then colKeys else rowKeys
+        if traceKeys.length == 0
+          traceKeys.push []
+        datumKeys = if transpose then rowKeys else colKeys
+        if datumKeys.length == 0
+          datumKeys.push []
+        fullAggName = pivotData.aggregatorName
+        if pivotData.valAttrs.length
+          fullAggName += '(' + pivotData.valAttrs.join(', ') + ')'
+        rows = if traceKeys.length % 2 then Math.trunc(traceKeys.length / 2) + 1 else Math.trunc(traceKeys.length / 2)
+        data = traceKeys.map((traceKey, index) ->
+          datumKey = undefined
+          i = undefined
+          labels = undefined
+          len = undefined
+          trace = undefined
+          val = undefined
+          values = undefined
+          values = []
+          labels = []
+          i = 0
+          len = datumKeys.length
+          while i < len
+            datumKey = datumKeys[i]
+            val = parseFloat(pivotData.getAggregator(if transpose then datumKey else traceKey, if transpose then traceKey else datumKey).value())
+            values.push if isFinite(val) then val else null
+            labels.push datumKey.join('-') or ' '
+            i++
+          trace = name: traceKey.join('-') or fullAggName
+          column = index % 2
+          row = Math.trunc(index / 2)
+          trace.domain =
+            row: row
+            column: column
+          trace.textinfo = 'label+percent'
+          trace.insidetextfont = color: 'white'
+          trace.hole = .4
+          trace.labels = if transpose then values else labels
+          trace.values = if transpose then labels else values
+          $.extend trace, traceOptions
+        )
+        if transpose
+          hAxisTitle = pivotData.rowAttrs.join('-')
+          groupByTitle = pivotData.colAttrs.join('-')
+        else
+          hAxisTitle = pivotData.colAttrs.join('-')
+          groupByTitle = pivotData.rowAttrs.join('-')
+        titleText = fullAggName
+        if hAxisTitle != ''
+          titleText += ' ' + opts.localeStrings.vs + ' ' + hAxisTitle
+        if groupByTitle != ''
+          titleText += ' ' + opts.localeStrings.by + ' ' + groupByTitle
+        layout =
+          grid:
+            rows: rows
+            columns: if traceKeys.length <= 1 then 1 else 2
+          title: titleText
+          hovermode: 'closest'
+          width: window.innerWidth / 1.4
+          height: window.innerHeight / 1.4 - 50
+          xaxis:
+            title: if transpose then fullAggName else null
+            automargin: true
+          yaxis:
+            title: if transpose then null else fullAggName
+            automargin: true
+        result = $('<div>').appendTo($('body'))
+        data = data.reverse()
+        Plotly.newPlot result[0], data, $.extend(layout, layoutOptions, opts.plotly)
+        result.detach()
 
     makePlotlyScatterChart = -> (pivotData, opts) ->
         defaults =
@@ -118,3 +217,4 @@ callWithJQuery ($, Plotly) ->
         "Stacked Bar Chart": makePlotlyChart({type: 'bar'}, {barmode: 'relative'})
         "Line Chart": makePlotlyChart()
         "Scatter Chart": makePlotlyScatterChart()
+        "Donut Chart": makePlotlyPieChart({type: 'pie'})
