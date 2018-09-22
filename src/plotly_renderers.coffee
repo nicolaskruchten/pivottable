@@ -117,4 +117,5 @@ callWithJQuery ($, Plotly) ->
         "Bar Chart": makePlotlyChart({type: 'bar'}, {barmode: 'group'})
         "Stacked Bar Chart": makePlotlyChart({type: 'bar'}, {barmode: 'relative'})
         "Line Chart": makePlotlyChart()
+        "Area Chart": makePlotlyChart({stackgroup: 1})
         "Scatter Chart": makePlotlyScatterChart()

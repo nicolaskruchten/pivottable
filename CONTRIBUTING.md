@@ -1,3 +1,9 @@
+## Issues
+
+[Issues](https://github.com/nicolaskruchten/pivottable/issues/new) are the preferred way to communicate with the author and users of PivotTable.js, rather than private email.
+
+* Please read this repo's [guidelines regarding issues](https://github.com/nicolaskruchten/pivottable/blob/master/SUPPORT.md).
+
 ## Pull Requests
 
 [Pull requests](https://help.github.com/articles/using-pull-requests) to this project are very welcome! They are most likely to be merged in if they conform to this project's basic goals, scope and structure:
