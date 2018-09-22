@@ -182,6 +182,9 @@
         barmode: 'relative'
       }),
       "Line Chart": makePlotlyChart(),
+      "Area Chart": makePlotlyChart({
+        stackgroup: 1
+      }),
       "Scatter Chart": makePlotlyScatterChart()
     };
   });
