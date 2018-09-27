@@ -28,6 +28,9 @@ callWithJQuery ($) ->
             totals: "Totales"
             vs: "vs"
             by: "por"
+            apply: "Aplicar"
+            cancel: "Cancelar"
+
         aggregators: 
             "Cuenta":                             tpl.count(frFmtInt)
             "Cuenta de valores únicos":          tpl.countUnique(frFmtInt)
