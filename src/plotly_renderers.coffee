@@ -104,7 +104,7 @@ callWithJQuery ($, Plotly) ->
 
         renderArea = $("<div>", style: "display:none;").appendTo $("body")
         result = $("<div>").appendTo renderArea
-        Plotly.plot(result[0], [data], $.extend(layout, opts.plotly))
+        Plotly.newPlot(result[0], [data], $.extend(layout, opts.plotly))
         result.detach()
         renderArea.remove()
         return result
