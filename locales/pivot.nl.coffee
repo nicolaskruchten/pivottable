@@ -6,7 +6,7 @@ callWithJQuery = (pivotModule) ->
     # Plain browser env
     else
         pivotModule jQuery
-        
+
 callWithJQuery ($) ->
     nf = $.pivotUtilities.numberFormat
     tpl = $.pivotUtilities.aggregatorTemplates
@@ -15,7 +15,7 @@ callWithJQuery ($) ->
     frFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: " ", decimalSep: ",")
     frFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: " ", decimalSep: ",")
 
-    $.pivotUtilities.locales.nl = 
+    $.pivotUtilities.locales.nl =
         localeStrings:
             renderError: "Er is een fout opgetreden bij het renderen van de kruistabel."
             computeError: "Er is een fout opgetreden bij het berekenen van de kruistabel."
@@ -28,7 +28,7 @@ callWithJQuery ($) ->
             vs: "versus"
             by: "per"
 
-        aggregators: 
+        aggregators:
             "Aantal":                              tpl.count(frFmtInt)
             "Aantal unieke waarden":               tpl.countUnique(frFmtInt)
             "Lijst unieke waarden":                tpl.listUnique(", ")
@@ -37,6 +37,8 @@ callWithJQuery ($) ->
             "Gemiddelde":                          tpl.average(frFmt)
             "Minimum":                             tpl.min(frFmt)
             "Maximum":                             tpl.max(frFmt)
+            "Eerste":                              tpl.first(frFmt)
+            "Laatste":                             tpl.last(frFmt)
             "Som over som":                        tpl.sumOverSum(frFmt)
             "80% bovengrens":                      tpl.sumOverSumBound80(true, frFmt)
             "80% ondergrens":        			   tpl.sumOverSumBound80(false, frFmt)
