@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+            body {font-family: Verdana;}
+            /* High-contrast, dark theme for UI*/
+            .pvtUiCell, .pvtRenderer, .pvtAggregator, .pvtAttr, .pvtTriangle, .pvtFilterBox, .pvtFilterBox .count, .pvtFilterBox button
+               {
+               background-color: #000 !important;
+               color: #FFF;
+               }
+
+            /* Hides the UI when printing*/
+            @media print
+               {
+               .pvtUiCell
+                  { display: none; }
+               }
+        </style>
+
+        <!-- optional: mobile support with jqueryui-touch-punch -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
+        <!-- for examples only! script to show code to user -->
+        <script type="text/javascript" src="show_code.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+    // Basic usage of pivotUI()
+
+    $(function(){
+        $("#output").pivotUI(
+            [
+                {color: "blue", shape: "circle"},
+                {color: "red", shape: "triangle"}
+            ],
+            {
+                rows: ["color"],
+                cols: ["shape"]
+            }
+        );
+     });
+        </script>
+
+        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
+
+     <pre style='font-family: Source Code Pro;'>
+     &lt;<span style='color:#3182bd;'>style</span>&gt;
+        <span style='color:gray;'>/* High-contrast, dark theme for UI*/</span>
+        <span style='color:#756bb1;'>.pvtUiCell</span>, <span style='color:#756bb1;'>.pvtRenderer</span>, <span style='color:#756bb1;'>.pvtAggregator</span>, <span style='color:#756bb1;'>.pvtAttr</span>, <span style='color:#756bb1;'>.pvtTriangle</span>, <span style='color:#756bb1;'>.pvtFilterBox</span>, <span style='color:#756bb1;'>.pvtFilterBox .count</span>, <span style='color:#756bb1;'>.pvtFilterBox button</span>
+           {
+           background-color: #000 !important;
+           color: #FFF;
+           }
+
+        <span style='color:gray;'>/* Hides the UI when printing*/</span>
+        <span style='color:#756bb1;'>@media print</span>
+           {
+           <span style='color:#756bb1;'>.pvtUiCell</span>
+              { display: none; }
+           }
+     &lt;/<span style='color:#3182bd;'>style</span>&gt;
+     </pre>
+
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>
