@@ -3,9 +3,8 @@
     <head>
         <title>Pivot Demo</title>
         <!-- external libs from cdnjs -->
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-basic-latest.min.js"></script>
+
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
@@ -13,17 +12,9 @@
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
         <script type="text/javascript" src="../dist/pivot.js"></script>
-        <script type="text/javascript" src="../dist/c3_renderers.js"></script>
+        <script type="text/javascript" src="../dist/plotly_renderers.js"></script>
         <style>
             body {font-family: Verdana;}
-
-            .c3-line, .c3-focused {stroke-width: 3px !important;}
-            .c3-bar {stroke: white !important; stroke-width: 1;}
-            .c3 text { font-size: 12px; color: grey;}
-            .tick line {stroke: white;}
-            .c3-axis path {stroke: grey;}
-            .c3-circle { opacity: 1 !important; }
-            .c3-xgrid-focus {visibility: hidden !important;}
         </style>
 
         <!-- optional: mobile support with jqueryui-touch-punch -->
@@ -34,7 +25,7 @@
     </head>
     <body>
         <script type="text/javascript">
-    // This example shows off the C3 Scatterplot renderer with CSV input.
+    // This example shows off the Plotly Scatterplot renderer with CSV input.
 
     $(function(){
         Papa.parse("https://raw.githubusercontent.com/nicolaskruchten/Rdatasets/master/csv/datasets/iris.csv", {
@@ -43,9 +34,9 @@
             complete: function(parsed){
                 $("#output").pivot(parsed.data, {
                     rows: ["Petal.Length"],
-                    cols: ["Petal.Width", "Species"],
-                    renderer: $.pivotUtilities.c3_renderers["Scatter Chart"],
-                    rendererOptions: { c3: { size: {width: 600, height: 600} } }
+                    cols: ["Petal.Width"],
+                    renderer: $.pivotUtilities.plotly_renderers["Scatter Chart"],
+                    rendererOptions: { plotly: {width: 600, height: 600} }
                 });
             }
         });
