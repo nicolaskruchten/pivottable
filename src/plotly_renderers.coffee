@@ -41,8 +41,12 @@ callWithJQuery ($, Plotly) ->
                     labels.push(datumKey.join('-') || ' ')
 
                 trace = {name: traceKey.join('-') || fullAggName}
-                trace.x = if transpose then values else labels
-                trace.y = if transpose then labels else values
+                if traceOptions.type == "pie"
+                    trace.values = values
+                    trace.labels = if labels.length > 1 then labels else [fullAggName]
+                else
+                    trace.x = if transpose then values else labels
+                    trace.y = if transpose then labels else values
                 return $.extend(trace, traceOptions)
 
             if transpose
@@ -55,18 +59,32 @@ callWithJQuery ($, Plotly) ->
             titleText += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
             titleText += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
 
-            layout = {
+            layout =
                 title: titleText
                 hovermode: 'closest'
                 width: window.innerWidth / 1.4
                 height: window.innerHeight / 1.4 - 50
-                xaxis:
+
+            if traceOptions.type == 'pie'
+                columns = Math.ceil(Math.sqrt(data.length))
+                rows = Math.ceil(data.length / columns)
+                layout.grid = {columns, rows}
+                for i, d of data
+                    d.domain = {
+                        row: Math.floor(i / columns),
+                        column: i - columns * Math.floor(i / columns),
+                    }
+                    if data.length > 1
+                        d.title = d.name
+                layout.showlegend = false if data[0].labels.length == 1
+            else
+                layout.xaxis =
                     title: if transpose then fullAggName else null
                     automargin: true
-                yaxis:
+                layout.yaxis =
                     title: if transpose then null else fullAggName
                     automargin: true
-            }
+
 
             result = $("<div>").appendTo $("body")
             Plotly.newPlot(result[0], data, $.extend(layout, layoutOptions, opts.plotly), opts.plotlyConfig)
@@ -121,3 +139,6 @@ callWithJQuery ($, Plotly) ->
         "Line Chart": makePlotlyChart()
         "Area Chart": makePlotlyChart({stackgroup: 1})
         "Scatter Chart": makePlotlyScatterChart()
+        'Multiple Pie Chart': makePlotlyChart(
+            {type: 'pie', scalegroup: 1, hoverinfo: 'label+value', textinfo: 'none'},
+            {}, true)
