@@ -42,7 +42,9 @@
         filterResults: "Filtrar resultados",
         totals: "Totales",
         vs: "vs",
-        by: "por"
+        by: "por",
+        apply: "Aplicar",
+        cancel: "Cancelar"
       },
       aggregators: {
         "Cuenta": tpl.count(frFmtInt),
@@ -51,8 +53,13 @@
         "Suma": tpl.sum(frFmt),
         "Suma de enteros": tpl.sum(frFmtInt),
         "Promedio": tpl.average(frFmt),
+        "Mediana": tpl.median(frFmt),
+        "Diferencia": tpl["var"](1, frFmt),
+        "Desviación estándar de la muestra": tpl.stdev(1, frFmt),
         "Mínimo": tpl.min(frFmt),
         "Máximo": tpl.max(frFmt),
+        "Primero": tpl.first(frFmt),
+        "Pasado": tpl.last(frFmt),
         "Suma de sumas": tpl.sumOverSum(frFmt),
         "Cota 80% superior": tpl.sumOverSumBound80(true, frFmt),
         "Cota 80% inferior": tpl.sumOverSumBound80(false, frFmt),

@@ -42,6 +42,9 @@ callWithJQuery ($) ->
             "Soma":                                         tpl.sum(frFmt)
             "Soma de Inteiros":                             tpl.sum(frFmtInt)
             "Média":                                        tpl.average(frFmt)
+            "Mediana":                                      tpl.median(frFmt)
+            "Variancia":                                    tpl.var(1, frFmt)
+            "Desvio Padrão da Amostra":                     tpl.stdev(1, frFmt)
             "Mínimo":                                       tpl.min(frFmt)
             "Máximo":                                       tpl.max(frFmt)
             "Primeiro":                                     tpl.first(frFmt),
