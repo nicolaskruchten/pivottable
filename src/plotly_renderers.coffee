@@ -14,6 +14,7 @@ callWithJQuery ($, Plotly) ->
             defaults =
                 localeStrings: {vs: "vs", by: "by"}
                 plotly: {}
+                plotlyConfig: {}
 
             opts = $.extend(true, {}, defaults, opts)
 
@@ -68,13 +69,14 @@ callWithJQuery ($, Plotly) ->
             }
 
             result = $("<div>").appendTo $("body")
-            Plotly.newPlot(result[0], data, $.extend(layout, layoutOptions, opts.plotly))
+            Plotly.newPlot(result[0], data, $.extend(layout, layoutOptions, opts.plotly), opts.plotlyConfig)
             return result.detach()
 
     makePlotlyScatterChart = -> (pivotData, opts) ->
         defaults =
             localeStrings: {vs: "vs", by: "by"}
             plotly: {}
+            plotlyConfig: {}
 
         opts = $.extend(true, {}, defaults, opts)
 
@@ -96,15 +98,15 @@ callWithJQuery ($, Plotly) ->
         layout = {
             title: pivotData.rowAttrs.join("-") + ' vs ' + pivotData.colAttrs.join("-")
             hovermode: 'closest',
-            xaxis: {title: pivotData.colAttrs.join('-'), domain: [0.1, 1.0]},
-            yaxis: {title: pivotData.rowAttrs.join('-')},
+            xaxis: {title: pivotData.colAttrs.join('-'), automargin: true},
+            yaxis: {title: pivotData.rowAttrs.join('-'), automargin: true},
             width: window.innerWidth / 1.5,
             height: window.innerHeight / 1.4 - 50
         }
 
         renderArea = $("<div>", style: "display:none;").appendTo $("body")
         result = $("<div>").appendTo renderArea
-        Plotly.newPlot(result[0], [data], $.extend(layout, opts.plotly))
+        Plotly.newPlot(result[0], [data], $.extend(layout, opts.plotly), opts.plotlyConfig)
         result.detach()
         renderArea.remove()
         return result
