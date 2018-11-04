@@ -53,6 +53,8 @@
         "Gemiddelde": tpl.average(frFmt),
         "Minimum": tpl.min(frFmt),
         "Maximum": tpl.max(frFmt),
+        "Eerste": tpl.first(frFmt),
+        "Laatste": tpl.last(frFmt),
         "Som over som": tpl.sumOverSum(frFmt),
         "80% bovengrens": tpl.sumOverSumBound80(true, frFmt),
         "80% ondergrens": tpl.sumOverSumBound80(false, frFmt),

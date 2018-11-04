@@ -24,13 +24,14 @@
         transpose = false;
       }
       return function(pivotData, opts) {
-        var colKeys, data, datumKeys, defaults, fullAggName, groupByTitle, hAxisTitle, layout, result, rowKeys, titleText, traceKeys;
+        var colKeys, columns, d, data, datumKeys, defaults, fullAggName, groupByTitle, hAxisTitle, i, layout, result, rowKeys, rows, titleText, traceKeys;
         defaults = {
           localeStrings: {
             vs: "vs",
             by: "by"
           },
-          plotly: {}
+          plotly: {},
+          plotlyConfig: {}
         };
         opts = $.extend(true, {}, defaults, opts);
         rowKeys = pivotData.getRowKeys();
@@ -48,11 +49,11 @@
           fullAggName += "(" + (pivotData.valAttrs.join(", ")) + ")";
         }
         data = traceKeys.map(function(traceKey) {
-          var datumKey, i, labels, len, trace, val, values;
+          var datumKey, j, labels, len, trace, val, values;
           values = [];
           labels = [];
-          for (i = 0, len = datumKeys.length; i < len; i++) {
-            datumKey = datumKeys[i];
+          for (j = 0, len = datumKeys.length; j < len; j++) {
+            datumKey = datumKeys[j];
             val = parseFloat(pivotData.getAggregator(transpose ? datumKey : traceKey, transpose ? traceKey : datumKey).value());
             values.push(isFinite(val) ? val : null);
             labels.push(datumKey.join('-') || ' ');
@@ -60,8 +61,13 @@
           trace = {
             name: traceKey.join('-') || fullAggName
           };
-          trace.x = transpose ? values : labels;
-          trace.y = transpose ? labels : values;
+          if (traceOptions.type === "pie") {
+            trace.values = values;
+            trace.labels = labels.length > 1 ? labels : [fullAggName];
+          } else {
+            trace.x = transpose ? values : labels;
+            trace.y = transpose ? labels : values;
+          }
           return $.extend(trace, traceOptions);
         });
         if (transpose) {
@@ -82,30 +88,53 @@
           title: titleText,
           hovermode: 'closest',
           width: window.innerWidth / 1.4,
-          height: window.innerHeight / 1.4 - 50,
-          xaxis: {
+          height: window.innerHeight / 1.4 - 50
+        };
+        if (traceOptions.type === 'pie') {
+          columns = Math.ceil(Math.sqrt(data.length));
+          rows = Math.ceil(data.length / columns);
+          layout.grid = {
+            columns: columns,
+            rows: rows
+          };
+          for (i in data) {
+            d = data[i];
+            d.domain = {
+              row: Math.floor(i / columns),
+              column: i - columns * Math.floor(i / columns)
+            };
+            if (data.length > 1) {
+              d.title = d.name;
+            }
+          }
+          if (data[0].labels.length === 1) {
+            layout.showlegend = false;
+          }
+        } else {
+          layout.xaxis = {
             title: transpose ? fullAggName : null,
             automargin: true
-          },
-          yaxis: {
+          };
+          layout.yaxis = {
             title: transpose ? null : fullAggName,
             automargin: true
-          }
-        };
+          };
+        }
         result = $("<div>").appendTo($("body"));
-        Plotly.newPlot(result[0], data, $.extend(layout, layoutOptions, opts.plotly));
+        Plotly.newPlot(result[0], data, $.extend(layout, layoutOptions, opts.plotly), opts.plotlyConfig);
         return result.detach();
       };
     };
     makePlotlyScatterChart = function() {
       return function(pivotData, opts) {
-        var colKey, colKeys, data, defaults, i, j, layout, len, len1, renderArea, result, rowKey, rowKeys, v;
+        var colKey, colKeys, data, defaults, j, k, layout, len, len1, renderArea, result, rowKey, rowKeys, v;
         defaults = {
           localeStrings: {
             vs: "vs",
             by: "by"
           },
-          plotly: {}
+          plotly: {},
+          plotlyConfig: {}
         };
         opts = $.extend(true, {}, defaults, opts);
         rowKeys = pivotData.getRowKeys();
@@ -123,10 +152,10 @@
           type: 'scatter',
           mode: 'markers'
         };
-        for (i = 0, len = rowKeys.length; i < len; i++) {
-          rowKey = rowKeys[i];
-          for (j = 0, len1 = colKeys.length; j < len1; j++) {
-            colKey = colKeys[j];
+        for (j = 0, len = rowKeys.length; j < len; j++) {
+          rowKey = rowKeys[j];
+          for (k = 0, len1 = colKeys.length; k < len1; k++) {
+            colKey = colKeys[k];
             v = pivotData.getAggregator(rowKey, colKey).value();
             if (v != null) {
               data.x.push(colKey.join('-'));
@@ -140,10 +169,11 @@
           hovermode: 'closest',
           xaxis: {
             title: pivotData.colAttrs.join('-'),
-            domain: [0.1, 1.0]
+            automargin: true
           },
           yaxis: {
-            title: pivotData.rowAttrs.join('-')
+            title: pivotData.rowAttrs.join('-'),
+            automargin: true
           },
           width: window.innerWidth / 1.5,
           height: window.innerHeight / 1.4 - 50
@@ -152,7 +182,7 @@
           style: "display:none;"
         }).appendTo($("body"));
         result = $("<div>").appendTo(renderArea);
-        Plotly.plot(result[0], [data], $.extend(layout, opts.plotly));
+        Plotly.newPlot(result[0], [data], $.extend(layout, opts.plotly), opts.plotlyConfig);
         result.detach();
         renderArea.remove();
         return result;
@@ -185,7 +215,13 @@
       "Area Chart": makePlotlyChart({
         stackgroup: 1
       }),
-      "Scatter Chart": makePlotlyScatterChart()
+      "Scatter Chart": makePlotlyScatterChart(),
+      'Multiple Pie Chart': makePlotlyChart({
+        type: 'pie',
+        scalegroup: 1,
+        hoverinfo: 'label+value',
+        textinfo: 'none'
+      }, {}, true)
     };
   });
 

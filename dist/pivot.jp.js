@@ -12,19 +12,19 @@
   };
 
   callWithJQuery(function($) {
-    var jaFmtInt, jaFmtPct, jpFmt, nf, tpl;
+    var jpFmt, jpFmtInt, jpFmtPct, nf, tpl;
     nf = $.pivotUtilities.numberFormat;
     tpl = $.pivotUtilities.aggregatorTemplates;
     jpFmt = nf({
       thousandsSep: ",",
       decimalSep: "."
     });
-    jaFmtInt = nf({
+    jpFmtInt = nf({
       digitsAfterDecimal: 0,
       thousandsSep: ",",
       decimalSep: "."
     });
-    jaFmtPct = nf({
+    jpFmtPct = nf({
       digitsAfterDecimal: 1,
       scaler: 100,
       suffix: "%",
