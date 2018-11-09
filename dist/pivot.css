@@ -116,7 +116,7 @@ table.pvtTable tbody tr td {
 .pvtUI2
 {
 	display: grid;
-	grid-template-columns: [rowGroups] 120px [reportArea] auto [end];
+	grid-template-columns: [rowGroups] 120px [reportArea] auto [margin] 1fr [end];
 	grid-template-rows: [rendererControl] 28px [pagingArea] 34px [aggregators] 34px [columnGroups] 34px [reportArea] auto [end];
 }
 
@@ -139,6 +139,7 @@ table.pvtTable tbody tr td {
 }
 
 .pvtUI2 > div:nth-child(5) {
+	grid-column: 1;
 	margin-top: 4px;
 }
 
