@@ -45,6 +45,7 @@
     "gulp-util": "^3.0.1",
     "gulp-rename": "^1.2.0",
     "gulp-minify-css": "^0.3.11",
-    "gulp-concat": "^2.4.2"
+    "gulp-concat": "^2.4.2",
+    "natives": "^1.1.6"
   }
 }
