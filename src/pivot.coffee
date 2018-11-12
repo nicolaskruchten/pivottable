@@ -652,7 +652,11 @@ callWithJQuery ($) ->
 
 
     ###
-    Pivot Table UI: calls Pivot Table core above with options set by user
+    Pivot Table UI: calls Pivot Table core above with options set by user.
+    Set the 'tag' option to 'table' (the default) to have the layout HTML
+    use the <table> and related tags.  Use a value of 'div' to hve the layout
+    HTML use a series of <div> tags for the renderer, page fields, aggregator,
+    columns, rows and report areas.
     ###
 
     $.fn.pivotUI = (input, inputOpts, overwrite = false, locale="en") ->
@@ -676,6 +680,7 @@ callWithJQuery ($) ->
             showUI: true
             filter: -> true
             sorters: {}
+            tag: 'table'
 
         localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         localeDefaults =
@@ -709,10 +714,16 @@ callWithJQuery ($) ->
                 recordsProcessed++
 
             #start building the output
-            uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
+            if opts.tag == 'div' 
+                uiTable = $("<div>", "class": "pvtUi pvtUi2")
+            else
+                uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
 
             #renderer control
-            rendererControl = $("<td>").addClass("pvtUiCell")
+            if opts.tag == 'div'
+                rendererControl = $("<div>").addClass("pvtUiCell")
+            else
+                rendererControl = $("<td>").addClass("pvtUiCell")
 
             renderer = $("<select>")
                 .addClass('pvtRenderer')
@@ -723,7 +734,10 @@ callWithJQuery ($) ->
 
 
             #axis list, including the double-click menu
-            unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
+            if opts.tag == 'div'
+                unused = $("<div>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
+            else
+                unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
             shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
             shownInAggregators = (c for c in shownAttributes when c not in opts.hiddenFromAggregators)
             shownInDragDrop = (c for c in shownAttributes when c not in opts.hiddenFromDragDrop)
@@ -858,7 +872,8 @@ callWithJQuery ($) ->
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                     unused.append(attrElem).append(valueList)
 
-            tr1 = $("<tr>").appendTo(uiTable)
+            if not opts.tag? or opts.tag != 'div'
+                tr1 = $("<tr>").appendTo(uiTable)
 
             #aggregator menu and value area
 
@@ -886,425 +901,66 @@ callWithJQuery ($) ->
                     $(this).html(ordering[$(this).data("order")].colSymbol)
                     refresh()
 
-            $("<td>").addClass('pvtVals pvtUiCell')
-              .appendTo(tr1)
-              .append(aggregator)
+            if opts.tag == 'div'
+                vals = $("<div>")
+            else
+                vals = $("<td>")
+
+            vals = vals.addClass('pvtVals pvtUiCell')
+
+            if opts.tag == 'div'
+                vals.appendTo(uiTable)
+            else
+                vals.appendTo(tr1)
+
+            vals.append(aggregator)
               .append(rowOrderArrow)
               .append(colOrderArrow)
               .append($("<br>"))
 
             #column axes
-            $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell').appendTo(tr1)
+            if opts.tag == 'div'
+                cols = $("<div>")
+            else
+                cols = $("<td>")
+            cols.addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell')
 
-            tr2 = $("<tr>").appendTo(uiTable)
+            if opts.tag == 'div'
+                cols.appendTo(uiTable)
+            else
+                cols.appendTo(tr1)
+
+            if opts.tag != 'div'
+                tr2 = $("<tr>").appendTo(uiTable)
 
             #row axes
-            tr2.append $("<td>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top")
+            if opts.tag == 'div'
+                uiTable.append $("<div>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top")
+            else
+                tr2.append $("<td>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top")
 
             #the actual pivot table container
-            pivotTable = $("<td>")
-                .attr("valign", "top")
+            if opts.tag == 'div'
+                pivotTable = $("<div>")
+            else
+                pivotTable = $("<td>")
+
+            pivotTable.attr("valign", "top")
                 .addClass('pvtRendererArea')
-                .appendTo(tr2)
+
+            if opts.tag == 'div' 
+                pivotTable.appendTo(uiTable)
+            else
+                pivotTable.appendTo(tr2)
 
             #finally the renderer dropdown and unused attribs are inserted at the requested location
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
                 uiTable.find('tr:nth-child(1)').prepend rendererControl
                 uiTable.find('tr:nth-child(2)').prepend unused
+            else if opts.tag == 'div'
+                uiTable.prepend(unused).prepend(rendererControl);
             else
                 uiTable.prepend $("<tr>").append(rendererControl).append(unused)
-
-            #render the UI in its default state
-            @html uiTable
-
-            #set up the UI initial state as requested by moving elements around
-
-            for x in opts.cols
-                @find(".pvtCols").append @find(".axis_#{$.inArray(x, shownInDragDrop)}")
-            for x in opts.rows
-                @find(".pvtRows").append @find(".axis_#{$.inArray(x, shownInDragDrop)}")
-            if opts.aggregatorName?
-                @find(".pvtAggregator").val opts.aggregatorName
-            if opts.rendererName?
-                @find(".pvtRenderer").val opts.rendererName
-
-            @find(".pvtUiCell").hide() unless opts.showUI
-
-            initialRender = true
-
-            #set up for refreshing
-            refreshDelayed = =>
-                subopts =
-                    derivedAttributes: opts.derivedAttributes
-                    localeStrings: opts.localeStrings
-                    rendererOptions: opts.rendererOptions
-                    sorters: opts.sorters
-                    cols: [], rows: []
-                    dataClass: opts.dataClass
-
-                numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0
-                vals = []
-                @find(".pvtRows li span.pvtAttr").each -> subopts.rows.push $(this).data("attrName")
-                @find(".pvtCols li span.pvtAttr").each -> subopts.cols.push $(this).data("attrName")
-                @find(".pvtVals select.pvtAttrDropdown").each ->
-                    if numInputsToProcess == 0
-                        $(this).remove()
-                    else
-                        numInputsToProcess--
-                        vals.push $(this).val() if $(this).val() != ""
-
-                if numInputsToProcess != 0
-                    pvtVals = @find(".pvtVals")
-                    for x in [0...numInputsToProcess]
-                        newDropdown = $("<select>")
-                            .addClass('pvtAttrDropdown')
-                            .append($("<option>"))
-                            .bind "change", -> refresh()
-                        for attr in shownInAggregators
-                            newDropdown.append($("<option>").val(attr).text(attr))
-                        pvtVals.append(newDropdown)
-
-                if initialRender
-                    vals = opts.vals
-                    i = 0
-                    @find(".pvtVals select.pvtAttrDropdown").each ->
-                        $(this).val vals[i]
-                        i++
-                    initialRender = false
-
-                subopts.aggregatorName = aggregator.val()
-                subopts.vals = vals
-                subopts.aggregator = opts.aggregators[aggregator.val()](vals)
-                subopts.renderer = opts.renderers[renderer.val()]
-                subopts.rowOrder = rowOrderArrow.data("order")
-                subopts.colOrder = colOrderArrow.data("order")
-                #construct filter here
-                exclusions = {}
-                @find('input.pvtFilter').not(':checked').each ->
-                    filter = $(this).data("filter")
-                    if exclusions[filter[0]]?
-                        exclusions[filter[0]].push( filter[1] )
-                    else
-                        exclusions[filter[0]] = [ filter[1] ]
-                #include inclusions when exclusions present
-                inclusions = {}
-                @find('input.pvtFilter:checked').each ->
-                    filter = $(this).data("filter")
-                    if exclusions[filter[0]]?
-                        if inclusions[filter[0]]?
-                            inclusions[filter[0]].push( filter[1] )
-                        else
-                            inclusions[filter[0]] = [ filter[1] ]
-
-                subopts.filter = (record) ->
-                    return false if not opts.filter(record)
-                    for k,excludedItems of exclusions
-                        return false if ""+(record[k] ? 'null') in excludedItems
-                    return true
-
-                pivotTable.pivot(materializedInput,subopts)
-                pivotUIOptions = $.extend {}, opts,
-                    cols: subopts.cols
-                    rows: subopts.rows
-                    colOrder: subopts.colOrder
-                    rowOrder: subopts.rowOrder
-                    vals: vals
-                    exclusions: exclusions
-                    inclusions: inclusions
-                    inclusionsInfo: inclusions #duplicated for backwards-compatibility
-                    aggregatorName: aggregator.val()
-                    rendererName: renderer.val()
-
-                @data "pivotUIOptions", pivotUIOptions
-
-                # if requested make sure unused columns are in alphabetical order
-                if opts.autoSortUnusedAttrs
-                    unusedAttrsContainer = @find("td.pvtUnused.pvtAxisContainer")
-                    $(unusedAttrsContainer).children("li")
-                        .sort((a, b) => naturalSort($(a).text(), $(b).text()))
-                        .appendTo unusedAttrsContainer
-
-                pivotTable.css("opacity", 1)
-                opts.onRefresh(pivotUIOptions) if opts.onRefresh?
-
-            refresh = =>
-                pivotTable.css("opacity", 0.5)
-                setTimeout refreshDelayed, 10
-
-            #the very first refresh will actually display the table
-            refresh()
-
-            @find(".pvtAxisContainer").sortable
-                    update: (e, ui) -> refresh() if not ui.sender?
-                    connectWith: @find(".pvtAxisContainer")
-                    items: 'li'
-                    placeholder: 'pvtPlaceholder'
-        catch e
-            console.error(e.stack) if console?
-            @html opts.localeStrings.uiRenderError
-        return this
-
-
-    ###
-    Pivot Table UI2: calls Pivot Table core above with options set by user.  
-	It is different to PivotUI in that it generates HTML using <div> tag 
-	rather than a table.  This means the table presentation can be more flexible.
-    ###
-
-    $.fn.pivotUI2 = (input, inputOpts, overwrite = false, locale="en") ->
-        locale = "en" if not locales[locale]?
-        defaults =
-            derivedAttributes: {}
-            aggregators: locales[locale].aggregators
-            renderers: locales[locale].renderers
-            hiddenAttributes: []
-            hiddenFromAggregators: []
-            hiddenFromDragDrop: []
-            menuLimit: 500
-            cols: [], rows: [], vals: []
-            rowOrder: "key_a_to_z", colOrder: "key_a_to_z"
-            dataClass: PivotData
-            exclusions: {}
-            inclusions: {}
-            unusedAttrsVertical: 85
-            autoSortUnusedAttrs: false
-            onRefresh: null
-            showUI: true
-            filter: -> true
-            sorters: {}
-
-        localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
-        localeDefaults =
-            rendererOptions: {localeStrings}
-            localeStrings: localeStrings
-
-        existingOpts = @data "pivotUIOptions"
-        if not existingOpts? or overwrite
-            opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts))
-        else
-            opts = existingOpts
-
-        try
-            # do a first pass on the data to cache a materialized copy of any
-            # function-valued inputs and to compute dimension cardinalities
-            attrValues = {}
-            materializedInput = []
-            recordsProcessed = 0
-            PivotData.forEachRecord input, opts.derivedAttributes, (record) ->
-                return unless opts.filter(record)
-                materializedInput.push(record)
-                for own attr of record
-                    if not attrValues[attr]?
-                        attrValues[attr] = {}
-                        if recordsProcessed > 0
-                            attrValues[attr]["null"] = recordsProcessed
-                for attr of attrValues
-                    value = record[attr] ? "null"
-                    attrValues[attr][value] ?= 0
-                    attrValues[attr][value]++
-                recordsProcessed++
-
-            #start building the output
-            uiTable = $("<div>", "class": "pvtUi pvtUi2").attr("cellpadding", 5)
-
-            #renderer control
-            rendererControl = $("<div>").addClass("pvtUiCell")
-
-            renderer = $("<select>")
-                .addClass('pvtRenderer')
-                .appendTo(rendererControl)
-                .bind "change", -> refresh() #capture reference
-            for own x of opts.renderers
-                $("<option>").val(x).html(x).appendTo(renderer)
-
-
-            #axis list, including the double-click menu
-            unused = $("<div>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
-            shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
-            shownInAggregators = (c for c in shownAttributes when c not in opts.hiddenFromAggregators)
-            shownInDragDrop = (c for c in shownAttributes when c not in opts.hiddenFromDragDrop)
-
-
-            unusedAttrsVerticalAutoOverride = false
-            if opts.unusedAttrsVertical == "auto"
-                unusedAttrsVerticalAutoCutoff = 120 # legacy support
-            else
-                unusedAttrsVerticalAutoCutoff = parseInt opts.unusedAttrsVertical
-
-            if not isNaN(unusedAttrsVerticalAutoCutoff)
-                attrLength = 0
-                attrLength += a.length for a in shownInDragDrop
-                unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff
-
-            if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
-                unused.addClass('pvtVertList')
-            else
-                unused.addClass('pvtHorizList')
-
-            for own i, attr of shownInDragDrop
-                do (attr) ->
-                    values = (v for v of attrValues[attr])
-                    hasExcludedItem = false
-                    valueList = $("<div>").addClass('pvtFilterBox').hide()
-
-                    valueList.append $("<h4>").append(
-                        $("<span>").text(attr),
-                        $("<span>").addClass("count").text("(#{values.length})"),
-                        )
-                    if values.length > opts.menuLimit
-                        valueList.append $("<p>").html(opts.localeStrings.tooMany)
-                    else
-                        if values.length > 5
-                            controls = $("<p>").appendTo(valueList)
-                            sorter = getSort(opts.sorters, attr)
-                            placeholder = opts.localeStrings.filterResults
-                            $("<input>", {type: "text"}).appendTo(controls)
-                                .attr({placeholder: placeholder, class: "pvtSearch"})
-                                .bind "keyup", ->
-                                    filter = $(this).val().toLowerCase().trim()
-                                    accept_gen = (prefix, accepted) -> (v) ->
-                                        real_filter = filter.substring(prefix.length).trim()
-                                        return true if real_filter.length == 0
-                                        return Math.sign(sorter(v.toLowerCase(), real_filter)) in accepted
-                                    accept =
-                                        if      filter.indexOf(">=") == 0 then accept_gen(">=", [1,0])
-                                        else if filter.indexOf("<=") == 0 then accept_gen("<=", [-1,0])
-                                        else if filter.indexOf(">") == 0  then accept_gen(">",  [1])
-                                        else if filter.indexOf("<") == 0  then accept_gen("<",  [-1])
-                                        else if filter.indexOf("~") == 0  then (v) ->
-                                                return true if filter.substring(1).trim().length == 0
-                                                v.toLowerCase().match(filter.substring(1))
-                                        else (v) -> v.toLowerCase().indexOf(filter) != -1
-
-                                    valueList.find('.pvtCheckContainer p label span.value').each ->
-                                        if accept($(this).text())
-                                            $(this).parent().parent().show()
-                                        else
-                                            $(this).parent().parent().hide()
-                            controls.append $("<br>")
-                            $("<button>", {type:"button"}).appendTo(controls)
-                                .html(opts.localeStrings.selectAll)
-                                .bind "click", ->
-                                    valueList.find("input:visible:not(:checked)")
-                                        .prop("checked", true).toggleClass("changed")
-                                    return false
-                            $("<button>", {type:"button"}).appendTo(controls)
-                                .html(opts.localeStrings.selectNone)
-                                .bind "click", ->
-                                    valueList.find("input:visible:checked")
-                                        .prop("checked", false).toggleClass("changed")
-                                    return false
-
-                        checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
-
-                        for value in values.sort(getSort(opts.sorters, attr))
-                             valueCount = attrValues[attr][value]
-                             filterItem = $("<label>")
-                             filterItemExcluded = false
-                             if opts.inclusions[attr]
-                                filterItemExcluded = (value not in opts.inclusions[attr])
-                             else if opts.exclusions[attr]
-                                filterItemExcluded = (value in opts.exclusions[attr])
-                             hasExcludedItem ||= filterItemExcluded
-                             $("<input>")
-                                .attr("type", "checkbox").addClass('pvtFilter')
-                                .attr("checked", !filterItemExcluded).data("filter", [attr,value])
-                                .appendTo(filterItem)
-                                .bind "change", -> $(this).toggleClass("changed")
-                             filterItem.append $("<span>").addClass("value").text(value)
-                             filterItem.append $("<span>").addClass("count").text("("+valueCount+")")
-                             checkContainer.append $("<p>").append(filterItem)
-
-                    closeFilterBox = ->
-                        if valueList.find("[type='checkbox']").length >
-                               valueList.find("[type='checkbox']:checked").length
-                                attrElem.addClass "pvtFilteredAttribute"
-                            else
-                                attrElem.removeClass "pvtFilteredAttribute"
-
-                            valueList.find('.pvtSearch').val('')
-                            valueList.find('.pvtCheckContainer p').show()
-                            valueList.hide()
-
-                    finalButtons = $("<p>").appendTo(valueList)
-
-                    if values.length <= opts.menuLimit
-                        $("<button>", {type: "button"}).text(opts.localeStrings.apply)
-                            .appendTo(finalButtons).bind "click", ->
-                                if valueList.find(".changed").removeClass("changed").length
-                                    refresh()
-                                closeFilterBox()
-
-                    $("<button>", {type: "button"}).text(opts.localeStrings.cancel)
-                        .appendTo(finalButtons).bind "click", ->
-                            valueList.find(".changed:checked")
-                                .removeClass("changed").prop("checked", false)
-                            valueList.find(".changed:not(:checked)")
-                                .removeClass("changed").prop("checked", true)
-                            closeFilterBox()
-
-                    triangleLink = $("<span>").addClass('pvtTriangle')
-                        .html(" &#x25BE;").bind "click", (e) ->
-                            {left, top} = $(e.currentTarget).position()
-                            valueList.css(left: left+10, top: top+10).show()
-
-                    attrElem = $("<li>").addClass("axis_#{i}")
-                        .append $("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink)
-
-                    attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
-                    unused.append(attrElem).append(valueList)
-
-            #aggregator menu and value area
-
-            aggregator = $("<select>").addClass('pvtAggregator')
-                .bind "change", -> refresh() #capture reference
-            for own x of opts.aggregators
-                aggregator.append $("<option>").val(x).html(x)
-
-            ordering =
-                key_a_to_z:   {rowSymbol: "&varr;", colSymbol: "&harr;", next: "value_a_to_z"}
-                value_a_to_z: {rowSymbol: "&darr;", colSymbol: "&rarr;", next: "value_z_to_a"}
-                value_z_to_a: {rowSymbol: "&uarr;", colSymbol: "&larr;", next: "key_a_to_z"}
-
-            rowOrderArrow = $("<a>", role: "button").addClass("pvtRowOrder")
-                .data("order", opts.rowOrder).html(ordering[opts.rowOrder].rowSymbol)
-                .bind "click", ->
-                    $(this).data("order", ordering[$(this).data("order")].next)
-                    $(this).html(ordering[$(this).data("order")].rowSymbol)
-                    refresh()
-
-            colOrderArrow = $("<a>", role: "button").addClass("pvtColOrder")
-                .data("order", opts.colOrder).html(ordering[opts.colOrder].colSymbol)
-                .bind "click", ->
-                    $(this).data("order", ordering[$(this).data("order")].next)
-                    $(this).html(ordering[$(this).data("order")].colSymbol)
-                    refresh()
-
-            $("<div>").addClass('pvtVals pvtUiCell')
-              .appendTo(uiTable)
-              .append(aggregator)
-              .append(rowOrderArrow)
-              .append(colOrderArrow)
-              .append($("<br>"))
-
-            #column axes
-            $("<div>").addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell').appendTo(uiTable)
-
-            #row axes
-            uiTable.append $("<div>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top")
-
-            #the actual pivot table container
-            pivotTable = $("<div>")
-                .attr("valign", "top")
-                .addClass('pvtRendererArea')
-                .appendTo(uiTable)
-
-            #finally the renderer dropdown and unused attribs are inserted at the requested location
-            if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
-                uiTable.find('div:nth-child(1)').prepend rendererControl
-                uiTable.find('div:nth-child(2)').prepend unused
-            else
-                uiTable.prepend(unused).prepend(rendererControl);
 
             #render the UI in its default state
             @html uiTable
