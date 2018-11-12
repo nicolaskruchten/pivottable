@@ -681,6 +681,7 @@ callWithJQuery ($) ->
             filter: -> true
             sorters: {}
             tag: 'table'
+            responsive: false
 
         localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         localeDefaults =
@@ -715,17 +716,24 @@ callWithJQuery ($) ->
 
             #start building the output
             if opts.tag == 'div' 
-                uiTable = $("<div>", "class": "pvtUi pvtUi2")
+                uiTable = $("<div>", "class": "pvtUi")
+                if opts.responsive
+                    uiTable.addClass('pvtUIResponsive')
+                else
+                    uiTable.addClass('pvtUI2');
             else
                 uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
 
             #renderer control
             rendererControl = $(if opts.tag == 'div' then "<div>" else "<td>").addClass("pvtUiCell")
+            if ( opts.responsive )
+                rendererControl.addClass('pvtAxisContainer');
 
             renderer = $("<select>")
                 .addClass('pvtRenderer')
                 .appendTo(rendererControl)
                 .bind "change", -> refresh() #capture reference
+
             for own x of opts.renderers
                 $("<option>").val(x).html(x).appendTo(renderer)
 
