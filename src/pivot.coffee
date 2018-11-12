@@ -720,10 +720,7 @@ callWithJQuery ($) ->
                 uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
 
             #renderer control
-            if opts.tag == 'div'
-                rendererControl = $("<div>").addClass("pvtUiCell")
-            else
-                rendererControl = $("<td>").addClass("pvtUiCell")
+            rendererControl = $(if opts.tag == 'div' then "<div>" else "<td>").addClass("pvtUiCell")
 
             renderer = $("<select>")
                 .addClass('pvtRenderer')
@@ -734,10 +731,7 @@ callWithJQuery ($) ->
 
 
             #axis list, including the double-click menu
-            if opts.tag == 'div'
-                unused = $("<div>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
-            else
-                unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
+            unused = $(if opts.tag == 'div' then "<div>" else "<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
             shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
             shownInAggregators = (c for c in shownAttributes when c not in opts.hiddenFromAggregators)
             shownInDragDrop = (c for c in shownAttributes when c not in opts.hiddenFromDragDrop)
@@ -901,34 +895,18 @@ callWithJQuery ($) ->
                     $(this).html(ordering[$(this).data("order")].colSymbol)
                     refresh()
 
-            if opts.tag == 'div'
-                vals = $("<div>")
-            else
-                vals = $("<td>")
-
-            vals = vals.addClass('pvtVals pvtUiCell')
-
-            if opts.tag == 'div'
-                vals.appendTo(uiTable)
-            else
-                vals.appendTo(tr1)
-
-            vals.append(aggregator)
-              .append(rowOrderArrow)
-              .append(colOrderArrow)
-              .append($("<br>"))
+            $(if opts.tag == 'div' then "<div>" else "<td>")
+                .addClass('pvtVals pvtUiCell')
+                .appendTo(if opts.tag == 'div' then uiTable else tr1)
+                .append(aggregator)
+                .append(rowOrderArrow)
+                .append(colOrderArrow)
+                .append($("<br>"))
 
             #column axes
-            if opts.tag == 'div'
-                cols = $("<div>")
-            else
-                cols = $("<td>")
-            cols.addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell')
-
-            if opts.tag == 'div'
-                cols.appendTo(uiTable)
-            else
-                cols.appendTo(tr1)
+            $(if opts.tag == 'div' then "<div>" else "<td>")
+                .addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell')
+                .appendTo(if opts.tag == 'div' then uiTable else tr1)
 
             if opts.tag != 'div'
                 tr2 = $("<tr>").appendTo(uiTable)
@@ -940,27 +918,22 @@ callWithJQuery ($) ->
                 tr2.append $("<td>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top")
 
             #the actual pivot table container
-            if opts.tag == 'div'
-                pivotTable = $("<div>")
-            else
-                pivotTable = $("<td>")
-
-            pivotTable.attr("valign", "top")
+            pivotTable = $(if opts.tag == 'div' then "<div>" else "<td>")
+                .attr("valign", "top")
                 .addClass('pvtRendererArea')
-
-            if opts.tag == 'div' 
-                pivotTable.appendTo(uiTable)
-            else
-                pivotTable.appendTo(tr2)
+                .appendTo(if opts.tag == 'div' then uiTable else tr2)
 
             #finally the renderer dropdown and unused attribs are inserted at the requested location
-            if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
-                uiTable.find('tr:nth-child(1)').prepend rendererControl
-                uiTable.find('tr:nth-child(2)').prepend unused
-            else if opts.tag == 'div'
-                uiTable.prepend(unused).prepend(rendererControl);
+			#When the tag is set to 'div' the the 'unusedAttrsVertical' option is not relevant because
+			#the position of the layout components is determined by CSS
+            if opts.tag == 'div'
+                uiTable.prepend(unused).prepend(rendererControl)
             else
-                uiTable.prepend $("<tr>").append(rendererControl).append(unused)
+                if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
+                    uiTable.find('tr:nth-child(1)').prepend rendererControl
+                    uiTable.find('tr:nth-child(2)').prepend unused
+                else
+                    uiTable.prepend $("<tr>").append(rendererControl).append(unused)
 
             #render the UI in its default state
             @html uiTable
