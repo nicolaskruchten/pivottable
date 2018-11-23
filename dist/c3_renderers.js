@@ -18,7 +18,7 @@
         chartOpts = {};
       }
       return function(pivotData, opts) {
-        var agg, attrs, base, base1, base2, base3, base4, base5, base6, base7, c, categories, colKey, colKeys, columns, dataColumns, defaults, formatter, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs, y;
+        var agg, attrs, base, base1, base2, base3, base4, c, categories, colKey, colKeys, columns, dataColumns, defaults, formatter, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, k, l, len, len1, len2, len3, len4, m, numCharsInHAxis, numSeries, params, ref, ref1, ref2, ref3, renderArea, result, rotationAngle, row, rowHeader, rowKey, rowKeys, s, scatterData, series, title, titleText, vAxisTitle, val, vals, x, xs, y;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -27,15 +27,6 @@
           c3: {}
         };
         opts = $.extend(true, {}, defaults, opts);
-        if ((base = opts.c3).size == null) {
-          base.size = {};
-        }
-        if ((base1 = opts.c3.size).width == null) {
-          base1.width = window.innerWidth / 1.4;
-        }
-        if ((base2 = opts.c3.size).height == null) {
-          base2.height = window.innerHeight / 1.4 - 50;
-        }
         if (chartOpts.type == null) {
           chartOpts.type = "line";
         }
@@ -95,21 +86,21 @@
                 if (series === "") {
                   series = "series";
                 }
-                if ((base3 = scatterData.x)[series] == null) {
-                  base3[series] = [];
+                if ((base = scatterData.x)[series] == null) {
+                  base[series] = [];
                 }
-                if ((base4 = scatterData.y)[series] == null) {
-                  base4[series] = [];
+                if ((base1 = scatterData.y)[series] == null) {
+                  base1[series] = [];
                 }
                 y = (ref2 = vals[0]) != null ? ref2 : 0;
                 x = (ref3 = vals[1]) != null ? ref3 : 0;
                 scatterData.y[series].push(y);
                 scatterData.x[series].push(x);
-                if ((base5 = scatterData.t)[series] == null) {
-                  base5[series] = {};
+                if ((base2 = scatterData.t)[series] == null) {
+                  base2[series] = {};
                 }
-                if ((base6 = scatterData.t[series])[x] == null) {
-                  base6[x] = {};
+                if ((base3 = scatterData.t[series])[x] == null) {
+                  base3[x] = {};
                 }
                 scatterData.t[series][x][y] = agg.value();
               }
@@ -223,8 +214,8 @@
           };
         } else {
           params.axis.x.type = 'category';
-          if ((base7 = params.axis.y.tick).format == null) {
-            base7.format = function(v) {
+          if ((base4 = params.axis.y.tick).format == null) {
+            base4.format = function(v) {
               return formatter(v);
             };
           }
