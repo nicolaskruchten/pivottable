@@ -48,7 +48,7 @@
                 rendererName: "Horizontal Stacked Bar Chart",
                 rowOrder: "value_z_to_a", colOrder: "value_z_to_a",
                 rendererOptions: {
-                    c3: { data: {colors: {
+                    c3: {bindto: document.getElementById('c3'), data: {colors: {
                         Liberal: '#dc3912', Conservative: '#3366cc', NDP: '#ff9900',
                         Green:'#109618', 'Bloc Quebecois': '#990099'
                     }}}
@@ -61,6 +61,7 @@
         <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
 
         <div id="output" style="margin: 30px;"></div>
+        <div id="c3" style="width: 1000px; height: 500px"></div>
 
     </body>
 </html>
