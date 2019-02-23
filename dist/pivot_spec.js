@@ -402,7 +402,7 @@
       });
       describe(".listUnique", function() {
         return it("works", function() {
-          return expect(getVal(tpl.listUnique()(['gender']))).toBe('male,female');
+          return expect(getVal(tpl.listUnique()(['gender']))).toBe('female,male');
         });
       });
       describe(".average", function() {
