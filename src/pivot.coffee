@@ -321,11 +321,15 @@ callWithJQuery ($) ->
             @colTotals = {}
             @allTotal = @aggregator(this, [], [])
             @sorted = false
+            @sums = opts.sums ? false
+            @rowSumsBefore = opts.rowSumsBefore ? true
+            @colSumsBefore = opts.colSumsBefore ? false
 
             # iterate through input, accumulating data for cells
             PivotData.forEachRecord @input, @derivedAttributes, (record) =>
                 @processRecord(record) if @filter(record)
-
+            window.pivotData = @
+            
         #can handle arrays or jQuery selections of tables
         @forEachRecord = (input, derivedAttributes, f) ->
             if $.isEmptyObject derivedAttributes
@@ -378,11 +382,11 @@ callWithJQuery ($) ->
                 switch @rowOrder
                     when "value_a_to_z" then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
                     when "value_z_to_a" then @rowKeys.sort (a,b) => -naturalSort v(a,[]), v(b,[])
-                    else                     @rowKeys.sort @arrSort(@rowAttrs, true)
+                    else                     @rowKeys.sort @arrSort(@rowAttrs, @rowSumsBefore)
                 switch @colOrder
                     when "value_a_to_z" then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
                     when "value_z_to_a" then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
-                    else                     @colKeys.sort @arrSort(@colAttrs, false)
+                    else                     @colKeys.sort @arrSort(@colAttrs, @colSumsBefore)
 
         getColKeys: (all_keys=false) =>
             @sortKeys()
@@ -394,38 +398,39 @@ callWithJQuery ($) ->
             l = @rowAttrs.length
             return if all_keys then @rowKeys else @rowKeys.filter (x) -> x.length == l
 
-        # subarays [1,2,3] => [[], [1], [1,2], [1,2,3]]
+        # subarrays [1,2,3] => [[], [1], [1,2], [1,2,3]]
         subarrays: (x) -> [[]].concat x.map (d,i) => x.slice(0,i+1)
 
         processRecord: (record) -> #this code is called in a tight loop
-            window.pivotData = @
-
             colKeys = []
             rowKeys = []
             colKeys.push record[x] ? "null" for x in @colAttrs
             rowKeys.push record[x] ? "null" for x in @rowAttrs
-            
+
             @allTotal.push record
 
-            for colKey in @subarrays colKeys
-                for rowKey in @subarrays rowKeys
-                    
-                    flatRowKey = rowKey.join(String.fromCharCode(0))
+            colKeys = if @sums then @subarrays colKeys else [ colKeys ]
+            rowKeys = if @sums then @subarrays rowKeys else [ rowKeys ]
+            
+            for j, rowKey of rowKeys
+                flatRowKey = rowKey.join(String.fromCharCode(0))
+
+                for i, colKey of colKeys
                     flatColKey = colKey.join(String.fromCharCode(0))
-                
+
                     if rowKey.length != 0
                         if not @rowTotals[flatRowKey]
                             @rowKeys.push rowKey
-                        if not @rowTotals[flatRowKey+flatColKey]
-                            @rowTotals[flatRowKey+flatColKey] = @aggregator(this, rowKey, [])
-                        @rowTotals[flatRowKey+flatColKey].push record
+                            @rowTotals[flatRowKey] = @aggregator(this, rowKey, [])
+                        if !@sums or colKey.length == 0
+                            @rowTotals[flatRowKey].push record
 
                     if colKey.length != 0
                         if not @colTotals[flatColKey]
                             @colKeys.push colKey
-                        if not @colTotals[flatColKey+flatRowKey]
-                            @colTotals[flatColKey+flatRowKey] = @aggregator(this, [], colKey)
-                        @colTotals[flatColKey+flatRowKey].push record
+                            @colTotals[flatColKey] = @aggregator(this, [], colKey)
+                        if !@sums or rowKey.length == 0 and @sums
+                            @colTotals[flatColKey].push record
 
                     if colKey.length != 0 and rowKey.length != 0
                         if not @tree[flatRowKey]
@@ -477,7 +482,8 @@ callWithJQuery ($) ->
                 filters[attr] = colValues[i] for own i, attr of colAttrs when colValues[i]?
                 filters[attr] = rowValues[i] for own i, attr of rowAttrs when rowValues[i]?
                 return (e) -> opts.table.clickCallback(e, value, filters, pivotData)
-
+        
+        compactLayout = opts.table.compactLayout ? true and pivotData.sums
         #now actually build the output
         result = document.createElement("table")
         result.className = "pvtTable"
@@ -499,7 +505,7 @@ callWithJQuery ($) ->
                 break if stop
                 len++
             return len
-        
+
         #the first few rows are for col headers
         thead = document.createElement("thead")
         for own j, c of colAttrs
@@ -518,7 +524,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtColLabel"
-                    th.textContent = colKey[j] ? pivotData.aggregatorName # '\u2211'
+                    th.textContent = colKey[j] ? pivotData.aggregatorName # or greek letter sigma '\u2211'
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
@@ -551,29 +557,42 @@ callWithJQuery ($) ->
         tbody = document.createElement("tbody")
         for own i, rowKey of rowKeys
             tr = document.createElement("tr")
-            tr.className = if rowKey.length != rowAttrs.length then "pvtSubtotal level#{rowKey.length}" else "pvtData"
-            
-            # for own j, txt of rowKey
-            #     x = spanSize(rowKeys, parseInt(i), parseInt(j))
-            #     if x != -1
-            j = rowKey.length - 1
-            txt = rowKey[j]
-            th = document.createElement("th")
-            th.className = "pvtRowLabel"
-            th.textContent = txt
-            # th.setAttribute("rowspan", x)
-            # if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
-            #     th.setAttribute("colspan",2)
-            th.setAttribute 'colspan', rowAttrs.length + if colAttrs.length !=0 then 1 else 0
-            th.style.paddingLeft = 5 + parseInt(j) * 30 + 'px'
-            tr.appendChild th
+            if pivotData.sums
+                tr.className = if rowKey.length != rowAttrs.length then "pvtSubtotal level#{rowKey.length}" else "pvtData"
 
+            if compactLayout
+                th = document.createElement("th")
+                th.className = "pvtRowLabel"
+                th.textContent = rowKey[rowKey.length - 1 ]
+                th.setAttribute 'colspan', rowAttrs.length + if colAttrs.length !=0 then 1 else 0
+                th.style.paddingLeft = 5 + parseInt(rowKey.length - 1) * 30 + 'px'
+                tr.appendChild th
+            else
+                for own j, txt of rowKey
+                    x = spanSize(rowKeys, parseInt(i), parseInt(j))
+                    if x != -1
+                        th = document.createElement("th")
+                        th.className = "pvtRowLabel"
+                        th.textContent = txt
+                        th.setAttribute("rowspan", x)
+                        if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
+                            th.setAttribute("colspan",2)
+                        tr.appendChild th
+
+                if rowAttrs.length - rowKey.length
+                    th = document.createElement("th")
+                    th.setAttribute "colspan", rowAttrs.length - rowKey.length + if colAttrs.length then 1 else 0
+                    tr.appendChild th
+            
             for own j, colKey of colKeys #this is the tight loop
                 aggregator = pivotData.getAggregator(rowKey, colKey)
                 val = aggregator.value()
                 td = document.createElement("td")
                 td.className = "pvtVal row#{i} col#{j}"
-                td.className += " pvtSubtotal level#{colKey.length}" if colKey.length != colAttrs.length
+                if pivotData.sums
+                    cls = if colKey.length == colAttrs.length and rowKey.length == rowAttrs.length then "pvtVal " else ""
+                    td.className = cls + "row#{i} col#{j}"
+                    td.className += " pvtSubtotal level#{colKey.length}" if colKey.length != colAttrs.length
                 td.textContent = aggregator.format(val)
                 td.setAttribute("data-value", val)
                 if getClickHandler?
@@ -607,6 +626,7 @@ callWithJQuery ($) ->
                 val = totalAggregator.value()
                 td = document.createElement("td")
                 td.className = "pvtTotal colTotal"
+                td.className += " pvtSubtotal level#{colKey.length}" if colKey.length != colAttrs.length
                 td.textContent = totalAggregator.format(val)
                 td.setAttribute("data-value", val)
                 if getClickHandler?
@@ -648,6 +668,7 @@ callWithJQuery ($) ->
             sorters: {}
             derivedAttributes: {}
             renderer: pivotTableRenderer
+            sums: false
 
         localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         localeDefaults =
@@ -655,7 +676,6 @@ callWithJQuery ($) ->
             localeStrings: localeStrings
 
         opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts))
-
         result = null
         try
             pivotData = new opts.dataClass(input, opts)
@@ -709,7 +729,7 @@ callWithJQuery ($) ->
             opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts))
         else
             opts = existingOpts
-
+        
         try
             # do a first pass on the data to cache a materialized copy of any
             # function-valued inputs and to compute dimension cardinalities
@@ -742,6 +762,16 @@ callWithJQuery ($) ->
                 .bind "change", -> refresh() #capture reference
             for own x of opts.renderers
                 $("<option>").val(x).html(x).appendTo(renderer)
+
+            label = $('<label>')
+                .appendTo(rendererControl)
+                .text(' Sums')
+                # .prepend(sumsCheckbox)
+            sumsCheckbox = $('<input/>')
+                .addClass('pvtSums')
+                .attr({type: 'checkbox', name: 'sums'})
+                .prependTo(label)
+                .bind "change", => refresh()
 
 
             #axis list, including the double-click menu
@@ -949,6 +979,8 @@ callWithJQuery ($) ->
                 @find(".pvtAggregator").val opts.aggregatorName
             if opts.rendererName?
                 @find(".pvtRenderer").val opts.rendererName
+            if opts.sums?
+                @find(".pvtSums").attr 'checked', opts.sums
 
             @find(".pvtUiCell").hide() unless opts.showUI
 
@@ -963,6 +995,8 @@ callWithJQuery ($) ->
                     sorters: opts.sorters
                     cols: [], rows: []
                     dataClass: opts.dataClass
+                    rowSumsBefore: opts.rowSumsBefore
+                    colSumsBefore: opts.colSumsBefore
 
                 numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0
                 vals = []
@@ -1000,6 +1034,7 @@ callWithJQuery ($) ->
                 subopts.renderer = opts.renderers[renderer.val()]
                 subopts.rowOrder = rowOrderArrow.data("order")
                 subopts.colOrder = colOrderArrow.data("order")
+                subopts.sums = sumsCheckbox.is(':checked')
                 #construct filter here
                 exclusions = {}
                 @find('input.pvtFilter').not(':checked').each ->
