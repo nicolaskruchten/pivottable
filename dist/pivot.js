@@ -519,13 +519,17 @@
     rd = /\d/;
     rz = /^0/;
     naturalSort = (function(_this) {
-      return function(as, bs) {
-        var a, a1, b, b1, nas, nbs;
+      return function(as, bs, nulls_first) {
+        var a, a1, b, b1, nas, nbs, nf;
+        if (nulls_first == null) {
+          nulls_first = true;
+        }
+        nf = nulls_first ? 1 : -1;
         if ((bs != null) && (as == null)) {
-          return -1;
+          return -1 * nf;
         }
         if ((as != null) && (bs == null)) {
-          return 1;
+          return 1 * nf;
         }
         if (typeof as === "number" && isNaN(as)) {
           return -1;
@@ -668,7 +672,7 @@
       }
 
       PivotData.forEachRecord = function(input, derivedAttributes, f) {
-        var addRecord, compactRecord, i, j, k, l, len1, record, ref, results, results1, tblCols;
+        var addRecord, compactRecord, i, j, k, len1, n, record, ref, results, results1, tblCols;
         if ($.isEmptyObject(derivedAttributes)) {
           addRecord = f;
         } else {
@@ -704,8 +708,8 @@
             return results;
           } else {
             results1 = [];
-            for (l = 0, len1 = input.length; l < len1; l++) {
-              record = input[l];
+            for (n = 0, len1 = input.length; n < len1; n++) {
+              record = input[n];
               results1.push(addRecord(record));
             }
             return results1;
@@ -745,13 +749,13 @@
         })(this));
       };
 
-      PivotData.prototype.arrSort = function(attrs) {
+      PivotData.prototype.arrSort = function(attrs, nulls_first) {
         var a, sortersArr;
         sortersArr = (function() {
-          var l, len1, results;
+          var len1, n, results;
           results = [];
-          for (l = 0, len1 = attrs.length; l < len1; l++) {
-            a = attrs[l];
+          for (n = 0, len1 = attrs.length; n < len1; n++) {
+            a = attrs[n];
             results.push(getSort(this.sorters, a));
           }
           return results;
@@ -761,7 +765,7 @@
           for (i in sortersArr) {
             if (!hasProp.call(sortersArr, i)) continue;
             sorter = sortersArr[i];
-            comparison = sorter(a[i], b[i]);
+            comparison = sorter(a[i], b[i], nulls_first);
             if (comparison !== 0) {
               return comparison;
             }
@@ -795,7 +799,7 @@
               })(this));
               break;
             default:
-              this.rowKeys.sort(this.arrSort(this.rowAttrs));
+              this.rowKeys.sort(this.arrSort(this.rowAttrs, true));
           }
           switch (this.colOrder) {
             case "value_a_to_z":
@@ -811,61 +815,113 @@
                 };
               })(this));
             default:
-              return this.colKeys.sort(this.arrSort(this.colAttrs));
+              return this.colKeys.sort(this.arrSort(this.colAttrs, false));
           }
         }
       };
 
-      PivotData.prototype.getColKeys = function() {
+      PivotData.prototype.getColKeys = function(all_keys) {
+        var l;
+        if (all_keys == null) {
+          all_keys = false;
+        }
         this.sortKeys();
-        return this.colKeys;
+        l = this.colAttrs.length;
+        if (all_keys) {
+          return this.colKeys;
+        } else {
+          return this.colKeys.filter(function(x) {
+            return x.length === l;
+          });
+        }
       };
 
-      PivotData.prototype.getRowKeys = function() {
+      PivotData.prototype.getRowKeys = function(all_keys) {
+        var l;
+        if (all_keys == null) {
+          all_keys = false;
+        }
         this.sortKeys();
-        return this.rowKeys;
+        l = this.rowAttrs.length;
+        if (all_keys) {
+          return this.rowKeys;
+        } else {
+          return this.rowKeys.filter(function(x) {
+            return x.length === l;
+          });
+        }
+      };
+
+      PivotData.prototype.subarrays = function(x) {
+        return [[]].concat(x.map((function(_this) {
+          return function(d, i) {
+            return x.slice(0, i + 1);
+          };
+        })(this)));
       };
 
       PivotData.prototype.processRecord = function(record) {
-        var colKey, flatColKey, flatRowKey, l, len1, len2, n, ref, ref1, ref2, ref3, rowKey, x;
-        colKey = [];
-        rowKey = [];
+        var colKey, colKeys, flatColKey, flatRowKey, len1, len2, len3, n, o, ref, ref1, ref2, ref3, ref4, results, rowKey, rowKeys, t, x;
+        window.pivotData = this;
+        colKeys = [];
+        rowKeys = [];
         ref = this.colAttrs;
-        for (l = 0, len1 = ref.length; l < len1; l++) {
-          x = ref[l];
-          colKey.push((ref1 = record[x]) != null ? ref1 : "null");
+        for (n = 0, len1 = ref.length; n < len1; n++) {
+          x = ref[n];
+          colKeys.push((ref1 = record[x]) != null ? ref1 : "null");
         }
         ref2 = this.rowAttrs;
-        for (n = 0, len2 = ref2.length; n < len2; n++) {
-          x = ref2[n];
-          rowKey.push((ref3 = record[x]) != null ? ref3 : "null");
+        for (o = 0, len2 = ref2.length; o < len2; o++) {
+          x = ref2[o];
+          rowKeys.push((ref3 = record[x]) != null ? ref3 : "null");
         }
-        flatRowKey = rowKey.join(String.fromCharCode(0));
-        flatColKey = colKey.join(String.fromCharCode(0));
         this.allTotal.push(record);
-        if (rowKey.length !== 0) {
-          if (!this.rowTotals[flatRowKey]) {
-            this.rowKeys.push(rowKey);
-            this.rowTotals[flatRowKey] = this.aggregator(this, rowKey, []);
-          }
-          this.rowTotals[flatRowKey].push(record);
+        ref4 = this.subarrays(colKeys);
+        results = [];
+        for (t = 0, len3 = ref4.length; t < len3; t++) {
+          colKey = ref4[t];
+          results.push((function() {
+            var len4, ref5, results1, u;
+            ref5 = this.subarrays(rowKeys);
+            results1 = [];
+            for (u = 0, len4 = ref5.length; u < len4; u++) {
+              rowKey = ref5[u];
+              flatRowKey = rowKey.join(String.fromCharCode(0));
+              flatColKey = colKey.join(String.fromCharCode(0));
+              if (rowKey.length !== 0) {
+                if (!this.rowTotals[flatRowKey]) {
+                  this.rowKeys.push(rowKey);
+                }
+                if (!this.rowTotals[flatRowKey + flatColKey]) {
+                  this.rowTotals[flatRowKey + flatColKey] = this.aggregator(this, rowKey, []);
+                }
+                this.rowTotals[flatRowKey + flatColKey].push(record);
+              }
+              if (colKey.length !== 0) {
+                if (!this.colTotals[flatColKey]) {
+                  this.colKeys.push(colKey);
+                }
+                if (!this.colTotals[flatColKey + flatRowKey]) {
+                  this.colTotals[flatColKey + flatRowKey] = this.aggregator(this, [], colKey);
+                }
+                this.colTotals[flatColKey + flatRowKey].push(record);
+              }
+              if (colKey.length !== 0 && rowKey.length !== 0) {
+                if (!this.tree[flatRowKey]) {
+                  this.tree[flatRowKey] = {};
+                }
+                if (!this.tree[flatRowKey][flatColKey]) {
+                  this.tree[flatRowKey][flatColKey] = this.aggregator(this, rowKey, colKey);
+                }
+                results1.push(this.tree[flatRowKey][flatColKey].push(record));
+              } else {
+                results1.push(void 0);
+              }
+            }
+            return results1;
+          }).call(this));
         }
-        if (colKey.length !== 0) {
-          if (!this.colTotals[flatColKey]) {
-            this.colKeys.push(colKey);
-            this.colTotals[flatColKey] = this.aggregator(this, [], colKey);
-          }
-          this.colTotals[flatColKey].push(record);
-        }
-        if (colKey.length !== 0 && rowKey.length !== 0) {
-          if (!this.tree[flatRowKey]) {
-            this.tree[flatRowKey] = {};
-          }
-          if (!this.tree[flatRowKey][flatColKey]) {
-            this.tree[flatRowKey][flatColKey] = this.aggregator(this, rowKey, colKey);
-          }
-          return this.tree[flatRowKey][flatColKey].push(record);
-        }
+        return results;
       };
 
       PivotData.prototype.getAggregator = function(rowKey, colKey) {
@@ -924,8 +980,8 @@
       opts = $.extend(true, {}, defaults, opts);
       colAttrs = pivotData.colAttrs;
       rowAttrs = pivotData.rowAttrs;
-      rowKeys = pivotData.getRowKeys();
-      colKeys = pivotData.getColKeys();
+      rowKeys = pivotData.getRowKeys(true);
+      colKeys = pivotData.getColKeys(true);
       if (opts.table.clickCallback) {
         getClickHandler = function(value, rowValues, colValues) {
           var attr, filters, i;
@@ -952,10 +1008,10 @@
       result = document.createElement("table");
       result.className = "pvtTable";
       spanSize = function(arr, i, j) {
-        var l, len, n, noDraw, ref, ref1, stop, x;
+        var len, n, noDraw, o, ref, ref1, stop, x;
         if (i !== 0) {
           noDraw = true;
-          for (x = l = 0, ref = j; 0 <= ref ? l <= ref : l >= ref; x = 0 <= ref ? ++l : --l) {
+          for (x = n = 0, ref = j; 0 <= ref ? n <= ref : n >= ref; x = 0 <= ref ? ++n : --n) {
             if (arr[i - 1][x] !== arr[i][x]) {
               noDraw = false;
             }
@@ -967,7 +1023,7 @@
         len = 0;
         while (i + len < arr.length) {
           stop = false;
-          for (x = n = 0, ref1 = j; 0 <= ref1 ? n <= ref1 : n >= ref1; x = 0 <= ref1 ? ++n : --n) {
+          for (x = o = 0, ref1 = j; 0 <= ref1 ? o <= ref1 : o >= ref1; x = 0 <= ref1 ? ++o : --o) {
             if (arr[i][x] !== arr[i + len][x]) {
               stop = true;
             }
@@ -1042,21 +1098,15 @@
         if (!hasProp.call(rowKeys, i)) continue;
         rowKey = rowKeys[i];
         tr = document.createElement("tr");
-        for (j in rowKey) {
-          if (!hasProp.call(rowKey, j)) continue;
-          txt = rowKey[j];
-          x = spanSize(rowKeys, parseInt(i), parseInt(j));
-          if (x !== -1) {
-            th = document.createElement("th");
-            th.className = "pvtRowLabel";
-            th.textContent = txt;
-            th.setAttribute("rowspan", x);
-            if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
-              th.setAttribute("colspan", 2);
-            }
-            tr.appendChild(th);
-          }
-        }
+        tr.className = rowKey.length !== rowAttrs.length ? "pvtSubtotal level" + rowKey.length : "pvtData";
+        j = rowKey.length - 1;
+        txt = rowKey[j];
+        th = document.createElement("th");
+        th.className = "pvtRowLabel";
+        th.textContent = txt;
+        th.setAttribute('colspan', rowAttrs.length + (colAttrs.length !== 0 ? 1 : 0));
+        th.style.paddingLeft = 5 + parseInt(j) * 30 + 'px';
+        tr.appendChild(th);
         for (j in colKeys) {
           if (!hasProp.call(colKeys, j)) continue;
           colKey = colKeys[j];
@@ -1064,6 +1114,9 @@
           val = aggregator.value();
           td = document.createElement("td");
           td.className = "pvtVal row" + i + " col" + j;
+          if (colKey.length !== colAttrs.length) {
+            td.className += " pvtSubtotal level" + colKey.length;
+          }
           td.textContent = aggregator.format(val);
           td.setAttribute("data-value", val);
           if (getClickHandler != null) {
@@ -1195,7 +1248,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, t, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1295,10 +1348,10 @@
           return results;
         })();
         shownInAggregators = (function() {
-          var l, len1, results;
+          var len1, n, results;
           results = [];
-          for (l = 0, len1 = shownAttributes.length; l < len1; l++) {
-            c = shownAttributes[l];
+          for (n = 0, len1 = shownAttributes.length; n < len1; n++) {
+            c = shownAttributes[n];
             if (indexOf.call(opts.hiddenFromAggregators, c) < 0) {
               results.push(c);
             }
@@ -1306,10 +1359,10 @@
           return results;
         })();
         shownInDragDrop = (function() {
-          var l, len1, results;
+          var len1, n, results;
           results = [];
-          for (l = 0, len1 = shownAttributes.length; l < len1; l++) {
-            c = shownAttributes[l];
+          for (n = 0, len1 = shownAttributes.length; n < len1; n++) {
+            c = shownAttributes[n];
             if (indexOf.call(opts.hiddenFromDragDrop, c) < 0) {
               results.push(c);
             }
@@ -1324,8 +1377,8 @@
         }
         if (!isNaN(unusedAttrsVerticalAutoCutoff)) {
           attrLength = 0;
-          for (l = 0, len1 = shownInDragDrop.length; l < len1; l++) {
-            a = shownInDragDrop[l];
+          for (n = 0, len1 = shownInDragDrop.length; n < len1; n++) {
+            a = shownInDragDrop[n];
             attrLength += a.length;
           }
           unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff;
@@ -1336,7 +1389,7 @@
           unused.addClass('pvtHorizList');
         }
         fn1 = function(attr) {
-          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, n, placeholder, ref1, sorter, triangleLink, v, value, valueCount, valueList, values;
+          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, o, placeholder, ref1, sorter, triangleLink, v, value, valueCount, valueList, values;
           values = (function() {
             var results;
             results = [];
@@ -1405,8 +1458,8 @@
             }
             checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
             ref1 = values.sort(getSort(opts.sorters, attr));
-            for (n = 0, len2 = ref1.length; n < len2; n++) {
-              value = ref1[n];
+            for (o = 0, len2 = ref1.length; o < len2; o++) {
+              value = ref1[o];
               valueCount = attrValues[attr][value];
               filterItem = $("<label>");
               filterItemExcluded = false;
@@ -1524,13 +1577,13 @@
         }
         this.html(uiTable);
         ref2 = opts.cols;
-        for (n = 0, len2 = ref2.length; n < len2; n++) {
-          x = ref2[n];
+        for (o = 0, len2 = ref2.length; o < len2; o++) {
+          x = ref2[o];
           this.find(".pvtCols").append(this.find(".axis_" + ($.inArray(x, shownInDragDrop))));
         }
         ref3 = opts.rows;
-        for (o = 0, len3 = ref3.length; o < len3; o++) {
-          x = ref3[o];
+        for (t = 0, len3 = ref3.length; t < len3; t++) {
+          x = ref3[t];
           this.find(".pvtRows").append(this.find(".axis_" + ($.inArray(x, shownInDragDrop))));
         }
         if (opts.aggregatorName != null) {
@@ -1545,7 +1598,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, subopts, t, u, unusedAttrsContainer, vals;
+            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, subopts, u, unusedAttrsContainer, vals, w;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1575,12 +1628,12 @@
             });
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
-              for (x = t = 0, ref5 = numInputsToProcess; 0 <= ref5 ? t < ref5 : t > ref5; x = 0 <= ref5 ? ++t : --t) {
+              for (x = u = 0, ref5 = numInputsToProcess; 0 <= ref5 ? u < ref5 : u > ref5; x = 0 <= ref5 ? ++u : --u) {
                 newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
-                for (u = 0, len4 = shownInAggregators.length; u < len4; u++) {
-                  attr = shownInAggregators[u];
+                for (w = 0, len4 = shownInAggregators.length; w < len4; w++) {
+                  attr = shownInAggregators[w];
                   newDropdown.append($("<option>").val(attr).text(attr));
                 }
                 pvtVals.append(newDropdown);
@@ -1693,7 +1746,7 @@
     Heatmap post-processing
      */
     $.fn.heatmap = function(scope, opts) {
-      var colorScaleGenerator, heatmapper, i, j, l, n, numCols, numRows, ref, ref1, ref2;
+      var colorScaleGenerator, heatmapper, i, j, n, numCols, numRows, o, ref, ref1, ref2;
       if (scope == null) {
         scope = "heatmap";
       }
@@ -1739,12 +1792,12 @@
           heatmapper(".pvtVal");
           break;
         case "rowheatmap":
-          for (i = l = 0, ref1 = numRows; 0 <= ref1 ? l < ref1 : l > ref1; i = 0 <= ref1 ? ++l : --l) {
+          for (i = n = 0, ref1 = numRows; 0 <= ref1 ? n < ref1 : n > ref1; i = 0 <= ref1 ? ++n : --n) {
             heatmapper(".pvtVal.row" + i);
           }
           break;
         case "colheatmap":
-          for (j = n = 0, ref2 = numCols; 0 <= ref2 ? n < ref2 : n > ref2; j = 0 <= ref2 ? ++n : --n) {
+          for (j = o = 0, ref2 = numCols; 0 <= ref2 ? o < ref2 : o > ref2; j = 0 <= ref2 ? ++o : --o) {
             heatmapper(".pvtVal.col" + j);
           }
       }
@@ -1757,7 +1810,7 @@
     Barchart post-processing
      */
     return $.fn.barchart = function(opts) {
-      var barcharter, i, l, numCols, numRows, ref;
+      var barcharter, i, n, numCols, numRows, ref;
       numRows = this.data("numrows");
       numCols = this.data("numcols");
       barcharter = (function(_this) {
@@ -1826,7 +1879,7 @@
           });
         };
       })(this);
-      for (i = l = 0, ref = numRows; 0 <= ref ? l < ref : l > ref; i = 0 <= ref ? ++l : --l) {
+      for (i = n = 0, ref = numRows; 0 <= ref ? n < ref : n > ref; i = 0 <= ref ? ++n : --n) {
         barcharter(".pvtVal.row" + i);
       }
       barcharter(".pvtTotal.colTotal");

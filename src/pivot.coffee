@@ -229,10 +229,11 @@ callWithJQuery ($) ->
     rx = /(\d+)|(\D+)/g
     rd = /\d/
     rz = /^0/
-    naturalSort = (as, bs) =>
+    naturalSort = (as, bs, nulls_first=true) =>
         #nulls first
-        return -1 if bs? and not as?
-        return  1 if as? and not bs?
+        nf = if nulls_first then 1 else -1
+        return -1*nf if bs? and not as?
+        return  1*nf if as? and not bs?
 
         #then raw NaNs
         return -1 if typeof as == "number" and isNaN(as)
@@ -362,11 +363,11 @@ callWithJQuery ($) ->
                     return if v != (record[k] ? "null")
                 callback(record)
 
-        arrSort: (attrs) =>
+        arrSort: (attrs, nulls_first) =>
             sortersArr = (getSort(@sorters, a) for a in attrs)
             (a,b) ->
                 for own i, sorter of sortersArr
-                    comparison = sorter(a[i], b[i])
+                    comparison = sorter(a[i], b[i], nulls_first)
                     return comparison if comparison != 0
                 return 0
 
@@ -375,50 +376,63 @@ callWithJQuery ($) ->
                 @sorted = true
                 v = (r,c) => @getAggregator(r,c).value()
                 switch @rowOrder
-                    when "value_a_to_z"  then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
+                    when "value_a_to_z" then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
                     when "value_z_to_a" then @rowKeys.sort (a,b) => -naturalSort v(a,[]), v(b,[])
-                    else             @rowKeys.sort @arrSort(@rowAttrs)
+                    else                     @rowKeys.sort @arrSort(@rowAttrs, true)
                 switch @colOrder
-                    when "value_a_to_z"  then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
+                    when "value_a_to_z" then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
                     when "value_z_to_a" then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
-                    else             @colKeys.sort @arrSort(@colAttrs)
+                    else                     @colKeys.sort @arrSort(@colAttrs, false)
 
-        getColKeys: () =>
+        getColKeys: (all_keys=false) =>
             @sortKeys()
-            return @colKeys
+            l = @colAttrs.length
+            return if all_keys then @colKeys else @colKeys.filter (x) -> x.length == l
 
-        getRowKeys: () =>
+        getRowKeys: (all_keys=false) =>
             @sortKeys()
-            return @rowKeys
+            l = @rowAttrs.length
+            return if all_keys then @rowKeys else @rowKeys.filter (x) -> x.length == l
+
+        # subarays [1,2,3] => [[], [1], [1,2], [1,2,3]]
+        subarrays: (x) -> [[]].concat x.map (d,i) => x.slice(0,i+1)
 
         processRecord: (record) -> #this code is called in a tight loop
-            colKey = []
-            rowKey = []
-            colKey.push record[x] ? "null" for x in @colAttrs
-            rowKey.push record[x] ? "null" for x in @rowAttrs
-            flatRowKey = rowKey.join(String.fromCharCode(0))
-            flatColKey = colKey.join(String.fromCharCode(0))
+            window.pivotData = @
 
+            colKeys = []
+            rowKeys = []
+            colKeys.push record[x] ? "null" for x in @colAttrs
+            rowKeys.push record[x] ? "null" for x in @rowAttrs
+            
             @allTotal.push record
 
-            if rowKey.length != 0
-                if not @rowTotals[flatRowKey]
-                    @rowKeys.push rowKey
-                    @rowTotals[flatRowKey] = @aggregator(this, rowKey, [])
-                @rowTotals[flatRowKey].push record
+            for colKey in @subarrays colKeys
+                for rowKey in @subarrays rowKeys
+                    
+                    flatRowKey = rowKey.join(String.fromCharCode(0))
+                    flatColKey = colKey.join(String.fromCharCode(0))
+                
+                    if rowKey.length != 0
+                        if not @rowTotals[flatRowKey]
+                            @rowKeys.push rowKey
+                        if not @rowTotals[flatRowKey+flatColKey]
+                            @rowTotals[flatRowKey+flatColKey] = @aggregator(this, rowKey, [])
+                        @rowTotals[flatRowKey+flatColKey].push record
 
-            if colKey.length != 0
-                if not @colTotals[flatColKey]
-                    @colKeys.push colKey
-                    @colTotals[flatColKey] = @aggregator(this, [], colKey)
-                @colTotals[flatColKey].push record
+                    if colKey.length != 0
+                        if not @colTotals[flatColKey]
+                            @colKeys.push colKey
+                        if not @colTotals[flatColKey+flatRowKey]
+                            @colTotals[flatColKey+flatRowKey] = @aggregator(this, [], colKey)
+                        @colTotals[flatColKey+flatRowKey].push record
 
-            if colKey.length != 0 and rowKey.length != 0
-                if not @tree[flatRowKey]
-                    @tree[flatRowKey] = {}
-                if not @tree[flatRowKey][flatColKey]
-                    @tree[flatRowKey][flatColKey] = @aggregator(this, rowKey, colKey)
-                @tree[flatRowKey][flatColKey].push record
+                    if colKey.length != 0 and rowKey.length != 0
+                        if not @tree[flatRowKey]
+                            @tree[flatRowKey] = {}
+                        if not @tree[flatRowKey][flatColKey]
+                            @tree[flatRowKey][flatColKey] = @aggregator(this, rowKey, colKey)
+                        @tree[flatRowKey][flatColKey].push record
 
         getAggregator: (rowKey, colKey) =>
             flatRowKey = rowKey.join(String.fromCharCode(0))
@@ -454,8 +468,8 @@ callWithJQuery ($) ->
 
         colAttrs = pivotData.colAttrs
         rowAttrs = pivotData.rowAttrs
-        rowKeys = pivotData.getRowKeys()
-        colKeys = pivotData.getColKeys()
+        rowKeys = pivotData.getRowKeys(true)
+        colKeys = pivotData.getColKeys(true)
 
         if opts.table.clickCallback
             getClickHandler = (value, rowValues, colValues) ->
@@ -537,21 +551,29 @@ callWithJQuery ($) ->
         tbody = document.createElement("tbody")
         for own i, rowKey of rowKeys
             tr = document.createElement("tr")
-            for own j, txt of rowKey
-                x = spanSize(rowKeys, parseInt(i), parseInt(j))
-                if x != -1
-                    th = document.createElement("th")
-                    th.className = "pvtRowLabel"
-                    th.textContent = txt
-                    th.setAttribute("rowspan", x)
-                    if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
-                        th.setAttribute("colspan",2)
-                    tr.appendChild th
+            tr.className = if rowKey.length != rowAttrs.length then "pvtSubtotal level#{rowKey.length}" else "pvtData"
+            
+            # for own j, txt of rowKey
+            #     x = spanSize(rowKeys, parseInt(i), parseInt(j))
+            #     if x != -1
+            j = rowKey.length - 1
+            txt = rowKey[j]
+            th = document.createElement("th")
+            th.className = "pvtRowLabel"
+            th.textContent = txt
+            # th.setAttribute("rowspan", x)
+            # if parseInt(j) == rowAttrs.length-1 and colAttrs.length !=0
+            #     th.setAttribute("colspan",2)
+            th.setAttribute 'colspan', rowAttrs.length + if colAttrs.length !=0 then 1 else 0
+            th.style.paddingLeft = 5 + parseInt(j) * 30 + 'px'
+            tr.appendChild th
+
             for own j, colKey of colKeys #this is the tight loop
                 aggregator = pivotData.getAggregator(rowKey, colKey)
                 val = aggregator.value()
                 td = document.createElement("td")
                 td.className = "pvtVal row#{i} col#{j}"
+                td.className += " pvtSubtotal level#{colKey.length}" if colKey.length != colAttrs.length
                 td.textContent = aggregator.format(val)
                 td.setAttribute("data-value", val)
                 if getClickHandler?

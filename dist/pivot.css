@@ -8,7 +8,8 @@ table.pvtTable {
 }
 table.pvtTable thead tr th, table.pvtTable tbody tr th {
     background-color: #e6EEEE;
-    border: 1px solid #CDCDCD;
+    border-top: 1px solid #CDCDCD;
+    border-left: 1px solid #CDCDCD;
     font-size: 8pt;
     padding: 5px;
 }
@@ -20,7 +21,8 @@ table.pvtTable tbody tr td {
     color: #3D3D3D;
     padding: 5px;
     background-color: #FFF;
-    border: 1px solid #CDCDCD;
+    border-top: 1px solid #CDCDCD;
+    border-left: 1px solid #CDCDCD;
     vertical-align: top;
     text-align: right;
 }
@@ -112,3 +114,36 @@ table.pvtTable tbody tr td {
 .pvtCheckContainer p{ margin: 5px; }
 
 .pvtRendererArea { padding: 5px;}
+
+td.pvtSubtotal.level1 {
+  font-weight: bold;
+  background-color: lightgray;
+  border-right: 1px solid black;
+  border-left: 1px solid darkgray;
+}
+
+td.pvtSubtotal.level2 {
+  font-weight: bold;
+  background-color: greenyellow;
+  border-right: 1px solid gray;    
+}
+
+tr.pvtSubtotal.level1 td
+ {
+  border-top: 1px solid black;
+  border-bottom: 1px solid darkgray;
+  font-weight: bold;
+  background-color: lightgray;
+}
+
+tr.pvtSubtotal.level2 td {
+  background-color: gainsboro;
+  border-bottom: 1px solid lightgray;  
+}
+
+tr.pvtData td,
+tr.pvtData th {
+  font-style: italic;
+  font-size: smaller;
+  font-weight: normal;
+}
