@@ -395,7 +395,7 @@ describe "$.pivotUtilities", ->
         describe ".listUnique", ->
             it "works", ->
                 expect getVal(tpl.listUnique()(['gender']))
-                .toBe 'male,female'
+                .toBe 'female,male'
 
         describe ".average", ->
             it "works", ->

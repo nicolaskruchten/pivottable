@@ -9,9 +9,7 @@
 
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.4.1/jasmine.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.4.1/jasmine-html.js"></script>
-
-  <!-- boot.js is patched to not execute env, so we can execute after compilation of tests -->
-  <script type="text/javascript" src="boot.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.4.1/boot.js"></script>
 
   <!-- include source files here... -->
 
@@ -21,8 +19,6 @@
 
   <!-- include spec files here... -->
   <script type="text/javascript" src="../dist/pivot_spec.js"></script>
-
-  <script type="text/javascript"> $(function(){jasmine.getEnv().execute();}); </script>
 
 </head>
 
