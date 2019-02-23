@@ -499,7 +499,7 @@ callWithJQuery ($) ->
                 break if stop
                 len++
             return len
-
+        
         #the first few rows are for col headers
         thead = document.createElement("thead")
         for own j, c of colAttrs
@@ -518,7 +518,7 @@ callWithJQuery ($) ->
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtColLabel"
-                    th.textContent = colKey[j]
+                    th.textContent = colKey[j] ? pivotData.aggregatorName # '\u2211'
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
