@@ -48,7 +48,8 @@
         apply: "Aplicar",
         cancel: "Cancelar",
         vs: "vs",
-        by: "por"
+        by: "por",
+        csv_sep: ";"
       },
       aggregators: {
         "Contagem": tpl.count(frFmtInt),
@@ -79,7 +80,9 @@
         "Tabela com Barras": r["Table Barchart"],
         "Mapa de Calor": r["Heatmap"],
         "Mapa de Calor por Linhas": r["Row Heatmap"],
-        "Mapa de Calor por Colunas": r["Col Heatmap"]
+        "Mapa de Calor por Colunas": r["Col Heatmap"],
+        "Exportar para TSV": r["TSV Export"],
+        "Exportar para CSV": r["CSV Export"]
       }
     };
     if (gcr) {

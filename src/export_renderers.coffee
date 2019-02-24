@@ -9,10 +9,17 @@ callWithJQuery = (pivotModule) ->
 
 callWithJQuery ($) ->
 
-    $.pivotUtilities.export_renderers = "TSV Export": (pivotData, opts) ->
-        defaults = localeStrings: {}
+    svExporter = (pivotData, opts, separator) ->
+        defaults = localeStrings: {
+            csv_sep: ","
+        }
 
         opts = $.extend(true, {}, defaults, opts)
+
+        if separator == "tsv"
+            separator = "\t"
+        else
+            separator = opts.localeStrings.csv_sep
 
         rowKeys = pivotData.getRowKeys()
         rowKeys.push [] if rowKeys.length == 0
@@ -48,9 +55,12 @@ callWithJQuery ($) ->
             result.push row
         text = ""
         for r in result
-            text += r.join("\t")+"\n"
+            text += r.join(separator)+"\n"
 
         return $("<textarea>").text(text).css(
                 width: ($(window).width() / 2) + "px",
                 height: ($(window).height() / 2) + "px")
 
+    $.pivotUtilities.export_renderers = 
+        "TSV Export": (pivotData, opts) -> svExporter(pivotData, opts, "tsv"),
+        "CSV Export": (pivotData, opts) -> svExporter(pivotData, opts, "csv")
