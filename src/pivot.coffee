@@ -322,8 +322,8 @@ callWithJQuery ($) ->
             @allTotal = @aggregator(this, [], [])
             @sorted = false
             @grouping = opts.grouping ? false
-            @rowSumsBefore = opts.rowSumsBefore ? true
-            @colSumsBefore = opts.colSumsBefore ? false
+            @rowGroupBefore = opts.rowGroupBefore ? true
+            @colGroupBefore = opts.colGroupBefore ? false
 
             # iterate through input, accumulating data for cells
             PivotData.forEachRecord @input, @derivedAttributes, (record) =>
@@ -381,11 +381,11 @@ callWithJQuery ($) ->
                 switch @rowOrder
                     when "value_a_to_z"  then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
                     when "value_z_to_a" then @rowKeys.sort (a,b) => -naturalSort v(a,[]), v(b,[])
-                    else                     @rowKeys.sort @arrSort(@rowAttrs, @rowSumsBefore)
+                    else                     @rowKeys.sort @arrSort(@rowAttrs, @rowGroupBefore)
                 switch @colOrder
                     when "value_a_to_z"  then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
                     when "value_z_to_a" then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
-                    else                     @colKeys.sort @arrSort(@colAttrs, @colSumsBefore)
+                    else                     @colKeys.sort @arrSort(@colAttrs, @colGroupBefore)
 
         getColKeys: (all_keys=false) =>
             @sortKeys()

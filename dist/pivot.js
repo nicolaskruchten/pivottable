@@ -663,8 +663,8 @@
         this.allTotal = this.aggregator(this, [], []);
         this.sorted = false;
         this.grouping = (ref10 = opts.grouping) != null ? ref10 : false;
-        this.rowSumsBefore = (ref11 = opts.rowSumsBefore) != null ? ref11 : true;
-        this.colSumsBefore = (ref12 = opts.colSumsBefore) != null ? ref12 : false;
+        this.rowGroupBefore = (ref11 = opts.rowGroupBefore) != null ? ref11 : true;
+        this.colGroupBefore = (ref12 = opts.colGroupBefore) != null ? ref12 : false;
         PivotData.forEachRecord(this.input, this.derivedAttributes, (function(_this) {
           return function(record) {
             if (_this.filter(record)) {
@@ -802,7 +802,7 @@
               })(this));
               break;
             default:
-              this.rowKeys.sort(this.arrSort(this.rowAttrs, this.rowSumsBefore));
+              this.rowKeys.sort(this.arrSort(this.rowAttrs, this.rowGroupBefore));
           }
           switch (this.colOrder) {
             case "value_a_to_z":
@@ -818,7 +818,7 @@
                 };
               })(this));
             default:
-              return this.colKeys.sort(this.arrSort(this.colAttrs, this.colSumsBefore));
+              return this.colKeys.sort(this.arrSort(this.colAttrs, this.colGroupBefore));
           }
         }
       };
