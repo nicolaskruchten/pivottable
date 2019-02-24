@@ -662,7 +662,7 @@
         this.colTotals = {};
         this.allTotal = this.aggregator(this, [], []);
         this.sorted = false;
-        this.sums = (ref10 = opts.sums) != null ? ref10 : false;
+        this.grouping = (ref10 = opts.grouping) != null ? ref10 : false;
         this.rowSumsBefore = (ref11 = opts.rowSumsBefore) != null ? ref11 : true;
         this.colSumsBefore = (ref12 = opts.colSumsBefore) != null ? ref12 : false;
         PivotData.forEachRecord(this.input, this.derivedAttributes, (function(_this) {
@@ -672,7 +672,6 @@
             }
           };
         })(this));
-        window.pivotData = this;
       }
 
       PivotData.forEachRecord = function(input, derivedAttributes, f) {
@@ -878,9 +877,9 @@
           x = ref2[o];
           rowKeys.push((ref3 = record[x]) != null ? ref3 : "null");
         }
+        colKeys = this.grouping ? this.subarrays(colKeys) : [colKeys];
+        rowKeys = this.grouping ? this.subarrays(rowKeys) : [rowKeys];
         this.allTotal.push(record);
-        colKeys = this.sums ? this.subarrays(colKeys) : [colKeys];
-        rowKeys = this.sums ? this.subarrays(rowKeys) : [rowKeys];
         results = [];
         for (j in rowKeys) {
           rowKey = rowKeys[j];
@@ -896,7 +895,7 @@
                   this.rowKeys.push(rowKey);
                   this.rowTotals[flatRowKey] = this.aggregator(this, rowKey, []);
                 }
-                if (!this.sums || colKey.length === 0) {
+                if (!(this.grouping && colKey.length)) {
                   this.rowTotals[flatRowKey].push(record);
                 }
               }
@@ -905,7 +904,7 @@
                   this.colKeys.push(colKey);
                   this.colTotals[flatColKey] = this.aggregator(this, [], colKey);
                 }
-                if (!this.sums || rowKey.length === 0 && this.sums) {
+                if (!(this.grouping && rowKey.length)) {
                   this.colTotals[flatColKey].push(record);
                 }
               }
@@ -969,7 +968,7 @@
     Default Renderer for hierarchical table layout
      */
     pivotTableRenderer = function(pivotData, opts) {
-      var aggregator, c, cls, colAttrs, colKey, colKeys, compactLayout, defaults, getClickHandler, i, j, r, ref, ref1, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
+      var aggregator, c, colAttrs, colKey, colKeys, compactLayout, defaults, getClickHandler, i, j, r, ref, ref1, result, rowAttrs, rowGap, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
       defaults = {
         table: {
           clickCallback: null,
@@ -1008,7 +1007,7 @@
           };
         };
       }
-      compactLayout = (ref = opts.table.compactLayout) != null ? ref : true && pivotData.sums;
+      compactLayout = ((ref = opts.table.compactLayout) != null ? ref : true) && pivotData.grouping;
       result = document.createElement("table");
       result.className = "pvtTable";
       spanSize = function(arr, i, j) {
@@ -1102,37 +1101,34 @@
         if (!hasProp.call(rowKeys, i)) continue;
         rowKey = rowKeys[i];
         tr = document.createElement("tr");
-        if (pivotData.sums) {
-          tr.className = rowKey.length !== rowAttrs.length ? "pvtSubtotal level" + rowKey.length : "pvtData";
-        }
-        if (compactLayout) {
-          th = document.createElement("th");
-          th.className = "pvtRowLabel";
-          th.textContent = rowKey[rowKey.length - 1];
-          th.setAttribute('colspan', rowAttrs.length + (colAttrs.length !== 0 ? 1 : 0));
-          th.style.paddingLeft = 5 + parseInt(rowKey.length - 1) * 30 + 'px';
-          tr.appendChild(th);
-        } else {
-          for (j in rowKey) {
-            if (!hasProp.call(rowKey, j)) continue;
-            txt = rowKey[j];
-            x = spanSize(rowKeys, parseInt(i), parseInt(j));
-            if (x !== -1) {
-              th = document.createElement("th");
-              th.className = "pvtRowLabel";
-              th.textContent = txt;
-              th.setAttribute("rowspan", x);
-              if (parseInt(j) === rowAttrs.length - 1 && colAttrs.length !== 0) {
-                th.setAttribute("colspan", 2);
-              }
-              tr.appendChild(th);
-            }
+        rowGap = rowAttrs.length - rowKey.length;
+        tr.className = rowGap ? "pvtSubtotal level" + rowKey.length : "pvtData";
+        for (j in rowKey) {
+          if (!hasProp.call(rowKey, j)) continue;
+          txt = rowKey[j];
+          if (compactLayout && j < rowKey.length - 1) {
+            continue;
           }
-          if (rowAttrs.length - rowKey.length) {
+          x = compactLayout ? 1 : spanSize(rowKeys, parseInt(i), parseInt(j));
+          if (x !== -1) {
             th = document.createElement("th");
-            th.setAttribute("colspan", rowAttrs.length - rowKey.length + (colAttrs.length ? 1 : 0));
+            th.className = "pvtRowLabel";
+            th.textContent = txt;
+            th.setAttribute("rowspan", x);
+            if (compactLayout) {
+              th.colSpan = rowAttrs.length;
+              th.style.paddingLeft = 5 + parseInt(j) * 20 + 'px';
+            }
             tr.appendChild(th);
           }
+        }
+        if (!compactLayout && rowGap) {
+          th = document.createElement("th");
+          th.colSpan = rowGap;
+          tr.appendChild(th);
+        }
+        if (colAttrs.length) {
+          th.colSpan++;
         }
         for (j in colKeys) {
           if (!hasProp.call(colKeys, j)) continue;
@@ -1141,12 +1137,8 @@
           val = aggregator.value();
           td = document.createElement("td");
           td.className = "pvtVal row" + i + " col" + j;
-          if (pivotData.sums) {
-            cls = colKey.length === colAttrs.length && rowKey.length === rowAttrs.length ? "pvtVal " : "";
-            td.className = cls + ("row" + i + " col" + j);
-            if (colKey.length !== colAttrs.length) {
-              td.className += " pvtSubtotal level" + colKey.length;
-            }
+          if (colAttrs.length - colKey.length) {
+            td.className = "pvtSubtotal level" + colKey.length + " row" + i + " col" + j;
           }
           td.textContent = aggregator.format(val);
           td.setAttribute("data-value", val);
@@ -1242,8 +1234,7 @@
         aggregatorName: "Count",
         sorters: {},
         derivedAttributes: {},
-        renderer: pivotTableRenderer,
-        sums: false
+        renderer: pivotTableRenderer
       };
       localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
       localeDefaults = {
@@ -1283,7 +1274,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, label, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, sumsCheckbox, t, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, c, checkbox, colOrderArrow, compactCheckobx, defaults, e, existingOpts, fn1, groupingCheckbox, i, initialRender, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, ref4, ref5, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, t, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1371,15 +1362,18 @@
           if (!hasProp.call(ref, x)) continue;
           $("<option>").val(x).html(x).appendTo(renderer);
         }
-        label = $('<label>').appendTo(rendererControl).text(' Sums');
-        sumsCheckbox = $('<input/>').addClass('pvtSums').attr({
-          type: 'checkbox',
-          name: 'sums'
-        }).prependTo(label).bind("change", (function(_this) {
-          return function() {
-            return refresh();
-          };
-        })(this));
+        unused = $('<div style="float:right">').appendTo(rendererControl).wrap('<small>').wrap('<small>');
+        checkbox = function(txt, parent) {
+          var label;
+          label = $('<label>').appendTo(parent).after('<br>').text(txt);
+          return $('<input type="checkbox"/>').prependTo(label).bind("change", (function(_this) {
+            return function() {
+              return refresh();
+            };
+          })(this));
+        };
+        groupingCheckbox = checkbox((ref1 = opts.localeStrings.grouping) != null ? ref1 : 'Grouping', unused);
+        compactCheckobx = checkbox((ref2 = opts.localeStrings.compact) != null ? ref2 : 'Compact', unused);
         unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell');
         shownAttributes = (function() {
           var results;
@@ -1433,7 +1427,7 @@
           unused.addClass('pvtHorizList');
         }
         fn1 = function(attr) {
-          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, o, placeholder, ref1, sorter, triangleLink, v, value, valueCount, valueList, values;
+          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, o, placeholder, ref3, sorter, triangleLink, v, value, valueCount, valueList, values;
           values = (function() {
             var results;
             results = [];
@@ -1462,12 +1456,12 @@
                 filter = $(this).val().toLowerCase().trim();
                 accept_gen = function(prefix, accepted) {
                   return function(v) {
-                    var real_filter, ref1;
+                    var real_filter, ref3;
                     real_filter = filter.substring(prefix.length).trim();
                     if (real_filter.length === 0) {
                       return true;
                     }
-                    return ref1 = Math.sign(sorter(v.toLowerCase(), real_filter)), indexOf.call(accepted, ref1) >= 0;
+                    return ref3 = Math.sign(sorter(v.toLowerCase(), real_filter)), indexOf.call(accepted, ref3) >= 0;
                   };
                 };
                 accept = filter.indexOf(">=") === 0 ? accept_gen(">=", [1, 0]) : filter.indexOf("<=") === 0 ? accept_gen("<=", [-1, 0]) : filter.indexOf(">") === 0 ? accept_gen(">", [1]) : filter.indexOf("<") === 0 ? accept_gen("<", [-1]) : filter.indexOf("~") === 0 ? function(v) {
@@ -1501,9 +1495,9 @@
               });
             }
             checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
-            ref1 = values.sort(getSort(opts.sorters, attr));
-            for (o = 0, len2 = ref1.length; o < len2; o++) {
-              value = ref1[o];
+            ref3 = values.sort(getSort(opts.sorters, attr));
+            for (o = 0, len2 = ref3.length; o < len2; o++) {
+              value = ref3[o];
               valueCount = attrValues[attr][value];
               filterItem = $("<label>");
               filterItemExcluded = false;
@@ -1550,8 +1544,8 @@
             return closeFilterBox();
           });
           triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", function(e) {
-            var left, ref2, top;
-            ref2 = $(e.currentTarget).position(), left = ref2.left, top = ref2.top;
+            var left, ref4, top;
+            ref4 = $(e.currentTarget).position(), left = ref4.left, top = ref4.top;
             return valueList.css({
               left: left + 10,
               top: top + 10
@@ -1572,9 +1566,9 @@
         aggregator = $("<select>").addClass('pvtAggregator').bind("change", function() {
           return refresh();
         });
-        ref1 = opts.aggregators;
-        for (x in ref1) {
-          if (!hasProp.call(ref1, x)) continue;
+        ref3 = opts.aggregators;
+        for (x in ref3) {
+          if (!hasProp.call(ref3, x)) continue;
           aggregator.append($("<option>").val(x).html(x));
         }
         ordering = {
@@ -1620,14 +1614,14 @@
           uiTable.prepend($("<tr>").append(rendererControl).append(unused));
         }
         this.html(uiTable);
-        ref2 = opts.cols;
-        for (o = 0, len2 = ref2.length; o < len2; o++) {
-          x = ref2[o];
+        ref4 = opts.cols;
+        for (o = 0, len2 = ref4.length; o < len2; o++) {
+          x = ref4[o];
           this.find(".pvtCols").append(this.find(".axis_" + ($.inArray(x, shownInDragDrop))));
         }
-        ref3 = opts.rows;
-        for (t = 0, len3 = ref3.length; t < len3; t++) {
-          x = ref3[t];
+        ref5 = opts.rows;
+        for (t = 0, len3 = ref5.length; t < len3; t++) {
+          x = ref5[t];
           this.find(".pvtRows").append(this.find(".axis_" + ($.inArray(x, shownInDragDrop))));
         }
         if (opts.aggregatorName != null) {
@@ -1636,8 +1630,11 @@
         if (opts.rendererName != null) {
           this.find(".pvtRenderer").val(opts.rendererName);
         }
-        if (opts.sums != null) {
-          this.find(".pvtSums").attr('checked', opts.sums);
+        if (opts.grouping != null) {
+          groupingCheckbox.attr('checked', opts.grouping);
+        }
+        if (opts.rendererOptions.table && (opts.rendererOptions.table.compactLayout != null)) {
+          compactCheckobx.attr('checked', opts.rendererOptions.table.compactLayout);
         }
         if (!opts.showUI) {
           this.find(".pvtUiCell").hide();
@@ -1645,7 +1642,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, subopts, u, unusedAttrsContainer, vals, w;
+            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref6, ref7, subopts, u, unusedAttrsContainer, vals, w;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1657,7 +1654,7 @@
               rowSumsBefore: opts.rowSumsBefore,
               colSumsBefore: opts.colSumsBefore
             };
-            numInputsToProcess = (ref4 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? ref4 : 0;
+            numInputsToProcess = (ref6 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? ref6 : 0;
             vals = [];
             _this.find(".pvtRows li span.pvtAttr").each(function() {
               return subopts.rows.push($(this).data("attrName"));
@@ -1677,7 +1674,7 @@
             });
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
-              for (x = u = 0, ref5 = numInputsToProcess; 0 <= ref5 ? u < ref5 : u > ref5; x = 0 <= ref5 ? ++u : --u) {
+              for (x = u = 0, ref7 = numInputsToProcess; 0 <= ref7 ? u < ref7 : u > ref7; x = 0 <= ref7 ? ++u : --u) {
                 newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
@@ -1703,7 +1700,11 @@
             subopts.renderer = opts.renderers[renderer.val()];
             subopts.rowOrder = rowOrderArrow.data("order");
             subopts.colOrder = colOrderArrow.data("order");
-            subopts.sums = sumsCheckbox.is(':checked');
+            subopts.grouping = groupingCheckbox.is(':checked');
+            subopts.rendererOptions = subopts.rendererOptions || {};
+            subopts.rendererOptions.table = subopts.rendererOptions.table || {};
+            subopts.rendererOptions.table.compactLayout = compactCheckobx.is(':checked');
+            compactCheckobx.attr('disabled', !groupingCheckbox.is(':checked'));
             exclusions = {};
             _this.find('input.pvtFilter').not(':checked').each(function() {
               var filter;
@@ -1727,13 +1728,13 @@
               }
             });
             subopts.filter = function(record) {
-              var excludedItems, k, ref6, ref7;
+              var excludedItems, k, ref8, ref9;
               if (!opts.filter(record)) {
                 return false;
               }
               for (k in exclusions) {
                 excludedItems = exclusions[k];
-                if (ref6 = "" + ((ref7 = record[k]) != null ? ref7 : 'null'), indexOf.call(excludedItems, ref6) >= 0) {
+                if (ref8 = "" + ((ref9 = record[k]) != null ? ref9 : 'null'), indexOf.call(excludedItems, ref8) >= 0) {
                   return false;
                 }
               }

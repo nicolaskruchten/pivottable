@@ -115,35 +115,32 @@ table.pvtTable tbody tr td {
 
 .pvtRendererArea { padding: 5px;}
 
+.pvtSubtotal.level1,
+.pvtSubtotal.level1 td {
+    font-weight: bold;
+    background-color: lightgray;
+}
+
 td.pvtSubtotal.level1 {
-  font-weight: bold;
-  background-color: lightgray;
   border-right: 1px solid black;
   border-left: 1px solid darkgray;
 }
 
+tr.pvtSubtotal.level1 td {
+  border-top: 1px solid black;
+  border-bottom: 1px solid darkgray;
+
+}
+
 td.pvtSubtotal.level2 {
-  font-weight: bold;
   background-color: gainsboro;
   border-right: 1px solid gray;    
 }
 
-tr.pvtSubtotal.level1 td
- {
-  border-top: 1px solid black;
-  border-bottom: 1px solid darkgray;
-  font-weight: bold;
-  background-color: lightgray;
-}
 
 tr.pvtSubtotal.level2 td {
   background-color: gainsboro;
   border-bottom: 1px solid lightgray;  
 }
 
-tr.pvtData td,
-tr.pvtData th {
-  font-style: italic;
-  font-size: smaller;
-  font-weight: normal;
-}
+
