@@ -752,18 +752,6 @@ callWithJQuery ($) ->
             for own x of opts.renderers
                 $("<option>").val(x).html(x).appendTo(renderer)
 
-            unused = $('<div style="float:right">').appendTo(rendererControl).wrap('<small>').wrap('<small>')
-            checkbox = (txt, parent) ->
-                label = $('<label>')
-                    .appendTo parent
-                    .after('<br>')
-                    .text txt
-                $('<input type="checkbox"/>')
-                    .prependTo label
-                    .bind "change", => refresh()
-
-            groupingCheckbox = checkbox opts.localeStrings.grouping ? 'Grouping', unused
-            compactCheckobx = checkbox opts.localeStrings.compact ? 'Compact', unused
 
             #axis list, including the double-click menu
             unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
@@ -970,11 +958,7 @@ callWithJQuery ($) ->
                 @find(".pvtAggregator").val opts.aggregatorName
             if opts.rendererName?
                 @find(".pvtRenderer").val opts.rendererName
-            if opts.grouping?
-                groupingCheckbox.attr 'checked', opts.grouping
-            if opts.rendererOptions.table and opts.rendererOptions.table.compactLayout?
-                compactCheckobx.attr 'checked', opts.rendererOptions.table.compactLayout
-            
+
             @find(".pvtUiCell").hide() unless opts.showUI
 
             initialRender = true
@@ -988,8 +972,6 @@ callWithJQuery ($) ->
                     sorters: opts.sorters
                     cols: [], rows: []
                     dataClass: opts.dataClass
-                    rowSumsBefore: opts.rowSumsBefore
-                    colSumsBefore: opts.colSumsBefore
 
                 numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0
                 vals = []
@@ -1027,12 +1009,6 @@ callWithJQuery ($) ->
                 subopts.renderer = opts.renderers[renderer.val()]
                 subopts.rowOrder = rowOrderArrow.data("order")
                 subopts.colOrder = colOrderArrow.data("order")
-                subopts.grouping = groupingCheckbox.is(':checked')
-                subopts.rendererOptions = subopts.rendererOptions || {}
-                subopts.rendererOptions.table = subopts.rendererOptions.table || {}
-                subopts.rendererOptions.table.compactLayout = compactCheckobx.is(':checked')
-                
-                compactCheckobx.attr 'disabled', !groupingCheckbox.is(':checked')
                 #construct filter here
                 exclusions = {}
                 @find('input.pvtFilter').not(':checked').each ->
