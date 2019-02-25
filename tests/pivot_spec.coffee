@@ -532,6 +532,11 @@ describe "$.pivotUtilities", ->
             expect nf 1234567.89123456
             .toEqual "1a234a567b89"
 
+        it "adds blank thousands separator", ->
+            nf = numberFormat(thousandsSep: "", decimalSep: "b")
+            expect nf 1234567.89123456
+            .toEqual "1234567b89"
+
         it "adds prefixes and suffixes", ->
             nf = numberFormat(prefix: "a", suffix: "b")
             expect nf 1234567.89123456
