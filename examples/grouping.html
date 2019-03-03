@@ -18,7 +18,7 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
 
         <!-- for examples only! script to show code to user -->
-        <script type="text/javascript" src="show_code.js"></script>
+        <!-- script type="text/javascript" src="show_code.js"></script -->
     </head>
     <body>
         <script type="text/javascript">
@@ -33,14 +33,21 @@
                 derivedAttributes: {
                     "Age Bin": derivers.bin("Age", 20),
                 },
-                rows: ['Province', 'Party'],
-                cols: ['Gender', 'Age Bin'],                
+                rows: [  ],
+                cols: [ 'Province', 'Party', 'Gender', 'Age Bin'],
                 grouping: true,
+                colGroupBefore: true,
                 rendererOptions: {
                     table: {
                         compactLayout: true,
+                        clickCallback: function (e, value, filters, pivotData) {
+                            var names = [];
+                            pivotData.forEachMatchingRecord(filters,
+                                function (record) { names.push(record.Name); });
+                            alert(names.join("\n"));
+                        }
                     }
-                }                
+                }
             });
         });
      });

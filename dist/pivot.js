@@ -20,7 +20,7 @@
     /*
     Utilities
      */
-    var PivotData, addSeparators, aggregatorTemplates, aggregators, dayNamesEn, derivers, getSort, locales, mthNamesEn, naturalSort, numberFormat, pivotTableRenderer, rd, renderers, rx, rz, sortAs, usFmt, usFmtInt, usFmtPct, zeroPad;
+    var PivotData, addSeparators, aggregatorTemplates, aggregators, childIndex, children, dayNamesEn, derivers, expandCol, expandRow, getSort, locales, mthNamesEn, naturalSort, numberFormat, parents, pivotTableRenderer, rd, renderers, rx, rz, showHide, showHide2, slide, sortAs, usFmt, usFmtInt, usFmtPct, zeroPad;
     addSeparators = function(nStr, thousandsSep, decimalSep) {
       var rgx, x, x1, x2;
       nStr += '';
@@ -672,10 +672,11 @@
             }
           };
         })(this));
+        window.pivotData = this;
       }
 
       PivotData.forEachRecord = function(input, derivedAttributes, f) {
-        var addRecord, compactRecord, i, j, k, len1, n, record, ref, results, results1, tblCols;
+        var addRecord, compactRecord, i, j, k, len1, o, record, ref, results, results1, tblCols;
         if ($.isEmptyObject(derivedAttributes)) {
           addRecord = f;
         } else {
@@ -711,8 +712,8 @@
             return results;
           } else {
             results1 = [];
-            for (n = 0, len1 = input.length; n < len1; n++) {
-              record = input[n];
+            for (o = 0, len1 = input.length; o < len1; o++) {
+              record = input[o];
               results1.push(addRecord(record));
             }
             return results1;
@@ -755,10 +756,10 @@
       PivotData.prototype.arrSort = function(attrs, nulls_first) {
         var a, sortersArr;
         sortersArr = (function() {
-          var len1, n, results;
+          var len1, o, results;
           results = [];
-          for (n = 0, len1 = attrs.length; n < len1; n++) {
-            a = attrs[n];
+          for (o = 0, len1 = attrs.length; o < len1; o++) {
+            a = attrs[o];
             results.push(getSort(this.sorters, a));
           }
           return results;
@@ -864,17 +865,17 @@
       };
 
       PivotData.prototype.processRecord = function(record) {
-        var colKey, colKeys, flatColKey, flatRowKey, i, j, len1, len2, n, o, ref, ref1, ref2, ref3, results, rowKey, rowKeys, x;
+        var colKey, colKeys, flatColKey, flatRowKey, i, j, len1, len2, o, ref, ref1, ref2, ref3, results, rowKey, rowKeys, t, x;
         colKeys = [];
         rowKeys = [];
         ref = this.colAttrs;
-        for (n = 0, len1 = ref.length; n < len1; n++) {
-          x = ref[n];
+        for (o = 0, len1 = ref.length; o < len1; o++) {
+          x = ref[o];
           colKeys.push((ref1 = record[x]) != null ? ref1 : "null");
         }
         ref2 = this.rowAttrs;
-        for (o = 0, len2 = ref2.length; o < len2; o++) {
-          x = ref2[o];
+        for (t = 0, len2 = ref2.length; t < len2; t++) {
+          x = ref2[t];
           rowKeys.push((ref3 = record[x]) != null ? ref3 : "null");
         }
         colKeys = this.grouping ? this.subarrays(colKeys) : [colKeys];
@@ -967,8 +968,99 @@
     /*
     Default Renderer for hierarchical table layout
      */
+    childIndex = function(el) {
+      return Array.prototype.indexOf.call(el.parentNode.children, el);
+    };
+    children = function(keys, n) {
+      var key, len, results, up;
+      up = keys[0].length === 1 ? 1 : -1;
+      len = keys[n].length;
+      results = [];
+      while ((n = n + up, key = keys[n]) && key.length > len) {
+        if (key.length === len + 1) {
+          results.push(n);
+        } else {
+          continue;
+        }
+      }
+      return results;
+    };
+    parents = function(keys, n) {
+      var key, len, results, up;
+      up = keys[0].length === 1 ? 1 : -1;
+      results = [];
+      while ((len = keys[n].length) > 1) {
+        while ((n = n - up, key = keys[n]) && key.length >= len) {}
+        results.push(n);
+      }
+      return results;
+    };
+    slide = function(type) {
+      return function(speed, easing, callback) {
+        return this.animate({
+          width: type
+        }, speed, easing, callback);
+      };
+    };
+    $.fn.slideLeft = slide('hide');
+    $.fn.slideRight = slide('show');
+    $.fn.slideLeft = $.fn.slideRight = $.fn.toggle;
+    showHide = function(rows, rowKeys, nth, fn) {
+      var i, n, ref;
+      ref = children(rowKeys, nth);
+      for (i in ref) {
+        n = ref[i];
+        fn.call($(rows[n]));
+        if (!$(rows[n]).hasClass('collapsed')) {
+          showHide(rows, rowKeys, n, fn);
+        }
+      }
+      return 1;
+    };
+    expandRow = function(rowKeys) {
+      return function(ev) {
+        var fn, nth, row;
+        row = ev.target.parentNode;
+        nth = childIndex(row);
+        fn = $(row).hasClass('collapsed') ? $.fn.slideDown : $.fn.slideUp;
+        showHide($(row.parentNode).find('tr'), rowKeys, nth, fn);
+        return $(row).toggleClass('collapsed');
+      };
+    };
+    showHide2 = function(rows, rowKeys, nth, fn) {
+      var i, n, ref;
+      ref = children(rowKeys, nth);
+      for (i in ref) {
+        n = ref[i];
+        fn.call(rows.find(".col" + n));
+        if (!rows.find(".col" + n).hasClass('collapsed')) {
+          showHide2(rows, rowKeys, n, fn);
+        }
+      }
+      return 1;
+    };
+    expandCol = function(colKeys, key) {
+      return function(ev) {
+        var col, fn, i, nth, p, parent, ref, ref1, rows;
+        col = ev.target;
+        ref = [col.colSpan, col._colSpan || 1], col._colSpan = ref[0], col.colSpan = ref[1];
+        nth = colKeys.indexOf(key);
+        console.log(parents(colKeys, nth));
+        ref1 = parents(colKeys, nth);
+        for (i in ref1) {
+          p = ref1[i];
+          parent = $("thead tr:nth-child(" + (key.length - i - 1) + ") .col" + p);
+          console.log(parent, parent.colSpan);
+          parent[0].colSpan += col.colSpan === 1 ? -col._colSpan + 1 : col.colSpan - 1;
+        }
+        rows = $('table tr');
+        fn = rows.find(".col" + nth).hasClass('collapsed') ? $.fn.slideRight : $.fn.slideLeft;
+        showHide2(rows, colKeys, nth, fn);
+        return rows.find(".col" + nth).toggleClass('collapsed');
+      };
+    };
     pivotTableRenderer = function(pivotData, opts) {
-      var aggregator, c, colAttrs, colKey, colKeys, compactLayout, defaults, getClickHandler, i, j, r, ref, ref1, result, rowAttrs, rowGap, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
+      var aggregator, c, colAttrs, colKey, colKeys, compactLayout, defaults, getClickHandler, i, j, r, ref, ref1, ref2, result, rowAttrs, rowGap, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
       defaults = {
         table: {
           clickCallback: null,
@@ -1011,10 +1103,10 @@
       result = document.createElement("table");
       result.className = "pvtTable";
       spanSize = function(arr, i, j) {
-        var len, n, noDraw, o, ref1, ref2, stop, x;
+        var len, noDraw, o, ref1, ref2, stop, t, x;
         if (i !== 0) {
           noDraw = true;
-          for (x = n = 0, ref1 = j; 0 <= ref1 ? n <= ref1 : n >= ref1; x = 0 <= ref1 ? ++n : --n) {
+          for (x = o = 0, ref1 = j; 0 <= ref1 ? o <= ref1 : o >= ref1; x = 0 <= ref1 ? ++o : --o) {
             if (arr[i - 1][x] !== arr[i][x]) {
               noDraw = false;
             }
@@ -1026,7 +1118,7 @@
         len = 0;
         while (i + len < arr.length) {
           stop = false;
-          for (x = o = 0, ref2 = j; 0 <= ref2 ? o <= ref2 : o >= ref2; x = 0 <= ref2 ? ++o : --o) {
+          for (x = t = 0, ref2 = j; 0 <= ref2 ? t <= ref2 : t >= ref2; x = 0 <= ref2 ? ++t : --t) {
             if (arr[i][x] !== arr[i + len][x]) {
               stop = true;
             }
@@ -1059,11 +1151,15 @@
           x = spanSize(colKeys, parseInt(i), parseInt(j));
           if (x !== -1) {
             th = document.createElement("th");
-            th.className = "pvtColLabel";
+            th.className = "pvtColLabel col" + (pivotData.colGroupBefore ? +i : +i + x - 1);
             th.textContent = (ref1 = colKey[j]) != null ? ref1 : pivotData.aggregatorName;
+            th.textContent = (ref2 = colKey[j]) != null ? ref2 : '';
             th.setAttribute("colspan", x);
             if (parseInt(j) === colAttrs.length - 1 && rowAttrs.length !== 0) {
               th.setAttribute("rowspan", 2);
+            }
+            if (j < colAttrs.length - 1 && colKey[j]) {
+              th.onclick = expandCol(colKeys, pivotData.colGroupBefore ? colKey : colKeys[+i + x - 1]);
             }
             tr.appendChild(th);
           }
@@ -1103,6 +1199,7 @@
         tr = document.createElement("tr");
         rowGap = rowAttrs.length - rowKey.length;
         tr.className = rowGap ? "pvtSubtotal level" + rowKey.length : "pvtData";
+        tr.onclick = expandRow(rowKeys);
         for (j in rowKey) {
           if (!hasProp.call(rowKey, j)) continue;
           txt = rowKey[j];
@@ -1177,7 +1274,7 @@
           totalAggregator = pivotData.getAggregator([], colKey);
           val = totalAggregator.value();
           td = document.createElement("td");
-          td.className = "pvtTotal colTotal";
+          td.className = "pvtTotal colTotal col" + j;
           if (colKey.length !== colAttrs.length) {
             td.className += " pvtSubtotal level" + colKey.length;
           }
@@ -1274,7 +1371,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, t, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, len1, len2, len3, localeDefaults, localeStrings, materializedInput, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, t, tr1, tr2, u, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1374,10 +1471,10 @@
           return results;
         })();
         shownInAggregators = (function() {
-          var len1, n, results;
+          var len1, o, results;
           results = [];
-          for (n = 0, len1 = shownAttributes.length; n < len1; n++) {
-            c = shownAttributes[n];
+          for (o = 0, len1 = shownAttributes.length; o < len1; o++) {
+            c = shownAttributes[o];
             if (indexOf.call(opts.hiddenFromAggregators, c) < 0) {
               results.push(c);
             }
@@ -1385,10 +1482,10 @@
           return results;
         })();
         shownInDragDrop = (function() {
-          var len1, n, results;
+          var len1, o, results;
           results = [];
-          for (n = 0, len1 = shownAttributes.length; n < len1; n++) {
-            c = shownAttributes[n];
+          for (o = 0, len1 = shownAttributes.length; o < len1; o++) {
+            c = shownAttributes[o];
             if (indexOf.call(opts.hiddenFromDragDrop, c) < 0) {
               results.push(c);
             }
@@ -1403,8 +1500,8 @@
         }
         if (!isNaN(unusedAttrsVerticalAutoCutoff)) {
           attrLength = 0;
-          for (n = 0, len1 = shownInDragDrop.length; n < len1; n++) {
-            a = shownInDragDrop[n];
+          for (o = 0, len1 = shownInDragDrop.length; o < len1; o++) {
+            a = shownInDragDrop[o];
             attrLength += a.length;
           }
           unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff;
@@ -1415,7 +1512,7 @@
           unused.addClass('pvtHorizList');
         }
         fn1 = function(attr) {
-          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, o, placeholder, ref1, sorter, triangleLink, v, value, valueCount, valueList, values;
+          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, placeholder, ref1, sorter, t, triangleLink, v, value, valueCount, valueList, values;
           values = (function() {
             var results;
             results = [];
@@ -1484,8 +1581,8 @@
             }
             checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
             ref1 = values.sort(getSort(opts.sorters, attr));
-            for (o = 0, len2 = ref1.length; o < len2; o++) {
-              value = ref1[o];
+            for (t = 0, len2 = ref1.length; t < len2; t++) {
+              value = ref1[t];
               valueCount = attrValues[attr][value];
               filterItem = $("<label>");
               filterItemExcluded = false;
@@ -1603,13 +1700,13 @@
         }
         this.html(uiTable);
         ref2 = opts.cols;
-        for (o = 0, len2 = ref2.length; o < len2; o++) {
-          x = ref2[o];
+        for (t = 0, len2 = ref2.length; t < len2; t++) {
+          x = ref2[t];
           this.find(".pvtCols").append(this.find(".axis_" + ($.inArray(x, shownInDragDrop))));
         }
         ref3 = opts.rows;
-        for (t = 0, len3 = ref3.length; t < len3; t++) {
-          x = ref3[t];
+        for (u = 0, len3 = ref3.length; u < len3; u++) {
+          x = ref3[u];
           this.find(".pvtRows").append(this.find(".axis_" + ($.inArray(x, shownInDragDrop))));
         }
         if (opts.aggregatorName != null) {
@@ -1624,7 +1721,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, subopts, u, unusedAttrsContainer, vals, w;
+            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, subopts, unusedAttrsContainer, vals, w, y;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1654,12 +1751,12 @@
             });
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
-              for (x = u = 0, ref5 = numInputsToProcess; 0 <= ref5 ? u < ref5 : u > ref5; x = 0 <= ref5 ? ++u : --u) {
+              for (x = w = 0, ref5 = numInputsToProcess; 0 <= ref5 ? w < ref5 : w > ref5; x = 0 <= ref5 ? ++w : --w) {
                 newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
                   return refresh();
                 });
-                for (w = 0, len4 = shownInAggregators.length; w < len4; w++) {
-                  attr = shownInAggregators[w];
+                for (y = 0, len4 = shownInAggregators.length; y < len4; y++) {
+                  attr = shownInAggregators[y];
                   newDropdown.append($("<option>").val(attr).text(attr));
                 }
                 pvtVals.append(newDropdown);
@@ -1772,7 +1869,7 @@
     Heatmap post-processing
      */
     $.fn.heatmap = function(scope, opts) {
-      var colorScaleGenerator, heatmapper, i, j, n, numCols, numRows, o, ref, ref1, ref2;
+      var colorScaleGenerator, heatmapper, i, j, numCols, numRows, o, ref, ref1, ref2, t;
       if (scope == null) {
         scope = "heatmap";
       }
@@ -1818,12 +1915,12 @@
           heatmapper(".pvtVal");
           break;
         case "rowheatmap":
-          for (i = n = 0, ref1 = numRows; 0 <= ref1 ? n < ref1 : n > ref1; i = 0 <= ref1 ? ++n : --n) {
+          for (i = o = 0, ref1 = numRows; 0 <= ref1 ? o < ref1 : o > ref1; i = 0 <= ref1 ? ++o : --o) {
             heatmapper(".pvtVal.row" + i);
           }
           break;
         case "colheatmap":
-          for (j = o = 0, ref2 = numCols; 0 <= ref2 ? o < ref2 : o > ref2; j = 0 <= ref2 ? ++o : --o) {
+          for (j = t = 0, ref2 = numCols; 0 <= ref2 ? t < ref2 : t > ref2; j = 0 <= ref2 ? ++t : --t) {
             heatmapper(".pvtVal.col" + j);
           }
       }
@@ -1836,7 +1933,7 @@
     Barchart post-processing
      */
     return $.fn.barchart = function(opts) {
-      var barcharter, i, n, numCols, numRows, ref;
+      var barcharter, i, numCols, numRows, o, ref;
       numRows = this.data("numrows");
       numCols = this.data("numcols");
       barcharter = (function(_this) {
@@ -1905,7 +2002,7 @@
           });
         };
       })(this);
-      for (i = n = 0, ref = numRows; 0 <= ref ? n < ref : n > ref; i = 0 <= ref ? ++n : --n) {
+      for (i = o = 0, ref = numRows; 0 <= ref ? o < ref : o > ref; i = 0 <= ref ? ++o : --o) {
         barcharter(".pvtVal.row" + i);
       }
       barcharter(".pvtTotal.colTotal");

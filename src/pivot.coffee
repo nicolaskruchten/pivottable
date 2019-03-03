@@ -329,6 +329,8 @@ callWithJQuery ($) ->
             PivotData.forEachRecord @input, @derivedAttributes, (record) =>
                 @processRecord(record) if @filter(record)
 
+            window.pivotData = @
+
         #can handle arrays or jQuery selections of tables
         @forEachRecord = (input, derivedAttributes, f) ->
             if $.isEmptyObject derivedAttributes
@@ -456,6 +458,68 @@ callWithJQuery ($) ->
     Default Renderer for hierarchical table layout
     ###
 
+    childIndex = (el) -> Array.prototype.indexOf.call el.parentNode.children, el
+
+    children = (keys, n) ->
+        up = if keys[0].length == 1 then 1 else -1
+        len = keys[n].length
+        while (n = n+up; key = keys[n]) and key.length > len
+            if key.length == len+1 then n else continue
+
+    parents = (keys, n) ->
+        up = if keys[0].length == 1 then 1 else -1
+        while (len = keys[n].length) > 1
+            while (n = n-up; key = keys[n]) and key.length >= len then
+            n
+
+
+    slide = (type) ->
+        (speed, easing, callback) -> @.animate({width: type}, speed, easing, callback)
+    # $.fn.slideLeft = (speed, easing, callback) -> @.animate({width: 'hide'}, speed, easing, callback)
+    # $.fn.slideRight = (speed, easing, callback) -> @.animate({width: 'show'}, speed, easing, callback)
+    $.fn.slideLeft = slide('hide')
+    $.fn.slideRight = slide('show')
+    $.fn.slideLeft = $.fn.slideRight = $.fn.toggle
+
+    showHide = (rows, rowKeys, nth, fn) ->
+        for i, n of children rowKeys, nth
+            fn.call $(rows[n])
+            if not $(rows[n]).hasClass('collapsed')
+                showHide rows, rowKeys, n, fn
+        1
+
+    expandRow = (rowKeys) ->
+        (ev) ->
+            row = ev.target.parentNode
+            nth = childIndex row
+            fn = if $(row).hasClass('collapsed') then $.fn.slideDown else $.fn.slideUp
+            showHide $(row.parentNode).find('tr'), rowKeys, nth, fn
+            $(row).toggleClass('collapsed')
+
+    showHide2 = (rows, rowKeys, nth, fn) ->
+        for i, n of children rowKeys, nth
+            fn.call rows.find(".col#{n}")
+            if not rows.find(".col#{n}").hasClass('collapsed')
+                showHide2 rows, rowKeys, n, fn
+        1
+
+    expandCol = (colKeys, key) ->
+        (ev) ->
+            col = ev.target
+            [col._colSpan, col.colSpan] = [col.colSpan, col._colSpan || 1 ]
+            nth = colKeys.indexOf key
+            console.log parents colKeys, nth
+            for i, p of parents colKeys, nth
+                parent = $("thead tr:nth-child(#{key.length-i-1}) .col#{p}")
+                console.log parent, parent.colSpan
+                parent[0].colSpan += if col.colSpan == 1 then -col._colSpan+1 else col.colSpan-1
+            rows = $('table tr')
+            fn = if rows.find(".col#{nth}").hasClass('collapsed') then $.fn.slideRight else $.fn.slideLeft
+            showHide2 rows, colKeys, nth, fn
+            rows.find(".col#{nth}").toggleClass('collapsed')
+
+
+
     pivotTableRenderer = (pivotData, opts) ->
 
         defaults =
@@ -518,11 +582,14 @@ callWithJQuery ($) ->
                 x = spanSize(colKeys, parseInt(i), parseInt(j))
                 if x != -1
                     th = document.createElement("th")
-                    th.className = "pvtColLabel"
+                    th.className = "pvtColLabel col#{if pivotData.colGroupBefore then +i else +i+x-1}"
                     th.textContent = colKey[j] ? pivotData.aggregatorName # or greek letter sigma '\u2211'
+                    th.textContent = colKey[j] ? ''  # '\u2211'
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
+                    if j < colAttrs.length - 1 and colKey[j]
+                        th.onclick = expandCol colKeys, if pivotData.colGroupBefore then colKey else colKeys[+i+x-1]
                     tr.appendChild th
             if parseInt(j) == 0 && opts.table.rowTotals
                 th = document.createElement("th")
@@ -554,6 +621,7 @@ callWithJQuery ($) ->
             tr = document.createElement("tr")
             rowGap = rowAttrs.length - rowKey.length
             tr.className = if rowGap then "pvtSubtotal level#{rowKey.length}" else "pvtData"
+            tr.onclick = expandRow rowKeys
             for own j, txt of rowKey
                 continue if compactLayout and j < rowKey.length - 1
                 x = if compactLayout then 1 else spanSize(rowKeys, parseInt(i), parseInt(j))
@@ -567,14 +635,14 @@ callWithJQuery ($) ->
                         th.style.paddingLeft = 5 + parseInt(j) * 20 + 'px'
                     tr.appendChild th
 
-            if !compactLayout and rowGap 
+            if !compactLayout and rowGap
                 th = document.createElement("th")
-                th.colSpan = rowGap 
+                th.colSpan = rowGap
                 tr.appendChild th
-            
+
             if colAttrs.length
                 th.colSpan++
-            
+
             for own j, colKey of colKeys #this is the tight loop
                 aggregator = pivotData.getAggregator(rowKey, colKey)
                 val = aggregator.value()
@@ -614,7 +682,7 @@ callWithJQuery ($) ->
                 totalAggregator = pivotData.getAggregator([], colKey)
                 val = totalAggregator.value()
                 td = document.createElement("td")
-                td.className = "pvtTotal colTotal"
+                td.className = "pvtTotal colTotal col#{j}"
                 td.className += " pvtSubtotal level#{colKey.length}" if colKey.length != colAttrs.length
                 td.textContent = totalAggregator.format(val)
                 td.setAttribute("data-value", val)
