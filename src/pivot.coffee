@@ -320,6 +320,8 @@ callWithJQuery ($) ->
             @colTotals = {}
             @allTotal = @aggregator(this, [], [])
             @sorted = false
+            @rowLimit = if opts.hot == true and opts.rowLimit > 0 then opts.rowLimit else 0
+            @colLimit = if opts.hot == true and opts.colLimit > 0 then opts.colLimit else 0
 
             # iterate through input, accumulating data for cells
             PivotData.forEachRecord @input, @derivedAttributes, (record) =>
@@ -382,6 +384,11 @@ callWithJQuery ($) ->
                     when "value_a_to_z"  then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
                     when "value_z_to_a" then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
                     else             @colKeys.sort @arrSort(@colAttrs)
+        getColLimit: () => 
+            return @colLimit
+
+        getRowLimit: () =>
+            return @rowLimit
 
         getColKeys: () =>
             @sortKeys()

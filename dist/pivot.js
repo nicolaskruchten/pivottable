@@ -636,6 +636,8 @@
         this.getAggregator = bind(this.getAggregator, this);
         this.getRowKeys = bind(this.getRowKeys, this);
         this.getColKeys = bind(this.getColKeys, this);
+        this.getRowLimit = bind(this.getRowLimit, this);
+        this.getColLimit = bind(this.getColLimit, this);
         this.sortKeys = bind(this.sortKeys, this);
         this.arrSort = bind(this.arrSort, this);
         this.input = input;
@@ -658,6 +660,8 @@
         this.colTotals = {};
         this.allTotal = this.aggregator(this, [], []);
         this.sorted = false;
+        this.rowLimit = opts.hot === true && opts.rowLimit > 0 ? opts.rowLimit : 0;
+        this.colLimit = opts.hot === true && opts.colLimit > 0 ? opts.colLimit : 0;
         PivotData.forEachRecord(this.input, this.derivedAttributes, (function(_this) {
           return function(record) {
             if (_this.filter(record)) {
@@ -814,6 +818,14 @@
               return this.colKeys.sort(this.arrSort(this.colAttrs));
           }
         }
+      };
+
+      PivotData.prototype.getColLimit = function() {
+        return this.colLimit;
+      };
+
+      PivotData.prototype.getRowLimit = function() {
+        return this.rowLimit;
       };
 
       PivotData.prototype.getColKeys = function() {
