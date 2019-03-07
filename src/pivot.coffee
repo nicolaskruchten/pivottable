@@ -982,7 +982,7 @@ callWithJQuery ($) ->
                 exclusions = {}
                 @find('input.pvtFilter').not(':checked').each ->
                     filter = $(this).data("filter")
-                    if exclusions[filter[0]]?
+                    if filter and exclusions[filter[0]]?
                         exclusions[filter[0]].push( filter[1] )
                     else
                         exclusions[filter[0]] = [ filter[1] ]
@@ -990,7 +990,7 @@ callWithJQuery ($) ->
                 inclusions = {}
                 @find('input.pvtFilter:checked').each ->
                     filter = $(this).data("filter")
-                    if exclusions[filter[0]]?
+                    if filter and exclusions[filter[0]]?
                         if inclusions[filter[0]]?
                             inclusions[filter[0]].push( filter[1] )
                         else
@@ -1095,7 +1095,8 @@ callWithJQuery ($) ->
             forEachCell = (f) =>
                 @find(scope).each ->
                     x = $(this).data("value")
-                    f(x, $(this)) if x? and isFinite(x)
+                    f(x, $(this)) if x? 
+                        isFinite(x)
 
             values = []
             forEachCell (x) -> values.push x
