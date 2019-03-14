@@ -22,15 +22,15 @@ callWithJQuery ($) ->
     $.pivotUtilities.locales.pt = 
 
         localeStrings:
-            renderError: "Ocorreu um error ao renderizar os resultados da Tabela Dinâmica."
-            computeError: "Ocorreu um error ao computar os resultados da Tabela Dinâmica."
-            uiRenderError: "Ocorreu um error ao renderizar a interface da Tabela Dinâmica."
+            renderError: "Ocorreu um erro ao renderizar os resultados da Tabela Dinâmica."
+            computeError: "Ocorreu um erro ao computar os resultados da Tabela Dinâmica."
+            uiRenderError: "Ocorreu um erro ao renderizar a interface da Tabela Dinâmica."
             selectAll: "Selecionar Tudo"
             selectNone: "Selecionar Nenhum"
             tooMany: "(demais para listar)"
             filterResults: "Filtrar resultados"
             totals: "Totais"
-            apply:"Aplicar",
+            apply: "Aplicar",
             cancel: "Cancelar",
             vs: "vs"
             by: "por"
@@ -43,7 +43,7 @@ callWithJQuery ($) ->
             "Soma de Inteiros":                             tpl.sum(frFmtInt)
             "Média":                                        tpl.average(frFmt)
             "Mediana":                                      tpl.median(frFmt)
-            "Variancia":                                    tpl.var(1, frFmt)
+            "Variância":                                    tpl.var(1, frFmt)
             "Desvio Padrão da Amostra":                     tpl.stdev(1, frFmt)
             "Mínimo":                                       tpl.min(frFmt)
             "Máximo":                                       tpl.max(frFmt)
