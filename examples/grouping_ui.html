@@ -35,8 +35,9 @@
                 },
                 cols: ['Gender', 'Age Bin',],
                 rows: ['Party', 'Province', ],
-                grouping: false,
+                grouping: true,
                 colGroupBefore: false,
+                rendererName: "Heatmap",
                 dataClass: $.pivotUtilities.GroupingPivotData,
                 rendererOptions: {
                     table: {
@@ -46,8 +47,7 @@
             };
 
             $.getJSON("mps.json", function (mps) {
-                console.log(mps);
-                $("#output").pivot(mps, params);
+                $("#output").pivotUI(mps, params);
             });
 
         });

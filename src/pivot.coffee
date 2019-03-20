@@ -329,8 +329,6 @@ callWithJQuery ($) ->
             PivotData.forEachRecord @input, @derivedAttributes, (record) =>
                 @processRecord(record) if @filter(record)
 
-            window.pivotData = @
-
         #can handle arrays or jQuery selections of tables
         @forEachRecord = (input, derivedAttributes, f) ->
             if $.isEmptyObject derivedAttributes
@@ -401,6 +399,7 @@ callWithJQuery ($) ->
 
         # subarrays [1,2,3] => [[], [1], [1,2], [1,2,3]]
         subarrays: (x) -> [[]].concat x.map (d,i) => x.slice(0,i+1)
+        # subarrays: (x) -> x.map (d,i) => x.slice(0,i+1)
 
         processRecord: (record) -> #this code is called in a tight loop
             colKeys = []
@@ -450,75 +449,135 @@ callWithJQuery ($) ->
                 agg = @tree[flatRowKey][flatColKey]
             return agg ? {value: (-> null), format: -> ""}
 
+    class GroupingPivotData extends PivotData
+        constructor: (input, opts = {}) ->
+            opts.grouping = true
+            super
+
+
     #expose these to the outside world
     $.pivotUtilities = {aggregatorTemplates, aggregators, renderers, derivers, locales,
-        naturalSort, numberFormat, sortAs, PivotData}
-
-    ###
-    Default Renderer for hierarchical table layout
-    ###
+        naturalSort, numberFormat, sortAs, PivotData, GroupingPivotData}
 
     childIndex = (el) -> Array.prototype.indexOf.call el.parentNode.children, el
 
-    children = (keys, n) ->
+    childKeysIndices = (keys, n) ->
         up = if keys[0].length == 1 then 1 else -1
         len = keys[n].length
         while (n = n+up; key = keys[n]) and key.length > len
             if key.length == len+1 then n else continue
 
-    parents = (keys, n) ->
+    levelKeysIndices = (keys, level) ->
+        (keys.filter (d) -> d.length == level).map keys.indexOf.bind(keys)
+
+    parentKeysIndices = (keys, n) ->
+        console.log keys
         up = if keys[0].length == 1 then 1 else -1
         while (len = keys[n].length) > 1
             while (n = n-up; key = keys[n]) and key.length >= len then
             n
 
+    getAxis = (table, rows, level) ->
+        if rows
+            table.find("thead tr:last-child th.pvtAxisLabel:nth-of-type(#{level})")
+        else
+            table.find("thead tr:nth-child(#{level}) th.pvtAxisLabel")
 
-    slide = (type) ->
-        (speed, easing, callback) -> @.animate({width: type}, speed, easing, callback)
-    # $.fn.slideLeft = (speed, easing, callback) -> @.animate({width: 'hide'}, speed, easing, callback)
-    # $.fn.slideRight = (speed, easing, callback) -> @.animate({width: 'show'}, speed, easing, callback)
-    $.fn.slideLeft = slide('hide')
-    $.fn.slideRight = slide('show')
-    $.fn.slideLeft = $.fn.slideRight = $.fn.toggle
+    getHeader = (table, rows, n) ->
+       table.find(if rows then "tbody tr th.row#{n}" else "thead th.col#{n}")
 
-    showHide = (rows, rowKeys, nth, fn) ->
-        for i, n of children rowKeys, nth
-            fn.call $(rows[n])
-            if not $(rows[n]).hasClass('collapsed')
-                showHide rows, rowKeys, n, fn
-        1
+    rowGetter = (table) ->
+        rows = table.find('tbody tr')
+        (n) -> $(rows[n])
 
-    expandRow = (rowKeys) ->
+    colGetter = (table) ->
+        rows = table.find('tr')
+        (n) -> rows.find(".col#{n}")
+
+    showHide = (getter, keys, nth, show) ->
+        for i, n of childKeysIndices keys, nth
+            row = getter(n)
+            fn = if show then $.fn.show else $.fn.hide
+            fn.call row
+            if not row.hasClass('collapsed')
+                showHide getter, keys, n, show
+        true
+
+    expandRowsGroupAfter = (cell, rows, keys, nth) ->
+        table = $(cell).closest('table')
+        initIndex = childIndex cell.parentNode
+        getter = rowGetter table
+        row = getter nth
+
+        insertPoint = if row.hasClass('collapsed') then getter cell._old else row
+        cell._old = childIndex cell.parentNode if not row.hasClass('collapsed')
+        insertPoint.prepend cell
+
+        for i, p of parentKeysIndices keys, nth
+            parent = (getHeader table, rows, p)[0]
+            parentIndex = childIndex parent.parentNode
+            parent._old = parent._old ? parentIndex
+            if parent._old == initIndex and parent.rowSpan == 1
+                parent._old -= initIndex - childIndex cell.parentNode
+
+            insertPoint.prepend parent if initIndex == parentIndex
+
+        expandWithSpan cell, rows, keys, nth
+
+    expandWithSpan = (cell, rows, keys, nth) ->
+        table = $(cell).closest('table')
+        span = if rows then 'rowSpan' else 'colSpan'
+
+        [ cell._span, cell[span] ] = [ cell[span], cell._span ? 1 ]
+        change = cell[span] - cell._span
+
+        for i, p of parentKeysIndices keys, nth
+            parent = (getHeader table, rows, p)[0]
+            if parent[span] == 1
+                parent._span += change
+                break
+            parent[span] += change
+
+        expandRowCol cell, rows, keys, nth, parent
+
+    expandRowCol = (cell, rows, keys, nth, parent) ->
+        table = $(cell).closest('table')
+        getter = if rows then rowGetter table else colGetter table
+        span = if rows then 'rowSpan' else 'colSpan'
+
+        showHide getter, keys, nth, getter(nth).hasClass('collapsed') unless parent?[span] == 1
+        getter(nth).toggleClass 'collapsed'
+        $(cell).toggleClass 'open close'
+
+
+    expandAll = (pivotData, table, level, rows, expand) ->
+        if expand and level > 1
+            getAxis(table, rows, level-1).removeClass('close').addClass('open')
+            expandAll pivotData, table, level-1, rows, expand
+
+        levels = (if rows then pivotData.rowAttrs else pivotData.colAttrs).length - 1
+        if not expand and (level < levels)
+            getAxis(table, rows, i).removeClass('open').addClass('close') for i in [level+1..levels]
+
+        keys = if rows then pivotData.rowKeys else pivotData.colKeys
+        for i, n of levelKeysIndices keys, level
+            el = getHeader table, rows, n
+            el.trigger 'click' if expand == el.hasClass('close')
+        null
+
+    getExpandHandler = (keys, rows, handler) ->
         (ev) ->
-            row = ev.target.parentNode
-            nth = childIndex row
-            fn = if $(row).hasClass('collapsed') then $.fn.slideDown else $.fn.slideUp
-            showHide $(row.parentNode).find('tr'), rowKeys, nth, fn
-            $(row).toggleClass('collapsed')
+            match = ev.target.className.match if rows then /row(\d+)/ else /col(\d+)/
+            handler ev.target, rows, keys, +match[1] if match
 
-    showHide2 = (rows, rowKeys, nth, fn) ->
-        for i, n of children rowKeys, nth
-            fn.call rows.find(".col#{n}")
-            if not rows.find(".col#{n}").hasClass('collapsed')
-                showHide2 rows, rowKeys, n, fn
-        1
-
-    expandCol = (colKeys, key) ->
+    getExpandAllHandler = (pivotData, level, rows) ->
         (ev) ->
-            col = ev.target
-            [col._colSpan, col.colSpan] = [col.colSpan, col._colSpan || 1 ]
-            nth = colKeys.indexOf key
-            console.log parents colKeys, nth
-            for i, p of parents colKeys, nth
-                parent = $("thead tr:nth-child(#{key.length-i-1}) .col#{p}")
-                console.log parent, parent.colSpan
-                parent[0].colSpan += if col.colSpan == 1 then -col._colSpan+1 else col.colSpan-1
-            rows = $('table tr')
-            fn = if rows.find(".col#{nth}").hasClass('collapsed') then $.fn.slideRight else $.fn.slideLeft
-            showHide2 rows, colKeys, nth, fn
-            rows.find(".col#{nth}").toggleClass('collapsed')
+            expandAll pivotData, $(ev.target).closest('table'), level+1, rows, $(ev.target).hasClass('close')
+            $(ev.target).toggleClass('open close')
 
-
+    ###
+    Default Renderer for hierarchical table layout
+    ###
 
     pivotTableRenderer = (pivotData, opts) ->
 
@@ -542,10 +601,17 @@ callWithJQuery ($) ->
                 filters[attr] = colValues[i] for own i, attr of colAttrs when colValues[i]?
                 filters[attr] = rowValues[i] for own i, attr of rowAttrs when rowValues[i]?
                 return (e) -> opts.table.clickCallback(e, value, filters, pivotData)
+
         compactLayout = (opts.table.compactLayout ? true) and pivotData.grouping
+        rowExpandHandler = if compactLayout then expandRowCol else if pivotData.rowGroupBefore then expandWithSpan else expandRowsGroupAfter
+
+        rowsExpandHandler = getExpandHandler rowKeys, true,  rowExpandHandler
+        colsExpandHandler = getExpandHandler colKeys, false, expandWithSpan
+
         #now actually build the output
         result = document.createElement("table")
         result.className = "pvtTable"
+        result.pivotData = pivotData
 
         #helper function for setting row/col-span in pivotTableRenderer
         spanSize = (arr, i, j) ->
@@ -577,19 +643,23 @@ callWithJQuery ($) ->
             th = document.createElement("th")
             th.className = "pvtAxisLabel"
             th.textContent = c
+            if j < colAttrs.length - 1
+                th.onclick = getExpandAllHandler pivotData, +j, false
+                th.className += " open level#{j}"
             tr.appendChild th
             for own i, colKey of colKeys
                 x = spanSize(colKeys, parseInt(i), parseInt(j))
                 if x != -1
                     th = document.createElement("th")
-                    th.className = "pvtColLabel col#{if pivotData.colGroupBefore then +i else +i+x-1}"
-                    th.textContent = colKey[j] ? pivotData.aggregatorName # or greek letter sigma '\u2211'
-                    th.textContent = colKey[j] ? ''  # '\u2211'
+                    th.className = "pvtColLabel"
+                    th.className += " col#{if pivotData.colGroupBefore then +i else +i+x-1}"
+                    th.textContent = colKey[j]
                     th.setAttribute("colspan", x)
                     if parseInt(j) == colAttrs.length-1 and rowAttrs.length != 0
                         th.setAttribute("rowspan", 2)
                     if j < colAttrs.length - 1 and colKey[j]
-                        th.onclick = expandCol colKeys, if pivotData.colGroupBefore then colKey else colKeys[+i+x-1]
+                        th.className += " pvtSubtotal open"
+                        th.onclick = colsExpandHandler
                     tr.appendChild th
             if parseInt(j) == 0 && opts.table.rowTotals
                 th = document.createElement("th")
@@ -606,6 +676,9 @@ callWithJQuery ($) ->
                 th = document.createElement("th")
                 th.className = "pvtAxisLabel"
                 th.textContent = r
+                if i < rowAttrs.length - 1
+                    th.className += " open level#{i}"
+                    th.onclick = getExpandAllHandler pivotData, +i, true
                 tr.appendChild th
             th = document.createElement("th")
             if colAttrs.length ==0
@@ -621,23 +694,27 @@ callWithJQuery ($) ->
             tr = document.createElement("tr")
             rowGap = rowAttrs.length - rowKey.length
             tr.className = if rowGap then "pvtSubtotal level#{rowKey.length}" else "pvtData"
-            tr.onclick = expandRow rowKeys
             for own j, txt of rowKey
                 continue if compactLayout and j < rowKey.length - 1
                 x = if compactLayout then 1 else spanSize(rowKeys, parseInt(i), parseInt(j))
                 if x != -1
                     th = document.createElement("th")
                     th.className = "pvtRowLabel"
+                    th.className += " row#{if pivotData.rowGroupBefore then +i else +i+x-1}"
                     th.textContent = txt
                     th.setAttribute("rowspan", x)
                     if compactLayout
                         th.colSpan = rowAttrs.length
                         th.style.paddingLeft = 5 + parseInt(j) * 20 + 'px'
+                    if j < rowAttrs.length - 1
+                        th.className += " open"
+                        th.onclick = rowsExpandHandler
                     tr.appendChild th
 
             if !compactLayout and rowGap
                 th = document.createElement("th")
                 th.colSpan = rowGap
+                th.textContent = "Total (#{rowKey[j]})"
                 tr.appendChild th
 
             if colAttrs.length
