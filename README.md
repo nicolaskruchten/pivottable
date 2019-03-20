@@ -1,5 +1,42 @@
 [![npm](https://pivottable.js.org/images/npm.svg)](https://www.npmjs.com/package/pivottable) [![cdnjs](https://pivottable.js.org/images/cdnjs.svg)](https://cdnjs.com/libraries/pivottable) [![tests](https://pivottable.js.org/images/tests.svg)](https://pivottable.js.org/tests/) [![license](https://pivottable.js.org/images/license.svg)](https://github.com/nicolaskruchten/pivottable/blob/master/LICENSE.md)
 
+# PivotTable-Grouping.js
+
+This fork of [PivotTable.js](https://pivottable.js.org/) adds the data grouping capablity, similar to [Subtotal.js](http://nagarajanchinnasamy.com/subtotal/) but made directly in the PivotTable code with the intention of the minimal changes possible. What's more, it introduces `compactLayout` feature to the default `pivotTableRenderer` that arranges the row headers in condensed way.
+
+To enable the `grouping` feature with the default options use:
+
+```javascript
+$("#output").pivot(data, {
+    grouping: true,
+});
+```
+
+To control the behaviour set `grouping` as an object:
+
+```javascript
+$("#output").pivot(data, {
+    grouping: {
+        rowGroupBefore: true,     // this is the default value, row grouping above the child rows
+        colGroupBefore: false,    // this is the default value, col grouping after the child cols
+    }
+});
+```
+
+By default the `compactLayout` is set when `grouping` is enabled. To switch it off:
+
+```javascript
+$("#output").pivot(data, {
+    grouping: true,
+    renderingOptions: {
+        table: {
+            compactLayout: false,
+        }
+    }
+});
+```
+Example page is extended with two samples of default usage of grouping capability (marked with the star).
+
 
 # PivotTable.js
 

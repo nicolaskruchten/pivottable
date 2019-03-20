@@ -8,7 +8,6 @@
 
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
-        <link rel="stylesheet" type="text/css" href="../dist/icons.css">
         <script type="text/javascript" src="../dist/pivot.js"></script>
 
         <style>
@@ -33,9 +32,9 @@
                 derivedAttributes: {
                     "Age Bin": derivers.bin("Age", 20),
                 },
-                cols: ['Gender', 'Age Bin',],
+                cols: ['Gender', 'Age Bin' ],
                 rows: ['Party', 'Province', ],
-                grouping: false,
+                grouping: true,
                 colGroupBefore: false,
                 dataClass: $.pivotUtilities.GroupingPivotData,
                 rendererOptions: {
