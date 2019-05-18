@@ -45,6 +45,8 @@
         tooMany: "(listelemek için fazla)",
         filterResults: "Sonuçları filtrele",
         totals: "Toplam",
+        apply: "Uygula",
+        cancel: "Kapat",
         vs: "vs",
         by: "ile"
       },
@@ -55,8 +57,8 @@
         "Toplam": tpl.sum(frFmt),
         "Toplam (tam sayı)": tpl.sum(frFmtInt),
         "Ortalama": tpl.average(frFmt),
-        "Min": tpl.min(frFmt),
-        "Maks": tpl.max(frFmt),
+        "En az": tpl.min(frFmt),
+        "En çok": tpl.max(frFmt),
         "Miktarların toplamı": tpl.sumOverSum(frFmt),
         "%80 daha yüksek": tpl.sumOverSumBound80(true, frFmt),
         "%80 daha düşük": tpl.sumOverSumBound80(false, frFmt),
@@ -70,9 +72,9 @@
       renderers: {
         "Tablo": r["Table"],
         "Tablo (Çubuklar)": r["Table Barchart"],
-        "İlgi haritası": r["Heatmap"],
-        "Satır ilgi haritası": r["Row Heatmap"],
-        "Sütun ilgi haritası": r["Col Heatmap"]
+        "Sıcaklık haritası": r["Heatmap"],
+        "Sıcaklık haritası (Satır)": r["Row Heatmap"],
+        "Sıcaklık haritası (Sütun)": r["Col Heatmap"]
       }
     };
     if (gcr) {
