@@ -57,7 +57,7 @@
         "Toplam": tpl.sum(frFmt),
         "Toplam (tam sayı)": tpl.sum(frFmtInt),
         "Ortalama": tpl.average(frFmt),
-        "Medyan": tpl.median(usFmt),
+        "Medyan": tpl.median(frFmt),
         "En az": tpl.min(frFmt),
         "En çok": tpl.max(frFmt),
         "Varyans (Örneklem)": tpl["var"](1, frFmt),
