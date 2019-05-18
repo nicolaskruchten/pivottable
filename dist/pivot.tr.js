@@ -51,14 +51,17 @@
         by: "ile"
       },
       aggregators: {
-        "Sayı": tpl.count(frFmtInt),
-        "Benzersiz değerler sayısı": tpl.countUnique(frFmtInt),
-        "Benzersiz değerler listesi": tpl.listUnique(", "),
+        "Say": tpl.count(frFmtInt),
+        "Benzersiz değerleri (say)": tpl.countUnique(frFmtInt),
+        "Benzersiz değerleri (listele)": tpl.listUnique(", "),
         "Toplam": tpl.sum(frFmt),
         "Toplam (tam sayı)": tpl.sum(frFmtInt),
         "Ortalama": tpl.average(frFmt),
+        "Medyan": tpl.median(frFmt),
         "En az": tpl.min(frFmt),
         "En çok": tpl.max(frFmt),
+        "Varyans (Örneklem)": tpl["var"](1, frFmt),
+        "Standart Sapma (Örneklem)": tpl.stdev(1, frFmt),
         "Miktarların toplamı": tpl.sumOverSum(frFmt),
         "%80 daha yüksek": tpl.sumOverSumBound80(true, frFmt),
         "%80 daha düşük": tpl.sumOverSumBound80(false, frFmt),
@@ -94,7 +97,7 @@
       $.pivotUtilities.locales.tr.c3_renderers = {
         "Çizgi Grafiği": c3r["Line Chart"],
         "Bar Grafiği": c3r["Bar Chart"],
-        "Yığılmış Çubuk Grafik ": c3r["Stacked Bar Chart"],
+        "Yığılmış Çubuk Grafik": c3r["Stacked Bar Chart"],
         "Alan Grafiği": c3r["Area Chart"]
       };
     }
