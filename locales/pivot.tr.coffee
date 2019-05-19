@@ -63,13 +63,13 @@ callWithJQuery ($) ->
       "Tablo": r["Table"]
       "Tablo (Çubuklar)": r["Table Barchart"]
       "Sıcaklık Haritası": r["Heatmap"]
-      "Sıcaklık Haritası (Satır) ": r["Row Heatmap"]
-      "Sıcaklık Haritası (Sütun) ": r["Col Heatmap"]
+      "Sıcaklık Haritası (Satır)": r["Row Heatmap"]
+      "Sıcaklık Haritası (Sütun)": r["Col Heatmap"]
   if gcr
     $.pivotUtilities.locales.tr.gchart_renderers =
       "Çizgi Grafiği": gcr["Line Chart"]
       "Bar Grafiği": gcr["Bar Chart"]
-      "Yığılmış Çubuk Grafik ": gcr["Stacked Bar Chart"]
+      "Yığılmış Çubuk Grafik": gcr["Stacked Bar Chart"]
       "Alan Grafiği": gcr["Area Chart"]
 
   if d3r
@@ -80,7 +80,7 @@ callWithJQuery ($) ->
     $.pivotUtilities.locales.tr.c3_renderers =
       "Çizgi Grafiği": c3r["Line Chart"]
       "Bar Grafiği": c3r["Bar Chart"]
-      "Yığılmış Çubuk Grafik ": c3r["Stacked Bar Chart"]
+      "Yığılmış Çubuk Grafik": c3r["Stacked Bar Chart"]
       "Alan Grafiği": c3r["Area Chart"]
 
   return $.pivotUtilities.locales.tr
