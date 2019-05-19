@@ -27,42 +27,49 @@ callWithJQuery ($) ->
       uiRenderError: "PivotTable UI sonuçlarını oluştuturken hata oluştu"
       selectAll: "Tümünü Seç"
       selectNone: "Tümünü Bırak"
-      tooMany: "(listelemek için fazla)"
+      tooMany: "(Listelemek için çok fazla)"
       filterResults: "Sonuçları filtrele"
       totals: "Toplam"
+      apply: "Uygula"
+      cancel: "Kapat"
       vs: "vs"
       by: "ile"
 
     aggregators:
-      "Sayı": tpl.count(frFmtInt)
-      "Benzersiz değerler sayısı": tpl.countUnique(frFmtInt)
-      "Benzersiz değerler listesi": tpl.listUnique(", ")
+      "Say": tpl.count(frFmtInt)
+      "Benzersiz Değerleri Say": tpl.countUnique(frFmtInt)
+      "Benzersiz Değerleri Listele": tpl.listUnique(", ")
       "Toplam": tpl.sum(frFmt)
-      "Toplam (tam sayı)": tpl.sum(frFmtInt)
+      "Toplam (Tam Sayı)": tpl.sum(frFmtInt)
       "Ortalama": tpl.average(frFmt)
-      "Min": tpl.min(frFmt)
-      "Maks": tpl.max(frFmt)
-      "Miktarların toplamı": tpl.sumOverSum(frFmt)
-      "%80 daha yüksek": tpl.sumOverSumBound80(true, frFmt)
-      "%80 daha düşük": tpl.sumOverSumBound80(false, frFmt)
-      "Toplam oranı (toplam)": tpl.fractionOf(tpl.sum(), "total", frFmtPct)
-      "Satır oranı (toplam)": tpl.fractionOf(tpl.sum(), "row", frFmtPct)
-      "Sütunun oranı (toplam)": tpl.fractionOf(tpl.sum(), "col", frFmtPct)
-      "Toplam oranı (sayı)": tpl.fractionOf(tpl.count(), "total", frFmtPct)
-      "Satır oranı (sayı)": tpl.fractionOf(tpl.count(), "row", frFmtPct)
-      "Sütunun oranı (sayı)": tpl.fractionOf(tpl.count(), "col", frFmtPct)
+      "Medyan": tpl.median(frFmt)
+      "Varyans (Örneklem)": tpl["var"](1, frFmt)
+      "Standart Sapma (Örneklem)": tpl.stdev(1, frFmt)
+      "En Az": tpl.min(frFmt)
+      "En Çok": tpl.max(frFmt)
+      "İlk": tpl.first(frFmt)
+      "Son": tpl.last(frFmt)
+      "Miktarların Toplamı": tpl.sumOverSum(frFmt)
+      "%80 Daha Yüksek": tpl.sumOverSumBound80(true, frFmt)
+      "%80 Daha Düşük": tpl.sumOverSumBound80(false, frFmt)
+      "Toplam Oranı (Toplam)": tpl.fractionOf(tpl.sum(), "total", frFmtPct)
+      "Satır Oranı (Toplam)": tpl.fractionOf(tpl.sum(), "row", frFmtPct)
+      "Sütun Oranı (Toplam)": tpl.fractionOf(tpl.sum(), "col", frFmtPct)
+      "Toplam Oranı (Say)": tpl.fractionOf(tpl.count(), "total", frFmtPct)
+      "Satır Oranı (Say)": tpl.fractionOf(tpl.count(), "row", frFmtPct)
+      "Sütun Oranı (Say)": tpl.fractionOf(tpl.count(), "col", frFmtPct)
 
     renderers:
       "Tablo": r["Table"]
       "Tablo (Çubuklar)": r["Table Barchart"]
-      "İlgi haritası": r["Heatmap"]
-      "Satır ilgi haritası": r["Row Heatmap"]
-      "Sütun ilgi haritası": r["Col Heatmap"]
+      "Sıcaklık Haritası": r["Heatmap"]
+      "Sıcaklık Haritası (Satır)": r["Row Heatmap"]
+      "Sıcaklık Haritası (Sütun)": r["Col Heatmap"]
   if gcr
     $.pivotUtilities.locales.tr.gchart_renderers =
       "Çizgi Grafiği": gcr["Line Chart"]
       "Bar Grafiği": gcr["Bar Chart"]
-      "Yığılmış Çubuk Grafik ": gcr["Stacked Bar Chart"]
+      "Yığılmış Çubuk Grafik": gcr["Stacked Bar Chart"]
       "Alan Grafiği": gcr["Area Chart"]
 
   if d3r
@@ -73,7 +80,7 @@ callWithJQuery ($) ->
     $.pivotUtilities.locales.tr.c3_renderers =
       "Çizgi Grafiği": c3r["Line Chart"]
       "Bar Grafiği": c3r["Bar Chart"]
-      "Yığılmış Çubuk Grafik ": c3r["Stacked Bar Chart"]
+      "Yığılmış Çubuk Grafik": c3r["Stacked Bar Chart"]
       "Alan Grafiği": c3r["Area Chart"]
 
   return $.pivotUtilities.locales.tr
