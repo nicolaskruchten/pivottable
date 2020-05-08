@@ -15,41 +15,49 @@ callWithJQuery ($) ->
     frFmtInt = nf(digitsAfterDecimal: 0, thousandsSep: " ", decimalSep: ",")
     frFmtPct = nf(digitsAfterDecimal: 1, scaler: 100, suffix: "%", thousandsSep: " ", decimalSep: ",")
 
-    $.pivotUtilities.locales.de = 
+    $.pivotUtilities.locales.se = 
         localeStrings:
-            renderError: "Bei der Darstellung der Pivot-Tabelle ist ein Fehler aufgetreten."
-            computeError: "Bei der Berechnung der Pivot-Tabelle ist ein Fehler aufgetreten."
-            uiRenderError: "Bei der Darstellung Oberfläche der Pivot-Tabelle ist ein Fehler aufgetreten."
-            selectAll: "Alles auswählen"
-            selectNone: "Nichts auswählen"
-            tooMany: "(zu viele für Liste)"
-            filterResults: "Ergebnisse filtern"
-            totals: "Gesamt"
-            vs: "gegen"
-            by: "pro"
+          renderError: "Ett fel uppstod när PivotTable-resultaten skulle ritas upp.",
+          computeError: "Ett fel uppstod när PivotTable-resultaten skulle beräknas.",
+          uiRenderError: "Ett fel uppstod när användargränssnittet för PivotTable skulle ritas upp.",
+          selectAll: "Välj alla",
+          selectNone: "Välj ingen",
+          tooMany: "(för många att lista)",
+          filterResults: "Filtrera värden",
+          apply: "Verkställ",
+          cancel: "Avbryt",
+          totals: "Totalt",
+          vs: "mot",
+          by: "av"
+			
 
         aggregators: 
-            "Anzahl":                       tpl.count(frFmtInt)
-            "Anzahl eindeutiger Werte":     tpl.countUnique(frFmtInt)
-            "Liste eindeutiger Werte":      tpl.listUnique(", ")
-            "Summe":                        tpl.sum(frFmt)
-            "Ganzzahlige Summe":			tpl.sum(frFmtInt)
-            "Durchschnitt":                 tpl.average(frFmt)
-            "Minimum":                      tpl.min(frFmt)
-            "Maximum":                      tpl.max(frFmt)
-            "Summe über Summe":             tpl.sumOverSum(frFmt)
-            "80% Obergrenze":               tpl.sumOverSumBound80(true, frFmt)
-            "80% Untergrenze":        		tpl.sumOverSumBound80(false, frFmt)
-            "Summe als Anteil von Gesamt":  tpl.fractionOf(tpl.sum(),   "total", frFmtPct)
-            "Summe als Anteil von Zeile":   tpl.fractionOf(tpl.sum(),   "row",   frFmtPct)
-            "Summe als Anteil von Spalte":  tpl.fractionOf(tpl.sum(),   "col",   frFmtPct)
-            "Anzahl als Anteil von Gesamt": tpl.fractionOf(tpl.count(), "total", frFmtPct)
-            "Anzahl als Anteil von Zeile":  tpl.fractionOf(tpl.count(), "row",   frFmtPct)
-            "Anzahl als Anteil von Spalte": tpl.fractionOf(tpl.count(), "col",   frFmtPct)
+            "Antal":                 			tpl.count(frFmtInt)
+            "Antal unika värden": 				tpl.countUnique(frFmtInt)
+            "Lista unika värden":				tpl.listUnique(", ")
+            "Summa":							tpl.sum(frFmt)
+            "Heltal":							tpl.sum(frFmtInt)
+            "Medelvärde":						tpl.average(frFmt)
+            "Median":							tpl.median(frFmt),
+			"Urval avvikelse":					tpl["var"](1, frFmt),
+			"Urval standardavvikelse": 		tpl.stdev(1, frFmt),
+			"Minimum":                      	tpl.min(frFmt)
+            "Maximum":                      	tpl.max(frFmt)
+		    "First": tpl.first(usFmt),
+			"Last": tpl.last(usFmt)
+            "Summa över summa":					tpl.sumOverSum(frFmt)
+            "80% övre gräns":					tpl.sumOverSumBound80(true, frFmt)
+            "80% undre gräns":					tpl.sumOverSumBound80(false, frFmt)
+            "Summa som en andel av det totala": tpl.fractionOf(tpl.sum(),   "total", frFmtPct)
+            "Summa som en del av raden": 		tpl.fractionOf(tpl.sum(),   "row",   frFmtPct)
+            "Summa som en del av kolumnen":		tpl.fractionOf(tpl.sum(),   "col",   frFmtPct)
+            "Antal som en del av det totala":	tpl.fractionOf(tpl.count(), "total", frFmtPct)
+            "Antal som en del av raden":		tpl.fractionOf(tpl.count(), "row",   frFmtPct)
+            "Antal som en del av kolumnen":		tpl.fractionOf(tpl.count(), "col",   frFmtPct)
 
         renderers:
-            "Tabelle":                      $.pivotUtilities.renderers["Table"]
-            "Tabelle mit Balkendiagramm":   $.pivotUtilities.renderers["Table Barchart"]
-            "Heatmap":                      $.pivotUtilities.renderers["Heatmap"]
-            "Heatmap pro Zeile":            $.pivotUtilities.renderers["Row Heatmap"]
-            "Heatmap pro Spalte":           $.pivotUtilities.renderers["Col Heatmap"]
+            "Tabell":                  		    $.pivotUtilities.renderers["Table"]
+            "Tabell med stapeldiagram": 		$.pivotUtilities.renderers["Table Barchart"]
+            "Värmekarta":						$.pivotUtilities.renderers["Heatmap"]
+            "Värmekarta per rad":				$.pivotUtilities.renderers["Row Heatmap"]
+            "Värmekarta per kolumn":			$.pivotUtilities.renderers["Col Heatmap"]
