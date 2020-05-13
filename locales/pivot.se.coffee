@@ -40,11 +40,11 @@ callWithJQuery ($) ->
             "Medelvärde":						tpl.average(frFmt)
             "Median":							tpl.median(frFmt),
 			"Urval avvikelse":					tpl["var"](1, frFmt),
-			"Urval standardavvikelse": 		tpl.stdev(1, frFmt),
+			"Urval standardavvikelse": 			tpl.stdev(1, frFmt),
 			"Minimum":                      	tpl.min(frFmt)
             "Maximum":                      	tpl.max(frFmt)
-		    "First": tpl.first(usFmt),
-			"Last": tpl.last(usFmt)
+		    "Första": tpl.first(usFmt),
+			"Sista": tpl.last(usFmt)
             "Summa över summa":					tpl.sumOverSum(frFmt)
             "80% övre gräns":					tpl.sumOverSumBound80(true, frFmt)
             "80% undre gräns":					tpl.sumOverSumBound80(false, frFmt)
