@@ -4,6 +4,11 @@
 
 This fork of [PivotTable.js](https://pivottable.js.org/) adds the data grouping capablity, similar to [Subtotal.js](http://nagarajanchinnasamy.com/subtotal/) but made directly in the PivotTable code with the intention of the minimal changes possible. What's more, it introduces `compactLayout` feature to the default `pivotTableRenderer` that arranges the row headers in condensed way.
 
+Left image is the default [PivotTable.js](https://pivottable.js.org/) rendering, while right images shows [PivotTable-Grouping.js](https://jjagielka.github.com/pivottable-grouping) with the default _grouping:true_ enabled.
+
+<img src="http://jjagielka.github.io/pivottable-grouping-demo/images/grouping_false.png" width="50%"> <img src="http://jjagielka.github.io/pivottable-grouping-demo/images/grouping_true.png" width="49%">
+
+
 To enable the `grouping` feature with the default options use:
 
 ```javascript
@@ -36,10 +41,6 @@ $("#output").pivot(data, {
 });
 ```
 Example page is extended with two samples of default usage of grouping capability (marked with the star).
-
-Left image is the default PivotTable.js rendering, while right images shows _grouping:true_ enabled.
-
-![image](http://jjagielka.github.io/pivottable-grouping-demo/images/grouping_false.png) ![image](http://jjagielka.github.io/pivottable-grouping-demo/images/grouping_true.png)
 
 All other PivotTable.js functionality rest unchanged. (https://github.com/nicolaskruchten/pivottable/)
 
