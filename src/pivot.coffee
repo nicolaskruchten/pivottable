@@ -12,6 +12,7 @@ callWithJQuery ($) ->
     ###
     Utilities
     ###
+    isFunction = (x) -> typeof x == 'function'
 
     addSeparators = (nStr, thousandsSep, decimalSep) ->
         nStr += ''
@@ -290,16 +291,16 @@ callWithJQuery ($) ->
 
     getSort = (sorters, attr) ->
         if sorters?
-            if $.isFunction(sorters)
+            if isFunction(sorters)
                 sort = sorters(attr)
-                return sort if $.isFunction(sort)
+                return sort if isFunction(sort)
             else if sorters[attr]?
                 return sorters[attr]
         return naturalSort
 
     filterByLength = (keys, length) -> keys.filter (x) -> x.length == length
 
-    subarrays = (array) -> array.map (d,i) => array.slice(0,i+1)  # [1,2,3] => [[1], [1,2], [1,2,3]]
+    subarrays = (array) -> array.map (d,i) -> array.slice(0,i+1)  # [1,2,3] => [[1], [1,2], [1,2,3]]
 
     ###
     Data Model class
@@ -343,10 +344,10 @@ callWithJQuery ($) ->
                     f(record)
 
             #if it's a function, have it call us back
-            if $.isFunction(input)
+            if isFunction(input)
                 input(addRecord)
-            else if $.isArray(input)
-                if $.isArray(input[0]) #array of arrays
+            else if Array.isArray(input)
+                if Array.isArray(input[0]) #array of arrays
                     for own i, compactRecord of input when i > 0
                         record = {}
                         record[k] = compactRecord[j] for own j, k of input[0]
@@ -404,11 +405,9 @@ callWithJQuery ($) ->
             rowKeys = []
             colKeys.push record[x] ? "null" for x in @colAttrs
             rowKeys.push record[x] ? "null" for x in @rowAttrs
-            colKeys = if @grouping and colKeys.length then @subarrays colKeys else [ colKeys ]
-            rowKeys = if @grouping and rowKeys.length then @subarrays rowKeys else [ rowKeys ]
-
+            colKeys = if @grouping and colKeys.length then subarrays colKeys else [ colKeys ]
+            rowKeys = if @grouping and rowKeys.length then subarrays rowKeys else [ rowKeys ]
             @allTotal.push record
-
             for j, rowKey of rowKeys
                 flatRowKey = rowKey.join(String.fromCharCode(0))
 
@@ -419,13 +418,13 @@ callWithJQuery ($) ->
                         if not @rowTotals[flatRowKey]
                             @rowKeys.push rowKey
                             @rowTotals[flatRowKey] = @aggregator(this, rowKey, [])
-                        @rowTotals[flatRowKey].push record unless @grouping and colKey.length
+                        @rowTotals[flatRowKey].push record unless @grouping and colKey.length != 1
 
                     if colKey.length != 0
                         if not @colTotals[flatColKey]
                             @colKeys.push colKey
                             @colTotals[flatColKey] = @aggregator(this, [], colKey)
-                        @colTotals[flatColKey].push record unless @grouping and rowKey.length
+                        @colTotals[flatColKey].push record unless @grouping and rowKey.length != 1
 
                     if colKey.length != 0 and rowKey.length != 0
                         if not @tree[flatRowKey]

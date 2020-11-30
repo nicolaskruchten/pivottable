@@ -1,7 +1,7 @@
 {
-  "name": "pivottable",
+  "name": "pivottable-grouping",
   "version": "2.23.0",
-  "description": "Javascript Pivot Table (aka Pivot Grid, Pivot Chart, Cross-Tab) implementation with drag'n'drop",
+  "description": "Fork of Javascript Pivot Table with grouping support.",
   "main": "dist/pivot.js",
   "files": [
     "dist"
@@ -20,14 +20,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/nicolaskruchten/pivottable.git"
+    "url": "git://github.com/jjagielka/pivottable-grouping.git"
   },
-  "author": "Nicolas Kruchten",
+  "author": "Jakub Jagielka",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nicolaskruchten/pivottable/issues"
+    "url": "https://github.com/jjagielka/pivottable-grouping/issues"
   },
-  "homepage": "https://github.com/nicolaskruchten/pivottable",
+  "homepage": "https://github.com/jjagielka/pivottable-grouping",
   "dependencies": {
     "jquery": ">=1.9.0"
   },

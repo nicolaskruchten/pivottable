@@ -20,7 +20,10 @@
     /*
     Utilities
      */
-    var PivotData, addSeparators, aggregatorTemplates, aggregators, childIndex, childKeysIndices, colGetter, dayNamesEn, derivers, expandAll, expandRowCol, expandRowsGroupAfter, expandWithSpan, getAxis, getExpandAllHandler, getExpandHandler, getHeader, getSort, levelKeysIndices, locales, mthNamesEn, naturalSort, numberFormat, parentKeysIndices, pivotTableRenderer, rd, renderers, rowGetter, rx, rz, showHide, sortAs, usFmt, usFmtInt, usFmtPct, zeroPad;
+    var PivotData, addSeparators, aggregatorTemplates, aggregators, childIndex, childKeysIndices, colGetter, dayNamesEn, derivers, expandAll, expandRowCol, expandRowsGroupAfter, expandWithSpan, filterByLength, getAxis, getExpandAllHandler, getExpandHandler, getHeader, getSort, isFunction, levelKeysIndices, locales, mthNamesEn, naturalSort, numberFormat, parentKeysIndices, pivotTableRenderer, rd, renderers, rowGetter, rx, rz, showHide, sortAs, subarrays, usFmt, usFmtInt, usFmtPct, zeroPad;
+    isFunction = function(x) {
+      return typeof x === 'function';
+    };
     addSeparators = function(nStr, thousandsSep, decimalSep) {
       var rgx, x, x1, x2;
       nStr += '';
@@ -616,9 +619,9 @@
     getSort = function(sorters, attr) {
       var sort;
       if (sorters != null) {
-        if ($.isFunction(sorters)) {
+        if (isFunction(sorters)) {
           sort = sorters(attr);
-          if ($.isFunction(sort)) {
+          if (isFunction(sort)) {
             return sort;
           }
         } else if (sorters[attr] != null) {
@@ -626,6 +629,16 @@
         }
       }
       return naturalSort;
+    };
+    filterByLength = function(keys, length) {
+      return keys.filter(function(x) {
+        return x.length === length;
+      });
+    };
+    subarrays = function(array) {
+      return array.map(function(d, i) {
+        return array.slice(0, i + 1);
+      });
     };
 
     /*
@@ -640,7 +653,6 @@
         this.getAggregator = bind(this.getAggregator, this);
         this.getRowKeys = bind(this.getRowKeys, this);
         this.getColKeys = bind(this.getColKeys, this);
-        this.filterByLength = bind(this.filterByLength, this);
         this.sortKeys = bind(this.sortKeys, this);
         this.arrSort = bind(this.arrSort, this);
         this.input = input;
@@ -689,10 +701,10 @@
             return f(record);
           };
         }
-        if ($.isFunction(input)) {
+        if (isFunction(input)) {
           return input(addRecord);
-        } else if ($.isArray(input)) {
-          if ($.isArray(input[0])) {
+        } else if (Array.isArray(input)) {
+          if (Array.isArray(input[0])) {
             results = [];
             for (i in input) {
               if (!hasProp.call(input, i)) continue;
@@ -824,12 +836,6 @@
         }
       };
 
-      PivotData.prototype.filterByLength = function(keys, length) {
-        return keys.filter(function(x) {
-          return x.length === length;
-        });
-      };
-
       PivotData.prototype.getColKeys = function(all_keys) {
         if (all_keys == null) {
           all_keys = false;
@@ -854,14 +860,6 @@
         }
       };
 
-      PivotData.prototype.subarrays = function(x) {
-        return x.map((function(_this) {
-          return function(d, i) {
-            return x.slice(0, i + 1);
-          };
-        })(this));
-      };
-
       PivotData.prototype.processRecord = function(record) {
         var colKey, colKeys, flatColKey, flatRowKey, i, j, l, len1, len2, o, ref, ref1, ref2, ref3, results, rowKey, rowKeys, x;
         colKeys = [];
@@ -876,8 +874,8 @@
           x = ref2[o];
           rowKeys.push((ref3 = record[x]) != null ? ref3 : "null");
         }
-        colKeys = this.grouping && colKeys.length ? this.subarrays(colKeys) : [colKeys];
-        rowKeys = this.grouping && rowKeys.length ? this.subarrays(rowKeys) : [rowKeys];
+        colKeys = this.grouping && colKeys.length ? subarrays(colKeys) : [colKeys];
+        rowKeys = this.grouping && rowKeys.length ? subarrays(rowKeys) : [rowKeys];
         this.allTotal.push(record);
         results = [];
         for (j in rowKeys) {
@@ -894,7 +892,7 @@
                   this.rowKeys.push(rowKey);
                   this.rowTotals[flatRowKey] = this.aggregator(this, rowKey, []);
                 }
-                if (!(this.grouping && colKey.length)) {
+                if (!(this.grouping && colKey.length !== 1)) {
                   this.rowTotals[flatRowKey].push(record);
                 }
               }
@@ -903,7 +901,7 @@
                   this.colKeys.push(colKey);
                   this.colTotals[flatColKey] = this.aggregator(this, [], colKey);
                 }
-                if (!(this.grouping && rowKey.length)) {
+                if (!(this.grouping && rowKey.length !== 1)) {
                   this.colTotals[flatColKey].push(record);
                 }
               }

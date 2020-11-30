@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Pivot Demo</title>
-        <!-- external libs from cdnjs -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 
-        <!-- PivotTable.js libs from ../dist -->
-        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
-        <script type="text/javascript" src="../dist/pivot.js"></script>
+<head>
+    <title>Pivot Demo</title>
+    <!-- external libs from cdnjs -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 
-        <style>
-            body {font-family: Verdana;}
-        </style>
+    <!-- PivotTable.js libs from ../dist -->
+    <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+    <script type="text/javascript" src="../dist/pivot.js"></script>
 
-        <!-- optional: mobile support with jqueryui-touch-punch -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <style>
+        body {
+            font-family: Verdana;
+        }
+    </style>
 
-        <!-- for examples only! script to show code to user -->
-        <script type="text/javascript" src="show_code.js"></script>
-    </head>
-    <body>
-        <script type="text/javascript">
-    // This example loads the "Canadian Parliament 2012" dataset
-    // and adds derived attributes: "Age Bin" and "Gender Imbalance".
+    <!-- optional: mobile support with jqueryui-touch-punch -->
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
 
-        $(function(){
+    <!-- for examples only! script to show code to user -->
+    <script type="text/javascript" src="show_code.js"></script>
+</head>
+
+<body>
+    <script type="text/javascript">
+        // This example loads the "Canadian Parliament 2012" dataset
+        // and adds derived attributes: "Age Bin" and "Gender Imbalance".
+
+        $(function () {
             var derivers = $.pivotUtilities.derivers;
 
             const params = {
@@ -33,7 +39,7 @@
                     "Age Bin": derivers.bin("Age", 20),
                 },
                 cols: ['Gender', 'Age Bin',],
-                rows: ['Party', 'Province', ],
+                rows: ['Party', 'Province',],
                 grouping: {
                     colGroupBefore: false, // this is defualt value
                 },
@@ -51,10 +57,11 @@
 
         });
 
-        </script>
-        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
+    </script>
+    <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
 
-        <div id="output" style="margin: 30px;"></div>
+    <div id="output" style="margin: 30px;"></div>
 
-    </body>
+</body>
+
 </html>
