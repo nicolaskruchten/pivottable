@@ -6,6 +6,9 @@ This fork of [PivotTable.js](https://pivottable.js.org/) adds the data grouping 
 
 Working demo can be found here: [PivotTable grouping demo](https://jjagielka.github.io/pivottable-grouping-demo/)
 
+| ⚠️ Note! *This is jQuery based version. Check out also other versions: [react-pivottable-grouping](https://github.com/jjagielka/react-pivottable-grouping) and [svelte-pivottable](https://github.com/jjagielka/svelte-pivottable).* |
+| --- |
+
 Left image is the default [PivotTable.js](https://pivottable.js.org/) rendering, while right images shows [PivotTable-Grouping.js](https://jjagielka.github.com/pivottable-grouping) with the default _grouping:true_ enabled.
 
 <img src="http://jjagielka.github.io/pivottable-grouping-demo/images/grouping_false.png" width="50%"> <img src="http://jjagielka.github.io/pivottable-grouping-demo/images/grouping_true.png" width="49%">
