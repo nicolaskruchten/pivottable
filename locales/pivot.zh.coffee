@@ -32,6 +32,8 @@ callWithJQuery ($) ->
             tooMany: "(因数据过多而无法列出)"
             filterResults: "输入值帮助筛选"
             totals: "合计"
+            apply: "应用",
+            cancel: "取消",
             vs: "于"
             by: "分组于"
 
