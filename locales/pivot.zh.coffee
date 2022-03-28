@@ -74,6 +74,7 @@ callWithJQuery ($) ->
             "柱形图(g)":            gcr["Bar Chart"]
             "堆栈柱形图(g)": gcr["Stacked Bar Chart"]
             "面积图(g)":       gcr["Area Chart"]
+            "散点图(g)":       gcr["Scatter Chart"]
         $.pivotUtilities.locales.zh.renderers = $.extend(
             $.pivotUtilities.locales.zh.renderers,
             $.pivotUtilities.locales.zh.gchart_renderers)
