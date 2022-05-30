@@ -455,7 +455,11 @@
           cancel: "Cancel",
           totals: "Totals",
           vs: "vs",
-          by: "by"
+          by: "by",
+          key_a_to_z: "Key A to Z",
+          key_z_to_a: "Key Z to A",
+          value_a_to_z: "Value A to Z",
+          value_z_to_a: "Value Z to A"
         }
       }
     };
@@ -794,6 +798,13 @@
                 };
               })(this));
               break;
+            case "key_z_to_a":
+              this.rowKeys.sort((function(_this) {
+                return function(a, b) {
+                  return -naturalSort(a, b);
+                };
+              })(this));
+              break;
             default:
               this.rowKeys.sort(this.arrSort(this.rowAttrs));
           }
@@ -808,6 +819,12 @@
               return this.colKeys.sort((function(_this) {
                 return function(a, b) {
                   return -naturalSort(v([], a), v([], b));
+                };
+              })(this));
+            case "key_z_to_a":
+              return this.colKeys.sort((function(_this) {
+                return function(a, b) {
+                  return -naturalSort(a, b);
                 };
               })(this));
             default:
@@ -1482,33 +1499,44 @@
         }
         ordering = {
           key_a_to_z: {
-            rowSymbol: "&varr;",
-            colSymbol: "&harr;",
-            next: "value_a_to_z"
+            rowSymbol: "&DownArrowBar;",
+            colSymbol: "&rarrb;",
+            next: "key_z_to_a",
+            title: opts.localeStrings.key_a_to_z
+          },
+          key_z_to_a: {
+            rowSymbol: "&UpArrowBar;",
+            colSymbol: "&larrb;",
+            next: "value_a_to_z",
+            title: opts.localeStrings.key_z_to_a
           },
           value_a_to_z: {
             rowSymbol: "&darr;",
             colSymbol: "&rarr;",
-            next: "value_z_to_a"
+            next: "value_z_to_a",
+            title: opts.localeStrings.value_a_to_z
           },
           value_z_to_a: {
             rowSymbol: "&uarr;",
             colSymbol: "&larr;",
-            next: "key_a_to_z"
+            next: "key_a_to_z",
+            title: opts.localeStrings.value_z_to_a
           }
         };
         rowOrderArrow = $("<a>", {
           role: "button"
-        }).addClass("pvtRowOrder").data("order", opts.rowOrder).html(ordering[opts.rowOrder].rowSymbol).bind("click", function() {
+        }).addClass("pvtRowOrder").data("order", opts.rowOrder).attr('title', ordering[opts.rowOrder].title).html(ordering[opts.rowOrder].rowSymbol).bind("click", function() {
           $(this).data("order", ordering[$(this).data("order")].next);
           $(this).html(ordering[$(this).data("order")].rowSymbol);
+          $(this).attr('title', ordering[$(this).data("order")].title);
           return refresh();
         });
         colOrderArrow = $("<a>", {
           role: "button"
-        }).addClass("pvtColOrder").data("order", opts.colOrder).html(ordering[opts.colOrder].colSymbol).bind("click", function() {
+        }).addClass("pvtColOrder").data("order", opts.colOrder).attr('title', ordering[opts.colOrder].title).html(ordering[opts.colOrder].colSymbol).bind("click", function() {
           $(this).data("order", ordering[$(this).data("order")].next);
           $(this).html(ordering[$(this).data("order")].colSymbol);
+          $(this).attr('title', ordering[$(this).data("order")].title);
           return refresh();
         });
         $("<td>").addClass('pvtVals pvtUiCell').appendTo(tr1).append(aggregator).append(rowOrderArrow).append(colOrderArrow).append($("<br>"));
