@@ -51,6 +51,7 @@ callWithJQuery ($) ->
             value: -> fn(@uniq)
             format: formatter
             numInputs: if attr? then 0 else 1
+            canUseCascadeDropdown: true
 
         sum: (formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             sum: 0
@@ -58,6 +59,7 @@ callWithJQuery ($) ->
             value: -> @sum
             format: formatter
             numInputs: if attr? then 0 else 1
+            canUseCascadeDropdown: true
 
         extremes: (mode, formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             val: null
@@ -72,6 +74,7 @@ callWithJQuery ($) ->
             value: -> @val
             format: (x) -> if isNaN(x) then x else formatter(x)
             numInputs: if attr? then 0 else 1
+            canUseCascadeDropdown: true
 
         quantile: (q, formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             vals: []
@@ -85,6 +88,7 @@ callWithJQuery ($) ->
                 return (@vals[Math.floor(i)] + @vals[Math.ceil(i)])/2.0
             format: formatter
             numInputs: if attr? then 0 else 1
+            canUseCascadeDropdown: true
 
         runningStat: (mode="mean", ddof=1, formatter=usFmt) -> ([attr]) -> (data, rowKey, colKey) ->
             n: 0.0, m: 0.0, s: 0.0
@@ -107,6 +111,7 @@ callWithJQuery ($) ->
                     when "stdev" then Math.sqrt(@s/(@n-ddof))
             format: formatter
             numInputs: if attr? then 0 else 1
+            canUseCascadeDropdown: true
 
         sumOverSum: (formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
             sumNum: 0
@@ -117,6 +122,7 @@ callWithJQuery ($) ->
             value: -> @sumNum/@sumDenom
             format: formatter
             numInputs: if num? and denom? then 0 else 2
+            canUseCascadeDropdown: true
 
         sumOverSumBound80: (upper=true, formatter=usFmt) -> ([num, denom]) -> (data, rowKey, colKey) ->
             sumNum: 0
@@ -200,6 +206,9 @@ callWithJQuery ($) ->
                 totals: "Totals" #for table renderer
                 vs: "vs" #for gchart renderer
                 by: "by" #for gchart renderer
+                selectView: "Select View"
+                selectFirstLevelDropdown: "Select Category"
+                selectSecondLevelDropdown: "Select Field"
 
     #dateFormat deriver l10n requires month and day names to be passed in directly
     mthNamesEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -676,6 +685,8 @@ callWithJQuery ($) ->
             showUI: true
             filter: -> true
             sorters: {}
+            cascadeDropdownFirstLevelVals: []
+            cascadeDropdownMapping: null
 
         localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         localeDefaults =
@@ -687,6 +698,31 @@ callWithJQuery ($) ->
             opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts))
         else
             opts = existingOpts
+
+        buildFirstLevelDropdown = (pvtAttrFirstLevelDropdownName, cascadeDropdownMapping) ->
+            defaultOptionVal = opts.localeStrings.selectFirstLevelDropdown
+
+            newFirstLevelDropdown = $("<select>")
+                .addClass(pvtAttrFirstLevelDropdownName)
+                .append($("<option>").val(defaultOptionVal).html(defaultOptionVal))
+
+            for firstLevelVal of cascadeDropdownMapping
+                $("<option>").val(firstLevelVal).html(firstLevelVal).appendTo(newFirstLevelDropdown)
+
+            newFirstLevelDropdown.bind "change", ->
+                resetSecondLevelDropdownOptions.call(this, cascadeDropdownMapping)
+
+            newFirstLevelDropdown
+
+        resetSecondLevelDropdownOptions = (cascadeDropdownMapping) ->
+            currentDropdown = $($(this)[0].nextElementSibling)
+            currentDropdown[0].length = 0
+            defaultOptionVal = opts.localeStrings.selectSecondLevelDropdown
+            $("<option>").val(defaultOptionVal).html(defaultOptionVal).appendTo(currentDropdown)
+            secondLevelDropdownVals = cascadeDropdownMapping[this.value]
+            return unless secondLevelDropdownVals
+            for currentDropdownVal in secondLevelDropdownVals
+                $("<option>").val(currentDropdownVal).html(currentDropdownVal).appendTo(currentDropdown)
 
         try
             # do a first pass on the data to cache a materialized copy of any
@@ -930,6 +966,7 @@ callWithJQuery ($) ->
 
             @find(".pvtUiCell").hide() unless opts.showUI
 
+            needResetSecondLevelDropdownOptions = false
             initialRender = true
 
             #set up for refreshing
@@ -943,29 +980,86 @@ callWithJQuery ($) ->
                     dataClass: opts.dataClass
 
                 numInputsToProcess = opts.aggregators[aggregator.val()]([])().numInputs ? 0
+
+                # Check if the current aggregator needs a cascading drop-down box
+                canUseCascadeDropdown = opts.aggregators[aggregator.val()]([])().canUseCascadeDropdown ? false
+                cascadeDropdownMapping = opts.cascadeDropdownMapping ? null
+
                 vals = []
+
+                # Used to store the value of the first level of the cascade dropdown,
+                # so that they can be append after a refresh
+                cascadeDropdownFirstLevelVals = []
+                pvtAttrFirstLevelDropdownName = 'pvtAttrFirstLevelDropdown'
+                pvtAttrBreakName = 'pvtAttrBreak'
+
                 @find(".pvtRows li span.pvtAttr").each -> subopts.rows.push $(this).data("attrName")
                 @find(".pvtCols li span.pvtAttr").each -> subopts.cols.push $(this).data("attrName")
-                @find(".pvtVals select.pvtAttrDropdown").each ->
+                pvtAttrDropdowns = @find(".pvtVals select.pvtAttrDropdown")
+                pvtAttrDropdowns.each (index) ->
+                    currentDropdown = $(this)
+                    firstLevelDropdown = $(currentDropdown[0].previousElementSibling)
+                    breakDom = $(currentDropdown[0].nextElementSibling)
                     if numInputsToProcess == 0
-                        $(this).remove()
+                        firstLevelDropdown.remove() if firstLevelDropdown.hasClass(pvtAttrFirstLevelDropdownName)
+                        breakDom.remove() if breakDom.hasClass(pvtAttrBreakName)
+                        currentDropdown.remove()
                     else
                         numInputsToProcess--
-                        vals.push $(this).val() if $(this).val() != ""
+                        vals.push currentDropdown.val() if currentDropdown.val() != ""
+
+                        cascadeDropdownFirstLevelVal = firstLevelDropdown.val()
+                        firstLevelDropdown.remove() if firstLevelDropdown.hasClass(pvtAttrFirstLevelDropdownName)
+                        if canUseCascadeDropdown and cascadeDropdownMapping
+                            newFirstLevelDropdown = buildFirstLevelDropdown(pvtAttrFirstLevelDropdownName, cascadeDropdownMapping)
+
+                            if firstLevelDropdown.hasClass(pvtAttrFirstLevelDropdownName)
+                                newFirstLevelDropdown.val(cascadeDropdownFirstLevelVal || opts.localeStrings.selectFirstLevelDropdown)
+
+                            currentDropdown.before(newFirstLevelDropdown)
+                            currentDropdown.after($("<br class='#{pvtAttrBreakName}'>")) unless breakDom.hasClass(pvtAttrBreakName)
+
+                            if needResetSecondLevelDropdownOptions
+                                resetSecondLevelDropdownOptions.call(newFirstLevelDropdown, cascadeDropdownMapping)
+                                isAllSecondLevelDropdownOptionsResetted = index == pvtAttrDropdowns.length - 1
+                                needResetSecondLevelDropdownOptions = false if isAllSecondLevelDropdownOptionsResetted
+
+                            cascadeDropdownFirstLevelVals.push newFirstLevelDropdown.val() if newFirstLevelDropdown.val() != ""
+                        else
+                            breakDom.remove() if breakDom.hasClass(pvtAttrBreakName)
+                            needResetSecondLevelDropdownOptions = true
+                            return if currentDropdown.length > 1
+                            for attr in shownInAggregators
+                              currentDropdown.append($("<option>").val(attr).text(attr))
 
                 if numInputsToProcess != 0
                     pvtVals = @find(".pvtVals")
                     for x in [0...numInputsToProcess]
                         newDropdown = $("<select>")
                             .addClass('pvtAttrDropdown')
-                            .append($("<option>"))
+                            .append($("<option>#{opts.localeStrings.selectSecondLevelDropdown}</option>"))
                             .bind "change", -> refresh()
-                        for attr in shownInAggregators
-                            newDropdown.append($("<option>").val(attr).text(attr))
-                        pvtVals.append(newDropdown)
+                        if canUseCascadeDropdown and cascadeDropdownMapping
+                            needResetSecondLevelDropdownOptions = false
+                            newFirstLevelDropdown = buildFirstLevelDropdown(pvtAttrFirstLevelDropdownName, cascadeDropdownMapping)
+                            pvtVals.append(newFirstLevelDropdown).append(newDropdown).append($("<br class='#{pvtAttrBreakName}'>"))
+                        else
+                            needResetSecondLevelDropdownOptions = true
+                            for attr in shownInAggregators
+                                newDropdown.append($("<option>").val(attr).text(attr))
+                            pvtVals.append(newDropdown)
 
                 if initialRender
                     vals = opts.vals
+
+                    cascadeDropdownFirstLevelVals = opts.cascadeDropdownFirstLevelVals
+
+                    cascadeDropdownFirstLevelIndex = 0
+                    @find(".pvtVals select.#{pvtAttrFirstLevelDropdownName}").each ->
+                        $(this).val cascadeDropdownFirstLevelVals[cascadeDropdownFirstLevelIndex]
+                        $(this).trigger('change')
+                        cascadeDropdownFirstLevelIndex++
+
                     i = 0
                     @find(".pvtVals select.pvtAttrDropdown").each ->
                         $(this).val vals[i]
@@ -974,6 +1068,7 @@ callWithJQuery ($) ->
 
                 subopts.aggregatorName = aggregator.val()
                 subopts.vals = vals
+                subopts.cascadeDropdownFirstLevelVals = cascadeDropdownFirstLevelVals
                 subopts.aggregator = opts.aggregators[aggregator.val()](vals)
                 subopts.renderer = opts.renderers[renderer.val()]
                 subopts.rowOrder = rowOrderArrow.data("order")
@@ -1009,6 +1104,7 @@ callWithJQuery ($) ->
                     colOrder: subopts.colOrder
                     rowOrder: subopts.rowOrder
                     vals: vals
+                    cascadeDropdownFirstLevelVals: subopts.cascadeDropdownFirstLevelVals
                     exclusions: exclusions
                     inclusions: inclusions
                     inclusionsInfo: inclusions #duplicated for backwards-compatibility

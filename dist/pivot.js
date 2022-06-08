@@ -102,7 +102,8 @@
                 return fn(this.uniq);
               },
               format: formatter,
-              numInputs: attr != null ? 0 : 1
+              numInputs: attr != null ? 0 : 1,
+              canUseCascadeDropdown: true
             };
           };
         };
@@ -126,7 +127,8 @@
                 return this.sum;
               },
               format: formatter,
-              numInputs: attr != null ? 0 : 1
+              numInputs: attr != null ? 0 : 1,
+              canUseCascadeDropdown: true
             };
           };
         };
@@ -172,7 +174,8 @@
                   return formatter(x);
                 }
               },
-              numInputs: attr != null ? 0 : 1
+              numInputs: attr != null ? 0 : 1,
+              canUseCascadeDropdown: true
             };
           };
         };
@@ -206,7 +209,8 @@
                 return (this.vals[Math.floor(i)] + this.vals[Math.ceil(i)]) / 2.0;
               },
               format: formatter,
-              numInputs: attr != null ? 0 : 1
+              numInputs: attr != null ? 0 : 1,
+              canUseCascadeDropdown: true
             };
           };
         };
@@ -263,7 +267,8 @@
                 }
               },
               format: formatter,
-              numInputs: attr != null ? 0 : 1
+              numInputs: attr != null ? 0 : 1,
+              canUseCascadeDropdown: true
             };
           };
         };
@@ -291,7 +296,8 @@
                 return this.sumNum / this.sumDenom;
               },
               format: formatter,
-              numInputs: (num != null) && (denom != null) ? 0 : 2
+              numInputs: (num != null) && (denom != null) ? 0 : 2,
+              canUseCascadeDropdown: true
             };
           };
         };
@@ -455,7 +461,10 @@
           cancel: "Cancel",
           totals: "Totals",
           vs: "vs",
-          by: "by"
+          by: "by",
+          selectView: "Select View",
+          selectFirstLevelDropdown: "Select Category",
+          selectSecondLevelDropdown: "Select Field"
         }
       }
     };
@@ -1195,7 +1204,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrLength, attrValues, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
+      var a, aggregator, attr, attrLength, attrValues, buildFirstLevelDropdown, c, colOrderArrow, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, len3, localeDefaults, localeStrings, materializedInput, n, needResetSecondLevelDropdownOptions, o, opts, ordering, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, resetSecondLevelDropdownOptions, rowOrderArrow, shownAttributes, shownInAggregators, shownInDragDrop, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoCutoff, unusedAttrsVerticalAutoOverride, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1228,7 +1237,9 @@
         filter: function() {
           return true;
         },
-        sorters: {}
+        sorters: {},
+        cascadeDropdownFirstLevelVals: [],
+        cascadeDropdownMapping: null
       };
       localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
       localeDefaults = {
@@ -1243,6 +1254,35 @@
       } else {
         opts = existingOpts;
       }
+      buildFirstLevelDropdown = function(pvtAttrFirstLevelDropdownName, cascadeDropdownMapping) {
+        var defaultOptionVal, firstLevelVal, newFirstLevelDropdown;
+        defaultOptionVal = opts.localeStrings.selectFirstLevelDropdown;
+        newFirstLevelDropdown = $("<select>").addClass(pvtAttrFirstLevelDropdownName).append($("<option>").val(defaultOptionVal).html(defaultOptionVal));
+        for (firstLevelVal in cascadeDropdownMapping) {
+          $("<option>").val(firstLevelVal).html(firstLevelVal).appendTo(newFirstLevelDropdown);
+        }
+        newFirstLevelDropdown.bind("change", function() {
+          return resetSecondLevelDropdownOptions.call(this, cascadeDropdownMapping);
+        });
+        return newFirstLevelDropdown;
+      };
+      resetSecondLevelDropdownOptions = function(cascadeDropdownMapping) {
+        var currentDropdown, currentDropdownVal, defaultOptionVal, l, len1, results, secondLevelDropdownVals;
+        currentDropdown = $($(this)[0].nextElementSibling);
+        currentDropdown[0].length = 0;
+        defaultOptionVal = opts.localeStrings.selectSecondLevelDropdown;
+        $("<option>").val(defaultOptionVal).html(defaultOptionVal).appendTo(currentDropdown);
+        secondLevelDropdownVals = cascadeDropdownMapping[this.value];
+        if (!secondLevelDropdownVals) {
+          return;
+        }
+        results = [];
+        for (l = 0, len1 = secondLevelDropdownVals.length; l < len1; l++) {
+          currentDropdownVal = secondLevelDropdownVals[l];
+          results.push($("<option>").val(currentDropdownVal).html(currentDropdownVal).appendTo(currentDropdown));
+        }
+        return results;
+      };
       try {
         attrValues = {};
         materializedInput = [];
@@ -1542,10 +1582,11 @@
         if (!opts.showUI) {
           this.find(".pvtUiCell").hide();
         }
+        needResetSecondLevelDropdownOptions = false;
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function() {
-            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, subopts, t, u, unusedAttrsContainer, vals;
+            var canUseCascadeDropdown, cascadeDropdownFirstLevelIndex, cascadeDropdownFirstLevelVals, cascadeDropdownMapping, exclusions, inclusions, len4, newDropdown, newFirstLevelDropdown, numInputsToProcess, pivotUIOptions, pvtAttrBreakName, pvtAttrDropdowns, pvtAttrFirstLevelDropdownName, pvtVals, ref4, ref5, ref6, ref7, subopts, t, u, unusedAttrsContainer, vals;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1556,38 +1597,106 @@
               dataClass: opts.dataClass
             };
             numInputsToProcess = (ref4 = opts.aggregators[aggregator.val()]([])().numInputs) != null ? ref4 : 0;
+            canUseCascadeDropdown = (ref5 = opts.aggregators[aggregator.val()]([])().canUseCascadeDropdown) != null ? ref5 : false;
+            cascadeDropdownMapping = (ref6 = opts.cascadeDropdownMapping) != null ? ref6 : null;
             vals = [];
+            cascadeDropdownFirstLevelVals = [];
+            pvtAttrFirstLevelDropdownName = 'pvtAttrFirstLevelDropdown';
+            pvtAttrBreakName = 'pvtAttrBreak';
             _this.find(".pvtRows li span.pvtAttr").each(function() {
               return subopts.rows.push($(this).data("attrName"));
             });
             _this.find(".pvtCols li span.pvtAttr").each(function() {
               return subopts.cols.push($(this).data("attrName"));
             });
-            _this.find(".pvtVals select.pvtAttrDropdown").each(function() {
+            pvtAttrDropdowns = _this.find(".pvtVals select.pvtAttrDropdown");
+            pvtAttrDropdowns.each(function(index) {
+              var breakDom, cascadeDropdownFirstLevelVal, currentDropdown, firstLevelDropdown, isAllSecondLevelDropdownOptionsResetted, len4, newFirstLevelDropdown, results, t;
+              currentDropdown = $(this);
+              firstLevelDropdown = $(currentDropdown[0].previousElementSibling);
+              breakDom = $(currentDropdown[0].nextElementSibling);
               if (numInputsToProcess === 0) {
-                return $(this).remove();
+                if (firstLevelDropdown.hasClass(pvtAttrFirstLevelDropdownName)) {
+                  firstLevelDropdown.remove();
+                }
+                if (breakDom.hasClass(pvtAttrBreakName)) {
+                  breakDom.remove();
+                }
+                return currentDropdown.remove();
               } else {
                 numInputsToProcess--;
-                if ($(this).val() !== "") {
-                  return vals.push($(this).val());
+                if (currentDropdown.val() !== "") {
+                  vals.push(currentDropdown.val());
+                }
+                cascadeDropdownFirstLevelVal = firstLevelDropdown.val();
+                if (firstLevelDropdown.hasClass(pvtAttrFirstLevelDropdownName)) {
+                  firstLevelDropdown.remove();
+                }
+                if (canUseCascadeDropdown && cascadeDropdownMapping) {
+                  newFirstLevelDropdown = buildFirstLevelDropdown(pvtAttrFirstLevelDropdownName, cascadeDropdownMapping);
+                  if (firstLevelDropdown.hasClass(pvtAttrFirstLevelDropdownName)) {
+                    newFirstLevelDropdown.val(cascadeDropdownFirstLevelVal || opts.localeStrings.selectFirstLevelDropdown);
+                  }
+                  currentDropdown.before(newFirstLevelDropdown);
+                  if (!breakDom.hasClass(pvtAttrBreakName)) {
+                    currentDropdown.after($("<br class='" + pvtAttrBreakName + "'>"));
+                  }
+                  if (needResetSecondLevelDropdownOptions) {
+                    resetSecondLevelDropdownOptions.call(newFirstLevelDropdown, cascadeDropdownMapping);
+                    isAllSecondLevelDropdownOptionsResetted = index === pvtAttrDropdowns.length - 1;
+                    if (isAllSecondLevelDropdownOptionsResetted) {
+                      needResetSecondLevelDropdownOptions = false;
+                    }
+                  }
+                  if (newFirstLevelDropdown.val() !== "") {
+                    return cascadeDropdownFirstLevelVals.push(newFirstLevelDropdown.val());
+                  }
+                } else {
+                  if (breakDom.hasClass(pvtAttrBreakName)) {
+                    breakDom.remove();
+                  }
+                  needResetSecondLevelDropdownOptions = true;
+                  if (currentDropdown.length > 1) {
+                    return;
+                  }
+                  results = [];
+                  for (t = 0, len4 = shownInAggregators.length; t < len4; t++) {
+                    attr = shownInAggregators[t];
+                    results.push(currentDropdown.append($("<option>").val(attr).text(attr)));
+                  }
+                  return results;
                 }
               }
             });
             if (numInputsToProcess !== 0) {
               pvtVals = _this.find(".pvtVals");
-              for (x = t = 0, ref5 = numInputsToProcess; 0 <= ref5 ? t < ref5 : t > ref5; x = 0 <= ref5 ? ++t : --t) {
-                newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>")).bind("change", function() {
+              for (x = t = 0, ref7 = numInputsToProcess; 0 <= ref7 ? t < ref7 : t > ref7; x = 0 <= ref7 ? ++t : --t) {
+                newDropdown = $("<select>").addClass('pvtAttrDropdown').append($("<option>" + opts.localeStrings.selectSecondLevelDropdown + "</option>")).bind("change", function() {
                   return refresh();
                 });
-                for (u = 0, len4 = shownInAggregators.length; u < len4; u++) {
-                  attr = shownInAggregators[u];
-                  newDropdown.append($("<option>").val(attr).text(attr));
+                if (canUseCascadeDropdown && cascadeDropdownMapping) {
+                  needResetSecondLevelDropdownOptions = false;
+                  newFirstLevelDropdown = buildFirstLevelDropdown(pvtAttrFirstLevelDropdownName, cascadeDropdownMapping);
+                  pvtVals.append(newFirstLevelDropdown).append(newDropdown).append($("<br class='" + pvtAttrBreakName + "'>"));
+                } else {
+                  needResetSecondLevelDropdownOptions = true;
+                  for (u = 0, len4 = shownInAggregators.length; u < len4; u++) {
+                    attr = shownInAggregators[u];
+                    newDropdown.append($("<option>").val(attr).text(attr));
+                  }
+                  pvtVals.append(newDropdown);
                 }
-                pvtVals.append(newDropdown);
               }
             }
             if (initialRender) {
               vals = opts.vals;
+              cascadeDropdownFirstLevelVals = opts.cascadeDropdownFirstLevelVals;
+              cascadeDropdownFirstLevelIndex = 0;
+              _this.find(".pvtVals select." + pvtAttrFirstLevelDropdownName).each(function() {
+                $(this).val(cascadeDropdownFirstLevelVals[cascadeDropdownFirstLevelIndex]);
+                $(this).trigger('change');
+                return cascadeDropdownFirstLevelIndex++;
+              });
               i = 0;
               _this.find(".pvtVals select.pvtAttrDropdown").each(function() {
                 $(this).val(vals[i]);
@@ -1597,6 +1706,7 @@
             }
             subopts.aggregatorName = aggregator.val();
             subopts.vals = vals;
+            subopts.cascadeDropdownFirstLevelVals = cascadeDropdownFirstLevelVals;
             subopts.aggregator = opts.aggregators[aggregator.val()](vals);
             subopts.renderer = opts.renderers[renderer.val()];
             subopts.rowOrder = rowOrderArrow.data("order");
@@ -1624,13 +1734,13 @@
               }
             });
             subopts.filter = function(record) {
-              var excludedItems, k, ref6, ref7;
+              var excludedItems, k, ref8, ref9;
               if (!opts.filter(record)) {
                 return false;
               }
               for (k in exclusions) {
                 excludedItems = exclusions[k];
-                if (ref6 = "" + ((ref7 = record[k]) != null ? ref7 : 'null'), indexOf.call(excludedItems, ref6) >= 0) {
+                if (ref8 = "" + ((ref9 = record[k]) != null ? ref9 : 'null'), indexOf.call(excludedItems, ref8) >= 0) {
                   return false;
                 }
               }
@@ -1643,6 +1753,7 @@
               colOrder: subopts.colOrder,
               rowOrder: subopts.rowOrder,
               vals: vals,
+              cascadeDropdownFirstLevelVals: subopts.cascadeDropdownFirstLevelVals,
               exclusions: exclusions,
               inclusions: inclusions,
               inclusionsInfo: inclusions,
