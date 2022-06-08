@@ -687,6 +687,8 @@ callWithJQuery ($) ->
             sorters: {}
             cascadeDropdownFirstLevelVals: []
             cascadeDropdownMapping: null
+            views: {}
+            currentView: null
 
         localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         localeDefaults =
@@ -757,6 +759,37 @@ callWithJQuery ($) ->
             for own x of opts.renderers
                 $("<option>").val(x).html(x).appendTo(renderer)
 
+            # If there are views, build the viewer
+            if opts.views
+                viewer = $("<select style='margin: 0 10px;'>")
+                    .addClass('pvtViewer')
+                    .appendTo(rendererControl)
+
+                # Bind events for view switching when the views in the viewer are switched
+                viewer.bind "change", ->
+                    currentView = $(this).val()
+                    currentPvOptions = opts.views[currentView]
+                    copyCurrentPvOptions = if currentPvOptions then JSON.parse(JSON.stringify(currentPvOptions)) else {}
+
+                    # Unnecessary or non-persistent configurations, such as
+                    #  views, currentView, cascadeDropdownMapping, aggregators, renderers
+                    #  need to be append manually
+                    copyCurrentPvOptions['views'] = opts.views
+                    copyCurrentPvOptions['currentView'] = currentView
+                    copyCurrentPvOptions['cascadeDropdownMapping'] = opts.cascadeDropdownMapping
+                    copyCurrentPvOptions['aggregators'] = opts.aggregators
+                    copyCurrentPvOptions['renderers'] = opts.renderers
+
+                    # Drawing the currentView
+                    $("#output").pivotUI(input, copyCurrentPvOptions, true, locale)
+
+                # Append the defaultOptionVal for viewer
+                defaultOptionVal = opts.localeStrings.selectView
+                $("<option>").val(defaultOptionVal).html(defaultOptionVal).appendTo(viewer)
+
+                # Append all persistent views
+                for own viewName of opts.views
+                    $("<option>").val(viewName).html(viewName).appendTo(viewer)
 
             #axis list, including the double-click menu
             unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
@@ -1050,6 +1083,9 @@ callWithJQuery ($) ->
                             pvtVals.append(newDropdown)
 
                 if initialRender
+                    pvtViewer = @find(".pvtViewer")
+                    pvtViewer.val(opts.currentView || defaultOptionVal)
+
                     vals = opts.vals
 
                     cascadeDropdownFirstLevelVals = opts.cascadeDropdownFirstLevelVals
