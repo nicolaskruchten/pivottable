@@ -1059,7 +1059,7 @@ callWithJQuery ($) ->
             min = Math.min(values...)
             max = Math.max(values...)
             return (x) ->
-                nonRed = 255 - Math.round 255*(x-min)/(max-min)
+                nonRed = 255 - if max == min then 0 else Math.round 255*(x-min)/(max-min)
                 return "rgb(255,#{nonRed},#{nonRed})"
 
         heatmapper = (scope) =>
