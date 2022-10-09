@@ -9,7 +9,7 @@ callWithJQuery = (pivotModule) ->
 
 callWithJQuery ($, Plotly) ->
 
-    makePlotlyChart = (traceOptions = {texttemplate: "test",textposition: "inside"}, layoutOptions = {}, transpose = false) ->
+    makePlotlyChart = (traceOptions = {text: "test",textposition: "inside"}, layoutOptions = {}, transpose = false) ->
         (pivotData, opts) ->
             defaults =
                 localeStrings: {vs: "vs", by: "by"}
