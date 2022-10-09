@@ -32,7 +32,8 @@ callWithJQuery ($, Plotly) ->
             data = traceKeys.map (traceKey) ->
                 values = []
                 labels = []
-                texttemplate: "%{label}: %{value}"
+                texttemplate: "test"
+                textposition: "inside"
                 for datumKey in datumKeys
                     val = parseFloat(pivotData.getAggregator(
                         if transpose then datumKey else traceKey,
