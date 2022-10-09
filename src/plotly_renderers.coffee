@@ -9,7 +9,7 @@ callWithJQuery = (pivotModule) ->
 
 callWithJQuery ($, Plotly) ->
 
-    makePlotlyChart = (traceOptions = {}, layoutOptions = {}, transpose = false) ->
+    makePlotlyChart = (traceOptions = {texttemplate: "test",textposition: "inside"}, layoutOptions = {}, transpose = false) ->
         (pivotData, opts) ->
             defaults =
                 localeStrings: {vs: "vs", by: "by"}
@@ -32,8 +32,6 @@ callWithJQuery ($, Plotly) ->
             data = traceKeys.map (traceKey) ->
                 values = []
                 labels = []
-                texttemplate: "test"
-                textposition: "inside"
                 for datumKey in datumKeys
                     val = parseFloat(pivotData.getAggregator(
                         if transpose then datumKey else traceKey,
