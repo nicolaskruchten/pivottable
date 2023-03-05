@@ -54,12 +54,12 @@ PivotTable.js implements the [Universal Module Definition (UMD)](https://github.
 If you are loading the scripts directly (as in the [examples](https://pivottable.js.org)), you need to:
 
 1. load the dependencies:
-  1. jQuery in all cases
-  2. jQueryUI for the interactive `pivotUI()` function (see below)
-  3. D3.js, C3.js and/or Google Charts if you use [charting plugins](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
+    1. jQuery in all cases
+    2. jQueryUI for the interactive `pivotUI()` function (see below)
+    3. D3.js, C3.js and/or Google Charts if you use [charting plugins](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers)
 2. load the PivotTable.js files:
-  1. `pivot.min.js`
-  2. any [plugins](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers) you wish to use
+    1. `pivot.min.js`
+    2. any [plugins](https://github.com/nicolaskruchten/pivottable/wiki/Optional-Extra-Renderers) you wish to use
 
 The dependencies and PivotTable.js files can be loaded:
 
