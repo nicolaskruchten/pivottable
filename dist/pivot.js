@@ -358,6 +358,53 @@
             };
           };
         };
+      },
+      movingAverage: function(formatter) {
+        if (formatter == null) {
+          formatter = usFmt;
+        }
+        return function(arg) {
+          var attr;
+          attr = arg[0];
+          return function(data, rowKey, colKey) {
+            return {
+              sum: 0,
+              push: function(record) {
+                if (!isNaN(parseFloat(record[attr]))) {
+                  return this.sum += parseFloat(record[attr]);
+                }
+              },
+              value: function() {
+                var aggregator, colKeys, counter, denom, flat_col_key, flat_item, i, item, itter, j, k, len, prev_value, ref;
+                colKeys = data.getColKeys();
+                counter = 0;
+                flat_col_key = colKey.join(String.fromCharCode(0));
+                for (j = 0, len = colKeys.length; j < len; j++) {
+                  item = colKeys[j];
+                  flat_item = item.join(String.fromCharCode(0));
+                  if (flat_item === flat_col_key) {
+                    itter = counter;
+                  }
+                  counter++;
+                }
+                prev_value = 0;
+                denom = 1;
+                if (itter > 0) {
+                  for (i = k = 1, ref = itter + 1; 1 <= ref ? k < ref : k > ref; i = 1 <= ref ? ++k : --k) {
+                    aggregator = data.getAggregator(rowKey, colKeys[itter - i]);
+                    if ('sum' in aggregator) {
+                      prev_value += aggregator.sum;
+                      denom++;
+                    }
+                  }
+                }
+                return (this.sum + prev_value) / denom;
+              },
+              format: formatter,
+              numInputs: 1
+            };
+          };
+        };
       }
     };
     aggregatorTemplates.countUnique = function(f) {
@@ -417,6 +464,7 @@
         "Sum as Fraction of Total": tpl.fractionOf(tpl.sum(), "total", usFmtPct),
         "Sum as Fraction of Rows": tpl.fractionOf(tpl.sum(), "row", usFmtPct),
         "Sum as Fraction of Columns": tpl.fractionOf(tpl.sum(), "col", usFmtPct),
+        "Moving Average": tpl.movingAverage(usFmt),
         "Count as Fraction of Total": tpl.fractionOf(tpl.count(), "total", usFmtPct),
         "Count as Fraction of Rows": tpl.fractionOf(tpl.count(), "row", usFmtPct),
         "Count as Fraction of Columns": tpl.fractionOf(tpl.count(), "col", usFmtPct)
