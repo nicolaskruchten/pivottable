@@ -32,6 +32,8 @@ callWithJQuery ($) ->
             tooMany: "(因数据过多而无法列出)"
             filterResults: "输入值帮助筛选"
             totals: "合计"
+            apply: "应用"
+            cancel: "取消"
             vs: "于"
             by: "分组于"
 
@@ -72,6 +74,7 @@ callWithJQuery ($) ->
             "柱形图(g)":            gcr["Bar Chart"]
             "堆栈柱形图(g)": gcr["Stacked Bar Chart"]
             "面积图(g)":       gcr["Area Chart"]
+            "散点图(g)":       gcr["Scatter Chart"]
         $.pivotUtilities.locales.zh.renderers = $.extend(
             $.pivotUtilities.locales.zh.renderers,
             $.pivotUtilities.locales.zh.gchart_renderers)
