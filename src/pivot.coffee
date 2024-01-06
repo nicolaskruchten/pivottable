@@ -200,6 +200,10 @@ callWithJQuery ($) ->
                 totals: "Totals" #for table renderer
                 vs: "vs" #for gchart renderer
                 by: "by" #for gchart renderer
+                key_a_to_z: "Key A to Z"
+                key_z_to_a: "Key Z to A"
+                value_a_to_z: "Value A to Z"
+                value_z_to_a: "Value Z to A"
 
     #dateFormat deriver l10n requires month and day names to be passed in directly
     mthNamesEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
@@ -377,10 +381,12 @@ callWithJQuery ($) ->
                 switch @rowOrder
                     when "value_a_to_z"  then @rowKeys.sort (a,b) =>  naturalSort v(a,[]), v(b,[])
                     when "value_z_to_a" then @rowKeys.sort (a,b) => -naturalSort v(a,[]), v(b,[])
+                    when "key_z_to_a" then @rowKeys.sort (a,b) => -naturalSort a, b
                     else             @rowKeys.sort @arrSort(@rowAttrs)
                 switch @colOrder
                     when "value_a_to_z"  then @colKeys.sort (a,b) =>  naturalSort v([],a), v([],b)
                     when "value_z_to_a" then @colKeys.sort (a,b) => -naturalSort v([],a), v([],b)
+                    when "key_z_to_a" then @colKeys.sort (a,b) => -naturalSort a, b
                     else             @colKeys.sort @arrSort(@colAttrs)
 
         getColKeys: () =>
@@ -868,22 +874,25 @@ callWithJQuery ($) ->
                 aggregator.append $("<option>").val(x).html(x)
 
             ordering =
-                key_a_to_z:   {rowSymbol: "&varr;", colSymbol: "&harr;", next: "value_a_to_z"}
-                value_a_to_z: {rowSymbol: "&darr;", colSymbol: "&rarr;", next: "value_z_to_a"}
-                value_z_to_a: {rowSymbol: "&uarr;", colSymbol: "&larr;", next: "key_a_to_z"}
+                key_a_to_z:   {rowSymbol: "&DownArrowBar;", colSymbol: "&rarrb;", next: "key_z_to_a", title: opts.localeStrings.key_a_to_z}
+                key_z_to_a:   {rowSymbol: "&UpArrowBar;", colSymbol: "&larrb;", next: "value_a_to_z", title: opts.localeStrings.key_z_to_a}
+                value_a_to_z: {rowSymbol: "&darr;", colSymbol: "&rarr;", next: "value_z_to_a", title: opts.localeStrings.value_a_to_z}
+                value_z_to_a: {rowSymbol: "&uarr;", colSymbol: "&larr;", next: "key_a_to_z", title: opts.localeStrings.value_z_to_a}
 
             rowOrderArrow = $("<a>", role: "button").addClass("pvtRowOrder")
-                .data("order", opts.rowOrder).html(ordering[opts.rowOrder].rowSymbol)
+                .data("order", opts.rowOrder).attr('title', ordering[opts.rowOrder].title).html(ordering[opts.rowOrder].rowSymbol)
                 .bind "click", ->
                     $(this).data("order", ordering[$(this).data("order")].next)
                     $(this).html(ordering[$(this).data("order")].rowSymbol)
+                    $(this).attr('title', ordering[$(this).data("order")].title)
                     refresh()
 
             colOrderArrow = $("<a>", role: "button").addClass("pvtColOrder")
-                .data("order", opts.colOrder).html(ordering[opts.colOrder].colSymbol)
+                .data("order", opts.colOrder).attr('title', ordering[opts.colOrder].title).html(ordering[opts.colOrder].colSymbol)
                 .bind "click", ->
                     $(this).data("order", ordering[$(this).data("order")].next)
                     $(this).html(ordering[$(this).data("order")].colSymbol)
+                    $(this).attr('title', ordering[$(this).data("order")].title)
                     refresh()
 
             $("<td>").addClass('pvtVals pvtUiCell')
