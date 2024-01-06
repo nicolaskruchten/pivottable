@@ -1,6 +1,5 @@
 .pvtUi { color: #333; }
 
-
 table.pvtTable {
     font-size: 8pt;
     text-align: left;
@@ -112,3 +111,146 @@ table.pvtTable tbody tr td {
 .pvtCheckContainer p{ margin: 5px; }
 
 .pvtRendererArea { padding: 5px;}
+
+.pvtUI2
+{
+	display: grid;
+	grid-template-columns: [rowGroups] auto [reportArea] auto [nargin ] 1fr [end];
+	grid-template-rows: 34px 34px auto;
+}
+
+.pvtUI2 > div:first-child
+{
+	grid-column: 1;
+	grid-row: 1;
+	margin-top: 4px;
+	
+}
+.pvtUI2 > div:nth-child(2)
+{
+	grid-column: 2;
+	grid-row: 1;
+	margin-top: 4px;	
+}
+.pvtUI2 > div:nth-child(3)
+{
+	grid-column: 1;
+	grid-row: 2;
+	margin-top: 4px;
+}
+.pvtUI2 > div:nth-child(4)
+{
+	grid-column: 2;
+	grid-row: 2;
+	margin-top: 4px;
+}
+.pvtUI2 > div:nth-child(5) 
+{
+	grid-column: 1;
+	grid-row: 5;
+	margin-top: 4px;
+}
+.pvtUI2 > div:nth-child(6) 
+{
+	grid-column: 2;
+	grid-row: 5;
+	margin-top: 4px;
+}
+
+.pvtUI2 > .pvtVals
+{
+	text-align: left;
+}
+
+.pvtUI2 > div:first-child 
+{
+	margin-top: 8px;
+}
+
+.pvtUI2 > .pvtRendererArea 
+{
+	overflow: auto;
+}
+
+@media handheld, only screen and (max-width: 800px) 
+{
+	.pvtUIResponsive
+	{
+		display: grid;
+		grid-template-columns: auto [margin ] 1fr [end];
+	}
+	
+	.pvtUIResponsive > div:first-child,
+	.pvtUIResponsive > .pvtUnused,
+	.pvtUIResponsive > .pvtVals,
+	.pvtUIResponsive > .pvtCols,
+	.pvtUIResponsive > .pvtRows,
+	.pvtUIResponsive > .pvtRendererArea 
+	{
+		grid-column: 1;
+		margin-top: 4px;
+	}
+
+}
+
+@media only screen and (min-width: 801px) 
+{
+	.pvtUIResponsive
+	{
+		display: grid;
+		grid-template-columns: [left] auto [reportArea] auto [margin ] 1fr [end];
+		grid-template-rows: [rendererControl] 34px [columnGroups] 34px [reportArea] auto [end];
+	}
+
+	.pvtUIResponsive > div:first-child
+	{
+		grid-column: 1;
+		grid-row: 1;
+		margin-top: 4px;	
+	}
+
+	.pvtUIResponsive > .pvtUnused 
+	{
+		grid-column: 2;
+		grid-row: 1;
+		margin-top: 4px;	
+	}
+
+	.pvtUIResponsive > .pvtVals
+	{
+		grid-column: 1;
+		grid-row: 2;
+		margin-top: 4px;
+	}
+
+	.pvtUIResponsive > .pvtCols
+	{
+		grid-column: 2;
+		grid-row: 2;
+		margin-top: 4px;
+	}
+
+	.pvtUIResponsive > .pvtRows 
+	{
+		grid-column: 1;
+		grid-row: 5;
+		margin-top: 4px;
+	}
+
+	.pvtUIResponsive > .pvtRendererArea 
+	{
+		grid-column: 2;
+		grid-row: 5;
+		margin-top: 4px;
+	}
+
+}
+
+.pvtUIResponsive .pvtVals
+{
+	text-align: left;
+}
+
+.pvtUIResponsive .pvtRendererArea {
+	overflow: auto;
+}
