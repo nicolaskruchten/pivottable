@@ -112,3 +112,20 @@ table.pvtTable tbody tr td {
 .pvtCheckContainer p{ margin: 5px; }
 
 .pvtRendererArea { padding: 5px;}
+
+.pvtTable thead {
+    position: -webkit-sticky; /* for Safari */
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+    
+.pvtTable tbody th {
+    position: sticky;
+    position: -webkit-sticky;
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
+    left: 0px;
+    z-index: 1;
+}
