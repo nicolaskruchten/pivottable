@@ -19,7 +19,7 @@ callWithJQuery ($) ->
         x1 = x[0]
         x2 = if x.length > 1 then  decimalSep + x[1] else ''
         rgx = /(\d+)(\d{3})/
-        x1 = x1.replace(rgx, '$1' + thousandsSep + '$2') while rgx.test(x1)
+        x1 = x1.replace(rgx, '$1' + thousandsSep + '$2') while rgx.test(x1) if thousandsSep
         return x1 + x2
 
     numberFormat = (opts) ->
